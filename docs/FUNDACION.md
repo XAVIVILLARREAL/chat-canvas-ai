@@ -49,11 +49,20 @@ Definir **antes** los eventos de streaming que emite el agente, con un esquema �
 | `message.delta` | texto parcial del agente | chat streaming |
 | `tool.started` | qué herramienta, args | log de herramientas |
 | `tool.output` | resultado | log / colapso |
-| `browser.screenshot` | base64 de captura | vista Browser |
-| `ci.status` | verde/rojo, detalle | estado del kanban/ticket |
+| `browser.screenshot` | base64 de captura | **tarjeta de evidencia en el prompt** |
+| `evidence.result` | ✅/❌ veredicto + tests | tarjeta de evidencia (antes/después) |
+| `voice.transcript` | texto transcrito (STT) | mini-hilo de voz en la ventanita |
+| `voice.response` | audio TTS + texto | reproducción 🔊 sin abrir |
 | `session.state` | en qué anda el agente | badge en la ventanita |
+| `ci.status` | verde/rojo, detalle | estado del kanban/ticket |
 
-Esto hace que el chat "ventanita" se vea profesional: cada evento con su UI dedicada, no texto crudo.
+Esto hace que el chat "ventanita" se vea profesional: cada evento con su UI dedicada, no texto crudo. **Voz y screenshots son eventos de primera clase**, no extras.
+
+## 5b. Voz (STT/TTS) y evidencia — pilares de la Etapa 1
+
+- **Voz sin abrir la ventanita:** STT (Whisper local en servidor, fallback Web Speech API) → la transcripción entra como mensaje normal; TTS (servidor local, fallback navegador) responde 🔊. El audio viaja por WebSocket. Objetivo: conversación natural <1s de latencia.
+- **Screenshot por prompt:** cada respuesta del agente adjunta evidencia (código, terminal, UI vía Chrome headless, tests) con veredicto visual ✅/❌. La evidencia queda guardada en la sesión.
+- El servidor ya tiene ollama → STT/TTS local sin mandar audio a terceros.
 
 ## 6. Persistencia
 
@@ -81,7 +90,9 @@ No empezar por "todo el canva". Empezar por **una ventanita que abre un chat que
 | Estado | Zustand + TanStack Query |
 | Canva | React Flow (xyflow) |
 | Kanban | dnd-kit |
-| Realtime | WebSocket/SSE tipado (Zod) |
+| Realtime | WebSocket/SSE tipado (Zod) — incluye eventos de **voz** y **evidencia** |
+| Voz STT | Whisper local en servidor (fallback Web Speech API) |
+| Voz TTS | TTS local en servidor (fallback navegador) |
 | Backend | **Hono + Bun + TypeScript** (ver ADR-001) |
 | API tipada | @hono/zod-openapi |
 | DB | SQLite + Drizzle (etapa 1) → Postgres (etapa 4) |

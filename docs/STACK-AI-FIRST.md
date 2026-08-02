@@ -112,6 +112,8 @@ Es el framework **correcto** para esto. Lo que aporta coincide 1:1 con los requi
 | Motor de agente | **Fork opencode (Bun)** — core+llm+server+console reutilizados | Acelera Etapa 1; UI propia encima |
 | Orquestación | **LangGraph JS** (durable, interrupts, streaming) | El núcleo de la "empresa" |
 | Streaming | Hono SSE/WS + protocolo Zod | Eventos del agente tipados |
+| **Voz (STT/TTS)** | Whisper local (servidor) + TTS local; WebSocket de audio; fallback Web Speech API | Hablar con la IA **sin abrir** la ventanita |
+| **Evidencia por prompt** | Chrome headless (MCP) + capturas + veredicto ✅/❌ | Screenshot en cada respuesta de lo que hizo y probó |
 | DB | SQLite+Drizzle → Postgres (+pgvector) | Simple → escalable + RAG |
 | Verificación | Chrome DevTools MCP + Playwright headless | Evidencia visual real |
 | Observabilidad | Langfuse o LangSmith (tracing de agentes) | Ver qué hace cada agente |

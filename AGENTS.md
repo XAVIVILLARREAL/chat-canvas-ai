@@ -46,6 +46,13 @@ Una **app web mobile-first** para dirigir una "empresa de desarrollo" de agentes
 
 Canva (React Flow, nodos: cajas/notas/flechas + **ventanitas de agente**) donde cada ventanita abre **nuestro chat de agente web** (fork opencode MIT, UI propia). Detalle en `docs/ETAPA1.md`.
 
+**Los 3 pilares de la Etapa 1 (no son opcionales):**
+1. **El canva es el mapa de sesiones** — todas las ventanitas visibles con mini-estado; cambiar de conversación = un clic, sin perder contexto.
+2. **Voz (STT/TTS) en cada ventanita** — hablar con la IA y oír su respuesta **sin abrir la conversación** (Whisper local en servidor; fallback Web Speech API).
+3. **Screenshot de evidencia en cada prompt** — la IA adjunta capturas de lo que hizo (código, terminal, UI vía Chrome headless, tests) con veredicto visual ✅/❌.
+
+Reglas técnicas de voz/evidencia: ver `docs/FUNDACION.md` §5 (protocolo de eventos) y §5b (voz + evidencia).
+
 ## Convenios
 
 - Commits en español, cortos y con contexto ("feat:", "fix:", "docs:", "chore:").
