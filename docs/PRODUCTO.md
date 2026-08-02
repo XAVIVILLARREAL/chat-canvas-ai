@@ -57,7 +57,7 @@ Cada sesión es un agente trabajando en un directorio real de tu máquina (o del
 | Kanban | react-kanban / dnd-kit | Drag & drop táctil |
 | Estado | **Zustand + TanStack Query** | Ya usado + cache/refetch |
 | Realtime | **WebSocket** | Streaming de eventos del agente |
-| Backend | **Node + TypeScript** (Express o Fastify) | Mismo idioma que frontend |
+| Backend | **Hono (Bun/Node) + TypeScript** | JS/TS nativo, ultra rápido, tipado extremo, middleware HTTP estándar, ideal para WebSocket/SSE y runtime multiplataforma (Bun, Node, Deno) |
 | Orquestación | **LangGraph (JS o Python)** | Estado, retry, human-in-the-loop |
 | UI testing | **MCP Chrome DevTools** | El agente prueba como humano |
 | DB | SQLite (local) → Postgres (multi-usuario) | Simple primero, robusto después |

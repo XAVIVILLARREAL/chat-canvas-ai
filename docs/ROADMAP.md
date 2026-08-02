@@ -59,7 +59,7 @@
 | Orquestación | **LangGraph** (agentes propios sobre el fork) | Fase 2 |
 | Kanban | dnd-kit / react-kanban | Fase 2 |
 | UI testing | **MCP Chrome DevTools** (headless servidor) | Fase 3 |
-| Backend | Node + TS (Express/Fastify) | Etapa 1 |
+| Backend | **Hono + TypeScript** en Bun (WebSocket/SSE, streaming) | Etapa 1 |
 | DB | SQLite → Postgres | Etapa 1 → 4 |
 | Realtime | WebSocket | Etapa 1 |
 | Mobile | PWA | Etapa 1 |
