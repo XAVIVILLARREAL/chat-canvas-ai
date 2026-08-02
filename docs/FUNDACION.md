@@ -73,6 +73,8 @@ No empezar por "todo el canva". Empezar por **una ventanita que abre un chat que
 
 ## Stack final (resumen)
 
+> **Validación AI-first:** este stack fue evaluado para el objetivo de empresa autónoma de generación de código en [`STACK-AI-FIRST.md`](./STACK-AI-FIRST.md) y registrado en [`ADRs/ADR-002-ai-first-stack.md`](./ADRs/ADR-002-ai-first-stack.md). Incluye 3 ajustes: reutilizar `packages/console` del fork de opencode, cola de trabajos durable (Fase 2), y observabilidad desde el día 1.
+
 | Capa | Elección |
 |---|---|
 | Frontend | React 19 + Vite + TS + Tailwind v4 + shadcn/ui |
