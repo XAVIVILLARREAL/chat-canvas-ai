@@ -31,6 +31,13 @@ Una **app web mobile-first** para dirigir una "empresa de desarrollo" de agentes
 - **DB:** SQLite (local/etapa 1) → Postgres (multi-usuario, etapa 4).
 - **Mobile:** PWA instalable.
 - **Servidor de producción:** Proxmox `pve` — el código vive en `/opt/empresa-desarrollo-autonoma`, no local.
+- **Túnel Cloudflare dedicado (configurado):**
+  - URL pública: **`https://empresa-dev.xtremediagnostics.com`**
+  - Túnel: `empresa-desarrollo-autonoma-tunnel` (id `9370425a-6ffd-48af-a73d-4bebfa7c74bf`)
+  - Origen: `http://localhost:7688` en `pve`
+  - Config en servidor: `/etc/cloudflared/empresa-config.yml` + `empresa-creds.json`
+  - Servicio: `empresa-tunnel.service` (systemd, habilitado, protocol http2)
+  - Para levantar la app: correr el servidor (Hono/Vite) en el puerto **7688** y quedará expuesto públicamente.
 
 ## Etapa 1 (lo primero)
 
