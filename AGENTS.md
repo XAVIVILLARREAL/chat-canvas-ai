@@ -9,6 +9,8 @@ Una **app web mobile-first** para dirigir una "empresa de desarrollo" de agentes
 - Primer para los desarrollos propios de @javir; después potencial producto para otros.
 - **Idea rectora:** *nuestro propio chat de agente web (fork de opencode MIT) + agentes especializados + un navegador real que verifica cada feature con capturas como evidencia.*
 - Documentación del plan en `docs/` (PLAN, PRODUCTO, ARQUITECTURA, AGENTES, VERIFICACION, PIPELINE, ROADMAP, ETAPA1). Actualízalos cuando cambie una decisión.
+- **`docs/FUNDACION.md`** = decisiones base del proyecto (monorepo, TS estricto, design system, perf budget, protocolo del agente, DB, CI, primer slice vertical). **Leer antes de codear.**
+- **`docs/ADRs/`** = decisiones de arquitectura registradas (ADR-001: Hono). Si tomas una decisión de arquitectura, crea un ADR.
 
 ## Reglas obligatorias de trabajo
 
