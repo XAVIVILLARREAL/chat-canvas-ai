@@ -5,6 +5,8 @@ export type VentanitaNodeData = {
   proyecto?: string
   status: VentanitaStatus
   ultimaEvidencia?: string | null
+  sessionId?: string | null
+  ultimaRespuesta?: string | null
 }
 
 export type ChatChunk = {

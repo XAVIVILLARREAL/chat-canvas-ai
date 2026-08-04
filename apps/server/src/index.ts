@@ -3,9 +3,11 @@ import { cors } from 'hono/cors'
 import { streamSSE } from 'hono/streaming'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { serve } from '@hono/node-server'
+import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts'
 
 const OPENCODE_URL = process.env.OPENCODE_URL ?? 'http://127.0.0.1:7699'
 const MODEL = process.env.OPENCODE_MODEL ?? 'deepseek/deepseek-chat'
+const TTS_VOICE = process.env.TTS_VOICE ?? 'es-MX-DaliaNeural'
 
 const app = new Hono()
 
@@ -84,6 +86,34 @@ app.post('/api/sessions/:id/message', (c) => {
       controller.abort()
     }
     await stream.writeSSE({ data: '[DONE]' })
+  })
+})
+
+// Text-to-Speech con Edge TTS (Microsoft Read Aloud) — voz natural en español
+app.post('/api/tts', async (c) => {
+  let text = ''
+  try {
+    const body = (await c.req.json()) as { text?: string }
+    text = body.text ?? ''
+  } catch {
+    text = ''
+  }
+  const sanitized = text.replace(/[<>&"']/g, '').slice(0, 2000)
+
+  const tts = new MsEdgeTTS()
+  await tts.setMetadata(TTS_VOICE, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3)
+  const { audioStream } = tts.toStream(sanitized || 'Hola')
+
+  const chunks: Buffer[] = []
+  for await (const chunk of audioStream as AsyncIterable<Buffer>) {
+    chunks.push(Buffer.from(chunk))
+  }
+  const audio = Buffer.concat(chunks)
+
+  return c.body(audio, 200, {
+    'Content-Type': 'audio/mpeg',
+    'Content-Length': String(audio.length),
+    'Cache-Control': 'no-cache',
   })
 })
 

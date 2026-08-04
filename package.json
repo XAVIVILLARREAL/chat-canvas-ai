@@ -18,7 +18,8 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild"
+      "esbuild",
+      "msedge-tts"
     ]
   },
   "packageManager": "pnpm@11.1.2"

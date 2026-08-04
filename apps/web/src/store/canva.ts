@@ -15,6 +15,8 @@ export type CanvaState = {
   openVentanita: (id: string) => void
   closeVentanita: () => void
   setVentanitaStatus: (id: string, status: VentanitaNodeData['status']) => void
+  setVentanitaSession: (id: string, sessionId: string) => void
+  setVentanitaReply: (id: string, text: string) => void
 }
 
 let idCounter = 0
@@ -43,6 +45,24 @@ export const useCanvaStore = create<CanvaState>()(
           nodes: get().nodes.map((n) =>
             n.id === id && n.type === 'ventanita'
               ? { ...n, data: { ...(n.data as VentanitaNodeData), status } }
+              : n,
+          ),
+        }),
+
+      setVentanitaSession: (id, sessionId) =>
+        set({
+          nodes: get().nodes.map((n) =>
+            n.id === id && n.type === 'ventanita'
+              ? { ...n, data: { ...(n.data as VentanitaNodeData), sessionId } }
+              : n,
+          ),
+        }),
+
+      setVentanitaReply: (id, text) =>
+        set({
+          nodes: get().nodes.map((n) =>
+            n.id === id && n.type === 'ventanita'
+              ? { ...n, data: { ...(n.data as VentanitaNodeData), ultimaRespuesta: text } }
               : n,
           ),
         }),

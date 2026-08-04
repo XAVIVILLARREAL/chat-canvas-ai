@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { VentanitaNodeData } from '../types'
 import { useCanvaStore } from '../store/canva'
+import { speak, startListening, stopListening, browserSpeechSupported } from '../lib/voice'
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string }
 
@@ -17,7 +18,10 @@ export default function ChatWindow() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [status, setStatus] = useState<'idle' | 'streaming' | 'error'>('idle')
+  const [listening, setListening] = useState(false)
+  const [autoSpeak, setAutoSpeak] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const canSpeak = browserSpeechSupported()
 
   // Al abrir una ventanita, crear una sesión de agente real en opencode
   useEffect(() => {
@@ -95,11 +99,42 @@ export default function ChatWindow() {
       }
       setStatus('idle')
       if (selectedId) setVentanitaStatus(selectedId, 'listo')
+      if (autoSpeak) {
+        const lastMsg = messages[messages.length - 1]
+        if (lastMsg?.role === 'assistant') void speak(lastMsg.content)
+      }
     } catch (err) {
       console.error('[chat] error:', err)
       setStatus('error')
       if (selectedId) setVentanitaStatus(selectedId, 'error')
     }
+  }
+
+  function toggleListening() {
+    if (listening) {
+      stopListening()
+      setListening(false)
+      return
+    }
+    const ok = startListening({
+      onTranscript: (finalText) => {
+        setInput(finalText)
+        void send()
+      },
+      onInterim: setInput,
+      onEnd: () => setListening(false),
+      onError: () => setListening(false),
+    })
+    if (!ok) {
+      setInput('')
+      return
+    }
+    setListening(true)
+  }
+
+  function speakMessage(content: string) {
+    if (autoSpeak) setAutoSpeak(false)
+    void speak(content)
   }
 
   if (!selectedId) return null
@@ -139,11 +174,26 @@ export default function ChatWindow() {
           {messages.map((m, i) => (
             <div
               key={i}
-              className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
-                m.role === 'user' ? 'ml-auto bg-sky-600 text-white' : 'bg-slate-800 text-slate-100'
+              className={`group flex max-w-[80%] items-end gap-2 ${
+                m.role === 'user' ? 'ml-auto' : 'mr-auto'
               }`}
             >
-              {m.content}
+              <div
+                className={`whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
+                  m.role === 'user' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-100'
+                }`}
+              >
+                {m.content}
+              </div>
+              {m.role === 'assistant' ? (
+                <button
+                  onClick={() => speakMessage(m.content)}
+                  title="Escuchar"
+                  className="mb-1 rounded-lg p-1.5 text-slate-500 opacity-0 transition hover:bg-slate-700 hover:text-white group-hover:opacity-100"
+                >
+                  🔊
+                </button>
+              ) : null}
             </div>
           ))}
           {status === 'streaming' && (
@@ -179,10 +229,27 @@ export default function ChatWindow() {
             ➜
           </button>
           <button
-            className="rounded-xl border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800"
-            title="voz (próximamente)"
+            onClick={toggleListening}
+            disabled={!canSpeak}
+            title={canSpeak ? (listening ? 'Deja de escuchar' : 'Habla con el agente') : 'Voz no soportada'}
+            className={`rounded-xl border px-3 py-2 text-sm transition ${
+              listening
+                ? 'animate-pulse border-rose-500 bg-rose-500/20 text-rose-300'
+                : 'border-slate-700 text-slate-300 hover:bg-slate-800'
+            } disabled:opacity-40`}
           >
-            🎤
+            {listening ? '⏺' : '🎤'}
+          </button>
+          <button
+            onClick={() => setAutoSpeak((v) => !v)}
+            title={autoSpeak ? 'Respuestas por voz: activado' : 'Respuestas por voz: desactivado'}
+            className={`rounded-xl border px-3 py-2 text-sm transition ${
+              autoSpeak
+                ? 'border-emerald-600/60 bg-emerald-600/10 text-emerald-300'
+                : 'border-slate-700 text-slate-400 hover:bg-slate-800'
+            }`}
+          >
+            {autoSpeak ? '🔊' : '🔇'}
           </button>
         </div>
       </div>
