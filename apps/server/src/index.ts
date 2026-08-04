@@ -4,10 +4,15 @@ import { streamSSE } from 'hono/streaming'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { serve } from '@hono/node-server'
 import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts'
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 const OPENCODE_URL = process.env.OPENCODE_URL ?? 'http://127.0.0.1:7699'
-const MODEL = process.env.OPENCODE_MODEL ?? 'deepseek/deepseek-chat'
+const MODEL = process.env.OPENCODE_MODEL ?? 'deepseek/deepseek-v4-flash'
 const TTS_VOICE = process.env.TTS_VOICE ?? 'es-MX-DaliaNeural'
+const EVIDENCE_DIR = process.env.EVIDENCE_DIR ?? '/opt/empresa-desarrollo-autonoma/data/evidence'
+
+mkdirSync(EVIDENCE_DIR, { recursive: true })
 
 const app = new Hono()
 
@@ -26,7 +31,34 @@ app.post('/api/sessions', async (c) => {
   return c.json({ id: data.id })
 })
 
-// Enviar un mensaje al agente y transmitir la respuesta en streaming (SSE)
+// Servir evidencias (screenshots) guardadas
+app.get('/api/evidence/:file', (c) => {
+  const file = c.req.param('file')
+  // solo nombres seguros
+  if (!/^[a-zA-Z0-9._-]+$/.test(file)) return c.text('invalid', 400)
+  const p = join(EVIDENCE_DIR, file)
+  const buf = readFileSafe(p)
+  if (!buf) return c.text('not found', 404)
+  const type = file.endsWith('.png') ? 'image/png' : 'image/jpeg'
+  const body = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength)
+  return new Response(body, {
+    status: 200,
+    headers: { 'Content-Type': type, 'Cache-Control': 'public, max-age=31536000, immutable' },
+  })
+})
+
+function readFileSafe(p: string): Buffer | null {
+  try {
+    const { readFileSync } = require('node:fs') as typeof import('node:fs')
+    return readFileSync(p)
+  } catch {
+    return null
+  }
+}
+
+// Enviar un mensaje al agente y transmitir la respuesta en streaming (SSE).
+// Flujo correcto de opencode: POST /session/{id}/message dispara el turno;
+// GET /event entrega los eventos en vivo (text, tool, screenshots, idle).
 app.post('/api/sessions/:id/message', (c) => {
   const sessionId = c.req.param('id')
   return streamSSE(c, async (stream) => {
@@ -39,51 +71,122 @@ app.post('/api/sessions/:id/message', (c) => {
     }
     const text = body?.message ?? 'hola'
 
-    const controller = new AbortController()
-    const upstream = await fetch(`${OPENCODE_URL}/session/${sessionId}/message`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        providerID: 'deepseek',
-        modelID: MODEL,
-        parts: [{ type: 'text', text }],
-      }),
-      signal: controller.signal,
+    // 1. Abrir el stream de eventos de opencode ANTES de disparar el mensaje
+    const eventRes = await fetch(`${OPENCODE_URL}/event`, {
+      headers: { Accept: 'text/event-stream' },
     })
-
-    if (!upstream.ok || !upstream.body) {
-      await stream.writeSSE({ data: JSON.stringify({ error: `upstream ${upstream.status}` }) })
+    if (!eventRes.ok || !eventRes.body) {
+      await stream.writeSSE({ data: JSON.stringify({ error: 'no event stream' }) })
       await stream.writeSSE({ data: '[DONE]' })
       return
     }
 
-    // Leer el stream NDJSON del agente y reenviarlo
-    const reader = upstream.body.getReader()
-    const decoder = new TextDecoder()
-    let buffer = ''
-    try {
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
-        buffer = lines.pop() ?? ''
-        for (const line of lines) {
-          const trimmed = line.trim()
-          if (!trimmed) continue
-          try {
-            const event = JSON.parse(trimmed) as { type?: string; text?: string }
-            if (event.type === 'text' && event.text) {
-              await stream.writeSSE({ data: JSON.stringify({ content: event.text }) })
-            }
-          } catch {
-            // línea no JSON: ignorar
-          }
+    const evReader = eventRes.body.getReader()
+    const evDecoder = new TextDecoder()
+    let evBuffer = ''
+
+    const handleEvent = async (event: Record<string, unknown>) => {
+      const type = event.type as string
+      const props = (event.properties as Record<string, unknown>) ?? {}
+      const sid = props.sessionID as string | undefined
+      if (sid && sid !== sessionId) return
+      const part = props.part as
+        | { type?: string; text?: string; tool?: string; state?: { output?: unknown } }
+        | undefined
+
+      if (type === 'message.part.delta' && part?.type === 'text' && part.text) {
+        await stream.writeSSE({ data: JSON.stringify({ type: 'text', content: part.text }) })
+      }
+
+      if (type === 'message.part.updated' && part?.type === 'tool') {
+        const output = part.state?.output
+        const extractions = extractImages(output)
+        for (const img of extractions) {
+          const filename = `${sessionId.slice(0, 8)}-${Date.now().toString(36)}.png`
+          writeFileSync(join(EVIDENCE_DIR, filename), Buffer.from(img.b64, 'base64'))
+          await stream.writeSSE({
+            data: JSON.stringify({ type: 'evidence', url: `/api/evidence/${filename}`, caption: part.tool }),
+          })
+        }
+        await stream.writeSSE({
+          data: JSON.stringify({ type: 'tool', tool: part.tool, output: stringifyOutput(output).slice(0, 2000) }),
+        })
+      }
+    }
+
+    // 2. Disparar el mensaje en paralelo (opencode POST espera al turno completo,
+    //    los eventos van llegando por /event mientras tanto)
+    const postPromise = fetch(`${OPENCODE_URL}/session/${sessionId}/message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ providerID: 'deepseek', modelID: MODEL, parts: [{ type: 'text', text }] }),
+    })
+
+    // 3. Consumir eventos mientras el POST del turno corre; el POST resuelve
+    //    cuando opencode termina el turno.
+    const deadline = Date.now() + 180_000
+    let upstreamError: string | null = null
+    let turnFinished = false
+    const turnResult = postPromise
+      .then((res) => {
+        if (!res.ok) upstreamError = `upstream ${res.status}`
+      })
+      .catch(() => {
+        upstreamError = 'upstream error'
+      })
+      .finally(() => {
+        turnFinished = true
+      })
+
+    // eslint-disable-next-line no-constant-condition
+    while (Date.now() < deadline) {
+      const evDonePromise = evReader.read()
+      const finishSignal = new Promise<void>((resolve) => {
+        const check = () => {
+          if (turnFinished) resolve()
+          else setTimeout(check, 50)
+        }
+        check()
+      })
+      const outcome = await Promise.race([
+        evDonePromise.then((r) => ({ kind: 'event', value: r })),
+        finishSignal.then(() => ({ kind: 'finish', value: null as never })),
+      ])
+
+      if (outcome.kind === 'event') {
+        const { done: evDone, value } = outcome.value
+        if (evDone) break
+        evBuffer += evDecoder.decode(value, { stream: true })
+      } else {
+        break
+      }
+
+      // Procesar bloques completos
+      const blocks = evBuffer.split('\n\n')
+      evBuffer = blocks.pop() ?? ''
+      for (const block of blocks) {
+        const dataLine = block.split('\n').find((l) => l.startsWith('data:'))
+        if (!dataLine) continue
+        const json = dataLine.slice(5).trim()
+        if (!json || json === '[DONE]') continue
+        try {
+          const event = JSON.parse(json) as Record<string, unknown>
+          const props = (event.properties as Record<string, unknown>) ?? {}
+          const sid = props.sessionID as string | undefined
+          if (sid && sid !== sessionId) continue
+          await handleEvent(event)
+        } catch {
+          // ignorar
         }
       }
-    } finally {
-      controller.abort()
+    }
+    try {
+      evReader.cancel()
+    } catch {
+      // ignore
+    }
+    if (upstreamError) {
+      await stream.writeSSE({ data: JSON.stringify({ error: upstreamError }) })
     }
     await stream.writeSSE({ data: '[DONE]' })
   })
@@ -129,4 +232,37 @@ export default app
 if (process.env.NODE_ENV !== 'test') {
   console.log(`[server] listening on http://localhost:${port} -> opencode ${OPENCODE_URL}`)
   serve({ fetch: app.fetch, port })
+}
+
+// Helpers
+
+function extractImages(output: unknown): { b64: string }[] {
+  const found: { b64: string }[] = []
+  const walk = (o: unknown): void => {
+    if (!o || typeof o !== 'object') return
+    if (Array.isArray(o)) {
+      o.forEach(walk)
+      return
+    }
+    const rec = o as Record<string, unknown>
+    for (const v of Object.values(rec)) {
+      if (typeof v === 'string' && v.startsWith('data:image/')) {
+        const m = /^data:image\/[a-z+]+;base64,([A-Za-z0-9+/=]+)$/.exec(v)
+        if (m && m[1]) found.push({ b64: m[1] })
+      } else {
+        walk(v)
+      }
+    }
+  }
+  walk(output)
+  return found
+}
+
+function stringifyOutput(o: unknown): string {
+  if (typeof o === 'string') return o
+  try {
+    return JSON.stringify(o)
+  } catch {
+    return String(o)
+  }
 }

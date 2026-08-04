@@ -4,6 +4,8 @@ import { useCanvaStore } from '../store/canva'
 import { speak, startListening, stopListening, browserSpeechSupported } from '../lib/voice'
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string }
+type ToolLog = { tool: string; output: string }
+type Evidence = { url: string; caption?: string | undefined }
 
 export default function ChatWindow() {
   const selectedId = useCanvaStore((s) => s.selectedVentanitaId)
@@ -16,6 +18,8 @@ export default function ChatWindow() {
 
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [tools, setTools] = useState<ToolLog[]>([])
+  const [evidence, setEvidence] = useState<Evidence[]>([])
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [status, setStatus] = useState<'idle' | 'streaming' | 'error'>('idle')
   const [listening, setListening] = useState(false)
@@ -27,6 +31,8 @@ export default function ChatWindow() {
   useEffect(() => {
     let cancelled = false
     setMessages([])
+    setTools([])
+    setEvidence([])
     setStatus('idle')
     setSessionId(null)
     if (selectedId) {
@@ -81,8 +87,15 @@ export default function ChatWindow() {
         for (const line of buffer.split('\n')) {
           if (line.startsWith('data: ') && line !== 'data: [DONE]') {
             try {
-              const chunk = JSON.parse(line.slice(6)) as { content?: string }
-              if (chunk.content) {
+              const chunk = JSON.parse(line.slice(6)) as {
+                type?: 'text' | 'tool' | 'evidence'
+                content?: string
+                tool?: string
+                output?: string
+                url?: string
+                caption?: string
+              }
+              if (chunk.type === 'text' && chunk.content) {
                 setMessages((m) => {
                   const last = m[m.length - 1]
                   if (last?.role === 'assistant') {
@@ -90,6 +103,13 @@ export default function ChatWindow() {
                   }
                   return [...m, { role: 'assistant', content: chunk.content ?? '' }]
                 })
+              } else if (chunk.type === 'tool') {
+                setTools((t) => [...t, { tool: chunk.tool ?? 'tool', output: chunk.output ?? '' }])
+              } else if (chunk.type === 'evidence') {
+                setEvidence((e) => [
+                  ...e,
+                  { url: chunk.url ?? '', caption: chunk.caption ?? undefined },
+                ])
               }
             } catch {
               // ignora líneas no JSON
@@ -196,6 +216,48 @@ export default function ChatWindow() {
               ) : null}
             </div>
           ))}
+          {tools.length > 0 ? (
+            <div className="space-y-1.5">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                Herramientas usadas
+              </div>
+              {tools.map((t, i) => (
+                <details
+                  key={i}
+                  className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-xs"
+                >
+                  <summary className="cursor-pointer text-slate-300">
+                    <span className="font-mono text-sky-400">[{t.tool}]</span>
+                  </summary>
+                  <pre className="mt-1 overflow-x-auto whitespace-pre-wrap font-mono text-[11px] text-slate-400">
+                    {t.output}
+                  </pre>
+                </details>
+              ))}
+            </div>
+          ) : null}
+
+          {evidence.length > 0 ? (
+            <div className="space-y-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                📷 Evidencia de este prompt
+              </div>
+              {evidence.map((e, i) => (
+                <div
+                  key={i}
+                  className="overflow-hidden rounded-xl border border-slate-700/70 bg-slate-900"
+                >
+                  <img src={e.url} alt={e.caption ?? 'evidencia'} className="w-full object-cover" />
+                  {e.caption ? (
+                    <div className="border-t border-slate-800 px-2 py-1 text-[11px] text-slate-400">
+                      {e.caption}
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : null}
+
           {status === 'streaming' && (
             <div className="flex items-center gap-2 text-xs text-slate-500">
               <span className="animate-pulse">●</span> agente trabajando…
