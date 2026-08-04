@@ -1,0 +1,40 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "deepseek/deepseek-chat",
+  "mcp": {
+    "chrome-devtools-mcp": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "/usr/local/bin/chrome-devtools-mcp",
+        "--isolated",
+        "--headless",
+        "--allow-unrestricted-paths",
+        "--no-usage-statistics",
+        "--no-performance-crux",
+        "--experimentalPageIdRouting",
+        "--executablePath",
+        "/root/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome",
+        "--chromeArg=--no-sandbox",
+        "--chromeArg=--disable-dev-shm-usage"
+      ]
+    },
+    "playwright-mcp": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "/usr/local/bin/playwright-mcp",
+        "--isolated",
+        "--headless",
+        "--no-sandbox"
+      ]
+    },
+    "codebase-memory-mcp": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "/root/.local/bin/codebase-memory-mcp"
+      ]
+    }
+  }
+}

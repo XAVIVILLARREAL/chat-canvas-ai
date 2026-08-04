@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { ChatChunk, VentanitaNodeData } from '../types'
+import type { VentanitaNodeData } from '../types'
 import { useCanvaStore } from '../store/canva'
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string }
@@ -15,12 +15,34 @@ export default function ChatWindow() {
 
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [sessionId, setSessionId] = useState<string | null>(null)
   const [status, setStatus] = useState<'idle' | 'streaming' | 'error'>('idle')
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  // Al abrir una ventanita, crear una sesión de agente real en opencode
   useEffect(() => {
+    let cancelled = false
     setMessages([])
     setStatus('idle')
+    setSessionId(null)
+    if (selectedId) {
+      setVentanitaStatus(selectedId, 'thinking')
+      fetch('/api/sessions', { method: 'POST' })
+        .then((r) => r.json())
+        .then((s) => {
+          if (!cancelled) setSessionId(s.id)
+        })
+        .catch(() => {
+          if (!cancelled) setStatus('error')
+        })
+        .finally(() => {
+          if (!cancelled && selectedId) setVentanitaStatus(selectedId, 'idle')
+        })
+    }
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId])
 
   useEffect(() => {
@@ -29,14 +51,14 @@ export default function ChatWindow() {
 
   async function send() {
     const msg = input.trim()
-    if (!msg || status === 'streaming') return
+    if (!msg || status === 'streaming' || !sessionId) return
     setInput('')
     setMessages((m) => [...m, { role: 'user', content: msg }])
     setStatus('streaming')
     if (selectedId) setVentanitaStatus(selectedId, 'thinking')
 
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch(`/api/sessions/${sessionId}/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg }),
@@ -55,14 +77,16 @@ export default function ChatWindow() {
         for (const line of buffer.split('\n')) {
           if (line.startsWith('data: ') && line !== 'data: [DONE]') {
             try {
-              const chunk = JSON.parse(line.slice(6)) as ChatChunk
-              setMessages((m) => {
-                const last = m[m.length - 1]
-                if (last?.role === 'assistant') {
-                  return [...m.slice(0, -1), { role: 'assistant', content: last.content + chunk.content }]
-                }
-                return [...m, { role: 'assistant', content: chunk.content }]
-              })
+              const chunk = JSON.parse(line.slice(6)) as { content?: string }
+              if (chunk.content) {
+                setMessages((m) => {
+                  const last = m[m.length - 1]
+                  if (last?.role === 'assistant') {
+                    return [...m.slice(0, -1), { role: 'assistant', content: (last.content ?? '') + chunk.content }]
+                  }
+                  return [...m, { role: 'assistant', content: chunk.content ?? '' }]
+                })
+              }
             } catch {
               // ignora líneas no JSON
             }
@@ -92,9 +116,9 @@ export default function ChatWindow() {
           />
           <div className="flex-1">
             <div className="text-sm font-semibold text-slate-100">{data?.titulo ?? 'Agente'}</div>
-            {data?.proyecto ? (
-              <div className="text-xs text-slate-500">{data.proyecto}</div>
-            ) : null}
+            <div className="text-xs text-slate-500">
+              {sessionId ? `sesión ${sessionId.slice(0, 8)}` : 'conectando…'} · opencode
+            </div>
           </div>
           <button
             onClick={closeVentanita}
@@ -109,16 +133,14 @@ export default function ChatWindow() {
         <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
           {messages.length === 0 && status !== 'streaming' ? (
             <div className="flex h-full items-center justify-center text-sm text-slate-500">
-              Escribe un mensaje para empezar…
+              {status === 'error' ? 'No pude conectar con el agente.' : 'Escribe un mensaje para empezar…'}
             </div>
           ) : null}
           {messages.map((m, i) => (
             <div
               key={i}
               className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
-                m.role === 'user'
-                  ? 'ml-auto bg-sky-600 text-white'
-                  : 'bg-slate-800 text-slate-100'
+                m.role === 'user' ? 'ml-auto bg-sky-600 text-white' : 'bg-slate-800 text-slate-100'
               }`}
             >
               {m.content}
@@ -126,7 +148,7 @@ export default function ChatWindow() {
           ))}
           {status === 'streaming' && (
             <div className="flex items-center gap-2 text-xs text-slate-500">
-              <span className="animate-pulse">●</span> agente escribiendo…
+              <span className="animate-pulse">●</span> agente trabajando…
             </div>
           )}
           {status === 'error' && (
@@ -146,11 +168,12 @@ export default function ChatWindow() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && void send()}
             placeholder="Mensaje al agente…"
-            className="flex-1 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none"
+            disabled={!sessionId || status === 'streaming'}
+            className="flex-1 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none disabled:opacity-50"
           />
           <button
             onClick={() => void send()}
-            disabled={!input.trim() || status === 'streaming'}
+            disabled={!input.trim() || status === 'streaming' || !sessionId}
             className="rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500 disabled:opacity-40"
           >
             ➜

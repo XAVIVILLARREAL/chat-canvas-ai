@@ -3,7 +3,9 @@ import { cors } from 'hono/cors'
 import { streamSSE } from 'hono/streaming'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { serve } from '@hono/node-server'
-import type { ChatChunk } from './types.js'
+
+const OPENCODE_URL = process.env.OPENCODE_URL ?? 'http://127.0.0.1:7699'
+const MODEL = process.env.OPENCODE_MODEL ?? 'deepseek/deepseek-chat'
 
 const app = new Hono()
 
@@ -11,12 +13,76 @@ app.use('*', cors({ origin: '*' }))
 
 app.get('/api/health', (c) => c.json({ status: 'ok', uptime: process.uptime() }))
 
-app.post('/api/chat', (c) => {
-  const id = crypto.randomUUID()
-  const reply = 'hola desde Hono'
+// Crear una sesión de agente en opencode
+app.post('/api/sessions', async (c) => {
+  const res = await fetch(`${OPENCODE_URL}/session`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  })
+  const data = (await res.json()) as { id: string }
+  return c.json({ id: data.id })
+})
+
+// Enviar un mensaje al agente y transmitir la respuesta en streaming (SSE)
+app.post('/api/sessions/:id/message', (c) => {
+  const sessionId = c.req.param('id')
   return streamSSE(c, async (stream) => {
-    const chunk: ChatChunk = { id, content: reply }
-    await stream.writeSSE({ data: JSON.stringify(chunk) })
+    let body: { message: string } | undefined
+    try {
+      const raw = await c.req.text()
+      body = JSON.parse(raw) as { message: string }
+    } catch {
+      body = { message: 'hola' }
+    }
+    const text = body?.message ?? 'hola'
+
+    const controller = new AbortController()
+    const upstream = await fetch(`${OPENCODE_URL}/session/${sessionId}/message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        providerID: 'deepseek',
+        modelID: MODEL,
+        parts: [{ type: 'text', text }],
+      }),
+      signal: controller.signal,
+    })
+
+    if (!upstream.ok || !upstream.body) {
+      await stream.writeSSE({ data: JSON.stringify({ error: `upstream ${upstream.status}` }) })
+      await stream.writeSSE({ data: '[DONE]' })
+      return
+    }
+
+    // Leer el stream NDJSON del agente y reenviarlo
+    const reader = upstream.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+    try {
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() ?? ''
+        for (const line of lines) {
+          const trimmed = line.trim()
+          if (!trimmed) continue
+          try {
+            const event = JSON.parse(trimmed) as { type?: string; text?: string }
+            if (event.type === 'text' && event.text) {
+              await stream.writeSSE({ data: JSON.stringify({ content: event.text }) })
+            }
+          } catch {
+            // línea no JSON: ignorar
+          }
+        }
+      }
+    } finally {
+      controller.abort()
+    }
     await stream.writeSSE({ data: '[DONE]' })
   })
 })
@@ -31,7 +97,6 @@ const port = Number(process.env.PORT) || 7688
 export default app
 
 if (process.env.NODE_ENV !== 'test') {
-  console.log(`[server] listening on http://localhost:${port}`)
+  console.log(`[server] listening on http://localhost:${port} -> opencode ${OPENCODE_URL}`)
   serve({ fetch: app.fetch, port })
 }
-
