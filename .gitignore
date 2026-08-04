@@ -29,3 +29,8 @@ coverage/
 
 # opencode fork cache
 .agents/
+
+# artefactos de prueba del orquestador
+saludo.txt
+nota-fase3.txt
+

@@ -4,6 +4,7 @@ import { streamSSE } from 'hono/streaming'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { serve } from '@hono/node-server'
 import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts'
+import { buildGraph, type Runner, type Ticket } from '@empresa/orchestrator'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -29,6 +30,15 @@ app.post('/api/sessions', async (c) => {
   })
   const data = (await res.json()) as { id: string }
   return c.json({ id: data.id })
+})
+
+// Estado de una sesión (para mini-estado en vivo en las ventanitas)
+app.get('/api/sessions/:id', async (c) => {
+  const sessionId = c.req.param('id')
+  const res = await fetch(`${OPENCODE_URL}/session/${sessionId}`)
+  if (!res.ok) return c.json({ error: 'not found' }, 404)
+  const data = (await res.json()) as { info?: { time?: { created?: number; updated?: number } } }
+  return c.json({ id: sessionId, updated: data.info?.time?.updated ?? null })
 })
 
 // Servir evidencias (screenshots) guardadas
@@ -190,6 +200,98 @@ app.post('/api/sessions/:id/message', (c) => {
     }
     await stream.writeSSE({ data: '[DONE]' })
   })
+})
+
+// ===== Orquestador (Fase 2: LangGraph — la empresa) =====
+const activeJobs = new Map<string, { status: string; result: unknown }>()
+
+// Runner: ejecuta prompts con opencode en un directorio (multi-directorio)
+const runner: Runner = {
+  async runPrompt(directory, prompt) {
+    const sid = await createOpencodeSession(directory)
+    const res = await fetch(`${OPENCODE_URL}/session/${sid}/message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ providerID: 'deepseek', modelID: MODEL, parts: [{ type: 'text', text: prompt }] }),
+    })
+    const data = (await res.json()) as { parts?: { type: string; text?: string }[] }
+    const texts = (data.parts ?? [])
+      .filter((p) => p.type === 'text' && p.text)
+      .map((p) => p.text)
+    return texts.join('\n') || '(sin respuesta)'
+  },
+  async runUITest(directory, url) {
+    // Fase 3: verificación con Chrome headless (Playwright) + captura como evidencia
+    try {
+      const { chromium } = await import('playwright-core')
+      const CHROME =
+        process.env.CHROME_PATH ?? '/root/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome'
+      const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ['--no-sandbox'] })
+      const page = await browser.newPage({ viewport: { width: 1280, height: 800 } })
+      const consoleErrors: string[] = []
+      page.on('console', (m) => {
+        if (m.type() === 'error') consoleErrors.push(m.text().slice(0, 200))
+      })
+      try {
+        await page.goto(url, { waitUntil: 'networkidle', timeout: 20000 })
+        await page.waitForTimeout(1000)
+      } catch (e) {
+        consoleErrors.push(`goto: ${String(e).slice(0, 200)}`)
+      }
+      const screenshotPath = join(EVIDENCE_DIR, `uitest-${Date.now().toString(36)}.png`)
+      await page.screenshot({ path: screenshotPath })
+      const title = await page.title().catch(() => '')
+      await browser.close()
+      return `UI visitada OK. Titulo: ${title}. Errores de consola: ${consoleErrors.length ? consoleErrors.join(' | ') : 'ninguno'}. Evidencia: /api/evidence/${screenshotPath.split('/').pop()}`
+    } catch (e) {
+      return `UI test fallo: ${String(e).slice(0, 300)}`
+    }
+  },
+}
+
+async function createOpencodeSession(directory?: string): Promise<string> {
+  const res = await fetch(`${OPENCODE_URL}/session`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(directory ? { directory } : {}),
+  })
+  const data = (await res.json()) as { id: string }
+  return data.id
+}
+
+app.post('/api/jobs', async (c) => {
+  const body = (await c.req.json()) as { title?: string; description?: string; directory?: string }
+  const ticket: Ticket = {
+    id: `t_${Date.now().toString(36)}`,
+    title: body.title ?? 'Ticket sin título',
+    description: body.description ?? '',
+    directory: body.directory ?? '/opt/empresa-desarrollo-autonoma',
+  }
+  const graph = buildGraph(runner)
+  const jobId = `job_${Date.now().toString(36)}`
+  activeJobs.set(jobId, { status: 'pending', result: null })
+
+  graph
+    .run(ticket)
+    .then((result) => {
+      activeJobs.set(jobId, { status: result.status, result })
+    })
+    .catch((err) => {
+      activeJobs.set(jobId, { status: 'failed', result: { error: String(err) } })
+    })
+
+  return c.json({ jobId, ticket })
+})
+
+app.get('/api/jobs/:id', (c) => {
+  const job = activeJobs.get(c.req.param('id'))
+  if (!job) return c.json({ error: 'not found' }, 404)
+  return c.json(job)
+})
+
+app.get('/api/jobs', (c) => {
+  const list = [...activeJobs.entries()].map(([id, j]) => ({ id, status: j.status }))
+  return c.json(list)
 })
 
 // Text-to-Speech con Edge TTS (Microsoft Read Aloud) — voz natural en español

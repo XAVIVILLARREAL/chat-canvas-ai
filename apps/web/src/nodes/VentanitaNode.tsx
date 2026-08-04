@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Handle, Position, type NodeProps } from '@xyflow/react'
 import type { VentanitaNodeData } from '../types'
 import { useCanvaStore } from '../store/canva'
@@ -27,6 +27,30 @@ function VentanitaNode({ id, data, selected }: NodeProps) {
   const [listening, setListening] = useState(false)
   const [voiceErr, setVoiceErr] = useState<string | null>(null)
   const canVoice = browserSpeechSupported()
+
+  // Mini-estado en vivo: si la sesión tiene actividad reciente, marcar "pensando"
+  useEffect(() => {
+    if (!d.sessionId) return
+    let cancelled = false
+    const poll = async () => {
+      try {
+        const r = await fetch(`/api/sessions/${d.sessionId}`)
+        if (!r.ok) return
+        const s = (await r.json()) as { updated?: number | null }
+        const now = Date.now()
+        const last = s.updated ?? 0
+        if (now - last < 8000 && !cancelled) setStatus(id, 'thinking')
+      } catch {
+        // ignore
+      }
+    }
+    const t = setInterval(poll, 6000)
+    return () => {
+      cancelled = true
+      clearInterval(t)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [d.sessionId, id])
 
   async function ensureSession(): Promise<string | null> {
     if (d.sessionId) return d.sessionId

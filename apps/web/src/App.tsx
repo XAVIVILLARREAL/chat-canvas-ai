@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import {
   ReactFlow,
   Background,
@@ -19,6 +19,7 @@ import CajaNode from './nodes/CajaNode'
 import VentanitaNode from './nodes/VentanitaNode'
 import Toolbar from './components/Toolbar'
 import ChatWindow from './components/ChatWindow'
+import KanbanPanel from './components/KanbanPanel'
 
 const nodeTypes: NodeTypes = {
   caja: CajaNode,
@@ -30,6 +31,7 @@ export default function App() {
   const edges = useCanvaStore((s) => s.edges)
   const setNodes = useCanvaStore((s) => s.setNodes)
   const setEdges = useCanvaStore((s) => s.setEdges)
+  const [kanbanOpen, setKanbanOpen] = useState(false)
 
   const onNodesChange = useCallback<OnNodesChange>(
     (changes: NodeChange[]) => setNodes(applyNodeChanges(changes, nodes)),
@@ -71,6 +73,14 @@ export default function App() {
 
       <Toolbar />
       <ChatWindow />
+      {kanbanOpen ? <KanbanPanel /> : null}
+      <button
+        onClick={() => setKanbanOpen((v) => !v)}
+        className="pointer-events-auto absolute bottom-4 left-4 z-20 rounded-xl border border-slate-800 bg-slate-900/95 px-3 py-2 text-sm text-slate-200 shadow-2xl backdrop-blur hover:bg-slate-800"
+        title="Tablero de la empresa"
+      >
+        📋 {kanbanOpen ? 'Cerrar' : 'Empresa'}
+      </button>
     </div>
   )
 }
