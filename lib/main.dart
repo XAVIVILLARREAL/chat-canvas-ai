@@ -2,17 +2,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'services/ssh_service.dart';
-import 'services/sftp_service.dart';
 import 'services/canva_store.dart';
+import 'services/sessions_store.dart';
 import 'models/sync_snapshot.dart';
-import 'screens/terminal_screen.dart';
-import 'screens/sftp_screen.dart';
 import 'screens/canva_screen.dart';
+import 'screens/tabs_screen.dart';
 import 'screens/hub_screen.dart';
 
 void main() {
   runApp(const EmpresaDevApp());
 }
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class EmpresaDevApp extends StatelessWidget {
   const EmpresaDevApp({super.key});
@@ -46,6 +47,8 @@ class HostsScreen extends StatefulWidget {
 
 class _HostsScreenState extends State<HostsScreen> {
   final SshService _service = SshService();
+  final SessionsStore _sessionsStore = SessionsStore();
+  String _view = 'tabs'; // 'tabs' | 'canva'
   final List<SshHost> _hosts = [
     SshHost(
       name: 'pve',
@@ -57,6 +60,14 @@ class _HostsScreenState extends State<HostsScreen> {
       keyPem: _readLocalTestKey(),
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _sessionsStore.load().then((_) {
+      if (mounted) setState(() => _view = _sessionsStore.lastTab);
+    });
+  }
 
   // Para pruebas locales en Windows: lee la llave instalada en pve.
   // En producción se importa/genera desde la UI (Fase 1.2).
@@ -76,34 +87,6 @@ class _HostsScreenState extends State<HostsScreen> {
     if (result != null) {
       setState(() => _hosts.add(result));
     }
-  }
-
-  void _connect(SshHost host) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => TerminalScreen(host: host, service: _service),
-      ),
-    );
-  }
-
-  void _openSftp(SshHost host) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => SftpScreen(host: host, sftp: SftpService(_service)),
-      ),
-    );
-  }
-
-  void _openCanva() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => CanvaScreen(
-          hosts: _hosts,
-          sshService: _service,
-          store: CanvaStore(),
-        ),
-      ),
-    );
   }
 
   Future<SyncSnapshot> _buildSnapshot() async {
@@ -160,11 +143,6 @@ class _HostsScreenState extends State<HostsScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.account_tree, color: Colors.lightBlueAccent),
-                  onPressed: _openCanva,
-                  tooltip: 'Canva',
-                ),
-                IconButton(
                   icon: const Icon(Icons.cell_tower, color: Colors.greenAccent),
                   onPressed: _openHub,
                   tooltip: 'Hub de sync',
@@ -172,43 +150,52 @@ class _HostsScreenState extends State<HostsScreen> {
               ],
             ),
           ),
-          Expanded(
-            child: _hosts.isEmpty
-                ? const Center(child: Text('Sin hosts. Agrega uno con +', style: TextStyle(color: Colors.white54)))
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    itemCount: _hosts.length,
-                    itemBuilder: (ctx, i) {
-                      final h = _hosts[i];
-                      return Card(
-                        color: const Color(0xFF1E293B),
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundColor: Colors.lightBlueAccent,
-                            foregroundColor: Colors.black,
-                            child: Icon(Icons.dns),
-                          ),
-                          title: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                          subtitle: Text('${h.username}@${h.host}:${h.port}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.folder_open, color: Colors.amber, size: 20),
-                                onPressed: () => _openSftp(h),
-                                tooltip: 'SFTP',
-                              ),
-                              FilledButton(
-                                onPressed: () => _connect(h),
-                                style: FilledButton.styleFrom(backgroundColor: Colors.lightBlueAccent, foregroundColor: Colors.black),
-                                child: const Text('Conectar'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+          // Conmutador de vista: Tabs | Canva
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SegmentedButton<String>(
+                    segments: const [
+                      ButtonSegment(
+                        value: 'tabs',
+                        label: Text('Tabs'),
+                        icon: Icon(Icons.tab, size: 16),
+                      ),
+                      ButtonSegment(
+                        value: 'canva',
+                        label: Text('Canva'),
+                        icon: Icon(Icons.layers, size: 16),
+                      ),
+                    ],
+                    selected: {_view},
+                    onSelectionChanged: (sel) {
+                      final v = sel.first;
+                      setState(() => _view = v);
+                      _sessionsStore.setLastTab(v);
                     },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(const Color(0xFF1E293B)),
+                      foregroundColor: const WidgetStatePropertyAll(Colors.white),
+                      side: WidgetStatePropertyAll(const BorderSide(color: Color(0xFF334155))),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: _view == 'canva'
+                ? CanvaScreen(
+                    hosts: _hosts,
+                    sshService: _service,
+                    store: CanvaStore(),
+                  )
+                : TabsScreen(
+                    hosts: _hosts,
+                    sshService: _service,
+                    store: _sessionsStore,
                   ),
           ),
         ],

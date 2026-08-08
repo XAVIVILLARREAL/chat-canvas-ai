@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import '../main.dart' show navigatorKey;
 import '../services/ssh_service.dart';
 import '../services/sftp_service.dart';
 
@@ -252,5 +253,3 @@ class FilePickerHelper {
     return (path == null || path.trim().isEmpty) ? null : path.trim();
   }
 }
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

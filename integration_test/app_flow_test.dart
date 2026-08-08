@@ -8,30 +8,31 @@ import 'package:empresa_dev/main.dart' as app;
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('flujo principal: hosts, canva y hub', (tester) async {
+  testWidgets('flujo principal: tabs, canva y hub', (tester) async {
     app.main();
     await tester.pumpAndSettle();
 
-    // 1. Pantalla de hosts con pve
+    // 1. Vista Tabs: host pve + conmutador
     expect(find.text('pve'), findsOneWidget);
     expect(find.text('Empresa Dev'), findsOneWidget);
-
-    // Botones disponibles
-    expect(find.byIcon(Icons.account_tree), findsOneWidget); // canva
-    expect(find.byIcon(Icons.cell_tower), findsOneWidget); // hub
-
-    // 2. Abrir el canva
-    await tester.tap(find.byIcon(Icons.account_tree));
-    await tester.pumpAndSettle();
+    // conmutador Tabs | Canva
+    expect(find.text('Tabs'), findsOneWidget);
     expect(find.text('Canva'), findsOneWidget);
+
+    // botón hub presente (usa tooltip para ser preciso)
+    expect(find.byTooltip('Hub de sync'), findsOneWidget);
+
+    // 2. Cambiar a vista Canva
+    await tester.tap(find.text('Canva'));
+    await tester.pumpAndSettle();
     expect(find.byType(InteractiveViewer), findsOneWidget);
 
-    // volver
-    await tester.pageBack();
+    // volver a Tabs
+    await tester.tap(find.text('Tabs'));
     await tester.pumpAndSettle();
 
     // 3. Abrir el hub
-    await tester.tap(find.byIcon(Icons.cell_tower));
+    await tester.tap(find.byTooltip('Hub de sync'));
     await tester.pumpAndSettle();
     expect(find.text('Hub de sincronización'), findsOneWidget);
     expect(find.text('Ser el hub (celular)'), findsOneWidget);
