@@ -14,9 +14,11 @@ Un **reemplazo de Termius multiplataforma** hecho en **Flutter**: terminal SSH/S
 
 1. **SDD por feature — antes de implementar.** Escribe el diseño (objetivo, flujo, contratos, tests) antes de tocar código.
 2. **TDD:** primero el test que falla, después el código que lo pasa.
-3. **CI día 1:** `flutter analyze` + `flutter test` + build multiplataforma (Android + Windows al menos).
-4. **Definition of Done:** CI verde + probado en al menos 2 plataformas (Android + desktop).
-5. Máx 3 intentos por error antes de escalar al humano.
+3. **CI día 1:** `flutter analyze` + `flutter test --exclude-tags integration` + build multiplataforma.
+4. **Gate por fase:** cada fase del ROADMAP tiene su verificación (ver `docs/ROADMAP.md`). Una fase no se cierra sin pasar su gate.
+5. **Tests de integración SSH:** en `test/ssh_integration_test.dart`, tag `integration`, requieren red + llave (`test/fixtures/app_test_key`), no corren en CI.
+6. **Definition of Done:** CI verde + probado en al menos 2 plataformas (Android + desktop) + gate de la fase cumplido.
+7. Máx 3 intentos por error antes de escalar al humano.
 
 ## Decisiones de arquitectura (ADRs)
 
