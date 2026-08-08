@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'services/ssh_service.dart';
+import 'services/sftp_service.dart';
 import 'screens/terminal_screen.dart';
+import 'screens/sftp_screen.dart';
 
 void main() {
   runApp(const EmpresaDevApp());
@@ -14,6 +16,7 @@ class EmpresaDevApp extends StatelessWidget {
     return MaterialApp(
       title: 'Empresa Dev',
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       theme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
@@ -65,6 +68,14 @@ class _HostsScreenState extends State<HostsScreen> {
     );
   }
 
+  void _openSftp(SshHost host) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => SftpScreen(host: host, sftp: SftpService(_service)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,10 +117,20 @@ class _HostsScreenState extends State<HostsScreen> {
                           ),
                           title: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                           subtitle: Text('${h.username}@${h.host}:${h.port}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                          trailing: FilledButton(
-                            onPressed: () => _connect(h),
-                            style: FilledButton.styleFrom(backgroundColor: Colors.lightBlueAccent, foregroundColor: Colors.black),
-                            child: const Text('Conectar'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.folder_open, color: Colors.amber, size: 20),
+                                onPressed: () => _openSftp(h),
+                                tooltip: 'SFTP',
+                              ),
+                              FilledButton(
+                                onPressed: () => _connect(h),
+                                style: FilledButton.styleFrom(backgroundColor: Colors.lightBlueAccent, foregroundColor: Colors.black),
+                                child: const Text('Conectar'),
+                              ),
+                            ],
                           ),
                         ),
                       );
@@ -137,10 +158,12 @@ class _HostFormDialog extends StatefulWidget {
 
 class _HostFormDialogState extends State<_HostFormDialog> {
   final _name = TextEditingController(text: 'pve');
-  final _host = TextEditingController(text: '192.168.100.200');
+  final _host = TextEditingController(text: '100.101.69.79');
   final _port = TextEditingController(text: '22');
   final _user = TextEditingController(text: 'root');
   final _password = TextEditingController();
+  final _keyPem = TextEditingController();
+  bool _useKey = false;
 
   @override
   Widget build(BuildContext context) {
@@ -160,9 +183,22 @@ class _HostFormDialogState extends State<_HostFormDialog> {
               style: const TextStyle(color: Colors.white)),
             TextField(controller: _user, decoration: const InputDecoration(labelText: 'Usuario', labelStyle: TextStyle(color: Colors.white54)),
               style: const TextStyle(color: Colors.white)),
-            TextField(controller: _password, obscureText: true,
-              decoration: const InputDecoration(labelText: 'Password', labelStyle: TextStyle(color: Colors.white54)),
-              style: const TextStyle(color: Colors.white)),
+            SwitchListTile(
+              value: _useKey,
+              onChanged: (v) => setState(() => _useKey = v),
+              title: const Text('Usar llave', style: TextStyle(color: Colors.white54, fontSize: 14)),
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+            ),
+            if (_useKey)
+              TextField(controller: _keyPem,
+                maxLines: 4,
+                decoration: const InputDecoration(labelText: 'Llave privada (PEM)', labelStyle: TextStyle(color: Colors.white54), hintText: '-----BEGIN OPENSSH PRIVATE KEY-----', hintStyle: TextStyle(color: Colors.white24)),
+                style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 11))
+            else
+              TextField(controller: _password, obscureText: true,
+                decoration: const InputDecoration(labelText: 'Password', labelStyle: TextStyle(color: Colors.white54)),
+                style: const TextStyle(color: Colors.white)),
           ],
         ),
       ),
@@ -177,6 +213,8 @@ class _HostFormDialogState extends State<_HostFormDialog> {
               port: port,
               username: _user.text,
               password: _password.text,
+              authType: _useKey ? SshAuthType.key : SshAuthType.password,
+              keyPem: _useKey ? _keyPem.text : null,
             ));
           },
           style: FilledButton.styleFrom(backgroundColor: Colors.lightBlueAccent, foregroundColor: Colors.black),
