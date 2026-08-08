@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'services/ssh_service.dart';
 import 'services/sftp_service.dart';
+import 'services/canva_store.dart';
 import 'screens/terminal_screen.dart';
 import 'screens/sftp_screen.dart';
+import 'screens/canva_screen.dart';
 
 void main() {
   runApp(const EmpresaDevApp());
@@ -76,6 +78,18 @@ class _HostsScreenState extends State<HostsScreen> {
     );
   }
 
+  void _openCanva() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CanvaScreen(
+          hosts: _hosts,
+          sshService: _service,
+          store: CanvaStore(),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,16 +98,27 @@ class _HostsScreenState extends State<HostsScreen> {
           Container(
             padding: const EdgeInsets.fromLTRB(16, 32, 16, 12),
             alignment: Alignment.centerLeft,
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.terminal, color: Colors.lightBlueAccent, size: 28),
-                SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Empresa Dev', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
-                    Text('Terminal SSH · supervitaminas', style: TextStyle(fontSize: 12, color: Colors.white54)),
-                  ],
+                const Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.terminal, color: Colors.lightBlueAccent, size: 28),
+                      SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Empresa Dev', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+                          Text('Terminal SSH · supervitaminas', style: TextStyle(fontSize: 12, color: Colors.white54)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.account_tree, color: Colors.lightBlueAccent),
+                  onPressed: _openCanva,
+                  tooltip: 'Canva',
                 ),
               ],
             ),
