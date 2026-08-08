@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 enum CanvaNodeType { host, note, container }
 
 class CanvaNode {
@@ -21,12 +19,13 @@ class CanvaNode {
     this.colorHex = '#334155',
   });
 
-  Color get color {
+  /// ARGB como int (0xFFRRGGBB) — evita depender de dart:ui en modelos puros.
+  int get colorValue {
     try {
       final hex = colorHex.replaceFirst('#', '');
-      return Color(int.parse('FF$hex', radix: 16));
+      return int.parse('FF$hex', radix: 16);
     } catch (_) {
-      return const Color(0xFF334155);
+      return 0xFF334155;
     }
   }
 

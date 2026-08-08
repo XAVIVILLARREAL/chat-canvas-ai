@@ -343,10 +343,10 @@ class _DraggableNodeState extends State<_DraggableNode> {
         width: isHost ? 170 : 150,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: n.color.withValues(alpha: 0.15),
+          color: Color(n.colorValue).withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: widget.connectMode ? Colors.amber : n.color,
+            color: widget.connectMode ? Colors.amber : Color(n.colorValue),
             width: widget.connectMode ? 2 : 1.5,
           ),
         ),
@@ -354,7 +354,7 @@ class _DraggableNodeState extends State<_DraggableNode> {
           children: [
             Icon(
               isHost ? Icons.dns : Icons.sticky_note_2,
-              color: n.color,
+              color: Color(n.colorValue),
               size: 20,
             ),
             const SizedBox(width: 8),

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'services/ssh_service.dart';
 import 'services/sftp_service.dart';
 import 'services/canva_store.dart';
+import 'models/sync_snapshot.dart';
 import 'screens/terminal_screen.dart';
 import 'screens/sftp_screen.dart';
 import 'screens/canva_screen.dart';
+import 'screens/hub_screen.dart';
 
 void main() {
   runApp(const EmpresaDevApp());
@@ -90,6 +92,34 @@ class _HostsScreenState extends State<HostsScreen> {
     );
   }
 
+  Future<SyncSnapshot> _buildSnapshot() async {
+    final canva = await CanvaStore().load();
+    return SyncSnapshot(
+      version: 1,
+      hosts: _hosts
+          .map((h) => HostRecord(
+                id: h.name,
+                name: h.name,
+                host: h.host,
+                port: h.port,
+                username: h.username,
+                authType: h.authType.name,
+              ))
+          .toList(),
+      nodes: canva.nodes,
+      edges: canva.edges,
+      sessions: [],
+    );
+  }
+
+  void _openHub() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => HubScreen(getSnapshot: () async => _buildSnapshot()),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,6 +149,11 @@ class _HostsScreenState extends State<HostsScreen> {
                   icon: const Icon(Icons.account_tree, color: Colors.lightBlueAccent),
                   onPressed: _openCanva,
                   tooltip: 'Canva',
+                ),
+                IconButton(
+                  icon: const Icon(Icons.cell_tower, color: Colors.greenAccent),
+                  onPressed: _openHub,
+                  tooltip: 'Hub de sync',
                 ),
               ],
             ),

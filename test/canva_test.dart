@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:empresa_dev/models/canva.dart';
@@ -23,7 +22,7 @@ void main() {
       expect(back.x, 100);
       expect(back.y, 200);
       expect(back.hostId, 'pve');
-      expect(back.color, const Color(0xFF0EA5E9));
+      expect(back.colorValue, 0xFF0EA5E9);
     });
 
     test('serializa y deserializa un nodo nota', () {
