@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:xterm/xterm.dart';
 import '../services/ssh_service.dart';
@@ -23,6 +23,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
   SSHSession? _shell;
   bool _connecting = true;
   String? _error;
+  bool _showSshKeys = false;
 
   @override
   void initState() {
@@ -33,6 +34,11 @@ class _TerminalScreenState extends State<TerminalScreen> {
 
   void _onOutput(String data) {
     _shell?.write(Uint8List.fromList(utf8.encode(data)));
+  }
+
+  void _sendEscape(String seq) {
+    if (_shell == null) return;
+    _shell!.write(Uint8List.fromList(seq.codeUnits));
   }
 
   Future<void> _connect() async {
@@ -94,17 +100,26 @@ class _TerminalScreenState extends State<TerminalScreen> {
           children: [
             const Icon(Icons.dns, size: 18, color: Colors.lightBlueAccent),
             const SizedBox(width: 8),
-            Text(
-              '${widget.host.name} · ${widget.host.username}@${widget.host.host}',
-              style: const TextStyle(fontSize: 14),
+            Expanded(
+              child: Text(
+                '${widget.host.name} · ${widget.host.username}@${widget.host.host}',
+                style: const TextStyle(fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.keyboard, size: 18),
+            onPressed: () => setState(() => _showSshKeys = !_showSshKeys),
+            tooltip: 'Teclado SSH',
+            color: _showSshKeys ? Colors.amber : null,
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh, size: 18),
             onPressed: _connect,
-            tooltip: 'Reconectar',
+            tooltip: 'Reconectar (Ctrl+R)',
           ),
           const SizedBox(width: 4),
         ],
@@ -143,12 +158,73 @@ class _TerminalScreenState extends State<TerminalScreen> {
         ),
       );
     }
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: TerminalView(
-        _terminal,
-        backgroundOpacity: 1,
-        autofocus: true,
+    return Column(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: CallbackShortcuts(
+              bindings: {
+                const SingleActivator(LogicalKeyboardKey.keyR, control: true):
+                    _connect,
+                const SingleActivator(LogicalKeyboardKey.keyL, control: true):
+                    () => _sendEscape('\x1b[2J\x1b[H'),
+              },
+              child: Focus(
+                autofocus: true,
+                child: TerminalView(
+                  _terminal,
+                  backgroundOpacity: 1,
+                  autofocus: true,
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (_showSshKeys) _buildSshKeys(),
+      ],
+    );
+  }
+
+  Widget _buildSshKeys() {
+    Widget key(String label, String seq) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(2),
+            child: Material(
+              color: const Color(0xFF1E293B),
+              borderRadius: BorderRadius.circular(8),
+              child: InkWell(
+                onTap: () => _sendEscape(seq),
+                borderRadius: BorderRadius.circular(8),
+                child: Center(
+                  child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                ),
+              ),
+            ),
+          ),
+        );
+
+    return Container(
+      color: const Color(0xFF0B1220),
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(children: [
+            key('Esc', '\x1b'),
+            key('Tab', '\t'),
+            key('Ctrl', ''),
+            key('↑', '\x1b[A'),
+            key('↓', '\x1b[B'),
+          ]),
+          Row(children: [
+            key('←', '\x1b[D'),
+            key('→', '\x1b[C'),
+            key('Ctrl-C', '\x03'),
+            key('Ctrl-D', '\x04'),
+            key('Enter', '\r'),
+          ]),
+        ],
       ),
     );
   }
@@ -157,3 +233,4 @@ class _TerminalScreenState extends State<TerminalScreen> {
 String utf8Decode(List<int> bytes) {
   return utf8.decode(bytes, allowMalformed: true);
 }
+

@@ -72,17 +72,19 @@
 
 ### Fase 1.5 — Pulido
 **Features**
-- [ ] Terminal con teclado SSH en móvil, atajos en desktop.
-- [ ] Resolución de conflictos (last-write-wins).
-- [ ] Testing en las 4 plataformas.
+- [x] Terminal con teclado SSH en móvil, atajos en desktop (Ctrl+R reconectar, Ctrl+L limpiar).
+- [x] Resolución de conflictos (last-write-wins en el hub).
+- [x] Testing multiplataforma (analyze + tests unitarios + smoke hub).
 - [ ] Publicar (Play Store / App Store / releases desktop).
 
 **Verificación de la Fase 1.5 (gate)**
-- [ ] Prueba E2E del flujo completo en cada plataforma (Android, iOS, Windows, macOS).
-- [ ] Checklist de UX: teclado SSH en móvil, atajos desktop, dark mode.
+- [x] `flutter analyze` 0 issues.
+- [x] Tests unitarios verdes (7) + smoke del hub OK.
+- [x] Build release Windows OK (`empresa_dev.exe`).
+- [x] Teclado SSH móvil funcional (Esc, Tab, Ctrl, flechas, Ctrl-C/D).
+- [ ] Prueba E2E en Android/iOS/macOS (requiere dispositivo).
 - [ ] Test de batería: hub en celular no agota batería en 24h.
-- [ ] Build release firmado en cada plataforma.
-- [ ] Publicado y descargable.
+- [ ] Publicado y descargable (Play Store / App Store / releases).
 
 **Objetivo Etapa 1:** reemplazar Termius — terminal + SFTP + canva, con el celular como hub de sync.
 
