@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'services/ssh_service.dart';
 import 'services/sftp_service.dart';
@@ -47,12 +49,24 @@ class _HostsScreenState extends State<HostsScreen> {
   final List<SshHost> _hosts = [
     SshHost(
       name: 'pve',
-      host: '192.168.100.200',
+      host: '100.101.69.79', // Tailscale — alcanzable desde cualquier lugar
       port: 22,
       username: 'root',
       password: '',
+      authType: SshAuthType.key,
+      keyPem: _readLocalTestKey(),
     ),
   ];
+
+  // Para pruebas locales en Windows: lee la llave instalada en pve.
+  // En producción se importa/genera desde la UI (Fase 1.2).
+  static String? _readLocalTestKey() {
+    try {
+      final f = File('test/fixtures/app_test_key');
+      if (f.existsSync()) return f.readAsStringSync();
+    } catch (_) {}
+    return null;
+  }
 
   Future<void> _addHost() async {
     final result = await showDialog<SshHost>(
