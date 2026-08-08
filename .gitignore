@@ -2,10 +2,17 @@
 node_modules/
 .pnpm-store/
 
-# Build
-dist/
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
 build/
-*.tsbuildinfo
+*.iml
+.gradle/
+local.properties
+android/app/.cxx/
+android/.gradle/
 
 # Env
 .env
@@ -26,11 +33,3 @@ Thumbs.db
 
 # Test
 coverage/
-
-# opencode fork cache
-.agents/
-
-# artefactos de prueba del orquestador
-saludo.txt
-nota-fase3.txt
-
