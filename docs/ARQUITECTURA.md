@@ -1,118 +1,99 @@
-# ARQUITECTURA — Sistema multi-agente con LangGraph + Chrome DevTools MCP
+# ARQUITECTURA — Flutter + dartssh2 + xterm.dart + hub Tailscale
+
+> Arquitectura del terminal SSH multiplataforma con celular como hub de sincronización.
 
 ## Visión general
 
-Capas: una **app web** (frontend + backend) expone canva, kanban y sesiones. Debajo, un **orquestador LangGraph** ejecuta el flujo de los agentes con estado, reintentos y pausas humanas. Los agentes usan herramientas vía **MCP**, con **Chrome DevTools MCP como herramienta central**: prueban la UI en un navegador real como lo haría un humano.
-
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     APP WEB (mobile-first)                       │
-│   Canva (sesiones/proyectos) · Kanban (tickets/CI) · Sesión/IDE  │
-└───────────────────────────┬─────────────────────────────────────┘
-                            │ REST + WebSocket (eventos en vivo)
-┌───────────────────────────▼─────────────────────────────────────┐
-│                        BACKEND (Node/TS)                         │
-│   · Auth, proyectos, sesiones, tablero (SQLite/Postgres)        │
-│   · Streaming de eventos → la UI muestra todo lo que pasa        │
-└───────────────────────────┬─────────────────────────────────────┘
-                            │
-┌───────────────────────────▼─────────────────────────────────────┐
-│                  ORQUESTADOR LangGraph                           │
-│  Grafo de estados: cada ticket = una ejecución del grafo         │
-│  · checkpoints (se puede pausar/reanudar)                        │
-│  · retry + límite de intentos                                    │
-│  · human-in-the-loop (interrupts: "aprueba hito")                │
-│  · nodos = roles de agentes (Project Lead, Implementador, QA,    │
-│    UI Tester, Reviewer)                                          │
-└───────────────────────────┬─────────────────────────────────────┘
-                            │ herramientas vía MCP
-              ┌─────────────┼──────────────┬──────────────┐
-              ▼             ▼              ▼              ▼
-    ┌────────────────┐ ┌─────────┐  ┌──────────┐   ┌────────────┐
-    │Chrome DevTools │ │filesys- │  │ shell/   │   │ git / CI   │
-    │MCP (el núcleo) │ │tem      │  │ node     │   │            │
-    │ navega, clic,  │ │         │  │          │   │            │
-    │ escribe, eval, │ │         │  │          │   │            │
-    │ screenshots,   │ │         │  │          │   │            │
-    │ console, net   │ └─────────┘  └──────────┘   └────────────┘
-    └────────────────┘
+┌─────────────────────────── CELULAR (hub) ───────────────────────────┐
+│ Flutter app                                                            │
+│  ├─ UI (Material 3)                                                    │
+│  ├─ Terminal: xterm.dart + dartssh2 → SSH/SFTP a servidores            │
+│  ├─ Canva: nodos SSH + notas + (agentes IA Etapa 2)                    │
+│  ├─ DB local: SQLite (drift) — fuente de verdad del hub                │
+│  └─ Hub server: dart:io (HttpServer + WebSocket) en puerto local      │
+│          │  Tailscale (100.x.y.z)                                      │
+└──────────┼───────────────────────────────────────────────────────────┘
+           │  WebSocket/HTTP (sync)
+┌──────────┴─────────── LAPTOP / OTROS ────────────────────────────────┐
+│ Flutter app (misma)                                                   │
+│  ├─ UI + Terminal + Canva                                             │
+│  ├─ DB local réplica (SQLite)                                         │
+│  └─ Sync client: conecta al hub del celular, replica y suscribe       │
+└───────────────────────────────────────────────────────────────────────┘
 ```
 
-## Componentes
+## Capas
 
-### 1. Frontend (React 19 + Vite + TS + Tailwind v4)
-- **Canva** (React Flow): tarjetas de sesión por proyecto; click → abre la sesión.
-- **Kanban**: tablero de la empresa; estados de tickets, CI, PRs, evidencia visual.
-- **Sesión/IDE**: chat + editor + terminal + panel Browser (lo que el agente ve en Chrome).
-- Realtime vía WebSocket: cada herramienta del agente emite eventos → la UI los muestra en vivo.
+### 1. Capa SSH (dartssh2)
 
-### 2. Backend (Node + TypeScript)
-- API REST + WebSocket.
-- Persistencia: proyectos, sesiones, tickets, mensajes, posiciones del canva.
-- Gestiona el ciclo de vida de ejecuciones LangGraph (lanzar, pausar, reanudar).
-- Ejecuta localmente (tus máquinas) o en servidor (modo empresa, multi-usuario).
+- `SSHClient` por conexión: autenticación (password / llaves), sesiones de shell y ejecución.
+- Soporte de **túneles** (local/remoto/dinámico/SOCKS5) y **jump servers**.
+- `SFTPClient` para gestión de archivos remotos.
+- Desacoplado en un servicio `SshService` (se inyecta en UI y en el hub).
 
-### 3. Orquestador LangGraph — el cerebro
+### 2. Capa terminal (xterm.dart)
 
-Un **grafo de estados** (no un loop ad-hoc). Cada ticket del kanban es una ejecución del grafo:
+- `Terminal` + `TerminalView`: emulador 60fps.
+- Puente: `dartssh2` shell `stdin/stdout/stderr` → `xterm.dart` (input/output).
+- Soporte de resize (cambiar tamaño de ventana → resize remoto).
+
+### 3. Capa canva
+
+- `InteractiveViewer` (zoom/pan) + nodos custom (host SSH, nota, contenedor).
+- Estado en un store (`Riverpod`): lista de nodos, posición, conexiones.
+- Persistencia en SQLite.
+
+### 4. Capa datos (SQLite / drift)
+
+- Tablas: `hosts`, `llaves`, `canva_nodos`, `canva_edges`, `sesiones`, `notas`.
+- Modelo con versionado (timestamp + versión por registro) para sync.
+
+### 5. Capa hub (servidor embebido, celular)
+
+- `dart:io HttpServer` + WebSocket en puerto local (ej. 8170).
+- Endpoints:
+  - `GET /api/snapshot` → estado completo (canvas, hosts, llaves, sesiones).
+  - `POST /api/apply` → aplicar cambios recibidos.
+  - `WS /ws` → push de cambios en tiempo real + suscripción.
+- **Auth**: token de emparejamiento (código corto) + solo escucha en la interfaz Tailscale.
+- El hub también puede **exponer SFTP/terminal remoto** si se quiere (futuro).
+
+### 6. Capa sync (clientes)
+
+- En cada dispositivo no-hub: `SyncClient` se conecta al hub (Tailscale IP), descarga snapshot, replica en SQLite local y suscribe a cambios.
+- En el hub: cada cambio local se propaga a clientes conectados.
+- Resolución de conflictos: **last-write-wins por registro** (versión + timestamp). Suficiente para datos pequeños de uso personal.
+
+## Flujo de conexión SSH desde cualquier dispositivo
 
 ```
-[Planificar] → [Implementar] → [Tests unit/integ] → [UI Test con Chrome DevTools MCP]
-      │                            │                      │ falla → vuelve a Implementar (max 3)
-      ▼                            ▼                      ▼ pasa
-[Revisar diff] ◄────────── [Capturas = evidencia] → [Merge]
-      │
-      └─ human-in-the-loop: "aprueba" en hitos / tocar producción
+Laptop (Flutter) ──Terminal local──► servidor SSH remoto
+        │
+        └── Sync ──► Celular hub (guarda sesión/host, replica al resto)
 ```
 
-**Por qué LangGraph y no un loop propio:**
-- **Checkpoints**: cada paso queda guardado; puedes pausar, reanudar o rebobinar (time-travel) a un estado anterior.
-- **Interrupts (human-in-the-loop)**: el grafo se detiene donde corresponde ("aprueba este hito") y espera.
-- **Reintentos y límites**: el grafo reintenta con política configurable y escala al humano al agotar intentos.
-- **Estado explícito**: todo el contexto vive en un estado tipado → auditable y reanudable tras un crash.
-- **Producción**: es el estándar para multi-agente confiable (LangChain ecosystem).
+La conexión SSH es **directa** del dispositivo al servidor; el hub solo sincroniza **config y estado**, no el tráfico SSH (eficiente y privado).
 
-### 4. Capa MCP — Chrome DevTools MCP como el núcleo
+## Seguridad
 
-Los agentes no "confían en que funciona": **lo prueban en un Chrome real**.
+- Sync solo sobre Tailscale (cifrado punto a punto, red privada).
+- Token de emparejamiento en el hub; rechazo de clientes sin token.
+- Llaves SSH almacenadas cifradas localmente (flutter_secure_storage).
+- El hub escucha solo en la interfaz Tailscale (no en Wi-Fi público).
 
-> 💡 **Headless en el servidor:** el Chrome del agente corre **siempre en segundo plano, del lado del servidor** (Chromium headless, sin ventana visible). El usuario nunca ve la ventana del navegador; la evidencia visual llega como **capturas de pantalla** que el agente toma y adjunta.
+## Etapa 2 (agentes IA) — extensión
 
-Capacidades del Chrome DevTools MCP (como Antigravity/Chrome DevTools):
-- **Navegar** a la URL de la app en desarrollo.
-- **Interactuar como humano**: clic, escribir, scroll, hover, esperar.
-- **Evaluar JS** en la página (estado, datos, condiciones).
-- **Leer la consola y la red**: errores JS, requests fallidas, warnings.
-- **Inspeccionar el DOM**: elementos visibles/ocultos, accesibilidad (a11y tree).
-- **Screenshots**: capturas de cada paso → evidencia visual para el reviewer y para ti.
+- Los nodos de agente (opencode) se conectan al mismo canva y DB.
+- El hub puede lanzar/controlar agentes en el servidor (reutilizando lo de `docs/legacy/`).
+- No cambia la arquitectura base: es un tipo de nodo + un servicio más.
 
-Reglas de uso:
-- **Ninguna feature de UI se cierra sin verificación en navegador real.**
-- El UI Tester deja **capturas** adjuntas al ticket/PR (prueba de que el flujo funciona).
-- El bucle: el UI Tester hace clic → la app responde → el agente compara con lo esperado (SDD) → si hay error de consola o flujo roto → devuelve el error al implementador.
+## Tecnología clave verificada (2026-08)
 
-### 5. Memoria del proyecto
-- `SPEC.md`, `SDD.md` por feature, `ADRs/` (decisiones de arquitectura).
-- Índice del código (grafo de conocimiento) que los agentes consultan.
-- Historial de verificación: capturas y errores por PR (para no repetir errores).
-
-### 6. Tablero / Kanban
-- El kanban **es la cara visible de LangGraph**: cada ticket en "En curso" corresponde a una ejecución del grafo.
-- Columnas: `Backlog → Pendiente → En curso → PR → CI → Revisión → Listo`.
-- Eventos del grafo → WebSocket → el kanban se actualiza en vivo.
-
-## Flujo de control de una feature
-
-1. El humano pide una feature (texto o voz) → el Project Lead crea ticket + SDD.
-2. El ticket pasa a "En curso" → LangGraph ejecuta: Implementador escribe código + QA escribe tests.
-3. CI (typecheck → lint → unit/integration) corre; si falla, el error exacto vuelve al Implementador (max 3).
-4. **UI Test**: el UI Tester lanza la app y la prueba en Chrome real vía Chrome DevTools MCP; toma capturas.
-5. Reviewer revisa el diff + las capturas; aprueba o pide cambios.
-6. Merge cuando: CI verde + UI verificado con evidencia + (si es hito) aprobación humana.
-
-## Reglas de seguridad
-
-- **Límite de autonomía**: nada toca producción sin aprobación humana.
-- **Git como red**: todo en ramas; revertir siempre es posible.
-- **Presupuesto de intentos**: N fallos → escala al humano (no loops infinitos).
-- **Chrome headless en el servidor**: el navegador del agente corre en segundo plano en el servidor, sin ventana; es controlado y desechable, y nunca abre una ventana en el cliente.
+| Librería | Versión | Estado |
+|---|---|---|
+| Flutter | 3.x | multiplataforma |
+| dartssh2 | 2.22.5 | SSH/SFTP completo, MIT |
+| xterm.dart | 4.0 | terminal 60fps, MIT |
+| drift (SQLite) | 2.x | ORM tipado |
+| Tailscale | SDK | red privada p2p |

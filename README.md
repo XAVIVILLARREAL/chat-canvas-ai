@@ -1,26 +1,33 @@
-# Empresa de Desarrollo Autónoma con Agentes de IA
+# Empresa Dev — Terminal SSH multiplataforma con supervitaminas
 
-Plan para construir **tu propia empresa de desarrollo con IA dentro de una app web**: mobile-first, rápida y con apariencia cuidada. Un canva de sesiones, un kanban de organización tipo empresa, y agentes multi-rol (LangGraph) que desarrollan y **prueban la interfaz en un Chrome real como un humano** (MCP Chrome DevTools).
+Un **reemplazo de Termius con supervitaminas**: cliente **SSH/SFTP multiplataforma** (Android, iOS, Windows, macOS, Linux) hecho en **Flutter**, con un **canva visual** donde cada cuadrito es una conexión SSH, una sesión de agente IA, o una nota. 
 
-Primero para tus propios desarrollos; con potencial de convertirse en un producto para otros.
+**La funcionalidad única:** el **celular actúa como servidor de sincronización** — desde donde te conectes (laptop, tablet, otro celular), todo se sincroniza con tu teléfono vía **Tailscale**, sin servidores centrales.
 
 ## La idea en una frase
 
-> **Nuestro propio chat de agente web (fork de opencode MIT) + agentes especializados + un navegador real que verifica cada feature, con capturas como evidencia.**
+> **Termius open source + supervitaminas: un canva donde cada nodo es un servidor o un agente IA, con el celular como hub de sincronización global.**
+
+## Qué lo hace único
+
+1. **Canva = mapa de tu infraestructura**: cada cuadrito es un host SSH, un agente IA, o una nota. Conectas cajas con flechas (topología), y un clic abre el terminal.
+2. **El celular es el hub**: un servidor embebido en la app Flutter sincroniza canvas, hosts, llaves y sesiones entre todos tus dispositivos.
+3. **Agentes IA como ciudadanos de primera clase**: cada cuadrito puede ser una sesión de agente (opencode) que desarrolla, ejecuta y verifica — la "empresa" que ya construimos como **Etapa 2**.
+4. **Multiplataforma real**: Flutter + dartssh2 + xterm.dart → SSH/SFTP nativo en móvil y desktop.
 
 ## Documentación
 
 | Documento | Contenido |
 |---|---|
-| [ETAPA1.md](docs/ETAPA1.md) | **Lo primero a construir:** canva de diagramas + ventanas que abren **nuestro propio chat de agente web** (fork de opencode MIT) |
-| [PLAN.md](docs/PLAN.md) | Visión, principios y decisiones |
-| [PRODUCTO.md](docs/PRODUCTO.md) | El producto: canva + kanban + sesiones, UX mobile-first, stack |
-| [ARQUITECTURA.md](docs/ARQUITECTURA.md) | LangGraph + capa MCP + Chrome DevTools MCP como núcleo |
-| [AGENTES.md](docs/AGENTES.md) | Roles (incl. UI Tester) y Definition of Done |
-| [VERIFICACION.md](docs/VERIFICACION.md) | **El corazón:** probar la UI como un humano, con evidencia |
-| [PIPELINE.md](docs/PIPELINE.md) | Flujo idea → producción con SDD + TDD + UI test |
-| [ROADMAP.md](docs/ROADMAP.md) | Etapa 1 (canva + ventanitas) y fases posteriores |
+| [PLAN.md](docs/PLAN.md) | Visión, decisiones y alcance |
+| [PRODUCTO.md](docs/PRODUCTO.md) | El producto: terminal + canva + hub de sync, UX, stack |
+| [ARQUITECTURA.md](docs/ARQUITECTURA.md) | Flutter + dartssh2 + xterm.dart + hub Tailscale |
+| [ROADMAP.md](docs/ROADMAP.md) | Fases de construcción |
+| [ETAPA1.md](docs/ETAPA1.md) | **Lo primero a construir:** SSH funcional en Flutter |
+| [FUNDACION.md](docs/FUNDACION.md) | Decisiones base y stack final |
+| [ADRs/](docs/ADRs/) | Decisiones de arquitectura |
+| [legacy/](docs/legacy/) | **Etapa 2:** plan anterior (empresa web con agentes IA) |
 
-## Siguiente paso (Etapa 1)
+## Estado
 
-Construir lo primero: **el canva donde dibujas diagramas e insertas ventanas que abren nuestro propio chat de agente web** (fork de opencode: core + llm + server, con UI propia). El resto del plan se construye sobre esta base. Ver [docs/ETAPA1.md](docs/ETAPA1.md).
+**En diseño.** Investigación hecha (2026-08): Flutter + dartssh2 + xterm.dart validados. Ver `docs/ETAPA1.md` para el primer hito.

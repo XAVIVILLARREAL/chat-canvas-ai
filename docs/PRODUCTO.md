@@ -1,73 +1,68 @@
-# PRODUCTO — Spec de la aplicación web
+# PRODUCTO — Spec del terminal SSH con supervitaminas
 
-> Una app web **mobile-first, responsive, super eficiente y con apariencia increíble**, que es a la vez tu canva de sesiones, tu tablero de empresa de desarrollo, y la sala de control de tus agentes de IA.
+> Una app **Flutter multiplataforma** que reemplaza a Termius con un canva visual de tu infraestructura y el **celular como hub de sincronización global**.
 
 ## Visión de producto
 
-Una sola aplicación con **tres espacios** que se conectan entre sí:
+Tres espacios conectados en una sola app:
 
-1. **Canva** — tu mente visual: **esquemas y diagramas libres** + **ventanitas de agente** que se abren como chat estilo terminal. Es la sección que se construye **primero** (ver [ETAPA1.md](./ETAPA1.md)).
-2. **Kanban / Empresa** — el tablero de tu "empresa de IA": tickets, estados, qué agente trabaja en qué, CI, PRs, verificación.
-3. **Sesión / IDE** — el espacio de trabajo: chat con el agente, editor de código, terminal, herramientas en vivo, y **el navegador real** donde el agente prueba la UI (Chrome DevTools MCP).
+1. **Terminal** — el corazón: SSH/SFTP completo, rápido y hermoso (xterm.dart).
+2. **Canva** — el mapa visual: cada cuadrito es un **host SSH**, una **sesión de agente IA** (Etapa 2) o una **nota**. Conectas cajas para dibujar tu topología.
+3. **Hub de sync** — el celular corre un servidor embebido; los demás dispositivos se sincronizan contra él vía Tailscale.
 
 ## Los tres espacios
 
-### 1. Canva (inicio)
+### 1. Terminal (núcleo)
 
-- Canva infinito, zoom/pan, arrastrar, responsive táctil.
-- **Esquemas libres**: cajas, notas, flechas, colores y contenedores para diagramar arquitectura y flujos.
-- **Ventanitas de agente**: cajas que al hacer click/touch abren un **chat de agentes estilo terminal** (streaming, logs de herramientas, código coloreado, voz). Ocórrer en el servidor (headless), la sesión sigue aunque cierres la ventanita.
-- Las tarjetas/ventanitas muestran estado en vivo: en qué anda el agente, CI verde/rojo, capturas de la última verificación de UI.
+- **SSH completo** (dartssh2): password, llaves públicas (RSA/ECDSA/Ed25519), túneles local/remoto/dinámico (SOCKS5), jump servers.
+- **SFTP**: navegar, subir, bajar, editar archivos remotos.
+- **Terminal real** (xterm.dart): 60fps, soporte UTF-8/CJK/emoji, tema oscuro, redimensionable.
+- **Sesiones persistentes**: se guardan y se pueden reabrir (incluso desde otro dispositivo).
+- **Agrupación**: hosts organizables por carpeta/tag/color.
 
-> La Etapa 1 (canva + ventanitas) se detalla en [ETAPA1.md](./ETAPA1.md).
+### 2. Canva (el diferenciador)
 
-### 2. Kanban (la "empresa")
+- Canva infinito con zoom/pan (responsive táctil y mouse).
+- **Cuadritos SSH**: cada nodo es un host con su estado. Click/touch → abre el terminal.
+- **Conexiones**: flechas entre hosts para dibujar topología y flujos de túneles.
+- **Notas/colores/contenedores**: organizar proyectos, entornos, clusters.
+- **Cuadritos de agente IA** (Etapa 2): sesiones de opencode como nodos.
+- El canva **se sincroniza** entre dispositivos (posición, hosts, conexiones).
 
-- Tablero por proyecto con columnas: `Backlog → Pendiente → En curso → PR → CI → Revisión → Listo`.
-- Cada ticket: quién lo implementa, su SDD, estado del CI, enlace al PR, evidencia visual.
-- El tablero es **la vista operativa de LangGraph**: cada ticket en "En curso" es un agente trabajando (visible en vivo).
-- Comandos por voz/texto: "mueve el ticket X a revisión", "dime qué falló en CI", "aprueba el PR".
-- Métricas: tickets completados, bugs capturados por CI, tiempo por ticket.
+### 3. Hub de sync (la funcionalidad única)
 
-### 3. Sesión / IDE
-
-Cada sesión es un agente trabajando en un directorio real de tu máquina (o del servidor):
-
-- **Chat streaming** con el agente (texto o voz, como CanvaDev).
-- **Log de herramientas en vivo**: ves qué hace (lee, edita, corre, navega, captura).
-- **Explorador + editor** (Monaco).
-- **Terminal**.
-- **Panel "Browser"**: la vista en vivo de un **Chrome headless** que corre en segundo plano en el servidor (MCP Chrome DevTools) — el agente lo controla sin abrir ventana en tu dispositivo; ves su navegación y las capturas que toma como evidencia.
+- **El celular es el servidor**: la app Flutter corre un servidor HTTP + WebSocket embebido (`dart:io`) en un puerto local.
+- **Alcance global por Tailscale**: el celular y tus dispositivos están en el mismo tailnet → el celular es alcanzable en `http://100.x.y.z:<puerto>` desde cualquier parte.
+- **Sincronización**: canvas, hosts SSH, llaves, sesiones y notas viajan entre dispositivos.
+- **Conflicto mínimo**: sync por versión/timestamp (datos pequeños). El celular es la autoridad.
+- **Modo hub opcional**: cualquier dispositivo puede ser hub, pero por defecto el celular lo es.
 
 ## Principios de UX
 
-- **Mobile-first responsive**: todo funciona desde el celular; el canva se vuelve lista, el IDE usa pestañas.
-- **Rápido**: sin fricción; las vistas pesadas (editor, browser) se cargan bajo demanda.
-- **Bello pero funcional**: apariencia cuidada (dark mode, animaciones sutiles, tipografía moderna) sin sacrificar rendimiento.
-- **Todo observable**: nunca un "está trabajando" sin detalles — ves exactamente qué hace el agente.
+- **Mobile-first**: todo usable con un pulgar; el terminal tiene teclado especial SSH.
+- **Desktop completo**: atajos de teclado, multi-panel, mouse.
+- **Dark mode por defecto** + tema claro opcional (Material 3).
+- **Rápido**: conexiones nativas, sin webviews.
+- **Bello pero funcional**: animaciones sutiles, tipografía mono para terminal.
 
-## Stack moderno propuesto
+## Stack (resumen)
 
-| Capa | Elección | Por qué |
-|---|---|---|
-| Frontend | **React 19 + Vite + TypeScript** | CanvaDev ya lo usa; ecosistema maduro |
-| Estilos | **Tailwind CSS v4** | Moderno, rápido, consistente |
-| UI components | **shadcn/ui** | Look profesional sin esfuerzo |
-| Canva | **React Flow (xyflow)** | Ya probado en CanvaDev |
-| Kanban | react-kanban / dnd-kit | Drag & drop táctil |
-| Estado | **Zustand + TanStack Query** | Ya usado + cache/refetch |
-| Realtime | **WebSocket** | Streaming de eventos del agente |
-| Backend | **Hono (Bun/Node) + TypeScript** | JS/TS nativo, ultra rápido, tipado extremo, middleware HTTP estándar, ideal para WebSocket/SSE y runtime multiplataforma (Bun, Node, Deno) |
-| Orquestación | **LangGraph (JS o Python)** | Estado, retry, human-in-the-loop |
-| UI testing | **MCP Chrome DevTools** | El agente prueba como humano |
-| DB | SQLite (local) → Postgres (multi-usuario) | Simple primero, robusto después |
-| Mobile | **PWA** (instalable, offline básico) | "Añadir a pantalla de inicio" |
+| Capa | Elección |
+|---|---|
+| Framework | Flutter (Material 3) |
+| SSH/SFTP | dartssh2 |
+| Terminal | xterm.dart |
+| Hub server | dart:io (HttpServer + WebSocket) |
+| Sync | Tailscale (red privada) |
+| DB local | SQLite (drift) |
+| Canva | Flutter (InteractiveViewer + nodos custom) |
+| Estado | Riverpod o Bloc |
 
 ## Criterios de aceptación del producto
 
-- [ ] Funciona en celular y desktop con la misma calidad.
-- [ ] El canva permite ver y abrir cualquier sesión en ≤2 toques.
-- [ ] El kanban refleja el estado real de los agentes en vivo.
-- [ ] El panel Browser muestra al agente probando la UI (navegación, clics, capturas).
-- [ ] Una feature completa se desarrolla y verifica sin salir de la app.
-- [ ] La app se siente instantánea (carga de vistas bajo demanda, transiciones suaves).
+- [ ] SSH funcional en Android, iOS, Windows y macOS (password + llaves).
+- [ ] SFTP navegable (subir/bajar/editar).
+- [ ] El canva muestra hosts como cuadritos y abre terminal al click.
+- [ ] El celular corre el hub; la laptop se conecta por Tailscale y sincroniza canvas/hosts/llaves.
+- [ ] Cambiar de dispositivo = el trabajo está (sincronizado), no se pierde nada.
+- [ ] La app se siente nativa y rápida en cada plataforma.
