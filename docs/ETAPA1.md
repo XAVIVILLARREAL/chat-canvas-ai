@@ -43,6 +43,17 @@ Flutter app ── dartssh2 ──► SSH al servidor (pve / cualquier host)
 - [ ] Dark mode + look profesional.
 - [ ] Desconectar/reconectar sin crash.
 
+## Pruebas de la Etapa 1 (gate de calidad)
+
+| Tipo | Qué se prueba | Cómo |
+|---|---|---|
+| Análisis estático | `flutter analyze` 0 issues | CI |
+| Unitario | Modelo de host, parsing de puerto | `flutter test` |
+| Manual SSH | Conexión real a pve (password) + comandos | La app en Windows/Android |
+| Terminal | Escribir, scroll, resize, UTF-8 | xterm.dart en vivo |
+| Reconexión | Desconectar y reconectar sin crash | Manual |
+| Evidencia | Capturas del terminal funcionando | Screenshots por plataforma |
+
 ## Herramientas
 
 - Flutter SDK (instalar local o en el servidor).
