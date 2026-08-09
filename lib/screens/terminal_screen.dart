@@ -20,6 +20,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
     maxLines: 10000,
     onOutput: (data) {},
   );
+  final FocusNode _termFocus = FocusNode();
   SSHSession? _shell;
   bool _connecting = true;
   String? _error;
@@ -74,6 +75,11 @@ class _TerminalScreenState extends State<TerminalScreen> {
           _terminal.write('\r\n\x1b[1;31m[conexión cerrada]\x1b[0m\r\n');
         }
       });
+
+      // Pedir el foco tras conectar para poder escribir de inmediato
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _termFocus.requestFocus();
+      });
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -86,6 +92,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
   @override
   void dispose() {
     widget.service.disconnect();
+    _termFocus.dispose();
     super.dispose();
   }
 
@@ -163,21 +170,25 @@ class _TerminalScreenState extends State<TerminalScreen> {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(8),
-            child: CallbackShortcuts(
-              bindings: {
-                const SingleActivator(LogicalKeyboardKey.keyR, control: true):
-                    _connect,
-                const SingleActivator(LogicalKeyboardKey.keyL, control: true):
-                    () => _sendEscape('\x1b[2J\x1b[H'),
+            child: TerminalView(
+              _terminal,
+              focusNode: _termFocus,
+              autofocus: true,
+              backgroundOpacity: 1,
+              onKeyEvent: (node, event) {
+                if (event is! KeyDownEvent) return KeyEventResult.ignored;
+                final logical = event.logicalKey;
+                final ctrl = HardwareKeyboard.instance.isControlPressed;
+                if (ctrl && logical == LogicalKeyboardKey.keyR) {
+                  _connect();
+                  return KeyEventResult.handled;
+                }
+                if (ctrl && logical == LogicalKeyboardKey.keyL) {
+                  _sendEscape('\x1b[2J\x1b[H');
+                  return KeyEventResult.handled;
+                }
+                return KeyEventResult.ignored;
               },
-              child: Focus(
-                autofocus: true,
-                child: TerminalView(
-                  _terminal,
-                  backgroundOpacity: 1,
-                  autofocus: true,
-                ),
-              ),
             ),
           ),
         ),
