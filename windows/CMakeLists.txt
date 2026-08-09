@@ -4,7 +4,9 @@ project(empresa_dev LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "empresa_dev")
+# Nota: "empresa_dev"/"empresa-dev"/"edapp" fueron bloqueados por el antivirus
+# en Debug (LNK1104); usamos "apptest.exe" para evitarlo.
+set(BINARY_NAME "apptest")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -28,6 +30,12 @@ set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 set(CMAKE_SHARED_LINKER_FLAGS_PROFILE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS_PROFILE "${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
+
+# Debug: desactivar linker incremental (evita LNK1104 al escribir exe en paths
+# con espacios/acentos bajo VS + antivirus).
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/INCREMENTAL:NO")
+set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "/INCREMENTAL:NO")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)

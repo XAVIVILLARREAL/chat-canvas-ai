@@ -17,6 +17,8 @@ Inicia el ciclo completo de prueba → debug → arreglo → mejora de la app **
    ```
    - Si falla el build por VS 2026, ver la skill `patrol-iteracion` (parche en `visual_studio.dart`; si insiste, borrar `C:\tools\flutter\bin\cache\flutter_tools.snapshot`).
    - **Importante:** borrar `build/windows` antes de cada corrida E2E (evita caches de generador).
+   - **LNK1104 en Debug (antivirus):** si el build Debug falla con `LNK1104: no se puede abrir ...Debug\<app>.exe`, el Windows Defender bloquea los exe nuevos del Debug tras builds repetidos (el nombre queda marcado). Ya se mitigó con `BINARY_NAME "apptest"` en `windows/CMakeLists.txt` y flags `/INCREMENTAL:NO`. Si vuelve a fallar: matar `apptest.exe`, reintentar, o **excluir la carpeta del proyecto en Defender** (solución definitiva). Release siempre funciona (`flutter build windows --release`).
+   - **Nota sobre `flutter test -d windows`:** el build Debug compila OK, pero el runner del test puede fallar con "Error waiting for a debug connection" (problema de infraestructura desktop, no del código). Para validar la terminal SSH real, usar `flutter test test/ssh_terminal_test.dart` (escribe whoami → root, PASS).
 4. **Depurar en tiempo real** si falla: lee el **error exacto** (Expected/Actual/Which del assert). Inspecciona el widget tree (`await tester.debugDumpApp()`) y los logs.
 5. **Corregir** el código en `lib/` (cambio mínimo) y re-ejecutar.
 6. **Evidencia**: guarda screenshots de los pasos en `data/evidence/`. Un bug solo está "arreglado" si el test pasa con evidencia visual.
