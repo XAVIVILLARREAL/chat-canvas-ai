@@ -12,10 +12,10 @@ class TerminalScreen extends StatefulWidget {
   const TerminalScreen({super.key, required this.host, required this.service});
 
   @override
-  State<TerminalScreen> createState() => _TerminalScreenState();
+  State<TerminalScreen> createState() => TerminalScreenState();
 }
 
-class _TerminalScreenState extends State<TerminalScreen> {
+class TerminalScreenState extends State<TerminalScreen> {
   final Terminal _terminal = Terminal(
     maxLines: 10000,
     onOutput: (data) {},
@@ -25,6 +25,16 @@ class _TerminalScreenState extends State<TerminalScreen> {
   bool _connecting = true;
   String? _error;
   bool _showSshKeys = false;
+
+  /// Acceso al emulador de terminal (para tests y extensión).
+  Terminal get terminal => _terminal;
+  SSHSession? get shell => _shell;
+  bool get isConnected => _shell != null && !_connecting;
+
+  /// Envía texto al shell como si el usuario lo escribiera.
+  void sendInput(String text) {
+    _shell?.write(Uint8List.fromList(utf8.encode(text)));
+  }
 
   @override
   void initState() {

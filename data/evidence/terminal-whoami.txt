@@ -1,0 +1,12 @@
+Linux pve 7.0.2-6-pve #1 SMP PREEMPT_DYNAMIC PMX 7.0.2-6 (2026-05-20T08:55Z) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Sun Aug  9 10:35:40 2026 from 100.106.62.62
+[?2004hroot@pve:/workspace/ERP-DOCKER-COMPOSE# whoami
+[?2004lroot
+[?2004hroot@pve:/workspace/ERP-DOCKER-COMPOSE# 
