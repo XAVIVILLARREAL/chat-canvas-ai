@@ -8,6 +8,7 @@ class CanvaNode {
   String label;
   String? hostId;
   String colorHex;
+  String? content;
 
   CanvaNode({
     required this.id,
@@ -17,6 +18,7 @@ class CanvaNode {
     required this.label,
     this.hostId,
     this.colorHex = '#334155',
+    this.content,
   });
 
   /// ARGB como int (0xFFRRGGBB) — evita depender de dart:ui en modelos puros.
@@ -37,6 +39,7 @@ class CanvaNode {
         'label': label,
         if (hostId != null) 'hostId': hostId,
         'color': colorHex,
+        if (content != null) 'content': content,
       };
 
   factory CanvaNode.fromJson(Map<String, dynamic> j) => CanvaNode(
@@ -50,6 +53,7 @@ class CanvaNode {
         label: j['label'] as String? ?? '',
         hostId: j['hostId'] as String?,
         colorHex: j['color'] as String? ?? '#334155',
+        content: j['content'] as String?,
       );
 }
 

@@ -76,6 +76,21 @@ flutter build apk --debug --no-tree-shake-icons
 
 ---
 
+## Inyección copia.md (prefase Etapa 4) — 3 piezas pequeñas de buzz/herdr
+
+> Fuente: `copia.md` (detalle completo y mapeo en ese archivo). Repos `buzz/` y `herdr/` clonados localmente (ignorados por git). Piezas baratas (días) que mejoran el canva ANTES de que Etapa 4 lo amplíe con nodos `.md`.
+
+- [x] **Detector de agentes (copia 1.1)** — `lib/services/agent_detector.dart` + manifiestos portados (`agent_detector_manifests.dart`, subset fiel de `herdr/src/detect/manifests/opencode.toml`), matchers `contains`/`regex`/`line_regex`, prioridades; `AgentStateBadge` en vivo en `AgentChatScreen`. SDD-109.
+  - *Gate: ✅ un host que corre `opencode` se clasifica `working` cuando su salida contiene "esc to interrupt" (fixture).*
+- [x] **IDs estables + estados explícitos en canva (copia 2.4)** — `CanvasNodeId` opaco (`w<sec>:<ms>:<seq>`, contador monotónico → nunca reutilizado) + `CanvasNode` puro serializable (`toJson/fromJson/copyWith`) + `AgentNodeRuntime` separado del modelo. `_newId()` del canva migrado. SDD-110.
+  - *Gate: ✅ al eliminar y recrear un nodo, el ID no se reutiliza (1000 generaciones sin colisión); el estado del nodo es serializable sin runtime.*
+- [x] **Contratos JSON + exit codes (copia 1.4)** — `AgentCommandRunner` (`cmd /c`, stdout JSON + BOM saneado, stderr, exit 0/1/2/3/4/5 + 9009→notFound, pre-check de ejecutable inexistente, timeout→kill). `SemanticExit` tipado. SDD-111.
+  - *Gate: ✅ wrapper parsea stdout JSON de un fixture y mapea exit codes a errores tipados.*
+
+**Piezas fusionadas con fases existentes (no nuevas):** copia 1.3 (skill estilo herdr) y 2.1 (Persona Pack de buzz) → se integran en **Etapa 4b** como fuente de su spec. Copia 2.3 (orquestador/colas) → **Etapa 6**. Copia 2.2 (workflows), 3.1 (eventos firmados, ADR), 3.2 (remote agents), 3.3 (marketplace) → **post-Etapa 7**. Copia 1.2 (refactor Riverpod) → solo convención en código nuevo; refactor total post-Etapa 7.
+
+---
+
 ## Etapa 4 — Canva de ideas + `.md`
 
 **Objetivo:** los nodos del canva son documentos Markdown enlazados (Obsidian-style).

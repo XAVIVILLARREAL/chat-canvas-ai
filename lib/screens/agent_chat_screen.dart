@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import '../models/agent.dart';
+import '../services/agent_detector.dart';
 import '../services/agent_runner.dart';
 import '../services/evidence_store.dart';
 import '../services/voice_service.dart';
+import '../widgets/agent_state_badge.dart';
 import '../widgets/voice_buttons.dart';
 import 'evidence_screen.dart';
 
@@ -36,6 +38,8 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
   late AgentSession _session;
   bool _running = false;
   StreamSubscription<AgentRunLine>? _sub;
+  AgentDetection _detection = const AgentDetection(AgentState.idle, null);
+  final AgentDetector _detector = AgentDetector();
 
   @override
   void initState() {
@@ -95,6 +99,7 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
                     ),
                   ],
                 );
+                _detection = _detector.detect(buffer.toString());
               });
             }
             _scrollToBottom();
@@ -174,6 +179,8 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
             const Icon(Icons.smart_toy, color: Colors.purpleAccent, size: 20),
             const SizedBox(width: 8),
             Text('Agente ${_session.agentName}', style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 12),
+            AgentStateBadge(state: _detection.state),
           ],
         ),
         actions: [

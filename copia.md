@@ -209,14 +209,16 @@
 
 ## 7. Estado del plan
 
-- [ ] 1.1 Detector de agentes — pendiente
-- [ ] 1.2 Estructura Flutter Riverpod — pendiente
-- [ ] 1.3 Skill de agente propio — pendiente
-- [ ] 1.4 Contratos JSON/exit codes — pendiente
-- [ ] 2.1 Formato de skills pack — pendiente
-- [ ] 2.2 Motor de workflows — pendiente
-- [ ] 2.3 Orquestador de agentes — pendiente
-- [ ] 2.4 IDs/estados estables en canva — pendiente
-- [ ] 3.1 Hub con eventos firmados (ADR) — pendiente
-- [ ] 3.2 Remote agents (POC) — pendiente
-- [ ] 3.3 Marketplace — pendiente
+> **2026-08:** aprobado el mapeo con el SUPER_PLAN. Las piezas 1.1, 2.4 y 1.4 pasan como **prefase Etapa 4** (inyección en `docs/SUPER_PLAN.md`); 1.3 y 2.1 se fusionan en **Etapa 4b**; 2.3 → Etapa 6; 2.2/3.x → post-Etapa 7; 1.2 → solo convención en código nuevo.
+
+- [ ] 1.1 Detector de agentes — **prefase Etapa 4**
+- [ ] 1.2 Estructura Flutter Riverpod — post-Etapa 7 (convención en código nuevo)
+- [ ] 1.3 Skill de agente propio — fusionado en Etapa 4b
+- [ ] 1.4 Contratos JSON/exit codes — **prefase Etapa 4**
+- [ ] 2.1 Formato de skills pack — fusionado en Etapa 4b
+- [ ] 2.2 Motor de workflows — post-Etapa 7
+- [ ] 2.3 Orquestador de agentes — Etapa 6
+- [ ] 2.4 IDs/estados estables en canva — **prefase Etapa 4**
+- [ ] 3.1 Hub con eventos firmados (ADR) — post-Etapa 7
+- [ ] 3.2 Remote agents (POC) — post-Etapa 7
+- [ ] 3.3 Marketplace — post-Etapa 7

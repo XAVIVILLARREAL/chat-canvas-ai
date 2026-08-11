@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../models/canva.dart';
+import '../models/canvas_node.dart';
 import '../services/agent_runner.dart';
 import '../services/agent_store.dart';
 import '../services/canva_store.dart';
@@ -58,7 +59,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
     await widget.store.save(_state);
   }
 
-  String _newId() => 'n${DateTime.now().microsecondsSinceEpoch}';
+  String _newId() => CanvasNodeId.generate().value;
 
   void _addHostNode(SshHost host) {
     setState(() {
