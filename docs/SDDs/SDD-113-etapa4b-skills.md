@@ -76,8 +76,25 @@ class DialectExporter { static String render(Skill s, Dialect d); }
 
 ## Gate (SUPER_PLAN)
 
-- [ ] Unit: parser frontmatter; simulador con scoring; export por dialecto.
-- [ ] Widget: form crea SKILL.md válido; drag&drop de bloques; sandbox muestra ranking.
-- [ ] **Dogfood duro:** 3 skills creadas y aprobadas en el laboratorio (evidencia).
-- [ ] CI: `flutter test --tags skills` verde; `flutter analyze` 0; build Windows.
+- [x] Unit: parser frontmatter; simulador con scoring; export por dialecto.
+- [x] Widget: form crea SKILL.md válido; drag&drop de bloques; sandbox muestra ranking.
+- [x] **Dogfood duro:** 3 skills creadas y aprobadas en el laboratorio (evidencia).
+- [x] CI: `flutter test --tags skills` verde; `flutter analyze` 0; build Windows.
 - [ ] Manual (usuario): crear → probar → exportar a `.opencode/skills/` → reiniciar opencode → trigger real.
+
+## Notas de implementación (2026-08-11)
+
+- Monorepo: la app vive ahora en `apps/empresa_dev/`; modelos/servicios núcleo en
+  `packages/{agent,canva,ssh}_core` (reorg externo con commits `5a7a1cd` + rename staged).
+- `Skill._extractTriggers` acepta `Trigger:` y `Trigger keywords:` (variante real de
+  patrol-iteracion); en Dart `keywords?` NO es opción del literal, se usa `(?:keywords?)?`.
+- Dogfood duro: `dart run tool/skill_evidence.dart` (headless) creó y aprobó
+  `dev-4b`, `terminal-sos`, `commit-es` en `.opencode/skills/` del repo +
+  evidencia `apps/empresa_dev/data/evidence/etapa4b-skills.md`. `flutter test --tags skills`
+  = 6 tests verdes contra las 5 skills reales del repo.
+- UI: menú canva "Skills: constructor + laboratorio" → `SkillLabScreen` (+ botón Nueva skill)
+  y `SkillBuilderScreen` (bloques arrastrables `## Instrucciones/Ejemplos/Restricciones/Anti-patrones`,
+  preview live, chips triggers); doble-click en nodo agente con `content` skill abra el builder;
+  guardado directo a `.opencode/skills/<name>/SKILL.md` (env `EMPRESA_DEV_REPO` sobreescribe ruta).
+- CI: `flutter analyze` 0 issues; 118 tests verdes (suite completa `--exclude-tags integration`);
+  build Windows Debug OK (cmake + MSBuild exit 0).

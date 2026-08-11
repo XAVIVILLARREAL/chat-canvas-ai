@@ -111,16 +111,16 @@ flutter build apk --debug --no-tree-shake-icons
 
 **Objetivo:** crear agentes/skills visualmente, probarlas en vivo y exportarlas a cualquier dialecto.
 
-- [ ] Constructor visual de `skills.md`: `name`, `description`, `triggers`, `tags`, permisos; cuerpo Markdown con preview; bloques arrastrables (instrucciones, ejemplos, restricciones, anti-patrones).
-- [ ] Laboratorio sandbox: input → ranking de skills que se activarían, con confianza y por qué. Historial + regression tests dentro de la propia skill.
-- [ ] Skills como nodos del canva (relaciones: depende, excluye, compone).
-- [ ] Export multi-dialecto: opencode, Cursor, Claude Code, Continue, Codex (con diff visual).
-- [ ] CI de dogfood: `flutter test --tags skills` ejecuta el laboratorio en modo headless.
+- [x] Constructor visual de `skills.md`: `name`, `description`, `triggers`, `tags`, permisos; cuerpo Markdown con preview; bloques arrastrables (instrucciones, ejemplos, restricciones, anti-patrones).
+- [x] Laboratorio sandbox: input → ranking de skills que se activarían, con confianza y por qué. Historial + regression tests dentro de la propia skill.
+- [x] Skills como nodos del canva (relaciones: depende, excluye, compone).
+- [x] Export multi-dialecto: opencode, Cursor, Claude Code, Continue, Codex (con diff visual).
+- [x] CI de dogfood: `flutter test --tags skills` ejecuta el laboratorio en modo headless.
 
 **Pruebas de comprobación (gate):**
-- [ ] Unit: parser YAML frontmatter por dialecto; simulador de triggers con scoring; export por dialecto.
-- [ ] Widget: el form crea un `SKILL.md` válido; drag&drop de bloques; el sandbox muestra ranking.
-- [ ] **Dogfood duro:** 3 skills de este repo creadas desde la app, y cada una pasa su test en el laboratorio.
+- [x] Unit: parser YAML frontmatter por dialecto; simulador de triggers con scoring; export por dialecto.
+- [x] Widget: el form crea un `SKILL.md` válido; drag&drop de bloques; el sandbox muestra ranking.
+- [x] **Dogfood duro:** 3 skills de este repo creadas desde la app, y cada una pasa su test en el laboratorio.
 - [ ] Manual: crear skill → probarla → exportarla a `.opencode/skills/` → reiniciar opencode → se activa con su trigger real.
 
 ---

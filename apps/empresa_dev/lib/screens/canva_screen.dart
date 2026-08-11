@@ -4,8 +4,8 @@ import 'dart:math';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../models/canva.dart';
-import '../models/canvas_node.dart';
+import 'package:canva_core/canva.dart';
+import '../models/skill.dart';
 import '../services/agent_runner.dart';
 import '../services/agent_store.dart';
 import '../services/canva_store.dart';
@@ -17,6 +17,8 @@ import '../services/sftp_service.dart';
 import 'agent_chat_screen.dart';
 import 'md_node_screen.dart';
 import 'project_tree_screen.dart';
+import 'skill_builder_screen.dart';
+import 'skill_lab_screen.dart';
 import 'terminal_screen.dart';
 import 'sftp_screen.dart';
 
@@ -321,9 +323,14 @@ class _CanvaScreenState extends State<CanvaScreen> {
                                   _save();
                                 },
                                 onTap: () => _onNodeTap(node),
-                                onDoubleTap: node.type == CanvaNodeType.note
-                                    ? () => _openMdNode(node)
-                                    : null,
+                                onDoubleTap:
+                                    node.type == CanvaNodeType.note
+                                        ? () => _openMdNode(node)
+                                        : node.type == CanvaNodeType.agent &&
+                                                _skillFromNode(node) != null
+                                            ? () => _openSkillBuilder(
+                                                initial: _skillFromNode(node))
+                                            : null,
                                 onLongPress: node.type == CanvaNodeType.host
                                     ? () => _startConnect(node.id)
                                     : null,
@@ -413,9 +420,88 @@ class _CanvaScreenState extends State<CanvaScreen> {
                 _openDocsMap();
               },
             ),
+            const Divider(color: Colors.white12),
+            ListTile(
+              leading: const Icon(Icons.science, color: Colors.lightBlueAccent),
+              title: const Text('Skills: constructor + laboratorio', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Crea skills visualmente y pruébalas', style: TextStyle(color: Colors.white38, fontSize: 11)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _openSkillLab();
+              },
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Skill? _skillFromNode(CanvaNode node) {
+    final content = node.content;
+    if (content == null || content.trim().isEmpty) return null;
+    return Skill.fromMarkdown(content);
+  }
+
+  Future<void> _openSkillLab() async {
+    if (kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Skills disponible solo en desktop')),
+      );
+      return;
+    }
+    final dir = Directory(
+        Platform.environment['EMPRESA_DEV_REPO'] ?? '../../.opencode/skills');
+    final skills = <Skill>[];
+    if (dir.existsSync()) {
+      for (final sub in dir.listSync().whereType<Directory>()) {
+        final f = File('${sub.path}/SKILL.md');
+        if (!f.existsSync()) continue;
+        final skill = Skill.fromMarkdown(f.readAsStringSync());
+        if (skill != null) skills.add(skill);
+      }
+    }
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SkillLabScreen(
+          skills: skills,
+          onNewSkill: () => _openSkillBuilder(),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openSkillBuilder({Skill? initial}) async {
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SkillBuilderScreen(
+          initial: initial,
+          onSave: (skill) => _saveSkillToRepo(skill),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveSkillToRepo(Skill skill) async {
+    final dir =
+        Directory(Platform.environment['EMPRESA_DEV_REPO'] ?? '../../.opencode/skills');
+    if (!dir.existsSync()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se encontró .opencode/skills (usa EMPRESA_DEV_REPO)')),
+      );
+      return;
+    }
+    final target = Directory('${dir.path}/${skill.name}');
+    target.createSync(recursive: true);
+    File('${target.path}/SKILL.md').writeAsStringSync(skill.toMarkdown());
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Skill "${skill.name}" guardada en .opencode/skills')),
     );
   }
 

@@ -17,13 +17,6 @@ class Skill {
     this.body = '',
   });
 
-  static const _blockTitles = [
-    'Instrucciones',
-    'Ejemplos',
-    'Restricciones',
-    'Anti-patrones',
-  ];
-
   /// Serializa a markdown opencode: frontmatter con name + description
   /// (triggers inline, estilo `Trigger: "a", "b"`).
   String toMarkdown() {
@@ -76,7 +69,8 @@ class Skill {
   }
 
   static List<String> _extractTriggers(String description) {
-    final m = RegExp(r'Trigger:\s*(.*)$').firstMatch(description);
+    final m = RegExp(r'Trigger\s*(?:keywords?)?\s*:\s*(.*)$')
+        .firstMatch(description);
     if (m == null) return [];
     return m
         .group(1)!
