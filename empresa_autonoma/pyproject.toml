@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "empresa-autonoma"
+version = "0.1.0"
+description = "Oficina de desarrollo autónoma: CrewAI + LangGraph (orquestación de agentes)."
+requires-python = ">=3.11"
+dependencies = [
+    "crewai>=0.80",
+    "langgraph>=0.2",
+    "langchain-core>=0.3",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "pydantic>=2.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["empresa_autonoma"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

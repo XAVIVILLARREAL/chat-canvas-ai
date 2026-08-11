@@ -33,6 +33,7 @@ empresa-desarrollo-autonoma/
 │   ├── ssh_core/           # SshHost, DevSession, SyncSnapshot, HostRecord
 │   ├── canva_core/         # CanvaNode/CanvaState, CanvasNode/CanvasNodeId/NodeKind
 │   └── agent_core/         # AgentMessage, AgentDetector, manifiestos (portados de herdr)
+├── empresa_autonoma/       # (reservado) servicio Python: CrewAI + LangGraph (orquestación)
 ├── melos.yaml              # Orquestación: bootstrap, analyze, test, build
 ├── skills/                 # (reservado) packs de skills versionados con el código
 ├── reference/              # (reservado) repos externos como submodulos: buzz, herdr
@@ -95,6 +96,8 @@ cd apps/empresa_dev && flutter build windows --release           # build desktop
 | DB | SQLite (drift) |
 | Estado | Riverpod |
 | Secretos | flutter_secure_storage |
+| Orquestación de agentes | CrewAI (Python) |
+| Grafos de estado | LangGraph (Python) |
 
 ## Identidad visual — GLASSMORPHISM NEÓN (OBLIGATORIO)
 
@@ -155,6 +158,64 @@ cd apps/empresa_dev && flutter build windows --release           # build desktop
 - ❌ Neón sobresaturado en el contenido (solo contornos y foco).
 - ❌ Animaciones de 1s+ o `easeIn` lento que ralentiza la app.
 - ❌ Copiar estilos de Material por defecto sin adaptar.
+
+## Visión — EMPRESA AUTÓNOMA DE DESARROLLO (CrewAI + LangGraph)
+
+> **Estado:** visión rectora de Etapa 2+ y del largo plazo. La meta no es una app
+> con agentes: es **una oficina de desarrollo que trabaja sola**, con agentes
+> especializados como empleados, coordinados por grafos de estado y con una vista
+> animada estilo juego para "ver a la empresa trabajar".
+
+### La idea rectora
+
+Construir **una empresa de desarrollo autónoma** donde cada agente es un rol de
+oficina (producto, arquitecto, dev, QA, devops, revisores, PM) que:
+
+- Trabaja sobre **tareas reales del repo** (issues, PRs, features, bugs).
+- Se coordina con los demás mediante **CrewAI** (formación de crews y
+  colaboración entre roles) **+ LangGraph** (grafos de estado state-of-the-art:
+  control explícito, loops, human-in-the-loop, persistencia y reanudación).
+- Se visualiza como una **oficina animada estilo juego**: cada agente es un
+  "personaje" en un espacio, con estados visibles (trabajando, bloqueado,
+  esperando aprobación), y el canva de la app es la ventana a esa oficina.
+
+### Stack de orquestación (OBJETIVO para la empresa autónoma)
+
+| Capa | Elección | Por qué |
+|---|---|---|
+| Orquestación de agentes | **CrewAI** | Roles tipo "empleado", crews, colaboración declarativa |
+| Grafos de flujo/estado | **LangGraph** | State-of-the-art: control fino, loops, human-in-the-loop, checkpoints |
+| Runtimes de agentes | opencode, Claude Code, Codex, etc. | Cada empleado puede correr en el runtime que mejor haga el rol |
+| Vista "oficina" | Flutter (canva + animaciones) | La UI actual ES la oficina; los nodos-agente se vuelven personajes |
+
+### Reglas para esta visión
+
+1. **La orquestación vive en un servicio propio** (nuevo directorio/servicio,
+   sugerido `empresa_autonoma/` como repo/servicio Python con CrewAI+LangGraph),
+   NO dentro de la app Flutter. La app solo lo controla/observa.
+2. **CrewAI define QUIÉN trabaja** (roles, crews, delegación).
+   **LangGraph define CÓMO fluye el trabajo** (estado, transiciones, gates).
+3. **Human-in-the-loop:** todo cambio que afecte al repo (merge, deploy, gasto)
+   requiere aprobación explícita en la app (nodo de aprobación en el grafo).
+4. **Persistencia de estado:** el grafo debe poder pausarse/reanudarse
+   (checkpoints de LangGraph); la "empresa" no muere si se apaga la máquina.
+5. **Observabilidad primero:** cada agente publica su estado al canva (estilo
+   `agent_core`). La UI es espejo del grafo, no el cerebro.
+6. **Pruebas:** los grafos se prueban headless (`LangGraph` testable, sin LLM
+   en CI salvo integraciones marcadas). La app come su propia comida.
+
+### Plan (ver `docs/SDDs/SDD-115-empresa-autonoma-crewai-langgraph.md`)
+
+- **Fase 0 — Fundación:** servicio Python `empresa_autonoma/` con CrewAI +
+  LangGraph, grafo "plan → implementar → revisar → merge" con un agente dev.
+- **Fase 1 — Crews:** roles (producto, dev, QA, devops) y delegación; cada
+  agente es un nodo en el canva.
+- **Fase 2 — Oficina animada:** vista estilo juego en la app (personajes,
+  estados animados con el lenguaje visual glassmorphism neón).
+- **Fase 3 — Integración repo:** leer issues/PRs, hacer ramas, PRs reales,
+  todo con aprobación humana.
+- **Fase 4 — Autonomía supervisada:** la empresa ejecuta tareas end-to-end con
+  gates de aprobación y trazabilidad.
 
 ## Etapa 1 (lo primero)
 
