@@ -130,7 +130,14 @@ class _HostsScreenState extends State<HostsScreen> {
                 const Expanded(
                   child: Row(
                     children: [
-                      Icon(Icons.terminal, color: Colors.lightBlueAccent, size: 28),
+                      ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        child: Image(
+                          image: AssetImage('assets/logo/logo.png'),
+                          width: 30,
+                          height: 30,
+                        ),
+                      ),
                       SizedBox(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
