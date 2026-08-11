@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:canva_core/canva.dart';
+import 'package:graph_core/graph_core.dart';
 import '../models/skill.dart';
 import '../services/agent_runner.dart';
 import '../services/agent_store.dart';
@@ -15,7 +16,9 @@ import '../services/project_service.dart';
 import '../services/ssh_service.dart';
 import '../services/sftp_service.dart';
 import 'agent_chat_screen.dart';
+import 'code_editor_screen.dart';
 import 'md_node_screen.dart';
+import 'project_graph_screen.dart';
 import 'project_tree_screen.dart';
 import 'skill_builder_screen.dart';
 import 'skill_lab_screen.dart';
@@ -430,6 +433,15 @@ class _CanvaScreenState extends State<CanvaScreen> {
                 _openSkillLab();
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.hub_outlined, color: Colors.purpleAccent),
+              title: const Text('Grafo del proyecto', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Archivos, imports y links en 2D/3D', style: TextStyle(color: Colors.white38, fontSize: 11)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _openProjectGraph();
+              },
+            ),
           ],
         ),
       ),
@@ -440,6 +452,46 @@ class _CanvaScreenState extends State<CanvaScreen> {
     final content = node.content;
     if (content == null || content.trim().isEmpty) return null;
     return Skill.fromMarkdown(content);
+  }
+
+  Future<void> _openProjectGraph() async {
+    if (kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Grafo disponible solo en desktop')),
+      );
+      return;
+    }
+    final dir = await FilePicker.getDirectoryPath();
+    if (dir == null || !mounted) return;
+    final graph = RelationIndexer.scan(dir);
+    final service = ProjectService(root: dir);
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProjectGraphScreen(
+          graph: graph,
+          root: dir,
+          onOpenFile: (path) {
+            final file = File('$dir${Platform.pathSeparator}$path');
+            if (!file.existsSync()) return;
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CodeEditorScreen(
+                  path: path,
+                  initialContent: file.readAsStringSync(),
+                  service: service,
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 
   Future<void> _openSkillLab() async {

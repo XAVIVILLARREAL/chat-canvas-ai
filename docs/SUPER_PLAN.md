@@ -129,15 +129,15 @@ flutter build apk --debug --no-tree-shake-icons
 
 **Objetivo:** visualizar las conexiones entre archivos como hizo `mcp codebase-memory` / Supermemory / Engram.
 
-- [ ] Indexador de relaciones: imports (Dart/Python), referencias, `[[links]]` entre `.md`.
-- [ ] Grafo 2D de fuerza dirigida (d3-force portado a Flutter), cluster por paquete.
-- [ ] Hover = preview, click = abre el archivo en el editor.
+- [x] Indexador de relaciones: imports (Dart/Python), referencias, `[[links]]` entre `.md`.
+- [x] Grafo 2D de fuerza dirigida (d3-force portado a Flutter), cluster por paquete.
+- [x] Hover = preview, click = abre el archivo en el editor.
 - [ ] Grafo 3D: WebView + Three.js solo en desktop/web; fallback 2D en mobile.
 
 **Pruebas de comprobación (gate):**
-- [ ] Unit: indexador detecta imports/referencias/links reales de un fixture.
-- [ ] Widget: grafo renderiza, hover muestra preview, click abre editor.
-- [ ] Performance: 5.000 nodos a ≥ 30fps (baseline registrada antes de optimizar).
+- [x] Unit: indexador detecta imports/referencias/links reales de un fixture.
+- [x] Widget: grafo renderiza, hover muestra preview, click abre editor.
+- [x] Performance: 5.000 nodos a ≥ 30fps (baseline registrada antes de optimizar).
 - [ ] Manual: cargar este repo y navegar su grafo completo en desktop.
 
 ---

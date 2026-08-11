@@ -47,6 +47,8 @@ dependencies:
     path: ../../packages/canva_core
   agent_core:
     path: ../../packages/agent_core
+  graph_core:
+    path: ../../packages/graph_core
 
 dev_dependencies:
   flutter_test:
