@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import '../models/agent.dart';
+import 'package:agent_core/agent.dart';
 
 class EvidenceRecord {
   final String path;

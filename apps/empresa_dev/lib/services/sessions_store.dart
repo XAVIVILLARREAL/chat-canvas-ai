@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
-import '../models/session.dart';
+import 'package:ssh_core/session.dart';
 
 class SessionsStore {
   List<DevSession> _sessions = [];

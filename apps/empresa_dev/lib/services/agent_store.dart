@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
-import '../models/agent.dart';
+import 'package:agent_core/agent.dart';
 
 class AgentStore {
   final Directory? baseDir;

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../models/canva.dart';
+import 'package:canva_core/canva.dart';
 
 class HostRecord {  final String id;
   final String name;

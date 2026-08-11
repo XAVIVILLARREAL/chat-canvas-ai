@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:empresa_dev/models/canva.dart';
+import 'package:canva_core/canva.dart';
 
 void main() {
   group('CanvaNode', () {

@@ -1,4 +1,4 @@
-import '../services/agent_detector.dart';
+import 'package:agent_core/agent_detector.dart';
 
 /// ID opaco de nodo del canva: `w<sec>:w<ms>` del momento de creación.
 /// Nunca se reutiliza: aunque el nodo se borre, no se vuelve a emitir.

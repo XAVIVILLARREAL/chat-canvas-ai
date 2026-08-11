@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:empresa_dev/models/canvas_node.dart';
-import 'package:empresa_dev/services/agent_detector.dart';
+import 'package:canva_core/canva.dart';
+import 'package:agent_core/agent_detector.dart';
 
 void main() {
   group('CanvasNodeId', () {

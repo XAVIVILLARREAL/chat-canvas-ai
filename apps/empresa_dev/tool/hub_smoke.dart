@@ -5,7 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:empresa_dev/models/sync_snapshot.dart';
+import 'package:ssh_core/sync_snapshot.dart';
 import 'package:empresa_dev/services/hub_server.dart';
 
 Future<String> httpGet(String url, {String? auth}) async {

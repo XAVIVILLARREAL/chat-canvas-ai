@@ -1,0 +1,27 @@
+# Monorepo raíz — Empresa Dev
+
+# Flutter/Dart (residuos de la raíz; la app tiene su propio .gitignore)
+.dart_tool/
+build/
+.packages
+
+# IDE
+.idea/
+*.iml
+
+# Referencias externas (submodulos o clones; jamás se suben crudos)
+buzz/
+herdr/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db

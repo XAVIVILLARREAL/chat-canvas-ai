@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../models/agent.dart';
-import '../services/agent_detector.dart';
+import 'package:agent_core/agent.dart';
+import 'package:agent_core/agent_detector.dart';
 import '../services/agent_runner.dart';
 import '../services/evidence_store.dart';
 import '../services/voice_service.dart';

@@ -41,6 +41,12 @@ dependencies:
   flutter_tts: ^4.2.5
   file_picker: ^11.0.3
   flutter_markdown: ^0.7.7+1
+  ssh_core:
+    path: ../../packages/ssh_core
+  canva_core:
+    path: ../../packages/canva_core
+  agent_core:
+    path: ../../packages/agent_core
 
 dev_dependencies:
   flutter_test:

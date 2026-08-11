@@ -1,3 +1,5 @@
+export 'canvas_node.dart';
+
 enum CanvaNodeType { host, note, container, agent }
 
 class CanvaNode {

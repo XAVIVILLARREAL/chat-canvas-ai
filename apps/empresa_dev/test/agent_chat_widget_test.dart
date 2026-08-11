@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:empresa_dev/models/agent.dart';
+import 'package:agent_core/agent.dart';
 import 'package:empresa_dev/screens/agent_chat_screen.dart';
 import 'package:empresa_dev/services/agent_runner.dart';
 

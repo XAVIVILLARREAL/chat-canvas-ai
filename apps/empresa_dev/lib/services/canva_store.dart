@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
-import '../models/canva.dart';
+import 'package:canva_core/canva.dart';
 
 class CanvaStore {
   Future<File> _file() async {

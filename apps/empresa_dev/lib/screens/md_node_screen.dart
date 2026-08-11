@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/canva.dart';
+import 'package:canva_core/canva.dart';
 import '../services/md_link_parser.dart';
 import '../widgets/md_node_editor.dart';
 

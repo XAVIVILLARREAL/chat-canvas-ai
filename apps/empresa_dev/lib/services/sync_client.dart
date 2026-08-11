@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import '../models/sync_snapshot.dart';
+import 'package:ssh_core/sync_snapshot.dart';
 
 class SyncClient {
   String? _baseUrl;

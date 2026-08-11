@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../models/sync_snapshot.dart';
+import 'package:ssh_core/sync_snapshot.dart';
 import '../services/hub_server.dart';
 import '../services/sync_client.dart';
 

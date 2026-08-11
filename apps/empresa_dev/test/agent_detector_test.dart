@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:empresa_dev/services/agent_detector.dart';
+import 'package:agent_core/agent_detector.dart';
 import 'package:empresa_dev/widgets/agent_state_badge.dart';
 
 AgentRule rule(String name, AgentState state, {List<String> contains = const [], List<String> regex = const [], List<String> lineRegex = const [], int priority = 0}) =>

@@ -1,6 +1,5 @@
 import 'dart:io';
-import '../models/canva.dart';
-import '../models/canvas_node.dart';
+import 'package:canva_core/canva.dart';
 import 'md_link_parser.dart';
 
 /// Construye un canva de ideas a partir de una carpeta de `.md`:

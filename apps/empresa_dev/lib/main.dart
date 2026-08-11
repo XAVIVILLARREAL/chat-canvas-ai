@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'services/ssh_service.dart';
 import 'services/canva_store.dart';
 import 'services/sessions_store.dart';
-import 'models/sync_snapshot.dart';
+import 'package:ssh_core/sync_snapshot.dart';
 import 'screens/canva_screen.dart';
 import 'screens/tabs_screen.dart';
 import 'screens/hub_screen.dart';

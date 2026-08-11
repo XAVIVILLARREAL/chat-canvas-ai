@@ -15,11 +15,65 @@ Un **reemplazo de Termius multiplataforma** hecho en **Flutter**: terminal SSH/S
 
 1. **SDD por feature — antes de implementar.** Escribe el diseño (objetivo, flujo, contratos, tests) antes de tocar código.
 2. **TDD:** primero el test que falla, después el código que lo pasa.
-3. **CI día 1:** `flutter analyze` + `flutter test --exclude-tags integration` + build multiplataforma.
+3. **CI día 1:** `melos analyze` + `melos test` + build multiplataforma. La app: `flutter analyze` + `flutter test --exclude-tags integration` desde `apps/empresa_dev`.
 4. **Gate por fase:** cada fase del ROADMAP tiene su verificación (ver `docs/ROADMAP.md`). Una fase no se cierra sin pasar su gate.
 5. **Tests de integración SSH:** en `test/ssh_integration_test.dart`, tag `integration`, requieren red + llave (`test/fixtures/app_test_key`), no corren en CI.
 6. **Definition of Done:** CI verde + probado en al menos 2 plataformas (Android + desktop) + gate de la fase cumplido.
 7. Máx 3 intentos por error antes de escalar al humano.
+
+## Arquitectura MONOREPO (OBLIGATORIA)
+
+Este proyecto es un **monorepo formal orquestado con Melos**. La estructura es ley; no se viola.
+
+```
+empresa-desarrollo-autonoma/
+├── apps/
+│   └── empresa_dev/        # ÚNICA app Flutter (capa de UI). Su pubspec es `empresa_dev`.
+├── packages/               # Librerías puras Dart (sin Flutter salvo que se justifique)
+│   ├── ssh_core/           # SshHost, DevSession, SyncSnapshot, HostRecord
+│   ├── canva_core/         # CanvaNode/CanvaState, CanvasNode/CanvasNodeId/NodeKind
+│   └── agent_core/         # AgentMessage, AgentDetector, manifiestos (portados de herdr)
+├── melos.yaml              # Orquestación: bootstrap, analyze, test, build
+├── skills/                 # (reservado) packs de skills versionados con el código
+├── reference/              # (reservado) repos externos como submodulos: buzz, herdr
+└── copia.md                # Plan de qué copiar de buzz/herdr
+```
+
+### Reglas obligatorias (incumplirlas = revertir el PR)
+
+1. **La app NUNCA importa por ruta relativa hacia un package.** Todo módulo
+   reutilizable vive en `packages/*` y se importa por nombre: `package:ssh_core/...`.
+2. **Dirección de dependencias:** `apps/*` → `packages/*`. Los packages NUNCA
+   importan desde `apps/` ni desde otro package que dependa de ellos (sin ciclos).
+3. **Todo código nuevo reutilizable va a un package**, no a `lib/` de la app.
+   - Modelos, lógica SSH, detección de agentes, sync → packages.
+   - Solo UI (screens, widgets), stores con `path_provider`, y estado Riverpod
+     viven en `apps/empresa_dev/lib`.
+4. **Los packages son Dart puro** (sin Flutter) salvo justificación en el SDD.
+   Si un modelo necesita Flutter, primero cuestiona el diseño.
+5. **No commits en la raíz que mezclen packages.** Cada package con su propio
+   pubspec, analysis_options y tests. `melos bootstrap` enlaza todo.
+6. **skills/ y reference/**: skills versionadas en el repo; repos externos
+   (buzz, herdr) SOLO como submodulos en `reference/`, jamás copiados crudos a `lib/`.
+7. **`melos analyze` y `melos test` deben pasar** antes de terminar una tarea.
+
+### Comandos
+
+```bash
+melos bootstrap        # pub get de todos los packages (tras clonar o cambiar pubspec)
+melos analyze          # dart analyze en todos los packages
+melos test             # dart test en todos los packages
+cd apps/empresa_dev && flutter test --exclude-tags integration   # tests de la app
+cd apps/empresa_dev && flutter build windows --release           # build desktop
+```
+
+### Al mover código a un package
+
+1. `git mv` (conserva historial).
+2. Arregla imports: `package:<nombre>_core/...`.
+3. Si `lib/canva.dart` exporta varios archivos, usa `export` en la entrada pública.
+4. Agrega `test/<package>_test.dart` y corre `dart test` dentro del package.
+5. Corre `melos analyze` — debe quedar en 0 issues en el package.
 
 ## Decisiones de arquitectura (ADRs)
 

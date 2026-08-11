@@ -1,0 +1,15 @@
+name: ssh_core
+description: Modelos puros de SSH (hosts, sesiones, snapshots de sync).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  canva_core:
+    path: ../canva_core
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.25.0

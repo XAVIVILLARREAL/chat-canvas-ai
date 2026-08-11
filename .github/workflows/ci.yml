@@ -16,11 +16,20 @@ jobs:
           flutter-version: '3.32.2'
           channel: stable
 
-      - name: Dependencias
-        run: flutter pub get
+      - name: Instalar Melos
+        run: dart pub global activate melos
 
-      - name: Análisis estático
-        run: flutter analyze
+      - name: Bootstrap
+        run: melos bootstrap
 
-      - name: Tests (unitarios, sin integración)
-        run: flutter test --exclude-tags integration
+      - name: Análisis estático (packages)
+        run: melos exec -- "dart analyze ."
+
+      - name: Análisis de la app
+        run: cd apps/empresa_dev && flutter analyze
+
+      - name: Tests unitarios (packages)
+        run: melos exec -- "dart test"
+
+      - name: Tests de la app (sin integración)
+        run: cd apps/empresa_dev && flutter test --exclude-tags integration

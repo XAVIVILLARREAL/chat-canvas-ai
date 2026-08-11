@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/session.dart';
+import 'package:ssh_core/session.dart';
 import '../services/sessions_store.dart';
 import '../services/ssh_service.dart';
 import '../services/sftp_service.dart';

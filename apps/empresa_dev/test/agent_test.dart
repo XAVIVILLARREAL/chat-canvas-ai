@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:empresa_dev/models/agent.dart';
+import 'package:agent_core/agent.dart';
 import 'package:empresa_dev/services/agent_store.dart';
 
 void main() {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/agent_detector.dart';
+import 'package:agent_core/agent_detector.dart';
 
 class AgentStateBadge extends StatelessWidget {
   final AgentState state;
