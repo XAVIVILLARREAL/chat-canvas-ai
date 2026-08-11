@@ -151,7 +151,31 @@ class _CanvaScreenState extends State<CanvaScreen> {
         return;
       }
       _openHostActions(host);
+    } else if (node.type == CanvaNodeType.agent) {
+      _openAgentChat(node);
     }
+  }
+
+  Future<void> _openAgentChat(CanvaNode node) async {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Agentes IA disponibles solo en desktop')),
+      );
+      return;
+    }
+    final store = AgentStore();
+    final session = await store.getOrCreate(node.hostId ?? 'dev');
+    if (!mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AgentChatScreen(
+          session: session,
+          store: (sessions) => store.save(sessions),
+          runner: OpenCodeAgentRunner(),
+        ),
+      ),
+    );
   }
 
   void _openHostActions(SshHost host) {
@@ -296,6 +320,16 @@ class _CanvaScreenState extends State<CanvaScreen> {
               onTap: () {
                 Navigator.pop(ctx);
                 _addNote();
+              },
+            ),
+            const Divider(color: Colors.white12),
+            ListTile(
+              leading: const Icon(Icons.smart_toy, color: Colors.purpleAccent),
+              title: const Text('Agente IA (opencode)', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Solo desktop por ahora', style: TextStyle(color: Colors.white38, fontSize: 11)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _addAgent();
               },
             ),
           ],
