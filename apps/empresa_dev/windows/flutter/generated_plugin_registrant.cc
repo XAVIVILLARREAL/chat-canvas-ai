@@ -8,10 +8,13 @@
 
 #include <flutter_tts/flutter_tts_plugin.h>
 #include <speech_to_text_windows/speech_to_text_windows.h>
+#include <webview_windows/webview_windows_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   FlutterTtsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterTtsPlugin"));
   SpeechToTextWindowsRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("SpeechToTextWindows"));
+  WebviewWindowsPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("WebviewWindowsPlugin"));
 }

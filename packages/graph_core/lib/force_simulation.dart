@@ -90,7 +90,7 @@ class ForceSimulation {
     // repulsa contra los de su celda y las 8 vecinas (k ≈ 9·densidad).
     const repulsion = 900.0;
     const cellSize = 90.0;
-    const gridSize = 1 << 20; // máscara para empaquetar (cx, cy)
+    // clave = (cx & 0x3FF) | ((cy & 0x3FF) << 10): empaquetado 10 bits por eje.
     final grid = <int, List<int>>{};
     for (var i = 0; i < n; i++) {
       final b = _bodies[i];

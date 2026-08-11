@@ -132,7 +132,7 @@ flutter build apk --debug --no-tree-shake-icons
 - [x] Indexador de relaciones: imports (Dart/Python), referencias, `[[links]]` entre `.md`.
 - [x] Grafo 2D de fuerza dirigida (d3-force portado a Flutter), cluster por paquete.
 - [x] Hover = preview, click = abre el archivo en el editor.
-- [ ] Grafo 3D: WebView + Three.js solo en desktop/web; fallback 2D en mobile.
+- [x] Grafo 3D: WebView + Three.js solo en desktop/web; fallback 2D en mobile.
 
 **Pruebas de comprobación (gate):**
 - [x] Unit: indexador detecta imports/referencias/links reales de un fixture.

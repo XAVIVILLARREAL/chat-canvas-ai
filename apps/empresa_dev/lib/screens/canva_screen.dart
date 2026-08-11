@@ -364,13 +364,14 @@ class _CanvaScreenState extends State<CanvaScreen> {
       context: context,
       backgroundColor: const Color(0xFF1E293B),
       builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(12),
-              child: Text('Añadir al canva', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(12),
+                child: Text('Añadir al canva', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
             if (widget.hosts.isEmpty)
               const ListTile(
                 title: Text('No hay hosts. Agrégalos primero.', style: TextStyle(color: Colors.white54)),
@@ -443,6 +444,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
               },
             ),
           ],
+          ),
         ),
       ),
     );
@@ -463,8 +465,14 @@ class _CanvaScreenState extends State<CanvaScreen> {
       );
       return;
     }
-    final dir = await FilePicker.getDirectoryPath();
-    if (dir == null || !mounted) return;
+    const repoDefine = String.fromEnvironment('EMPRESA_DEV_REPO');
+    final repoEnv = Platform.environment['EMPRESA_DEV_REPO'];
+    final dir = repoDefine.isNotEmpty
+        ? repoDefine
+        : (repoEnv != null && repoEnv.isNotEmpty)
+            ? repoEnv
+            : await FilePicker.getDirectoryPath();
+    if (dir == null || dir.isEmpty || !mounted) return;
     final graph = RelationIndexer.scan(dir);
     final service = ProjectService(root: dir);
     if (!mounted) return;

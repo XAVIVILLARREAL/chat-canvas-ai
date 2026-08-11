@@ -61,3 +61,11 @@ class Graph {
 
   const Graph({required this.nodes, required this.edges});
 }
+
+/// Punto 2D (posición de layout) para render 2D/3D.
+class Offset2 {
+  final double x;
+  final double y;
+
+  const Offset2(this.x, this.y);
+}

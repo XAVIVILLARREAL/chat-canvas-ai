@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:graph_core/graph_core.dart';
+import 'project_graph_3d_screen.dart';
 
 /// Grafo del proyecto: nodos = archivos (cluster por paquete), aristas =
 /// imports/links. Layout con física de fuerzas (headless, layout() síncrono).
@@ -49,6 +51,20 @@ class _ProjectGraphScreenState extends State<ProjectGraphScreen> {
     widget.onOpenFile?.call(id);
   }
 
+  void _open3D() {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ProjectGraph3DScreen(graph: widget.graph),
+        ),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('3D solo en desktop')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final nodes = widget.graph.nodes;
@@ -60,6 +76,13 @@ class _ProjectGraphScreenState extends State<ProjectGraphScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Grafo del proyecto'),
+        actions: [
+          IconButton(
+            tooltip: 'Ver grafo 3D',
+            icon: const Icon(Icons.view_in_ar),
+            onPressed: _open3D,
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(40),
           child: Padding(
