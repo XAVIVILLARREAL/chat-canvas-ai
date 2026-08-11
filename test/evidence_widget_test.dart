@@ -10,8 +10,8 @@ import 'package:empresa_dev/services/evidence_store.dart';
 class _FakeRunner extends AgentRunner {
   @override
   Stream<AgentRunLine> run(String prompt, {String? cwd}) async* {
-    yield AgentRunLine('Hola ', isError: false);
-    yield AgentRunLine('mundo', isError: false);
+    yield AgentRunLine(content: 'Hola ');
+    yield AgentRunLine(content: 'mundo');
   }
 }
 
