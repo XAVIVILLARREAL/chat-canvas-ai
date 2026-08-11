@@ -33,3 +33,9 @@ Thumbs.db
 
 # Test
 coverage/
+
+# Repo de referencia externo (block/buzz) - clon independiente
+buzz/
+
+# Repo de referencia externo (herdrdev/herdr) - clon independiente
+herdr/
