@@ -1,7 +1,7 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../models/agent.dart';
 import '../models/canva.dart';
 import '../services/agent_runner.dart';
 import '../services/agent_store.dart';
@@ -387,6 +387,12 @@ class _DraggableNodeState extends State<_DraggableNode> {
   Widget build(BuildContext context) {
     final n = widget.node;
     final isHost = n.type == CanvaNodeType.host;
+    final isAgent = n.type == CanvaNodeType.agent;
+    final icon = isHost
+        ? Icons.dns
+        : isAgent
+            ? Icons.smart_toy
+            : Icons.sticky_note_2;
     return GestureDetector(
       onTap: widget.onTap,
       onLongPress: widget.onLongPress,
@@ -406,7 +412,7 @@ class _DraggableNodeState extends State<_DraggableNode> {
         child: Row(
           children: [
             Icon(
-              isHost ? Icons.dns : Icons.sticky_note_2,
+              icon,
               color: Color(n.colorValue),
               size: 20,
             ),
