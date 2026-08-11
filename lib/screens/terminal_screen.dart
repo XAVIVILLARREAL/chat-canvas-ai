@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dartssh2/dartssh2.dart';
@@ -185,6 +187,10 @@ class TerminalScreenState extends State<TerminalScreen> {
               focusNode: _termFocus,
               autofocus: true,
               backgroundOpacity: 1,
+              // En desktop el teclado físico debe mandar directamente al
+              // terminal (sin IME), si no, las letras se pierden y no se
+              // puede escribir.
+              hardwareKeyboardOnly: !Platform.isAndroid && !Platform.isIOS,
               onKeyEvent: (node, event) {
                 if (event is! KeyDownEvent) return KeyEventResult.ignored;
                 final logical = event.logicalKey;

@@ -1,0 +1,165 @@
+# SUPER PLAN — Del terminal SSH al IDE visual de vibecoding
+
+> **Estado:** vigente. Fuente de verdad para las fases y sus **pruebas de comprobación (gates)**.
+> Metodología obligatoria por fase: **SDD → TDD → CI → Gate**. Detalle operativo en la skill `.opencode/skills/dev/SKILL.md`.
+
+## Estado actual (real, verificado en código)
+
+| Bloque | Estado | Evidencia |
+|---|---|---|
+| Terminal SSH (dartssh2 + xterm.dart) | ✅ hecho | `lib/services/ssh_service.dart`, `test/ssh_service_test.dart`, `ssh_integration_test.dart` |
+| SFTP | ✅ hecho | `lib/services/sftp_service.dart`, `sftp_integration_test.dart` |
+| Canva visual | ✅ hecho | `lib/models/canva.dart`, `lib/screens/canva_screen.dart`, `canva_test.dart`, `canva_widget_test.dart` |
+| Hub celular + sync | ✅ hecho | `lib/services/hub_server.dart`, `sync_client.dart`, `sync_integration_test.dart` |
+| Sesiones/tabs | ✅ hecho | `lib/screens/tabs_screen.dart`, `sessions_store.dart` |
+| Publicación (Play/App Store/releases) | ❌ pendiente | — |
+
+## Comandos maestros de comprobación (corren en cualquier fase)
+
+```powershell
+flutter analyze                              # 0 issues
+flutter test --exclude-tags integration      # suite unit/widget verde
+dart run tool/hub_smoke.dart                 # smoke del hub OK
+flutter build apk --debug --no-tree-shake-icons
+# Windows: cmake manual (ver AGENTS.md "Build Commands")
+```
+
+---
+
+## Etapa 1 — Cierre y publicación (gate: Termius reemplazado)
+
+**Objetivo:** terminar lo pendiente de Etapa 1 y publicar.
+
+- [ ] E2E real en Android + Windows + macOS (requiere dispositivos).
+- [ ] Prueba de batería: hub en Android no agota batería en 24h.
+- [ ] Publicar Play Store / App Store / releases desktop.
+
+**Pruebas de comprobación (gate de cierre):**
+- [ ] Suite completa (comandos maestros) verde.
+- [ ] Manual: SSH a `pve` por password **y** llave; SFTP subir/bajar con hash verificado; túnel local funcionando; canva con topología persistida tras reabrir; sync 2 dispositivos en el tailnet.
+- [ ] Capturas de cada flujo como evidencia.
+- [ ] Binario publicado y descargable en al menos una vía pública.
+
+---
+
+## Etapa 2 — Agentes IA en el canva (retoma `docs/legacy/`)
+
+**Objetivo:** los agentes (opencode) son ciudadanos de primera clase en el canva.
+
+- [ ] Nodo **agente IA** en el canva; click → sesión de chat con opencode.
+- [ ] Voz: dictar (STT navegador) → respuesta leída (Edge TTS).
+- [ ] Evidencia por prompt: cada respuesta se guarda como `.md` navegable.
+- [ ] Verificación de UI con Chrome headless (`tool/verify_ui.*`).
+
+**Pruebas de comprobación (gate):**
+- [ ] Unit: modelo `AgentNode`, store de sesiones de agente.
+- [ ] Widget: nodo agente se renderiza, abre sesión y recibe respuesta (mock).
+- [ ] Manual: lanzar agente real desde el nodo y recibir respuesta en el chat.
+- [ ] Voz: dictado → texto → respuesta audible en < 3s.
+- [ ] Evidencia: 3 prompts con captura guardada como `.md`.
+
+---
+
+## Etapa 3 — File tree + editor de código (sin IA)
+
+**Objetivo:** el canva pasa de "hosts" a "proyectos": abrir, navegar y editar proyectos locales + remotos.
+
+- [ ] Abrir proyecto local (`file_picker`) y renderizar árbol de archivos.
+- [ ] Editor de archivos planos (`.md`, `.dart`, `.py`, `.json`…) con guardado.
+- [ ] SFTP push: guardar también en el host remoto conectado; abrir archivo remoto y editar.
+
+**Pruebas de comprobación (gate):**
+- [ ] Unit: service de proyecto (listar, abrir, guardar con encoding correcto); parser de árbol.
+- [ ] Widget: árbol → click → editor abre contenido; modificar → guardar → reabrir conserva el cambio.
+- [ ] Integration SFTP: editar archivo remoto y verificar hash local == remoto.
+- [ ] **Dogfood:** este repo se abre, edita y guarda desde la propia app (2 sesiones seguidas sin fallos).
+
+---
+
+## Etapa 4 — Canva de ideas + `.md`
+
+**Objetivo:** los nodos del canva son documentos Markdown enlazados (Obsidian-style).
+
+- [ ] Nodos `.md` enlazados con `[[links]]`; render Markdown con preview live.
+- [ ] Backlinks y navegación por enlaces desde el editor.
+- [ ] Auto-layout simple; persistencia en drift.
+
+**Pruebas de comprobación (gate):**
+- [ ] Unit: parser de `[[links]]`, índice de backlinks.
+- [ ] Widget: preview markdown se actualiza en vivo; click en link navega al nodo.
+- [ ] Manual: crear 5 notas enlazadas, navegar por backlinks, cerrar/reabrir → todo persiste.
+- [ ] **Dogfood:** el mapa de ideas de este proyecto (`docs/`) representado como canva navegable.
+
+---
+
+## Etapa 4b — Gestor visual de skills + laboratorio
+
+**Objetivo:** crear agentes/skills visualmente, probarlas en vivo y exportarlas a cualquier dialecto.
+
+- [ ] Constructor visual de `skills.md`: `name`, `description`, `triggers`, `tags`, permisos; cuerpo Markdown con preview; bloques arrastrables (instrucciones, ejemplos, restricciones, anti-patrones).
+- [ ] Laboratorio sandbox: input → ranking de skills que se activarían, con confianza y por qué. Historial + regression tests dentro de la propia skill.
+- [ ] Skills como nodos del canva (relaciones: depende, excluye, compone).
+- [ ] Export multi-dialecto: opencode, Cursor, Claude Code, Continue, Codex (con diff visual).
+- [ ] CI de dogfood: `flutter test --tags skills` ejecuta el laboratorio en modo headless.
+
+**Pruebas de comprobación (gate):**
+- [ ] Unit: parser YAML frontmatter por dialecto; simulador de triggers con scoring; export por dialecto.
+- [ ] Widget: el form crea un `SKILL.md` válido; drag&drop de bloques; el sandbox muestra ranking.
+- [ ] **Dogfood duro:** 3 skills de este repo creadas desde la app, y cada una pasa su test en el laboratorio.
+- [ ] Manual: crear skill → probarla → exportarla a `.opencode/skills/` → reiniciar opencode → se activa con su trigger real.
+
+---
+
+## Etapa 5 — Grafo del proyecto (2D → 3D)
+
+**Objetivo:** visualizar las conexiones entre archivos como hizo `mcp codebase-memory` / Supermemory / Engram.
+
+- [ ] Indexador de relaciones: imports (Dart/Python), referencias, `[[links]]` entre `.md`.
+- [ ] Grafo 2D de fuerza dirigida (d3-force portado a Flutter), cluster por paquete.
+- [ ] Hover = preview, click = abre el archivo en el editor.
+- [ ] Grafo 3D: WebView + Three.js solo en desktop/web; fallback 2D en mobile.
+
+**Pruebas de comprobación (gate):**
+- [ ] Unit: indexador detecta imports/referencias/links reales de un fixture.
+- [ ] Widget: grafo renderiza, hover muestra preview, click abre editor.
+- [ ] Performance: 5.000 nodos a ≥ 30fps (baseline registrada antes de optimizar).
+- [ ] Manual: cargar este repo y navegar su grafo completo en desktop.
+
+---
+
+## Etapa 6 — Vibecoding
+
+**Objetivo:** el agente IA trabaja dentro del canva; cada propuesta es un nodo-diff aceptable o rechazable.
+
+- [ ] Agente conectado al editor + canva (opencode CLI de legacy o API LLM directa).
+- [ ] Cada propuesta = nodo-diff con preview; aceptar/rechazar; historial navegable.
+
+**Pruebas de comprobación (gate):**
+- [ ] Unit: pipeline parche → nodo-diff; transiciones de estado aceptar/rechazar/revertir.
+- [ ] Widget: chat + nodo-diff; aplicar cambio y revertir sin estado residual.
+- [ ] Integration: agente real propone un cambio en un fixture; aplicado, los tests siguen verdes.
+- [ ] **Dogfood:** una feature real de este repo implementada 100% vía vibecoding desde la app.
+
+---
+
+## Etapa 7 — SDD++ + Playwright E2E
+
+**Objetivo:** gates automáticos por fase; cada feature arranca como SDD enlazado en el canva.
+
+- [ ] Playwright CLI contra `flutter build web` (`tool/e2e_web.ps1`).
+- [ ] `patrol_cli` para flujos mobile.
+- [ ] CI (GitHub Actions) corre analyze + tests + E2E web por PR.
+
+**Pruebas de comprobación (gate):**
+- [ ] Script E2E web: conectar SSH, abrir archivo, editar, guardar — sin intervención humana.
+- [ ] Patrol: mismo flujo crítico en Android.
+- [ ] CI: un PR con feature + SDD + tests + E2E pasa completo.
+
+---
+
+## Definition of Done global
+
+- CI verde (`flutter analyze` + suite + gates de la fase).
+- Probado en ≥ 2 plataformas (Android + desktop).
+- Gate de la fase cumplido (checklist anterior).
+- Evidencia (capturas/logs) adjunta en el commit de cierre de fase.

@@ -1,4 +1,4 @@
-enum CanvaNodeType { host, note, container }
+enum CanvaNodeType { host, note, container, agent }
 
 class CanvaNode {
   String id;

@@ -4,9 +4,10 @@ project(empresa_dev LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-# Nota: "empresa_dev"/"empresa-dev"/"edapp" fueron bloqueados por el antivirus
-# en Debug (LNK1104); usamos "apptest.exe" para evitarlo.
-set(BINARY_NAME "apptest")
+# Nota: varios nombres ("empresa_dev", "edapp", "apptest", "devssh", "sshterm",
+# "termpro") fueron bloqueados por el antivirus en Debug (LNK1104); "sshpro" es
+# el actual.
+set(BINARY_NAME "sshpro")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.

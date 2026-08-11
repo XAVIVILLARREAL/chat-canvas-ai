@@ -33,17 +33,28 @@ class _TabsScreenState extends State<TabsScreen> {
     );
   }
 
+  /// Conexión SSH en un solo toque: crea la sesión si hace falta y abre el
+  /// terminal directo. Es el flujo principal para el usuario.
+  Future<void> _connectToHost(SshHost host) async {
+    var session = _sessions.firstWhere(
+      (s) => s.hostId == host.name && s.open,
+      orElse: () => DevSession(id: '', title: '', hostId: ''),
+    );
+    if (session.id.isEmpty) {
+      await widget.store.addSession(host.name, host.name);
+      if (!mounted) return;
+      setState(() {});
+      session = _sessions.firstWhere((s) => s.hostId == host.name);
+    }
+    await _openTerminal(host, session);
+  }
+
   Future<void> _openSftp(SshHost host) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => SftpScreen(host: host, sftp: SftpService(widget.sshService)),
       ),
     );
-  }
-
-  Future<void> _addSessionFromHost(SshHost host) async {
-    await widget.store.addSession(host.name, host.name);
-    if (mounted) setState(() {});
   }
 
   Future<void> _closeSession(DevSession s) async {
@@ -117,7 +128,6 @@ class _TabsScreenState extends State<TabsScreen> {
       itemCount: widget.hosts.length,
       itemBuilder: (ctx, i) {
         final h = widget.hosts[i];
-        final hasSession = _sessions.any((s) => s.hostId == h.name && s.open);
         return Card(
           color: const Color(0xFF1E293B),
           margin: const EdgeInsets.symmetric(vertical: 4),
@@ -129,24 +139,15 @@ class _TabsScreenState extends State<TabsScreen> {
             ),
             title: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
             subtitle: Text('${h.username}@${h.host}:${h.port}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+            onTap: () => _connectToHost(h),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (!hasSession)
-                  IconButton(
-                    icon: const Icon(Icons.add, color: Colors.lightBlueAccent, size: 20),
-                    onPressed: () => _addSessionFromHost(h),
-                    tooltip: 'Abrir pestaña',
-                  )
-                else
-                  IconButton(
-                    icon: const Icon(Icons.terminal, color: Colors.greenAccent, size: 20),
-                    onPressed: () {
-                      final s = _sessions.firstWhere((s) => s.hostId == h.name);
-                      _openTerminal(h, s);
-                    },
-                    tooltip: 'Abrir terminal',
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.terminal, color: Colors.greenAccent, size: 20),
+                  onPressed: () => _connectToHost(h),
+                  tooltip: 'Conectar por SSH',
+                ),
                 IconButton(
                   icon: const Icon(Icons.folder_open, color: Colors.amber, size: 20),
                   onPressed: () => _openSftp(h),

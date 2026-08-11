@@ -1,0 +1,17 @@
+Puente Modo Dios v5.1 (100.101.69.79:8003)
+
+===CONEXION-SSH===
+root
+pve
+pve-manager/9.2.2/b9984c6d90a4bd80 (running kernel: 7.0.2-6-pve)
+===RUTAS===
+100.101.69.79
+===PUERTO22===
+LISTEN 0      128                        0.0.0.0:22         0.0.0.0:*   
+LISTEN 0      128                           [::]:22            [::]:*   
+
+
+STDERR: 
+EXIT: 0
+
+Timestamp: 08/11/2026 02:32:26
