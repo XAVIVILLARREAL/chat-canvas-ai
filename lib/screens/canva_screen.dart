@@ -6,6 +6,7 @@ import '../models/canva.dart';
 import '../services/agent_runner.dart';
 import '../services/agent_store.dart';
 import '../services/canva_store.dart';
+import '../services/evidence_store.dart';
 import '../services/ssh_service.dart';
 import '../services/sftp_service.dart';
 import 'agent_chat_screen.dart';
@@ -173,6 +174,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
           session: session,
           store: (sessions) => store.save(sessions),
           runner: OpenCodeAgentRunner(),
+          evidenceStore: EvidenceStore(),
         ),
       ),
     );

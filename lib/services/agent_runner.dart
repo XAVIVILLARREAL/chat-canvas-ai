@@ -17,7 +17,25 @@ abstract class AgentRunner {
 class OpenCodeAgentRunner implements AgentRunner {
   final String executable;
 
-  OpenCodeAgentRunner({this.executable = 'opencode'});
+  OpenCodeAgentRunner({String? executable})
+      : executable = executable ?? _defaultExecutable();
+
+  static String _defaultExecutable() {
+    if (Platform.isWindows) {
+      final npmDir = Platform.environment['APPDATA'];
+      if (npmDir != null) {
+        final dir = '$npmDir\\npm';
+        for (final candidate in [
+          '$dir\\node_modules\\opencode-ai\\bin\\opencode.exe',
+          '$dir\\opencode.cmd',
+        ]) {
+          if (File(candidate).existsSync()) return candidate;
+        }
+      }
+      return 'opencode.cmd';
+    }
+    return 'opencode';
+  }
 
   @override
   Stream<AgentRunLine> run(String prompt, {String? cwd}) async* {
@@ -25,6 +43,9 @@ class OpenCodeAgentRunner implements AgentRunner {
       executable,
       ['run', prompt, '--dir', cwd ?? Directory.current.path],
     );
+    // opencode muere con EUNKNOWN si stdin queda en pipe abierto sin TTY:
+    // cerramos para que detecte EOF.
+    process.stdin.close();
     final stdoutLines =
         process.stdout.transform(utf8.decoder).transform(const LineSplitter());
     final stderrLines =

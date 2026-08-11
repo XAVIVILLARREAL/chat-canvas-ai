@@ -3,17 +3,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/agent.dart';
 import '../services/agent_runner.dart';
+import '../services/evidence_store.dart';
+import 'evidence_screen.dart';
 
 class AgentChatScreen extends StatefulWidget {
   final AgentSession session;
   final Future<void> Function(List<AgentSession>) store;
   final AgentRunner runner;
+  final EvidenceStore? evidenceStore;
 
   const AgentChatScreen({
     super.key,
     required this.session,
     required this.store,
     required this.runner,
+    this.evidenceStore,
   });
 
   @override
@@ -132,6 +136,16 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
       _running = false;
     });
     await widget.store([_session]);
+    if (finalText != null && finalText.trim().isNotEmpty) {
+      final store = widget.evidenceStore;
+      if (store != null) {
+        final prompt =
+            _session.messages.lastWhere((m) => m.role == AgentRole.user).text;
+        try {
+          await store.save(_session, prompt: prompt);
+        } catch (_) {}
+      }
+    }
   }
 
   void _scrollToBottom() {
@@ -156,6 +170,22 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
             Text('Agente ${_session.agentName}', style: const TextStyle(fontSize: 16)),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.description_outlined, color: Colors.white70, size: 20),
+            tooltip: 'Evidencia',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => EvidenceScreen(
+                    store: widget.evidenceStore ?? EvidenceStore(),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
