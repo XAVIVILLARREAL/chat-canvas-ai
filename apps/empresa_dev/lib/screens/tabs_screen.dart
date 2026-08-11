@@ -3,6 +3,8 @@ import 'package:ssh_core/session.dart';
 import '../services/sessions_store.dart';
 import '../services/ssh_service.dart';
 import '../services/sftp_service.dart';
+import '../theme/app_theme.dart';
+import '../widgets/neon_card.dart';
 import 'terminal_screen.dart';
 import 'sftp_screen.dart';
 
@@ -128,32 +130,50 @@ class _TabsScreenState extends State<TabsScreen> {
       itemCount: widget.hosts.length,
       itemBuilder: (ctx, i) {
         final h = widget.hosts[i];
-        return Card(
-          color: const Color(0xFF1E293B),
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          child: ListTile(
-            leading: const CircleAvatar(
-              backgroundColor: Colors.lightBlueAccent,
-              foregroundColor: Colors.black,
-              child: Icon(Icons.dns),
-            ),
-            title: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-            subtitle: Text('${h.username}@${h.host}:${h.port}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+        final hasSession = _sessions.any((s) => s.hostId == h.name && s.open);
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: NeonCard(
             onTap: () => _connectToHost(h),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.terminal, color: Colors.greenAccent, size: 20),
-                  onPressed: () => _connectToHost(h),
-                  tooltip: 'Conectar por SSH',
+            glow: hasSession ? AppColors.neonGreen : null,
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF0EA5E9), Color(0xFFA855F7)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.neonCyan.withValues(alpha: 0.35),
+                      blurRadius: 12,
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.folder_open, color: Colors.amber, size: 20),
-                  onPressed: () => _openSftp(h),
-                  tooltip: 'SFTP',
-                ),
-              ],
+                child: const Icon(Icons.dns, color: Colors.white, size: 20),
+              ),
+              title: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+              subtitle: Text('${h.username}@${h.host}:${h.port}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.terminal, color: Colors.greenAccent, size: 20),
+                    onPressed: () => _connectToHost(h),
+                    tooltip: 'Conectar por SSH',
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.folder_open, color: Colors.amber, size: 20),
+                    onPressed: () => _openSftp(h),
+                    tooltip: 'SFTP',
+                  ),
+                ],
+              ),
             ),
           ),
         );

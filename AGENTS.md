@@ -96,6 +96,66 @@ cd apps/empresa_dev && flutter build windows --release           # build desktop
 | Estado | Riverpod |
 | Secretos | flutter_secure_storage |
 
+## Identidad visual — GLASSMORPHISM NEÓN (OBLIGATORIO)
+
+> **Directiva de estilo del proyecto.** Toda interfaz nueva o retocada debe seguir
+> este lenguaje visual: **cristal, luz y futuro IA**. Nada de paneles planos ni
+> grises sordos. La app debe sentirse como un sistema de inteligencia artificial
+> autónoma de la siguiente era de la programación.
+
+### Principios de diseño
+
+1. **Glassmorphism de cristal** — paneles translúcidos (`Colors.white` con
+   alpha ~0.05–0.10), `BackdropFilter` + `ImageFilter.blur` como capa base,
+   bordes redondeados grandes (16–24), y un borde de 1px luminoso
+   (`gradient` blanco con alpha alto en la esquina superior → transparente).
+2. **Contornos de luz (light edges)** — el borde superior de cada "cristal"
+   lleva un gradiente sutil blanco/cian (simula luz entrando por arriba).
+3. **Neón sutil** — acentos neón cian (`#22D3EE`), violeta (`#A855F7`) y verde
+   (accent existente) SOLO en contornos, glows y elementos de foco. Nunca
+   saturar el contenido.
+4. **Glow (resplandor)** — sombras de color (`BoxShadow` con color cian/violeta
+   y `blurRadius` alto) en el borde de los elementos activos/importantes, no en
+   todo.
+5. **Píxeles / tech-grid** — fondo con grid sutil de puntos o línea fina
+   (como una cuadrícula de holograma), opacidad muy baja (~3–5%).
+6. **Animaciones fluidas** — transiciones de 200–350ms con `Curves.easeOutCubic`
+   o `Curves.elasticOut` para entradas destacadas. Nada de saltos bruscos.
+7. **Profundidad por capas** — fondos oscuros (`#0F172A` base) con cristales
+   encima; cada capa de UI (panel → tarjeta → diálogo) un poco más brillante.
+
+### Paleta de luz (token semilla)
+
+| Token | Color | Uso |
+|---|---|---|
+| `bg-base` | `#0F172A` | Fondo base (slate 900) |
+| `bg-glass` | `white 5–10%` | Paneles de cristal |
+| `neon-cyan` | `#22D3EE` | Luz principal, focus, contornos |
+| `neon-violet` | `#A855F7` | Agentes IA, acentos secundarios |
+| `neon-green` | `#4ADE80` | Conectado / éxito / hosts activos |
+| `edge-light` | `white → transparent` | Borde superior de cristales |
+
+### Reglas de implementación
+
+1. **Crea widgets reutilizables** de cristal (`GlassPanel`, `NeonCard`) en
+   `apps/empresa_dev/lib/widgets/` en vez de repetir `BackdropFilter` a mano.
+2. Los **diálogos, modales y paneles laterales** deben ser de cristal con borde
+   de luz (nunca `AlertDialog`/`Card` planos por defecto).
+3. El **canva** y las **tarjetas de host/agente** llevan glow neón al estar
+   activos/conectados.
+4. **Performance:** `BackdropFilter` es costoso — usarlo en paneles que cambian
+   poco; evitar en listas con scroll infinito. Los glows usan `BoxShadow`
+   normales, no `BackdropFilter`.
+5. `melos analyze` + tests en verde después de cualquier cambio visual.
+
+### Anti-patterns (prohibido)
+
+- ❌ Fondo sólido gris oscuro sin textura ni cristal.
+- ❌ Bordes negros/duros sin luz.
+- ❌ Neón sobresaturado en el contenido (solo contornos y foco).
+- ❌ Animaciones de 1s+ o `easeIn` lento que ralentiza la app.
+- ❌ Copiar estilos de Material por defecto sin adaptar.
+
 ## Etapa 1 (lo primero)
 
 Terminal SSH funcional en Flutter: conectar a `pve` (192.168.100.200 o 100.101.69.79 Tailscale), ver un shell en xterm.dart. Detalle en `docs/ETAPA1.md`.

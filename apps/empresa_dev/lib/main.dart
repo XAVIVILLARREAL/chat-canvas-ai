@@ -8,6 +8,8 @@ import 'package:ssh_core/sync_snapshot.dart';
 import 'screens/canva_screen.dart';
 import 'screens/tabs_screen.dart';
 import 'screens/hub_screen.dart';
+import 'theme/app_theme.dart';
+import 'widgets/neon_backdrop.dart';
 
 void main() {
   runApp(const EmpresaDevApp());
@@ -24,16 +26,8 @@ class EmpresaDevApp extends StatelessWidget {
       title: 'Empresa Dev',
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0EA5E9),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFF0F172A),
-      ),
-      home: const HostsScreen(),
+      theme: buildFuturisticTheme(),
+      home: const NeonBackdrop(child: HostsScreen()),
     );
   }
 }
