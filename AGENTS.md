@@ -113,3 +113,17 @@ Un **constructor visual de `skills.md`** + un **laboratorio para probarlas en vi
 ### Regla mientras tanto
 
 **Cero código de esto hasta cerrar Etapa 1.** Cuando Etapa 1 esté verde, re-evaluar con el equipo si (a) esta visión sigue vigente, (b) el "Termius + supervitaminas" original sigue siendo el núcleo, o (c) pivotamos. La historia de los IDEs visuales dice que el scope mata más proyectos que la falta de features.
+
+## Build Commands
+
+- **CI:** `flutter analyze` (0 issues) + `flutter test --exclude-tags integration`.
+- **Integration (requiere red/llaves):** `flutter test --tags integration` — `sync_integration_test.dart` falla sin Tailscale activa (esperado); `agent_integration_test.dart` prueba el agente real con opencode.
+- **APK:** `flutter build apk --debug --no-tree-shake-icons`.
+- **Windows (manual, VS 2026):** Flutter hardcodea VS 16 2019; workaround con cmake/MSBuild manuales:
+  ```powershell
+  $env:PATH = "C:\tools\nuget;$env:PATH"   # necesario desde flutter_tts (restaura paquetes NuGet)
+  & "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -G "Visual Studio 17 2022" -A x64 -S "windows" -B "build\windows\x64" -DCMAKE_INSTALL_PREFIX="$((Get-Location).Path)\build\windows\x64\runner\Debug"
+  & "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" "build\windows\x64\empresa_dev.sln" /p:Configuration=Debug /p:Platform=x64
+  ```
+  - Si `build\windows\x64` se borra, hay que re-pasar `-DCMAKE_INSTALL_PREFIX` (default: `C:\Program Files\empresa_dev` → falla sin admin).
+  - Avast/Defender puede bloquear el `.exe` de Debug (LNK1104): matar el proceso o excluir la carpeta del proyecto.

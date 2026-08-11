@@ -37,6 +37,9 @@ dependencies:
   dartssh2: ^2.22.5
   xterm: ^4.0.0
   path_provider: ^2.1.5
+  speech_to_text: ^7.4.0
+  flutter_tts: ^4.2.5
+  file_picker: ^11.0.3
 
 dev_dependencies:
   flutter_test:

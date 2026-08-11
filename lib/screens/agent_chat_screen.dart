@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../models/agent.dart';
 import '../services/agent_runner.dart';
 import '../services/evidence_store.dart';
+import '../services/voice_service.dart';
+import '../widgets/voice_buttons.dart';
 import 'evidence_screen.dart';
 
 class AgentChatScreen extends StatefulWidget {
@@ -11,6 +13,8 @@ class AgentChatScreen extends StatefulWidget {
   final Future<void> Function(List<AgentSession>) store;
   final AgentRunner runner;
   final EvidenceStore? evidenceStore;
+  final SpeechToTextVoice? stt;
+  final TextToSpeechVoice? tts;
 
   const AgentChatScreen({
     super.key,
@@ -18,6 +22,8 @@ class AgentChatScreen extends StatefulWidget {
     required this.store,
     required this.runner,
     this.evidenceStore,
+    this.stt,
+    this.tts,
   });
 
   @override
@@ -194,7 +200,10 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
               controller: _scroll,
               padding: const EdgeInsets.all(12),
               itemCount: _session.messages.length,
-              itemBuilder: (ctx, i) => _MessageBubble(message: _session.messages[i]),
+              itemBuilder: (ctx, i) => _MessageBubble(
+                message: _session.messages[i],
+                tts: widget.tts,
+              ),
             ),
           ),
           if (_running)
@@ -213,6 +222,13 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
             color: const Color(0xFF0F172A),
             child: Row(
               children: [
+                VoiceMicButton(
+                  stt: widget.stt ?? NativeStt(),
+                  onTranscript: (t) {
+                    if (t != null && t.isNotEmpty) _input.text = t;
+                  },
+                ),
+                const SizedBox(width: 4),
                 Expanded(
                   child: TextField(
                     controller: _input,
@@ -248,8 +264,9 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
 
 class _MessageBubble extends StatelessWidget {
   final AgentMessage message;
+  final TextToSpeechVoice? tts;
 
-  const _MessageBubble({required this.message});
+  const _MessageBubble({required this.message, this.tts});
 
   @override
   Widget build(BuildContext context) {
@@ -270,14 +287,24 @@ class _MessageBubble extends StatelessWidget {
           color: color.withValues(alpha: isError ? 0.6 : 0.9),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: SelectableText(
-          message.text,
-          style: TextStyle(
-            color: isError ? Colors.redAccent.shade100 : Colors.white,
-            fontSize: 13,
-            fontFamily: isUser ? null : 'monospace',
-            height: 1.4,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Flexible(
+              child: SelectableText(
+                message.text,
+                style: TextStyle(
+                  color: isError ? Colors.redAccent.shade100 : Colors.white,
+                  fontSize: 13,
+                  fontFamily: isUser ? null : 'monospace',
+                  height: 1.4,
+                ),
+              ),
+            ),
+            if (!isUser && !isError && tts != null && message.text.trim().isNotEmpty)
+              SpeakerButton(tts: tts!, text: message.text, compact: true),
+          ],
         ),
       ),
     );

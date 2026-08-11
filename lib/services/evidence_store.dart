@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
 import '../models/agent.dart';
 
 class EvidenceRecord {
@@ -17,21 +16,26 @@ class EvidenceRecord {
   });
 }
 
+/// Guarda y lista evidencia `.md` en `<docs>/evidencia/`.
+/// Usa I/O síncrono: los volúmenes son pequeños y así funciona dentro de
+/// FakeAsync en widget tests.
 class EvidenceStore {
   final Directory? baseDir;
 
   EvidenceStore({this.baseDir});
 
-  Future<Directory> _evidenciaDir() async {
-    if (baseDir != null) {
-      final dir = Directory('${baseDir!.path}/evidencia');
-      await dir.create(recursive: true);
-      return dir;
-    }
-    final docs = await getApplicationDocumentsDirectory();
-    final dir = Directory('${docs.path}/evidencia');
-    await dir.create(recursive: true);
+  Directory _evidenciaDirSync() {
+    final root = baseDir?.path ?? _defaultRoot();
+    final dir = Directory('$root/evidencia');
+    dir.createSync(recursive: true);
     return dir;
+  }
+
+  String _defaultRoot() {
+    final profile = Platform.environment['USERPROFILE'] ??
+        Platform.environment['HOME'] ??
+        Directory.current.path;
+    return '$profile\\Documents';
   }
 
   String formatName(DateTime at, String agentName) {
@@ -50,7 +54,7 @@ class EvidenceStore {
         .trim();
     if (assistant.isEmpty) return null;
 
-    final dir = await _evidenciaDir();
+    final dir = _evidenciaDirSync();
     final now = DateTime.now();
     var name = formatName(now, session.agentName);
     var n = 1;
@@ -73,12 +77,12 @@ class EvidenceStore {
       ..writeln(assistant);
 
     final file = File('${dir.path}/$name');
-    await file.writeAsString(content.toString());
+    file.writeAsStringSync(content.toString());
     return file.path;
   }
 
   Future<List<EvidenceRecord>> list() async {
-    final dir = await _evidenciaDir();
+    final dir = _evidenciaDirSync();
     final files = dir
         .listSync()
         .whereType<File>()
@@ -89,7 +93,8 @@ class EvidenceStore {
     return files.map((f) {
       final name = f.uri.pathSegments.last;
       final parts = name.split('_');
-      final agentName = parts.length >= 3 ? parts.last.replaceAll('.md', '') : 'dev';
+      final agentName =
+          parts.length >= 3 ? parts.last.replaceAll('.md', '') : 'dev';
       String prompt = name;
       try {
         final content = f.readAsStringSync();

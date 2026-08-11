@@ -1,7 +1,21 @@
 # SDD — Etapa 2, slice 3: Evidencia por prompt (.md navegable)
 
 > **Proyecto:** empresa_dev — Etapa 2 del SUPER_PLAN.
-> **Fecha:** 2026-08. **Estado:** En implementación.
+> **Fecha:** 2026-08. **Estado:** ✅ Implementado (gate de slice cerrado; pendiente evidencia manual de 3 prompts reales).
+
+## Resultado (2026-08)
+
+- `lib/services/evidence_store.dart`: formato `{fecha}_{hora}_{agente}.md` en `<Documentos>/evidencia/` (I/O síncrono para compatibilidad con widget tests; root por `USERPROFILE\Documents`, sin path_provider). Sufijo `_1`, `_2` si existe. `list()` devuelve registros descendentes con `prompt` extraído del propio `.md`.
+- `lib/screens/evidence_screen.dart`: lista con icono + agente/fecha; click → lector `SelectableText`; carpeta con `explorer /select,`.
+- `AgentChatScreen`: `evidenceStore` opcional; al `_finish` guarda evidencia si hay respuesta (sin bloquear UI); botón de evidencia en el AppBar.
+- `CanvaScreen` pasa `EvidenceStore()` al chat.
+- Tests: `test/evidence_test.dart` (4 unit) + `test/evidence_widget_test.dart` (2 widget: guarda al terminar, botón abre lista). CI: `flutter analyze` 0 issues, 26 unit/widget verdes, build Windows OK. `agent_integration_test` verde. Los 2 fallos de `sync_integration_test` son pre-existentes (hub Tailscale no alcanzable en este entorno).
+
+## Gate de slice
+
+- [x] Unit: `EvidenceStore` formatea, guarda, no escribe sin respuesta, lista descendente con prompt real.
+- [x] Widget: responder al agente escribe el `.md`; botón evidencia navega a la lista.
+- [ ] Manual: 3 prompts reales en la app → 3 `.md` en Documentos/evidencia/ (queda para la prueba manual final de Etapa 2).
 
 ## Objetivo
 

@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'dart:math';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../models/canva.dart';
@@ -7,9 +9,11 @@ import '../services/agent_runner.dart';
 import '../services/agent_store.dart';
 import '../services/canva_store.dart';
 import '../services/evidence_store.dart';
+import '../services/project_service.dart';
 import '../services/ssh_service.dart';
 import '../services/sftp_service.dart';
 import 'agent_chat_screen.dart';
+import 'project_tree_screen.dart';
 import 'terminal_screen.dart';
 import 'sftp_screen.dart';
 
@@ -334,7 +338,39 @@ class _CanvaScreenState extends State<CanvaScreen> {
                 _addAgent();
               },
             ),
+            const Divider(color: Colors.white12),
+            ListTile(
+              leading: const Icon(Icons.folder_open, color: Colors.greenAccent),
+              title: const Text('Abrir proyecto', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('File tree + editor', style: TextStyle(color: Colors.white38, fontSize: 11)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _openProject();
+              },
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openProject() async {
+    if (kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Abrir proyecto disponible solo en desktop')),
+      );
+      return;
+    }
+    final dir = await FilePicker.getDirectoryPath();
+    if (dir == null || !mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProjectTreeScreen(
+          service: ProjectService(root: dir),
+          title: dir.split(Platform.pathSeparator).last,
         ),
       ),
     );

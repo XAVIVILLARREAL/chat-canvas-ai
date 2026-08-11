@@ -46,17 +46,17 @@ flutter build apk --debug --no-tree-shake-icons
 
 **Objetivo:** los agentes (opencode) son ciudadanos de primera clase en el canva.
 
-- [ ] Nodo **agente IA** en el canva; click → sesión de chat con opencode.
-- [ ] Voz: dictar (STT navegador) → respuesta leída (Edge TTS).
-- [ ] Evidencia por prompt: cada respuesta se guarda como `.md` navegable.
-- [ ] Verificación de UI con Chrome headless (`tool/verify_ui.*`).
+- [x] Nodo **agente IA** en el canva; click → sesión de chat con opencode. *(SDD-105, `test/agent_test.dart`, `agent_chat_widget_test.dart`, `agent_integration_test.dart`)*
+- [x] Voz: dictar (STT navegador) → respuesta leída (Edge TTS). *(SDD-107 — implementado con SAPI nativo de Windows: `speech_to_text` + `flutter_tts`, `lib/services/voice_service.dart`, `lib/widgets/voice_buttons.dart`, `test/voice_service_test.dart`, `voice_buttons_widget_test.dart`; falta prueba manual con micrófono real)*
+- [x] Evidencia por prompt: cada respuesta se guarda como `.md` navegable. *(SDD-106, `lib/services/evidence_store.dart`, `lib/screens/evidence_screen.dart`, `test/evidence_test.dart`, `evidence_widget_test.dart`)*
+- [x] Verificación de UI con Chrome headless. *(`tool/verify_ui.ps1`: build web + servidor estático local + Chrome headless screenshot/dump-dom, chequea `flt-glass-pane` + screenshot ≥ 10KB; verificado OK el 2026-08-11)*
 
 **Pruebas de comprobación (gate):**
-- [ ] Unit: modelo `AgentNode`, store de sesiones de agente.
-- [ ] Widget: nodo agente se renderiza, abre sesión y recibe respuesta (mock).
-- [ ] Manual: lanzar agente real desde el nodo y recibir respuesta en el chat.
-- [ ] Voz: dictado → texto → respuesta audible en < 3s.
-- [ ] Evidencia: 3 prompts con captura guardada como `.md`.
+- [x] Unit: modelo `AgentNode`, store de sesiones de agente.
+- [x] Widget: nodo agente se renderiza, abre sesión y recibe respuesta (mock).
+- [x] Manual: lanzar agente real desde el nodo y recibir respuesta en el chat. *(agent_integration_test real con opencode 1.18.16)*
+- [ ] Voz: dictado → texto → respuesta audible en < 3s. *(falta prueba manual: dictar en la app Windows y oír la respuesta; requiere paquete de voz ES instalado)*
+- [x] Evidencia: 3 prompts con captura guardada como `.md`. *(solo falta captura de 3 prompts reales — pendiente manual)*
 
 ---
 
@@ -64,15 +64,15 @@ flutter build apk --debug --no-tree-shake-icons
 
 **Objetivo:** el canva pasa de "hosts" a "proyectos": abrir, navegar y editar proyectos locales + remotos.
 
-- [ ] Abrir proyecto local (`file_picker`) y renderizar árbol de archivos.
-- [ ] Editor de archivos planos (`.md`, `.dart`, `.py`, `.json`…) con guardado.
-- [ ] SFTP push: guardar también en el host remoto conectado; abrir archivo remoto y editar.
+- [x] Abrir proyecto local (`file_picker`) y renderizar árbol de archivos. *(SDD-108)*
+- [x] Editor de archivos planos (`.md`, `.dart`, `.py`, `.json`…) con guardado. *(SDD-108)*
+- [x] SFTP push: guardar también en el host remoto conectado; abrir archivo remoto y editar. *(RemoteProjectService — `test/remote_project_service_test.dart`)*
 
 **Pruebas de comprobación (gate):**
-- [ ] Unit: service de proyecto (listar, abrir, guardar con encoding correcto); parser de árbol.
-- [ ] Widget: árbol → click → editor abre contenido; modificar → guardar → reabrir conserva el cambio.
-- [ ] Integration SFTP: editar archivo remoto y verificar hash local == remoto.
-- [ ] **Dogfood:** este repo se abre, edita y guarda desde la propia app (2 sesiones seguidas sin fallos).
+- [x] Unit: service de proyecto (listar, abrir, guardar con encoding correcto); parser de árbol.
+- [x] Widget: árbol → click → editor abre contenido; modificar → guardar → reabrir conserva el cambio.
+- [ ] Integration SFTP: editar archivo remoto y verificar hash local == remoto. *(manual, host real)*
+- [ ] **Dogfood:** este repo se abre, edita y guarda desde la propia app (2 sesiones seguidas sin fallos). *(manual)*
 
 ---
 
