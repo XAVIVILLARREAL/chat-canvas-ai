@@ -9,11 +9,13 @@ import '../models/canvas_node.dart';
 import '../services/agent_runner.dart';
 import '../services/agent_store.dart';
 import '../services/canva_store.dart';
+import '../services/docs_map_builder.dart';
 import '../services/evidence_store.dart';
 import '../services/project_service.dart';
 import '../services/ssh_service.dart';
 import '../services/sftp_service.dart';
 import 'agent_chat_screen.dart';
+import 'md_node_screen.dart';
 import 'project_tree_screen.dart';
 import 'terminal_screen.dart';
 import 'sftp_screen.dart';
@@ -159,7 +161,57 @@ class _CanvaScreenState extends State<CanvaScreen> {
       _openHostActions(host);
     } else if (node.type == CanvaNodeType.agent) {
       _openAgentChat(node);
+    } else if (node.type == CanvaNodeType.note) {
+      _openMdNode(node);
     }
+  }
+
+  Future<void> _openMdNode(CanvaNode node) async {
+    if (kIsWeb || defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nodos .md disponibles solo en desktop')),
+      );
+      return;
+    }
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MdNodeScreen(
+          node: node,
+          allNodes: _state.nodes,
+          onSave: (updated) {
+            setState(() {
+              updated
+                ..x = node.x
+                ..y = node.y
+                ..id = node.id;
+              final idx = _state.nodes.indexOf(node);
+              _state.nodes[idx] = updated;
+            });
+            _save();
+          },
+          onCreateLink: (title) => _createLinkedNode(node, title),
+        ),
+      ),
+    );
+  }
+
+  void _createLinkedNode(CanvaNode from, String title) {
+    setState(() {
+      final created = CanvaNode(
+        id: _newId(),
+        type: CanvaNodeType.note,
+        x: from.x + 40,
+        y: from.y + 40,
+        label: title,
+        colorHex: '#F59E0B',
+        content: '# $title\n\n',
+      );
+      _state.nodes.add(created);
+      _state.edges.add(CanvaEdge(id: _newId(), fromNodeId: from.id, toNodeId: created.id));
+    });
+    _save();
   }
 
   Future<void> _openAgentChat(CanvaNode node) async {
@@ -269,6 +321,9 @@ class _CanvaScreenState extends State<CanvaScreen> {
                                   _save();
                                 },
                                 onTap: () => _onNodeTap(node),
+                                onDoubleTap: node.type == CanvaNodeType.note
+                                    ? () => _openMdNode(node)
+                                    : null,
                                 onLongPress: node.type == CanvaNodeType.host
                                     ? () => _startConnect(node.id)
                                     : null,
@@ -349,10 +404,37 @@ class _CanvaScreenState extends State<CanvaScreen> {
                 _openProject();
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.map_outlined, color: Colors.tealAccent),
+              title: const Text('Abrir docs (mapa .md)', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Carpeta de notas enlazadas', style: TextStyle(color: Colors.white38, fontSize: 11)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _openDocsMap();
+              },
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _openDocsMap() async {
+    if (kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Mapa .md disponible solo en desktop')),
+      );
+      return;
+    }
+    final dir = await FilePicker.getDirectoryPath();
+    if (dir == null || !mounted) return;
+    final built = DocsMapBuilder.build(dir);
+    setState(() {
+      _state = built;
+    });
+    _save();
   }
 
   Future<void> _openProject() async {
@@ -389,6 +471,7 @@ class _DraggableNode extends StatefulWidget {
   final bool connectMode;
   final void Function(double x, double y) onPositionChanged;
   final VoidCallback onTap;
+  final VoidCallback? onDoubleTap;
   final VoidCallback? onLongPress;
 
   const _DraggableNode({
@@ -396,6 +479,7 @@ class _DraggableNode extends StatefulWidget {
     required this.connectMode,
     required this.onPositionChanged,
     required this.onTap,
+    this.onDoubleTap,
     this.onLongPress,
   });
 
@@ -434,6 +518,7 @@ class _DraggableNodeState extends State<_DraggableNode> {
             : Icons.sticky_note_2;
     return GestureDetector(
       onTap: widget.onTap,
+      onDoubleTap: widget.onDoubleTap,
       onLongPress: widget.onLongPress,
       onPanStart: _onPanStart,
       onPanUpdate: _onPanUpdate,

@@ -93,17 +93,17 @@ flutter build apk --debug --no-tree-shake-icons
 
 ## Etapa 4 — Canva de ideas + `.md`
 
-**Objetivo:** los nodos del canva son documentos Markdown enlazados (Obsidian-style).
+**Objetivo:** los nodos del canva son documentos Markdown enlazados (Obsidian-style). *(SDD-112)*
 
-- [ ] Nodos `.md` enlazados con `[[links]]`; render Markdown con preview live.
-- [ ] Backlinks y navegación por enlaces desde el editor.
-- [ ] Auto-layout simple; persistencia en drift.
+- [x] Nodos `.md` enlazados con `[[links]]`; render Markdown con preview live.
+- [x] Backlinks y navegación por enlaces desde el editor.
+- [x] Auto-layout simple; persistencia (CanvaStore JSON existente).
 
 **Pruebas de comprobación (gate):**
-- [ ] Unit: parser de `[[links]]`, índice de backlinks.
-- [ ] Widget: preview markdown se actualiza en vivo; click en link navega al nodo.
-- [ ] Manual: crear 5 notas enlazadas, navegar por backlinks, cerrar/reabrir → todo persiste.
-- [ ] **Dogfood:** el mapa de ideas de este proyecto (`docs/`) representado como canva navegable.
+- [x] Unit: parser de `[[links]]` (`MdLinkParser` + `wikiToMarkdown`) e índice de backlinks (`BacklinkIndex`).
+- [x] Widget: preview se actualiza en vivo; click en link navega al nodo (abre o crea).
+- [ ] Manual: crear 5 notas enlazadas, navegar por backlinks, cerrar/reabrir → todo persiste. *(pendiente de mano humana — infra CanvaStore ya persistente)*
+- [x] **Dogfood:** `docs/` del proyecto como canva navegable — evidencia `data/evidence/etapa4-docs-map.md` (8 nodos, 3 edges; `tool/docs_map_evidence.dart`).
 
 ---
 
