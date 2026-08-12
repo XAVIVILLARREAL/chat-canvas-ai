@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import '../services/evidence_store.dart';
+import '../theme/app_theme.dart';
+import '../widgets/neon_card.dart';
 
 class EvidenceScreen extends StatefulWidget {
   final EvidenceStore store;
@@ -46,10 +48,8 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B1220),
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
         title: const Text('Evidencia', style: TextStyle(fontSize: 16)),
         actions: [
           IconButton(icon: const Icon(Icons.refresh, size: 20), onPressed: _load),
@@ -64,27 +64,52 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                       style: TextStyle(color: Colors.white38)),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
                   itemCount: _records.length,
                   itemBuilder: (ctx, i) {
                     final r = _records[i];
-                    return Card(
-                      color: const Color(0xFF1E293B),
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      child: ListTile(
-                        leading: const Icon(Icons.description, color: Colors.purpleAccent),
-                        title: Text(r.prompt,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Colors.white, fontSize: 13)),
-                        subtitle: Text('${r.agentName} · ${r.at.toString().substring(0, 16)}',
-                            style: const TextStyle(color: Colors.white38, fontSize: 11)),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.folder_open, color: Colors.white54, size: 18),
-                          onPressed: () => _openInFolder(r),
-                          tooltip: 'Abrir carpeta',
-                        ),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: NeonCard(
                         onTap: () => _openRecord(r),
+                        glow: AppColors.neonViolet,
+                        padding: EdgeInsets.zero,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 4),
+                          leading: Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(AppRadii.input),
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppColors.neonViolet,
+                                  AppColors.neonCyan,
+                                ],
+                              ),
+                            ),
+                            child: const Icon(Icons.description,
+                                color: Colors.white, size: 18),
+                          ),
+                          title: Text(r.prompt,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 13)),
+                          subtitle: Text(
+                              '${r.agentName} · ${r.at.toString().substring(0, 16)}',
+                              style: const TextStyle(
+                                  color: Colors.white38, fontSize: 11)),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.folder_open,
+                                color: Colors.white54, size: 18),
+                            onPressed: () => _openInFolder(r),
+                            tooltip: 'Abrir carpeta',
+                          ),
+                        ),
                       ),
                     );
                   },
@@ -105,17 +130,23 @@ class _EvidenceReader extends StatelessWidget {
       content = File(record.path).readAsStringSync();
     } catch (_) {}
     return Scaffold(
-      backgroundColor: const Color(0xFF0B1220),
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
         title: Text(record.agentName, style: const TextStyle(fontSize: 16)),
       ),
-      body: SingleChildScrollView(
+      body: Container(
+        margin: const EdgeInsets.all(12),
         padding: const EdgeInsets.all(16),
-        child: SelectableText(
-          content,
-          style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.5),
+        decoration: BoxDecoration(
+          color: AppColors.bgPanel,
+          borderRadius: BorderRadius.circular(AppRadii.card),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: SingleChildScrollView(
+          child: SelectableText(
+            content,
+            style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.5),
+          ),
         ),
       ),
     );

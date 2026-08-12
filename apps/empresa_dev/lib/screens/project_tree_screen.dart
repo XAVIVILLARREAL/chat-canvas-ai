@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/project_service.dart';
+import '../theme/app_theme.dart';
+import '../widgets/neon_dialog.dart';
 import 'code_editor_screen.dart';
 
 class ProjectTreeScreen extends StatefulWidget {
@@ -46,17 +48,35 @@ class _ProjectTreeScreenState extends State<ProjectTreeScreen> {
   }
 
   void _showBinaryDialog() {
-    showDialog(
+    showNeonDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text('Archivo binario', style: TextStyle(color: Colors.white)),
-        content: const Text('Este archivo no se puede editar desde el editor de texto.',
-            style: TextStyle(color: Colors.white70)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK', style: TextStyle(color: Colors.lightBlueAccent)),
+      glow: AppColors.neonAmber,
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.warning_amber, color: AppColors.neonAmber, size: 22),
+              SizedBox(width: 10),
+              Text('Archivo binario',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+              'Este archivo no se puede editar desde el editor de texto.',
+              style: TextStyle(color: Colors.white70)),
+          const SizedBox(height: 20),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('OK'),
+            ),
           ),
         ],
       ),
@@ -67,10 +87,8 @@ class _ProjectTreeScreenState extends State<ProjectTreeScreen> {
   Widget build(BuildContext context) {
     final nodes = _rootNodes;
     return Scaffold(
-      backgroundColor: const Color(0xFF0B1220),
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
         title: Text(widget.title, style: const TextStyle(fontSize: 16)),
       ),
       body: nodes == null
@@ -90,24 +108,54 @@ class _ProjectTreeScreenState extends State<ProjectTreeScreen> {
     final icon = node.isDir ? Icons.folder : _iconFor(node.name);
     final color = node.isDir ? Colors.amber.shade400 : _colorFor(node.name);
     if (!node.isDir) {
-      return ListTile(
-        dense: true,
-        leading: Icon(icon, color: color, size: 20),
-        title: Text(node.name,
-            style: const TextStyle(color: Colors.white, fontSize: 13)),
-        onTap: () => _openFile(node),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 1),
+        child: Material(
+          color: AppColors.bgPanel,
+          borderRadius: BorderRadius.circular(AppRadii.input),
+          child: ListTile(
+            dense: true,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadii.input)),
+            leading: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(AppRadii.chip),
+              ),
+              child: Icon(icon, color: color, size: 18),
+            ),
+            title: Text(node.name,
+                style:
+                    const TextStyle(color: Colors.white, fontSize: 13)),
+            onTap: () => _openFile(node),
+          ),
+        ),
       );
     }
-    return ExpansionTile(
-      leading: Icon(icon, color: color, size: 20),
-      title: Text(node.name, style: const TextStyle(color: Colors.white, fontSize: 13)),
-      iconColor: Colors.white54,
-      collapsedIconColor: Colors.white38,
-      maintainState: true,
-      onExpansionChanged: (open) {
-        if (open) _loadDir(node);
-      },
-      children: _dirChildren[node.path] ?? const [],
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        leading: Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(AppRadii.chip),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+        title: Text(node.name,
+            style: const TextStyle(color: Colors.white, fontSize: 13)),
+        iconColor: Colors.white54,
+        collapsedIconColor: Colors.white38,
+        maintainState: true,
+        onExpansionChanged: (open) {
+          if (open) _loadDir(node);
+        },
+        children: _dirChildren[node.path] ?? const [],
+      ),
     );
   }
 

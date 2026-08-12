@@ -1,6 +1,6 @@
 export 'canvas_node.dart';
 
-enum CanvaNodeType { host, note, container, agent }
+enum CanvaNodeType { host, note, container, agent, proposal }
 
 class CanvaNode {
   String id;

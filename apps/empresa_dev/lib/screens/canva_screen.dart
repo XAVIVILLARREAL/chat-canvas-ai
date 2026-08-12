@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:canva_core/canva.dart';
 import 'package:graph_core/graph_core.dart';
+import 'package:vibecoding_core/vibecoding_core.dart';
 import '../models/skill.dart';
 import '../services/agent_runner.dart';
 import '../services/agent_store.dart';
@@ -15,26 +16,36 @@ import '../services/evidence_store.dart';
 import '../services/project_service.dart';
 import '../services/ssh_service.dart';
 import '../services/sftp_service.dart';
+import '../services/vibecoding_service.dart';
+import '../services/vibecoding_store.dart';
+import '../theme/app_theme.dart';
+import '../widgets/diff_preview.dart';
+import '../widgets/neon_dialog.dart';
+import '../widgets/neon_sheet.dart';
 import 'agent_chat_screen.dart';
 import 'code_editor_screen.dart';
 import 'md_node_screen.dart';
 import 'project_graph_screen.dart';
 import 'project_tree_screen.dart';
+import 'proposal_node_screen.dart';
 import 'skill_builder_screen.dart';
 import 'skill_lab_screen.dart';
 import 'terminal_screen.dart';
 import 'sftp_screen.dart';
+import 'vibecoding_screen.dart';
 
 class CanvaScreen extends StatefulWidget {
   final List<SshHost> hosts;
   final SshService sshService;
   final CanvaStore store;
+  final VibecodingStore? vibecodingStore;
 
   const CanvaScreen({
     super.key,
     required this.hosts,
     required this.sshService,
     required this.store,
+    this.vibecodingStore,
   });
 
   @override
@@ -84,22 +95,44 @@ class _CanvaScreenState extends State<CanvaScreen> {
   }
 
   void _addNote() {
-    showDialog<String>(
+    showNeonDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text('Nota', style: TextStyle(color: Colors.white)),
-        content: TextField(
-          controller: _noteController,
-          autofocus: true,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(labelText: 'Texto', labelStyle: TextStyle(color: Colors.white54)),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar', style: TextStyle(color: Colors.white54))),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, _noteController.text),
-            child: const Text('Añadir'),
+      glow: AppColors.neonAmber,
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Nueva nota',
+            style: TextStyle(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _noteController,
+            autofocus: true,
+            decoration: const InputDecoration(
+                labelText: 'Texto', hintText: 'Escribe la nota…'),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancelar'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: FilledButton.icon(
+                  onPressed: () => Navigator.pop(ctx, _noteController.text),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Añadir'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -168,11 +201,113 @@ class _CanvaScreenState extends State<CanvaScreen> {
       _openAgentChat(node);
     } else if (node.type == CanvaNodeType.note) {
       _openMdNode(node);
+    } else if (node.type == CanvaNodeType.proposal) {
+      _openProposalNode(node);
     }
   }
 
+  /// Color de nodo por estado de la propuesta (misma paleta que DiffPreview).
+  String _hexForState(ProposalState state) => switch (state) {
+        ProposalState.pending => '#F59E0B',
+        ProposalState.applied => '#4ADE80',
+        ProposalState.rejected => '#94A3B8',
+        ProposalState.reverted => '#22D3EE',
+        ProposalState.failed => '#F87171',
+      };
+
+  Future<void> _openProposalNode(CanvaNode node) async {
+    if (kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nodo-diff disponible solo en desktop')),
+      );
+      return;
+    }
+    final store = widget.vibecodingStore ?? VibecodingStore();
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProposalNodeScreen(
+          proposalId: node.content ?? '',
+          store: store,
+        ),
+      ),
+    );
+    final saved = await store.load();
+    if (!mounted) return;
+    final updated = saved.where((p) => p.id == node.content).firstOrNull;
+    if (updated != null) {
+      setState(() => node.colorHex = _hexForState(updated.state));
+      _save();
+    }
+  }
+
+  Future<void> _addProposalNode() async {
+    final store = widget.vibecodingStore ?? VibecodingStore();
+    final proposals = await store.load();
+    if (!mounted) return;
+    if (proposals.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay propuestas — genera una desde Vibecoding primero')),
+      );
+      return;
+    }
+    showNeonSheet(
+      context: context,
+      glow: AppColors.neonAmber,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: Text('Propuestas del historial',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700)),
+          ),
+          Flexible(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                for (final p in proposals)
+                  NeonSheetTile(
+                    icon: Icons.difference,
+                    iconColor: DiffPreview.color(p.state),
+                    title: p.prompt,
+                    subtitle:
+                        '${DiffPreview.label(p.state)} · ${p.edits.length} archivos',
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _state.nodes.add(CanvaNode(
+                          id: _newId(),
+                          type: CanvaNodeType.proposal,
+                          x: 420 + (_state.nodes.length % 4) * 40,
+                          y: 420 + (_state.nodes.length % 3) * 24,
+                          label: p.prompt,
+                          colorHex: _hexForState(p.state),
+                          content: p.id,
+                        ));
+                      });
+                      _save();
+                    },
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _openMdNode(CanvaNode node) async {
-    if (kIsWeb || defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
+    if (!kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nodos .md disponibles solo en desktop')),
       );
@@ -243,31 +378,41 @@ class _CanvaScreenState extends State<CanvaScreen> {
   }
 
   void _openHostActions(SshHost host) {
-    showModalBottomSheet(
+    showNeonSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E293B),
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.terminal, color: Colors.lightBlueAccent),
-              title: const Text('Terminal', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(ctx);
-                Navigator.push(ctx, MaterialPageRoute(builder: (_) => TerminalScreen(host: host, service: widget.sshService)));
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.folder_open, color: Colors.amber),
-              title: const Text('SFTP', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(ctx);
-                Navigator.push(ctx, MaterialPageRoute(builder: (_) => SftpScreen(host: host, sftp: SftpService(widget.sshService))));
-              },
-            ),
-          ],
-        ),
+      glow: AppColors.neonCyan,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: Text('Acciones del host',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700)),
+          ),
+          NeonSheetTile(
+            icon: Icons.terminal,
+            iconColor: AppColors.neonGreen,
+            title: 'Terminal',
+            subtitle: 'Shell SSH en vivo',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => TerminalScreen(host: host, service: widget.sshService)));
+            },
+          ),
+          NeonSheetTile(
+            icon: Icons.folder_open,
+            iconColor: AppColors.neonAmber,
+            title: 'SFTP',
+            subtitle: 'Navega y transfiere archivos',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => SftpScreen(host: host, sftp: SftpService(widget.sshService))));
+            },
+          ),
+        ],
       ),
     );
   }
@@ -275,11 +420,25 @@ class _CanvaScreenState extends State<CanvaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B1220),
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
-        title: const Text('Canva', style: TextStyle(fontSize: 16)),
+        title: Row(
+          children: [
+            Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppRadii.chip),
+                gradient: AppGradients.neon,
+              ),
+              child: const Icon(Icons.layers, color: Color(0xFF062A33), size: 16),
+            ),
+            const SizedBox(width: 10),
+            const Text('Canva', style: TextStyle(fontSize: 16)),
+            const SizedBox(width: 12),
+            _NodeCountChip(count: _state.nodes.length),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_box_outlined, size: 20),
@@ -348,9 +507,30 @@ class _CanvaScreenState extends State<CanvaScreen> {
                   left: 16,
                   bottom: 16,
                   child: _connectModeFromId != null
-                      ? Chip(
-                          label: Text('Conectando… toca destino', style: const TextStyle(color: Colors.white)),
-                          backgroundColor: Colors.amber.shade700,
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppColors.neonAmber.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                                color:
+                                    AppColors.neonAmber.withValues(alpha: 0.6)),
+                            boxShadow: AppGlow.violet(strength: 0.3, blur: 20),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.link,
+                                  color: AppColors.neonAmber, size: 16),
+                              SizedBox(width: 6),
+                              Text('Conectando… toca el destino',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600)),
+                            ],
+                          ),
                         )
                       : const SizedBox.shrink(),
                 ),
@@ -360,92 +540,123 @@ class _CanvaScreenState extends State<CanvaScreen> {
   }
 
   void _showAddMenu() {
-    showModalBottomSheet(
+    showNeonSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E293B),
-      builder: (ctx) => SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(12),
-                child: Text('Añadir al canva', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              ),
-            if (widget.hosts.isEmpty)
-              const ListTile(
-                title: Text('No hay hosts. Agrégalos primero.', style: TextStyle(color: Colors.white54)),
-              )
-            else
-              ...widget.hosts.map((h) => ListTile(
-                    leading: const Icon(Icons.dns, color: Colors.lightBlueAccent),
-                    title: Text(h.name, style: const TextStyle(color: Colors.white)),
-                    subtitle: Text('${h.username}@${h.host}', style: const TextStyle(color: Colors.white38, fontSize: 11)),
-                    onTap: () {
-                      Navigator.pop(ctx);
-                      _addHostNode(h);
-                    },
-                  )),
-            const Divider(color: Colors.white12),
-            ListTile(
-              leading: const Icon(Icons.sticky_note_2, color: Colors.amber),
-              title: const Text('Nota', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(ctx);
-                _addNote();
-              },
-            ),
-            const Divider(color: Colors.white12),
-            ListTile(
-              leading: const Icon(Icons.smart_toy, color: Colors.purpleAccent),
-              title: const Text('Agente IA (opencode)', style: TextStyle(color: Colors.white)),
-              subtitle: const Text('Solo desktop por ahora', style: TextStyle(color: Colors.white38, fontSize: 11)),
-              onTap: () {
-                Navigator.pop(ctx);
-                _addAgent();
-              },
-            ),
-            const Divider(color: Colors.white12),
-            ListTile(
-              leading: const Icon(Icons.folder_open, color: Colors.greenAccent),
-              title: const Text('Abrir proyecto', style: TextStyle(color: Colors.white)),
-              subtitle: const Text('File tree + editor', style: TextStyle(color: Colors.white38, fontSize: 11)),
-              onTap: () {
-                Navigator.pop(ctx);
-                _openProject();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.map_outlined, color: Colors.tealAccent),
-              title: const Text('Abrir docs (mapa .md)', style: TextStyle(color: Colors.white)),
-              subtitle: const Text('Carpeta de notas enlazadas', style: TextStyle(color: Colors.white38, fontSize: 11)),
-              onTap: () {
-                Navigator.pop(ctx);
-                _openDocsMap();
-              },
-            ),
-            const Divider(color: Colors.white12),
-            ListTile(
-              leading: const Icon(Icons.science, color: Colors.lightBlueAccent),
-              title: const Text('Skills: constructor + laboratorio', style: TextStyle(color: Colors.white)),
-              subtitle: const Text('Crea skills visualmente y pruébalas', style: TextStyle(color: Colors.white38, fontSize: 11)),
-              onTap: () {
-                Navigator.pop(ctx);
-                _openSkillLab();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.hub_outlined, color: Colors.purpleAccent),
-              title: const Text('Grafo del proyecto', style: TextStyle(color: Colors.white)),
-              subtitle: const Text('Archivos, imports y links en 2D/3D', style: TextStyle(color: Colors.white38, fontSize: 11)),
-              onTap: () {
-                Navigator.pop(ctx);
-                _openProjectGraph();
-              },
-            ),
-          ],
+      glow: AppColors.neonViolet,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: Text('Añadir al canva',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700)),
           ),
-        ),
+          if (widget.hosts.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Text('No hay hosts. Agrégalos primero.',
+                  style: TextStyle(color: Colors.white54)),
+            )
+          else
+            ...widget.hosts.map((h) => NeonSheetTile(
+                  icon: Icons.dns,
+                  iconColor: AppColors.neonCyan,
+                  title: h.name,
+                  subtitle: '${h.username}@${h.host}',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _addHostNode(h);
+                  },
+                )),
+          const Divider(height: 24),
+          NeonSheetTile(
+            icon: Icons.sticky_note_2,
+            iconColor: AppColors.neonAmber,
+            title: 'Nota',
+            subtitle: 'Idea o fragmento en el canva',
+            onTap: () {
+              Navigator.pop(context);
+              _addNote();
+            },
+          ),
+          NeonSheetTile(
+            icon: Icons.smart_toy,
+            iconColor: AppColors.neonViolet,
+            title: 'Agente IA (opencode)',
+            subtitle: 'Solo desktop por ahora',
+            onTap: () {
+              Navigator.pop(context);
+              _addAgent();
+            },
+          ),
+          const Divider(height: 24),
+          NeonSheetTile(
+            icon: Icons.folder_open,
+            iconColor: AppColors.neonGreen,
+            title: 'Abrir proyecto',
+            subtitle: 'File tree + editor',
+            onTap: () {
+              Navigator.pop(context);
+              _openProject();
+            },
+          ),
+          NeonSheetTile(
+            icon: Icons.map_outlined,
+            iconColor: Colors.tealAccent,
+            title: 'Abrir docs (mapa .md)',
+            subtitle: 'Carpeta de notas enlazadas',
+            onTap: () {
+              Navigator.pop(context);
+              _openDocsMap();
+            },
+          ),
+          const Divider(height: 24),
+          NeonSheetTile(
+            icon: Icons.science,
+            iconColor: AppColors.neonCyan,
+            title: 'Skills: constructor + laboratorio',
+            subtitle: 'Crea skills visualmente y pruébalas',
+            onTap: () {
+              Navigator.pop(context);
+              _openSkillLab();
+            },
+          ),
+          NeonSheetTile(
+            icon: Icons.hub_outlined,
+            iconColor: AppColors.neonViolet,
+            title: 'Grafo del proyecto',
+            subtitle: 'Archivos, imports y links en 2D/3D',
+            onTap: () {
+              Navigator.pop(context);
+              _openProjectGraph();
+            },
+          ),
+          const Divider(height: 24),
+          NeonSheetTile(
+            icon: Icons.auto_fix_high,
+            iconColor: AppColors.neonCyan,
+            title: 'Vibecoding',
+            subtitle: 'El agente IA propone cambios con nodo-diff',
+            onTap: () {
+              Navigator.pop(context);
+              _openVibecoding();
+            },
+          ),
+          NeonSheetTile(
+            icon: Icons.difference,
+            iconColor: AppColors.neonAmber,
+            title: 'Propuesta vibecoding',
+            subtitle: 'Nodo-diff del historial en el canva',
+            onTap: () {
+              Navigator.pop(context);
+              _addProposalNode();
+            },
+          ),
+        ],
       ),
     );
   }
@@ -497,6 +708,34 @@ class _CanvaScreenState extends State<CanvaScreen> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openVibecoding() async {
+    if (kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vibecoding disponible solo en desktop')),
+      );
+      return;
+    }
+    const repoDefine = String.fromEnvironment('EMPRESA_DEV_REPO');
+    final repoEnv = Platform.environment['EMPRESA_DEV_REPO'];
+    final dir = repoDefine.isNotEmpty
+        ? repoDefine
+        : (repoEnv != null && repoEnv.isNotEmpty)
+            ? repoEnv
+            : await FilePicker.getDirectoryPath();
+    if (dir == null || dir.isEmpty || !mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => VibecodingScreen(
+          projectPath: dir,
+          runner: AgentCommandRunnerAdapter(),
         ),
       ),
     );
@@ -612,6 +851,27 @@ class _CanvaScreenState extends State<CanvaScreen> {
   }
 }
 
+/// Contador de nodos del canva (chip de información en el AppBar).
+class _NodeCountChip extends StatelessWidget {
+  final int count;
+
+  const _NodeCountChip({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.bgPanel,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Text('$count nodos',
+          style: const TextStyle(color: Colors.white54, fontSize: 11)),
+    );
+  }
+}
+
 class _DraggableNode extends StatefulWidget {
   final CanvaNode node;
   final bool connectMode;
@@ -637,6 +897,7 @@ class _DraggableNodeState extends State<_DraggableNode> {
   Offset _dragStart = Offset.zero;
   double _baseX = 0;
   double _baseY = 0;
+  bool _hovered = false;
 
   void _onPanStart(DragStartDetails d) {
     _dragStart = d.localPosition;
@@ -657,45 +918,95 @@ class _DraggableNodeState extends State<_DraggableNode> {
     final n = widget.node;
     final isHost = n.type == CanvaNodeType.host;
     final isAgent = n.type == CanvaNodeType.agent;
+    final isProposal = n.type == CanvaNodeType.proposal;
+    final color = Color(n.colorValue);
     final icon = isHost
         ? Icons.dns
         : isAgent
             ? Icons.smart_toy
-            : Icons.sticky_note_2;
-    return GestureDetector(
-      onTap: widget.onTap,
-      onDoubleTap: widget.onDoubleTap,
-      onLongPress: widget.onLongPress,
-      onPanStart: _onPanStart,
-      onPanUpdate: _onPanUpdate,
-      child: Container(
-        width: isHost ? 170 : 150,
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Color(n.colorValue).withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: widget.connectMode ? Colors.amber : Color(n.colorValue),
-            width: widget.connectMode ? 2 : 1.5,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: Color(n.colorValue),
-              size: 20,
+            : isProposal
+                ? Icons.difference
+                : Icons.sticky_note_2;
+    final glowColor = isAgent
+        ? AppColors.neonViolet
+        : isHost
+            ? AppColors.neonCyan
+            : isProposal
+                ? color
+                : AppColors.neonAmber;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.move,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        onDoubleTap: widget.onDoubleTap,
+        onLongPress: widget.onLongPress,
+        onPanStart: _onPanStart,
+        onPanUpdate: _onPanUpdate,
+        child: AnimatedContainer(
+          duration: AppMotion.fast,
+          curve: AppMotion.easeOutCubic,
+          width: isHost ? 180 : 156,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withValues(alpha: widget.connectMode ? 0.35 : 0.18),
+                color.withValues(alpha: 0.05),
+              ],
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                n.label,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white, fontSize: 13),
+            borderRadius: BorderRadius.circular(AppRadii.card),
+            border: Border.all(
+              color: widget.connectMode
+                  ? AppColors.neonAmber
+                  : color.withValues(alpha: _hovered ? 0.9 : 0.5),
+              width: widget.connectMode ? 2 : 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: glowColor.withValues(
+                    alpha: (widget.connectMode || _hovered) ? 0.3 : 0.15),
+                blurRadius: _hovered ? 22 : 12,
+                spreadRadius: 0,
               ),
-            ),
-          ],
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [color, glowColor],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: glowColor.withValues(alpha: 0.4),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+                child: Icon(icon, color: Colors.white, size: 17),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  n.label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -710,17 +1021,22 @@ class _EdgesPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.blueGrey.shade300
-      ..strokeWidth = 2;
     for (final e in edges) {
       final from = nodes.where((n) => n.id == e.fromNodeId).firstOrNull;
       final to = nodes.where((n) => n.id == e.toNodeId).firstOrNull;
       if (from == null || to == null) continue;
-      final a = Offset(from.x + 85, from.y + 20);
-      final b = Offset(to.x + 85, to.y + 20);
+      final color = Color(from.colorValue);
+      final a = Offset(from.x + 85, from.y + 28);
+      final b = Offset(to.x + 85, to.y + 28);
+      final paint = Paint()
+        ..color = color.withValues(alpha: 0.45)
+        ..strokeWidth = 2
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
       canvas.drawLine(a, b, paint);
-      _drawArrow(canvas, a, b, paint);
+      _drawArrow(canvas, a, b, Paint()
+        ..color = color.withValues(alpha: 0.8)
+        ..style = PaintingStyle.fill);
     }
   }
 
@@ -734,7 +1050,7 @@ class _EdgesPainter extends CustomPainter {
     final p1 = tip - norm * size + perp * size * 0.7;
     final p2 = tip - norm * size - perp * size * 0.7;
     final path = Path()..moveTo(tip.dx, tip.dy)..lineTo(p1.dx, p1.dy)..lineTo(p2.dx, p2.dy)..close();
-    canvas.drawPath(path, paint..style = PaintingStyle.fill);
+    canvas.drawPath(path, paint);
   }
 
   @override

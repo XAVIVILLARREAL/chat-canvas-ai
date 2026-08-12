@@ -3,15 +3,20 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'services/ssh_service.dart';
 import 'services/canva_store.dart';
+import 'services/e2e_flags.dart';
 import 'services/sessions_store.dart';
 import 'package:ssh_core/sync_snapshot.dart';
 import 'screens/canva_screen.dart';
 import 'screens/tabs_screen.dart';
 import 'screens/hub_screen.dart';
 import 'theme/app_theme.dart';
+import 'widgets/glass_panel.dart';
 import 'widgets/neon_backdrop.dart';
+import 'widgets/neon_dialog.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  ensureE2ESemantics();
   runApp(const EmpresaDevApp());
 }
 
@@ -74,8 +79,9 @@ class _HostsScreenState extends State<HostsScreen> {
   }
 
   Future<void> _addHost() async {
-    final result = await showDialog<SshHost>(
+    final result = await showNeonDialog<SshHost>(
       context: context,
+      glow: AppColors.neonCyan,
       builder: (ctx) => const _HostFormDialog(),
     );
     if (result != null) {
@@ -114,98 +120,225 @@ class _HostsScreenState extends State<HostsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 32, 16, 12),
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: [
-                const Expanded(
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        child: Image(
-                          image: AssetImage('assets/logo/logo.png'),
-                          width: 30,
-                          height: 30,
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Empresa Dev', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
-                          Text('Terminal SSH · supervitaminas', style: TextStyle(fontSize: 12, color: Colors.white54)),
-                        ],
-                      ),
-                    ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(),
+            // Conmutador de vista: Tabs | Canva
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(
+                    value: 'tabs',
+                    label: Text('Tabs'),
+                    icon: Icon(Icons.tab, size: 16),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.cell_tower, color: Colors.greenAccent),
-                  onPressed: _openHub,
-                  tooltip: 'Hub de sync',
-                ),
-              ],
+                  ButtonSegment(
+                    value: 'canva',
+                    label: Text('Canva'),
+                    icon: Icon(Icons.layers, size: 16),
+                  ),
+                ],
+                selected: {_view},
+                onSelectionChanged: (sel) {
+                  final v = sel.first;
+                  setState(() => _view = v);
+                  _sessionsStore.setLastTab(v);
+                },
+              ),
             ),
-          ),
-          // Conmutador de vista: Tabs | Canva
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(
-                        value: 'tabs',
-                        label: Text('Tabs'),
-                        icon: Icon(Icons.tab, size: 16),
+            Expanded(
+              child: _view == 'canva'
+                  ? CanvaScreen(
+                      hosts: _hosts,
+                      sshService: _service,
+                      store: CanvaStore(),
+                    )
+                  : TabsScreen(
+                      hosts: _hosts,
+                      sshService: _service,
+                      store: _sessionsStore,
+                    ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: _NeonFab(onPressed: _addHost),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: GlassPanel(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        radius: AppRadii.card,
+        glow: AppColors.neonCyan,
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppRadii.input),
+                gradient: AppGradients.hostAvatar,
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                boxShadow: AppGlow.cyan(strength: 0.4, blur: 16),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: const Image(
+                image: AssetImage('assets/logo/logo.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ShaderMask(
+                    shaderCallback: (bounds) => AppGradients.neon.createShader(bounds),
+                    child: const Text(
+                      'Empresa Dev',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
                       ),
-                      ButtonSegment(
-                        value: 'canva',
-                        label: Text('Canva'),
-                        icon: Icon(Icons.layers, size: 16),
-                      ),
-                    ],
-                    selected: {_view},
-                    onSelectionChanged: (sel) {
-                      final v = sel.first;
-                      setState(() => _view = v);
-                      _sessionsStore.setLastTab(v);
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(const Color(0xFF1E293B)),
-                      foregroundColor: const WidgetStatePropertyAll(Colors.white),
-                      side: WidgetStatePropertyAll(const BorderSide(color: Color(0xFF334155))),
                     ),
                   ),
-                ),
+                  const Text(
+                    'Terminal SSH · supervitaminas',
+                    style: TextStyle(fontSize: 12, color: Colors.white54),
+                  ),
+                ],
+              ),
+            ),
+            _HubPill(onTap: _openHub),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Píldora de acceso al hub de sincronización con luz de estado.
+class _HubPill extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _HubPill({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: 'Hub de sync',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              color: AppColors.neonGreen.withValues(alpha: 0.08),
+              border: Border.all(color: AppColors.neonGreen.withValues(alpha: 0.35)),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _PulseDot(),
+                SizedBox(width: 6),
+                Text('Hub',
+                    style: TextStyle(
+                        color: AppColors.neonGreen,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13)),
               ],
             ),
           ),
-          Expanded(
-            child: _view == 'canva'
-                ? CanvaScreen(
-                    hosts: _hosts,
-                    sshService: _service,
-                    store: CanvaStore(),
-                  )
-                : TabsScreen(
-                    hosts: _hosts,
-                    sshService: _service,
-                    store: _sessionsStore,
-                  ),
-          ),
-        ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addHost,
-        backgroundColor: Colors.lightBlueAccent,
-        foregroundColor: Colors.black,
-        child: const Icon(Icons.add),
+    );
+  }
+}
+
+/// Punto verde animado (pulso suave) indicando que el hub está disponible.
+class _PulseDot extends StatefulWidget {
+  const _PulseDot();
+
+  @override
+  State<_PulseDot> createState() => _PulseDotState();
+}
+
+class _PulseDotState extends State<_PulseDot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: Tween<double>(begin: 0.4, end: 1).animate(
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+      ),
+      child: Container(
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.neonGreen,
+          boxShadow: AppGlow.green(strength: 0.7, blur: 8),
+        ),
+      ),
+    );
+  }
+}
+
+/// FAB de cristal con gradiente neón y glow.
+class _NeonFab extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _NeonFab({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        customBorder: const CircleBorder(),
+        child: Container(
+          width: 58,
+          height: 58,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: AppGradients.neon,
+            border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.neonCyan.withValues(alpha: 0.45),
+                blurRadius: 20,
+                spreadRadius: 1,
+              ),
+              BoxShadow(
+                color: AppColors.neonViolet.withValues(alpha: 0.3),
+                blurRadius: 30,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: const Icon(Icons.add, color: Color(0xFF062A33), size: 30),
+        ),
       ),
     );
   }
@@ -229,58 +362,102 @@ class _HostFormDialogState extends State<_HostFormDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: const Color(0xFF1E293B),
-      title: const Text('Agregar host', style: TextStyle(color: Colors.white)),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
           children: [
-            TextField(controller: _name, decoration: const InputDecoration(labelText: 'Nombre', labelStyle: TextStyle(color: Colors.white54)),
-              style: const TextStyle(color: Colors.white)),
-            TextField(controller: _host, decoration: const InputDecoration(labelText: 'Host / IP', labelStyle: TextStyle(color: Colors.white54)),
-              style: const TextStyle(color: Colors.white)),
-            TextField(controller: _port, keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Puerto', labelStyle: TextStyle(color: Colors.white54)),
-              style: const TextStyle(color: Colors.white)),
-            TextField(controller: _user, decoration: const InputDecoration(labelText: 'Usuario', labelStyle: TextStyle(color: Colors.white54)),
-              style: const TextStyle(color: Colors.white)),
-            SwitchListTile(
-              value: _useKey,
-              onChanged: (v) => setState(() => _useKey = v),
-              title: const Text('Usar llave', style: TextStyle(color: Colors.white54, fontSize: 14)),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppRadii.input),
+                gradient: AppGradients.hostAvatar,
+                boxShadow: AppGlow.cyan(strength: 0.35, blur: 14),
+              ),
+              child: const Icon(Icons.dns, color: Colors.white, size: 22),
             ),
-            if (_useKey)
-              TextField(controller: _keyPem,
-                maxLines: 4,
-                decoration: const InputDecoration(labelText: 'Llave privada (PEM)', labelStyle: TextStyle(color: Colors.white54), hintText: '-----BEGIN OPENSSH PRIVATE KEY-----', hintStyle: TextStyle(color: Colors.white24)),
-                style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 11))
-            else
-              TextField(controller: _password, obscureText: true,
-                decoration: const InputDecoration(labelText: 'Password', labelStyle: TextStyle(color: Colors.white54)),
-                style: const TextStyle(color: Colors.white)),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Agregar host',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
           ],
         ),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar', style: TextStyle(color: Colors.white54))),
-        FilledButton(
-          onPressed: () {
-            final port = int.tryParse(_port.text) ?? 22;
-            Navigator.pop(context, SshHost(
-              name: _name.text,
-              host: _host.text,
-              port: port,
-              username: _user.text,
-              password: _password.text,
-              authType: _useKey ? SshAuthType.key : SshAuthType.password,
-              keyPem: _useKey ? _keyPem.text : null,
-            ));
-          },
-          style: FilledButton.styleFrom(backgroundColor: Colors.lightBlueAccent, foregroundColor: Colors.black),
-          child: const Text('Conectar'),
+        const SizedBox(height: 20),
+        TextField(controller: _name, decoration: const InputDecoration(labelText: 'Nombre')),
+        const SizedBox(height: 12),
+        TextField(controller: _host, decoration: const InputDecoration(labelText: 'Host / IP')),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _port,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(labelText: 'Puerto'),
+        ),
+        const SizedBox(height: 12),
+        TextField(controller: _user, decoration: const InputDecoration(labelText: 'Usuario')),
+        SwitchListTile(
+          value: _useKey,
+          onChanged: (v) => setState(() => _useKey = v),
+          title: const Text('Usar llave', style: TextStyle(fontSize: 14)),
+          subtitle: const Text('PEM privado (recomendado)', style: TextStyle(fontSize: 11, color: Colors.white38)),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+        ),
+        if (_useKey)
+          TextField(
+            controller: _keyPem,
+            maxLines: 4,
+            decoration: const InputDecoration(
+              labelText: 'Llave privada (PEM)',
+              hintText: '-----BEGIN OPENSSH PRIVATE KEY-----',
+              hintStyle: TextStyle(color: Colors.white24),
+            ),
+            style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 12),
+          )
+        else
+          TextField(
+            controller: _password,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'Password'),
+          ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: FilledButton.icon(
+                onPressed: () {
+                  final port = int.tryParse(_port.text) ?? 22;
+                  Navigator.pop(context, SshHost(
+                    name: _name.text,
+                    host: _host.text,
+                    port: port,
+                    username: _user.text,
+                    password: _password.text,
+                    authType: _useKey ? SshAuthType.key : SshAuthType.password,
+                    keyPem: _useKey ? _keyPem.text : null,
+                  ));
+                },
+                icon: const Icon(Icons.link, size: 18),
+                label: const Text('Conectar'),
+              ),
+            ),
+          ],
         ),
       ],
     );

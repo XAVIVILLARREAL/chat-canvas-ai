@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:canva_core/canva.dart';
 import '../services/md_link_parser.dart';
+import '../theme/app_theme.dart';
 import '../widgets/md_node_editor.dart';
 
 /// Pantalla de edición de un nodo `.md`: editor + preview live,
@@ -55,11 +56,15 @@ class _MdNodeScreenState extends State<MdNodeScreen> {
     })[_node.label]!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0B1220),
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
-        title: Text(_node.label, style: const TextStyle(fontSize: 16)),
+        title: Row(
+          children: [
+            const Icon(Icons.sticky_note_2, color: AppColors.neonAmber, size: 18),
+            const SizedBox(width: 8),
+            Text(_node.label, style: const TextStyle(fontSize: 16)),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.save_outlined, color: Colors.white70, size: 20),
@@ -85,22 +90,32 @@ class _MdNodeScreenState extends State<MdNodeScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.link, color: Colors.white38, size: 14),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: backlinks.isEmpty
-                      ? const Text('Sin backlinks',
-                          style: TextStyle(color: Colors.white38, fontSize: 12))
-                      : Text(
-                          'Backlinks: ${backlinks.join(', ')}',
-                          overflow: TextOverflow.ellipsis,
-                          style:
-                              const TextStyle(color: Colors.white54, fontSize: 12),
-                        ),
-                ),
-              ],
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.bgPanel,
+                borderRadius: BorderRadius.circular(AppRadii.input),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.link, color: Colors.white38, size: 14),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: backlinks.isEmpty
+                        ? const Text('Sin backlinks',
+                            style: TextStyle(
+                                color: Colors.white38, fontSize: 12))
+                        : Text(
+                            'Backlinks: ${backlinks.join(', ')}',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                color: Colors.white54, fontSize: 12),
+                          ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

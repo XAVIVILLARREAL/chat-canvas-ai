@@ -48,15 +48,7 @@ class GlassPanel extends StatelessWidget {
             padding: padding,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(radius - 1),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0x1FFFFFFF), // white 12% arriba
-                  Color(0x0FFFFFFF), // white 6%
-                  Color(0x0AFFFFFF), // white 4% abajo
-                ],
-              ),
+              gradient: AppGradients.glass,
               border: Border(
                 top: BorderSide(color: AppColors.edgeLight, width: 1),
               ),

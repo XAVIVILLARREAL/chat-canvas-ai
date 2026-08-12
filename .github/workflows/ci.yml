@@ -50,3 +50,35 @@ jobs:
 
       - name: Tests headless del grafo (sin LLM)
         run: cd empresa_autonoma && python -m pytest tests -q
+
+  # E2E web del flujo crítico (Etapa 7, SDD-120): build web con semántica,
+  # servidor estático y Playwright headless por PR.
+  e2e-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.2'
+          channel: stable
+
+      - name: Build web (semántica E2E)
+        run: cd apps/empresa_dev && flutter build web --debug --dart-define=E2E_WEB=true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Instalar Playwright
+        working-directory: apps/empresa_dev/tool
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Servidor estático + E2E Playwright
+        working-directory: apps/empresa_dev/tool
+        run: |
+          python3 -m http.server 8765 --directory ../build/web &
+          sleep 2
+          npx playwright test

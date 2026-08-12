@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:ssh_core/sync_snapshot.dart';
 import '../services/hub_server.dart';
 import '../services/sync_client.dart';
+import '../theme/app_theme.dart';
+import '../widgets/glass_panel.dart';
 
 class HubScreen extends StatefulWidget {
   final Future<SyncSnapshot> Function() getSnapshot;
@@ -99,40 +101,58 @@ class _HubScreenState extends State<HubScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
         title: const Text('Hub de sincronización', style: TextStyle(fontSize: 16)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'El celular como servidor. Sincroniza hosts, canva y sesiones entre tus dispositivos vía Tailscale.',
-            style: TextStyle(color: Colors.white70, fontSize: 13),
+          GlassPanel(
+            glow: AppColors.neonCyan,
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.cell_tower, color: AppColors.neonCyan, size: 20),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'El celular como servidor',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Sincroniza hosts, canva y sesiones entre tus dispositivos vía Tailscale.',
+                  style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _tokenController,
             obscureText: true,
-            style: const TextStyle(color: Colors.white),
             decoration: const InputDecoration(
               labelText: 'Token de emparejamiento',
-              labelStyle: TextStyle(color: Colors.white54),
-              border: OutlineInputBorder(),
+              hintText: 'mínimo 8 caracteres',
             ),
           ),
           if (_mode != _Mode.hub) ...[
             const SizedBox(height: 12),
             TextField(
               controller: _urlController,
-              style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 labelText: 'IP del hub (solo cliente)',
-                labelStyle: TextStyle(color: Colors.white54),
                 hintText: '100.x.y.z:8170',
-                border: OutlineInputBorder(),
               ),
             ),
           ],
@@ -144,7 +164,6 @@ class _HubScreenState extends State<HubScreen> {
                   onPressed: _mode == _Mode.hub ? null : _startHub,
                   icon: const Icon(Icons.cell_tower),
                   label: const Text('Ser el hub (celular)'),
-                  style: FilledButton.styleFrom(backgroundColor: Colors.lightBlueAccent, foregroundColor: Colors.black),
                 ),
               ),
             ],
@@ -157,46 +176,12 @@ class _HubScreenState extends State<HubScreen> {
                   onPressed: _mode == _Mode.client ? null : _connectClient,
                   icon: const Icon(Icons.sync),
                   label: const Text('Conectar como cliente (laptop)'),
-                  style: OutlinedButton.styleFrom(foregroundColor: Colors.lightBlueAccent),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      _mode == _Mode.hub
-                          ? Icons.cell_tower
-                          : _mode == _Mode.client
-                              ? Icons.sync
-                              : Icons.power_settings_new,
-                      color: _mode == _Mode.idle ? Colors.grey : Colors.greenAccent,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 8),
-                    Text('Estado', style: const TextStyle(color: Colors.white70)),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(_status, style: const TextStyle(color: Colors.white, fontSize: 13)),
-                if (_mode == _Mode.hub && _hubPort != null) ...[
-                  const SizedBox(height: 8),
-                  Text('Hub escuchando en: 0.0.0.0:$_hubPort',
-                      style: const TextStyle(color: Colors.lightBlueAccent, fontFamily: 'monospace')),
-                ],
-              ],
-            ),
-          ),
+          _StatusCard(mode: _mode, status: _status, port: _hubPort),
         ],
       ),
     );
@@ -204,5 +189,74 @@ class _HubScreenState extends State<HubScreen> {
 
   String get ip {
     return _hubIp ?? '0.0.0.0';
+  }
+}
+
+/// Tarjeta de estado del hub con luz de color según el modo.
+class _StatusCard extends StatelessWidget {
+  final _Mode mode;
+  final String status;
+  final int? port;
+
+  const _StatusCard({required this.mode, required this.status, this.port});
+
+  @override
+  Widget build(BuildContext context) {
+    final (icon, color, label) = switch (mode) {
+      _Mode.hub => (Icons.cell_tower, AppColors.neonGreen, 'SERVIDOR'),
+      _Mode.client => (Icons.sync, AppColors.neonCyan, 'CLIENTE'),
+      _Mode.idle => (Icons.power_settings_new, AppColors.textFaint, 'SIN CONEXIÓN'),
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(AppRadii.card),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+        boxShadow: mode == _Mode.idle
+            ? null
+            : [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.18),
+                  blurRadius: 22,
+                ),
+              ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: color.withValues(alpha: 0.15),
+                ),
+                child: Icon(icon, color: color, size: 15),
+              ),
+              const SizedBox(width: 10),
+              Text(label,
+                  style: TextStyle(
+                      color: color,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.1)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(status,
+              style: const TextStyle(color: Colors.white, fontSize: 13)),
+          if (mode == _Mode.hub && port != null) ...[
+            const SizedBox(height: 8),
+            Text('Hub escuchando en: 0.0.0.0:$port',
+                style: const TextStyle(
+                    color: AppColors.neonCyan, fontFamily: 'monospace')),
+          ],
+        ],
+      ),
+    );
   }
 }

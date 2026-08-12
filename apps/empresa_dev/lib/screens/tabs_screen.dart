@@ -67,7 +67,7 @@ class _TabsScreenState extends State<TabsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.bgDeep,
       body: Column(
         children: [
           // Barra de pestañas (sesiones abiertas)
@@ -81,34 +81,53 @@ class _TabsScreenState extends State<TabsScreen> {
 
   Widget _buildTabBar() {
     return Container(
-      height: 44,
-      color: const Color(0xFF0B1220),
+      height: 46,
+      margin: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+      decoration: BoxDecoration(
+        color: AppColors.bgPanel,
+        borderRadius: BorderRadius.circular(AppRadii.card),
+        border: Border.all(color: AppColors.border),
+      ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
         itemCount: _sessions.length,
         itemBuilder: (ctx, i) {
           final s = _sessions[i];
           return Padding(
             padding: const EdgeInsets.only(right: 6),
             child: Material(
-              color: const Color(0xFF1E293B),
-              borderRadius: BorderRadius.circular(8),
+              color: AppColors.bgElevated,
+              borderRadius: BorderRadius.circular(AppRadii.chip),
               child: InkWell(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppRadii.chip),
                 onTap: () {},
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.terminal, size: 14, color: Colors.lightBlueAccent),
+                      Container(
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.neonGreen.withValues(alpha: 0.15),
+                        ),
+                        child: const Icon(Icons.terminal,
+                            size: 10, color: AppColors.neonGreen),
+                      ),
                       const SizedBox(width: 6),
-                      Text(s.title, style: const TextStyle(color: Colors.white, fontSize: 12)),
+                      Text(s.title,
+                          style: const TextStyle(color: Colors.white, fontSize: 12)),
                       const SizedBox(width: 4),
                       InkWell(
                         onTap: () => _closeSession(s),
-                        child: const Icon(Icons.close, size: 14, color: Colors.white38),
+                        borderRadius: BorderRadius.circular(4),
+                        child: const Padding(
+                          padding: EdgeInsets.all(2),
+                          child: Icon(Icons.close, size: 14, color: Colors.white38),
+                        ),
                       ),
                     ],
                   ),
@@ -123,54 +142,103 @@ class _TabsScreenState extends State<TabsScreen> {
 
   Widget _buildHostList() {
     if (widget.hosts.isEmpty) {
-      return const Center(child: Text('Sin hosts. Agrega uno.', style: TextStyle(color: Colors.white54)));
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.bgPanel,
+                border: Border.all(color: AppColors.border),
+              ),
+              child: const Icon(Icons.dns_outlined,
+                  color: AppColors.textFaint, size: 34),
+            ),
+            const SizedBox(height: 16),
+            const Text('Sin hosts todavía',
+                style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4),
+            const Text('Toca + para agregar tu primer servidor',
+                style: TextStyle(color: Colors.white38, fontSize: 13)),
+          ],
+        ),
+      );
     }
     return ListView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 96),
       itemCount: widget.hosts.length,
       itemBuilder: (ctx, i) {
         final h = widget.hosts[i];
         final hasSession = _sessions.any((s) => s.hostId == h.name && s.open);
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.symmetric(vertical: 5),
           child: NeonCard(
             onTap: () => _connectToHost(h),
             glow: hasSession ? AppColors.neonGreen : null,
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               leading: Container(
-                width: 40,
-                height: 40,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF0EA5E9), Color(0xFFA855F7)],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.neonCyan.withValues(alpha: 0.35),
-                      blurRadius: 12,
-                    ),
-                  ],
+                  gradient: AppGradients.hostAvatar,
+                  boxShadow: AppGlow.cyan(strength: 0.35, blur: 14),
                 ),
-                child: const Icon(Icons.dns, color: Colors.white, size: 20),
+                child: const Icon(Icons.dns, color: Colors.white, size: 22),
               ),
-              title: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-              subtitle: Text('${h.username}@${h.host}:${h.port}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+              title: Row(
+                children: [
+                  Expanded(
+                    child: Text(h.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700)),
+                  ),
+                  if (hasSession)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.neonGreen.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                            color: AppColors.neonGreen.withValues(alpha: 0.4)),
+                      ),
+                      child: const Text('activa',
+                          style: TextStyle(
+                              color: AppColors.neonGreen,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600)),
+                    ),
+                ],
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text('${h.username}@${h.host}:${h.port}',
+                    style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 12,
+                        fontFamily: 'monospace')),
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.terminal, color: Colors.greenAccent, size: 20),
-                    onPressed: () => _connectToHost(h),
+                  _QuickAction(
+                    icon: Icons.terminal,
+                    color: AppColors.neonGreen,
                     tooltip: 'Conectar por SSH',
+                    onTap: () => _connectToHost(h),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.folder_open, color: Colors.amber, size: 20),
-                    onPressed: () => _openSftp(h),
+                  _QuickAction(
+                    icon: Icons.folder_open,
+                    color: AppColors.neonAmber,
                     tooltip: 'SFTP',
+                    onTap: () => _openSftp(h),
                   ),
                 ],
               ),
@@ -178,6 +246,57 @@ class _TabsScreenState extends State<TabsScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+/// Botón de acción rápida compacto con hover y glow al pasar el cursor.
+class _QuickAction extends StatefulWidget {
+  final IconData icon;
+  final Color color;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _QuickAction({
+    required this.icon,
+    required this.color,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  State<_QuickAction> createState() => _QuickActionState();
+}
+
+class _QuickActionState extends State<_QuickAction> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        duration: AppMotion.fast,
+        curve: AppMotion.easeOutCubic,
+        margin: const EdgeInsets.symmetric(horizontal: 3),
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: widget.color.withValues(alpha: _hovered ? 0.2 : 0.08),
+          borderRadius: BorderRadius.circular(AppRadii.input),
+          border: Border.all(color: widget.color.withValues(alpha: _hovered ? 0.6 : 0.25)),
+        ),
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(AppRadii.input),
+          child: Tooltip(
+            message: widget.tooltip,
+            child: Icon(widget.icon, color: widget.color, size: 19),
+          ),
+        ),
+      ),
     );
   }
 }

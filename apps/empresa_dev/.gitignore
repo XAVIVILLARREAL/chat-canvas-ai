@@ -39,3 +39,7 @@ buzz/
 
 # Repo de referencia externo (herdrdev/herdr) - clon independiente
 herdr/
+
+# E2E web (Playwright) - artefactos de ejecución local
+tool/test-results/
+tool/playwright-report/

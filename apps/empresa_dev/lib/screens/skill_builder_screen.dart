@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../models/skill.dart';
+import '../theme/app_theme.dart';
 
 const skillBlocks = ['Instrucciones', 'Ejemplos', 'Restricciones', 'Anti-patrones'];
 
@@ -208,9 +209,9 @@ class _SkillBuilderScreenState extends State<SkillBuilderScreen> {
           const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF0B1220),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white12),
+              color: AppColors.bgPanel,
+              borderRadius: BorderRadius.circular(AppRadii.card),
+              border: Border.all(color: AppColors.border),
             ),
             padding: const EdgeInsets.all(12),
             child: MarkdownBody(data: _body.text),

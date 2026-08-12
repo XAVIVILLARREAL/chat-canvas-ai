@@ -1,0 +1,11 @@
+{
+  "name": "empresa-dev-e2e-web",
+  "private": true,
+  "description": "E2E web con Playwright contra flutter build web (Etapa 7, SDD-120)",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0"
+  }
+}

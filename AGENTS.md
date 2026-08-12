@@ -421,6 +421,10 @@ Un **constructor visual de `skills.md`** + un **laboratorio para probarlas en vi
   canva, agentes, editor, canva `.md`, skills + laboratorio, grafo 2D/3D).
 - ⬜ **Siguiente fase: Etapa 6 — Vibecoding** (SDD-118 pendiente). Etapa 7
   (Playwright/CI) no iniciada.
+- 🧠 **Etapa 8 — Supervitaminas (aprobada 2026-08, cola de innovación):** 8.1 sync
+  CRDT, 8.2 canva = espejo del grafo LangGraph, 8.3 hub elegible con failover,
+  8.4 SSH proxy opcional, 8.5 Warp-mode, 8.6 canva LOD. Detalle en
+  `docs/SUPER_PLAN.md`.
 - 🕐 Gates manuales pendientes (mano humana, no bloquean código): cargar el
   repo en desktop y navegar el grafo 2D/3D (Etapa 5), 5 notas enlazadas
   (Etapa 4), ciclo real de skill (4b), voz real + 3 prompts (Etapa 2), SFTP

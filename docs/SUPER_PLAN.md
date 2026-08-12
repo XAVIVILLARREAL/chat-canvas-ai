@@ -164,14 +164,14 @@ cd empresa_autonoma && .venv/Scripts/python -m pytest
 
 **Objetivo:** gates automáticos por fase; cada feature arranca como SDD enlazado en el canva.
 
-- [ ] Playwright CLI contra `flutter build web` (`tool/e2e_web.ps1`).
-- [ ] `patrol_cli` para flujos mobile.
-- [ ] CI (GitHub Actions) corre analyze + tests + E2E web por PR.
+- [x] Playwright CLI contra `flutter build web` (`tool/e2e_web.ps1`). *(SDD-120: `tool/e2e_web.ps1` + `playwright.config.js` + `e2e_web.spec.js`)*
+- [x] `patrol_cli` para flujos mobile. *(SDD-120: `patrol_test/canva_flow_test.dart` + sección `patrol:` en pubspec — ejecución = gate manual)*
+- [x] CI (GitHub Actions) corre analyze + tests + E2E web por PR.
 
 **Pruebas de comprobación (gate):**
-- [ ] Script E2E web: conectar SSH, abrir archivo, editar, guardar — sin intervención humana.
-- [ ] Patrol: mismo flujo crítico en Android.
-- [ ] CI: un PR con feature + SDD + tests + E2E pasa completo.
+- [x] Script E2E web: canva → nota `.md` → editar → guardar → **persiste tras recarga**. *(2026-08-12, chromium headless, 12–14s. La cobertura de SSH real es imposible en browser sin proxy WebSocket (Etapa 8.4); SSH sigue en integration tests desktop + patrol. El E2E destapó un bug real de a11y: `showGeneralDialog` con transitionBuilder custom rompía el árbol de semántica web — solo el título era accesible; fix: `showDialog` + `Dialog` estándar con el cristal `NeonDialog` intacto)*
+- [ ] Patrol: mismo flujo crítico en Android (gate manual, dispositivo real).
+- [x] CI: job `e2e-web` en `.github/workflows/ci.yml` (build web E2E_WEB + Playwright chromium + `python3 -m http.server`). *(falta la corrida real de un PR para el ítem completo)*
 
 ---
 

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../main.dart' show navigatorKey;
 import '../services/ssh_service.dart';
 import '../services/sftp_service.dart';
+import '../theme/app_theme.dart';
+import '../widgets/neon_dialog.dart';
 
 class SftpScreen extends StatefulWidget {
   final SshHost host;
@@ -83,22 +85,41 @@ class _SftpScreenState extends State<SftpScreen> {
 
   Future<void> _mkdir() async {
     final controller = TextEditingController();
-    final name = await showDialog<String>(
+    final name = await showNeonDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text('Nueva carpeta', style: TextStyle(color: Colors.white)),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(labelText: 'Nombre', labelStyle: TextStyle(color: Colors.white54)),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar', style: TextStyle(color: Colors.white54))),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, controller.text),
-            child: const Text('Crear'),
+      glow: AppColors.neonAmber,
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('Nueva carpeta',
+              style: TextStyle(
+                  color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 16),
+          TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Nombre'),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancelar'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: FilledButton.icon(
+                  onPressed: () => Navigator.pop(ctx, controller.text),
+                  icon: const Icon(Icons.create_new_folder, size: 18),
+                  label: const Text('Crear'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -117,11 +138,15 @@ class _SftpScreenState extends State<SftpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
-        title: Text('SFTP · ${widget.host.name}', style: const TextStyle(fontSize: 16)),
+        title: Row(
+          children: [
+            const Icon(Icons.folder_open, color: AppColors.neonAmber, size: 18),
+            const SizedBox(width: 8),
+            Text('SFTP · ${widget.host.name}', style: const TextStyle(fontSize: 16)),
+          ],
+        ),
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: () => _load(_cwd), tooltip: 'Refrescar'),
         ],
@@ -129,21 +154,35 @@ class _SftpScreenState extends State<SftpScreen> {
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: const Color(0xFF1E293B),
+            margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.bgPanel,
+              borderRadius: BorderRadius.circular(AppRadii.input),
+              border: Border.all(color: AppColors.border),
+            ),
             child: Row(
               children: [
+                const Icon(Icons.folder, color: Colors.white38, size: 18),
+                const SizedBox(width: 8),
                 Expanded(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Text(
                       _cwd,
-                      style: const TextStyle(color: Colors.lightBlueAccent, fontFamily: 'monospace'),
+                      style: const TextStyle(
+                          color: AppColors.neonCyan, fontFamily: 'monospace'),
                     ),
                   ),
                 ),
-                IconButton(icon: const Icon(Icons.create_new_folder, size: 20), onPressed: _mkdir, tooltip: 'Nueva carpeta'),
-                IconButton(icon: const Icon(Icons.upload, size: 20), onPressed: _upload, tooltip: 'Subir archivo'),
+                IconButton(
+                    icon: const Icon(Icons.create_new_folder, size: 20),
+                    onPressed: _mkdir,
+                    tooltip: 'Nueva carpeta'),
+                IconButton(
+                    icon: const Icon(Icons.upload, size: 20),
+                    onPressed: _upload,
+                    tooltip: 'Subir archivo'),
               ],
             ),
           ),
@@ -173,29 +212,53 @@ class _SftpScreenState extends State<SftpScreen> {
       );
     }
     return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       itemCount: _items.length,
       itemBuilder: (ctx, i) {
         final it = _items[i];
         if (it.name == '.' || it.name == '..') return const SizedBox.shrink();
-        return ListTile(
-          dense: true,
-          leading: Icon(
-            it.isDirectory ? Icons.folder : Icons.insert_drive_file,
-            color: it.isDirectory ? Colors.amber : Colors.lightBlueAccent,
-            size: 20,
-          ),
-          title: Text(it.name, style: const TextStyle(color: Colors.white, fontSize: 14)),
-          subtitle: it.isDirectory ? null : Text(_fmt(it.size), style: const TextStyle(color: Colors.white38, fontSize: 11)),
-          onTap: it.isDirectory
-              ? () => _load('$_cwd/${it.name}')
-              : null,
-          trailing: it.isDirectory
-              ? null
-              : IconButton(
-                  icon: const Icon(Icons.download, size: 18),
-                  onPressed: () => _download(it),
-                  tooltip: 'Descargar',
+        final isDir = it.isDirectory;
+        final iconColor = isDir ? AppColors.neonAmber : AppColors.neonCyan;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Material(
+            color: AppColors.bgPanel,
+            borderRadius: BorderRadius.circular(AppRadii.input),
+            child: ListTile(
+              dense: true,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadii.input)),
+              leading: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppRadii.chip),
+                  border: Border.all(color: iconColor.withValues(alpha: 0.25)),
                 ),
+                child: Icon(
+                  isDir ? Icons.folder : Icons.insert_drive_file,
+                  color: iconColor,
+                  size: 18,
+                ),
+              ),
+              title: Text(it.name,
+                  style: const TextStyle(color: Colors.white, fontSize: 14)),
+              subtitle: isDir
+                  ? null
+                  : Text(_fmt(it.size),
+                      style:
+                          const TextStyle(color: Colors.white38, fontSize: 11)),
+              onTap: isDir ? () => _load('$_cwd/${it.name}') : null,
+              trailing: isDir
+                  ? const Icon(Icons.chevron_right, color: Colors.white24, size: 18)
+                  : IconButton(
+                      icon: const Icon(Icons.download, size: 18),
+                      onPressed: () => _download(it),
+                      tooltip: 'Descargar',
+                    ),
+            ),
+          ),
         );
       },
     );
@@ -213,19 +276,37 @@ class FilePickerHelper {
   Future<String?> pickFile() async {
     // Este slice usa una ruta de texto; file_picker se integra después.
     final controller = TextEditingController(text: '/tmp');
-    final path = await showDialog<String>(
+    final path = await showNeonDialog<String>(
       context: navigatorKey.currentContext!,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text('Ruta local del archivo', style: TextStyle(color: Colors.white)),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          style: const TextStyle(color: Colors.white),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar', style: TextStyle(color: Colors.white54))),
-          FilledButton(onPressed: () => Navigator.pop(ctx, controller.text), child: const Text('Subir')),
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('Ruta local del archivo',
+              style: TextStyle(
+                  color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 16),
+          TextField(controller: controller, autofocus: true),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancelar'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: FilledButton.icon(
+                  onPressed: () => Navigator.pop(ctx, controller.text),
+                  icon: const Icon(Icons.upload, size: 18),
+                  label: const Text('Subir'),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -234,19 +315,37 @@ class FilePickerHelper {
 
   Future<String?> saveFile(String name) async {
     final controller = TextEditingController(text: '/tmp/$name');
-    final path = await showDialog<String>(
+    final path = await showNeonDialog<String>(
       context: navigatorKey.currentContext!,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text('Guardar en', style: TextStyle(color: Colors.white)),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          style: const TextStyle(color: Colors.white),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar', style: TextStyle(color: Colors.white54))),
-          FilledButton(onPressed: () => Navigator.pop(ctx, controller.text), child: const Text('Guardar')),
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('Guardar en',
+              style: TextStyle(
+                  color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 16),
+          TextField(controller: controller, autofocus: true),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancelar'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: FilledButton.icon(
+                  onPressed: () => Navigator.pop(ctx, controller.text),
+                  icon: const Icon(Icons.save, size: 18),
+                  label: const Text('Guardar'),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

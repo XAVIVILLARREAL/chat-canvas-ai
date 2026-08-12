@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:graph_core/graph_core.dart';
+import '../theme/app_theme.dart';
 import 'project_graph_3d_screen.dart';
 
 /// Grafo del proyecto: nodos = archivos (cluster por paquete), aristas =
@@ -74,8 +75,24 @@ class _ProjectGraphScreenState extends State<ProjectGraphScreen> {
       );
     }
     return Scaffold(
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
-        title: const Text('Grafo del proyecto'),
+        title: Row(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppRadii.chip),
+                gradient: AppGradients.neon,
+              ),
+              child:
+                  const Icon(Icons.account_tree, color: Color(0xFF062A33), size: 15),
+            ),
+            const SizedBox(width: 8),
+            const Text('Grafo del proyecto'),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: 'Ver grafo 3D',
@@ -98,48 +115,83 @@ class _ProjectGraphScreenState extends State<ProjectGraphScreen> {
           ),
         ),
       ),
-      body: InteractiveViewer(
-        constrained: false,
-        minScale: 0.2,
-        maxScale: 4,
-        child: SizedBox(
-          width: 1200,
-          height: 900,
-          child: Stack(
-            children: [
-              CustomPaint(
-                size: const Size(1200, 900),
-                painter: _EdgesPainter(
-                  edges: widget.graph.edges,
-                  pos: (id) => Offset(_sim.x(id), _sim.y(id)),
-                ),
-              ),
-              for (final node in nodes)
-                Positioned(
-                  left: _sim.x(node.id),
-                  top: _sim.y(node.id),
-                  child: MouseRegion(
-                    onEnter: (_) => setState(() => _hoveredId = node.id),
-                    onExit: (_) => setState(() => _hoveredId = null),
-                    child: Tooltip(
-                      message: node.id,
-                      child: GestureDetector(
-                        onTap: () => _onNodeTap(node.id),
-                        child: _NodeChip(
-                          label: node.label,
-                          color: _colorFor(node.package),
-                          highlighted: _hoveredId == node.id,
-                        ),
+      body: Stack(
+        children: [
+          const Positioned.fill(child: NeonDotGrid()),
+          Positioned.fill(
+            child: InteractiveViewer(
+              constrained: false,
+              minScale: 0.2,
+              maxScale: 4,
+              child: SizedBox(
+                width: 1200,
+                height: 900,
+                child: Stack(
+                  children: [
+                    CustomPaint(
+                      size: const Size(1200, 900),
+                      painter: _EdgesPainter(
+                        edges: widget.graph.edges,
+                        pos: (id) => Offset(_sim.x(id), _sim.y(id)),
                       ),
                     ),
-                  ),
+                    for (final node in nodes)
+                      Positioned(
+                        left: _sim.x(node.id),
+                        top: _sim.y(node.id),
+                        child: MouseRegion(
+                          onEnter: (_) => setState(() => _hoveredId = node.id),
+                          onExit: (_) => setState(() => _hoveredId = null),
+                          child: Tooltip(
+                            message: node.id,
+                            child: GestureDetector(
+                              onTap: () => _onNodeTap(node.id),
+                              child: _NodeChip(
+                                label: node.label,
+                                color: _colorFor(node.package),
+                                highlighted: _hoveredId == node.id,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
+}
+
+/// Rejilla de puntos sutil de fondo (holograma) para el grafo.
+class NeonDotGrid extends StatelessWidget {
+  const NeonDotGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(painter: _DotGridPainter());
+  }
+}
+
+class _DotGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.04)
+      ..strokeWidth = 1;
+    const spacing = 42.0;
+    for (var x = 0.0; x < size.width; x += spacing) {
+      for (var y = 0.0; y < size.height; y += spacing) {
+        canvas.drawCircle(Offset(x, y), 0.8, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _NodeChip extends StatelessWidget {

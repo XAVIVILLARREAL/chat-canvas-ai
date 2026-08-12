@@ -1,6 +1,6 @@
 # ESTADO ACTUAL — Empresa Dev
 
-> **Última actualización:** 2026-08-11 · último commit `2c88598` (Etapa 5 = grafo 2D+3D) · rama `main`, push OK.
+> **Última actualización:** 2026-08-12 · Etapa 7 en curso (E2E web + CI) · rama `main`.
 > Fuente de verdad de fases/gates: `docs/SUPER_PLAN.md`. Las features se diseñan en `docs/SDDs/` (siguiendo `SDD-XXX`).
 > Plan maestro consolidado (todo lo que falta, con gates): `plan.md` (raíz del repo).
 
@@ -10,9 +10,13 @@ La app (Flutter, `apps/empresa_dev`) es un reemplazo de Termius con canva visual
 que evoluciona hacia un **IDE visual de vibecoding**: terminal SSH/SFTP real,
 canva de nodos (hosts, notas `.md`, agentes, skills), editor de archivos, gestor
 de skills con laboratorio, y **grafo del proyecto en 2D y 3D** (Two.js local +
-WebView2 en Windows). La fase en curso según SUPER_PLAN es la **Etapa 6 —
-Vibecoding** (no iniciada). Todo el código automatizado de Etapas 1–5 está
-verde; quedan **gates manuales** (listados abajo) que requieren mano humana.
+WebView2 en Windows). La fase en curso según SUPER_PLAN es la **Etapa 7 —
+SDD++ + Playwright E2E**: E2E web del flujo crítico verde con Playwright contra
+`flutter build web` (canva → nota `.md` → editar → guardar → persiste tras
+recarga), test patrol mobile versionado (gate manual) y job `e2e-web` en el CI.
+El E2E destapó y arregló un bug real de accesibilidad (semántica web del
+`showNeonDialog`). Todo el código automatizado de Etapas 1–6 está verde; quedan
+**gates manuales** (listados abajo) que requieren mano humana.
 
 **Visión empresa autónoma (CrewAI+LangGraph):** la **Fase 0 ya está committeada**
 (`faf129f`, SDD-115): servicio Python `empresa_autonoma/` con grafo
@@ -35,11 +39,12 @@ oficina). CrewAI↔LangGraph siguen por canales nativos (mismo proceso).
 | Etapa 4b — Skills builder + lab + export + dogfood duro | ✅ automatizado (6 tests `--tags skills`) | manual: crear → probar → exportar → reiniciar opencode → trigger real |
 | **Etapa 5 — Grafo 2D + 3D** | ✅ automatizado (`68f742a` + `2c88598`) | **manual: cargar este repo en desktop y navegar 2D/3D** (commits `68f742a`, `2c88598`) |
 | **Etapa 6 — Vibecoding (SDD-118)** | ✅ automatizado + **dogfood ✅** | gates manuales abajo |
-| Etapa 7 — SDD++ + Playwright | ⬜ no iniciada | — |
+| **Etapa 7 — SDD++ + Playwright E2E (SDD-120)** | **E2E web ✅** (2026-08-12: `tool/e2e_web.ps1` + `playwright.config.js` + `e2e_web.spec.js`, chromium headless 12–14s); CI job `e2e-web` ✅; patrol test versionado ⬜ ejecución manual | **manual: patrol en Android real** |
 | **Visión Empresa Autónoma (SDD-115)** | **Fase 0 ✅** (`faf129f`); Fases 1–5 ⬜ | servicios/crews reales, paralelismo, oficina animada |
 
 ### Gates manuales pendientes (bloquean solo el cierre de fase, no el código)
 
+- Etapa 7 (manual): `patrol test -d <device> patrol_test/canva_flow_test.dart` en Android real (mismo flujo crítico que el E2E web, con relanzamiento de app).
 - Etapa 6 (manual): generar una propuesta desde la UI de Vibecoding de la app sobre un repo real y aceptarla. **Dogfood (código): ✅ hecho 2026-08-11** — `relativeTimeDetailed` en `vibecoding_core` generada por opencode real y aplicada; el dogfood arregló 3 bugs del pipeline (pubspec_overrides en copia, `.dart_tool/` como edits, prompts manglados por cmd — fix `--prompt-file` + argv-list).
 - Etapa 4: crear 5 notas enlazadas, navegar backlinks, cerrar/reabrir persiste.
 - Etapa 4b: ciclo real crear skill → probar → exportar a `.opencode/skills/` → reiniciar opencode → trigger.

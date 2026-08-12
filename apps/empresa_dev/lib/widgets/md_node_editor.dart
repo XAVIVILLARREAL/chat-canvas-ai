@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../services/md_link_parser.dart';
+import '../theme/app_theme.dart';
 
 /// Editor de nodo `.md` con preview Markdown en vivo.
 /// Los `[[links]]` del preview son clickables: [onOpenLink] si el destino
@@ -69,7 +70,6 @@ class _MdNodeEditorState extends State<MdNodeEditor> {
             decoration: const InputDecoration(
               hintText: 'Escribe Markdown… [[enlaces]] incluidos',
               hintStyle: TextStyle(color: Colors.white24),
-              border: OutlineInputBorder(),
             ),
             onChanged: (v) {
               setState(() {});
@@ -82,9 +82,9 @@ class _MdNodeEditorState extends State<MdNodeEditor> {
           flex: 5,
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF0B1220),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white12),
+              color: AppColors.bgPanel,
+              borderRadius: BorderRadius.circular(AppRadii.card),
+              border: Border.all(color: AppColors.border),
             ),
             padding: const EdgeInsets.all(12),
             child: MarkdownBody(

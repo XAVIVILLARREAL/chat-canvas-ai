@@ -68,9 +68,6 @@ dev_dependencies:
   integration_test:
     sdk: flutter
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
 # The following section is specific to Flutter packages.
 flutter:
 
@@ -113,4 +110,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# E2E mobile con patrol_cli (Etapa 7, SDD-120). Gate manual con Android real:
+#   cd apps/empresa_dev && patrol test -d <device> patrol_test/canva_flow_test.dart
+patrol:
+  app_path: lib/main.dart
+  android:
+    application_id: com.empresadev.empresa_dev
 

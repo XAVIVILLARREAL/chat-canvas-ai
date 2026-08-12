@@ -6,6 +6,7 @@ import 'package:agent_core/agent_detector.dart';
 import '../services/agent_runner.dart';
 import '../services/evidence_store.dart';
 import '../services/voice_service.dart';
+import '../theme/app_theme.dart';
 import '../widgets/agent_state_badge.dart';
 import '../widgets/voice_buttons.dart';
 import 'evidence_screen.dart';
@@ -170,14 +171,25 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B1220),
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
         title: Row(
           children: [
-            const Icon(Icons.smart_toy, color: Colors.purpleAccent, size: 20),
-            const SizedBox(width: 8),
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.neonViolet, AppColors.neonCyan],
+                ),
+                boxShadow: AppGlow.violet(strength: 0.5, blur: 14),
+              ),
+              child: const Icon(Icons.smart_toy, color: Colors.white, size: 16),
+            ),
+            const SizedBox(width: 10),
             Text('Agente ${_session.agentName}', style: const TextStyle(fontSize: 16)),
             const SizedBox(width: 12),
             AgentStateBadge(state: _detection.state),
@@ -226,7 +238,10 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
             ),
           Container(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-            color: const Color(0xFF0F172A),
+            decoration: const BoxDecoration(
+              color: AppColors.bgElevated,
+              border: Border(top: BorderSide(color: AppColors.border)),
+            ),
             child: Row(
               children: [
                 VoiceMicButton(
@@ -235,7 +250,7 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
                     if (t != null && t.isNotEmpty) _input.text = t;
                   },
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
                     controller: _input,
@@ -243,10 +258,6 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
                     style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       hintText: 'Pregúntale al agente…',
-                      hintStyle: TextStyle(color: Colors.white38),
-                      filled: true,
-                      fillColor: Color(0xFF1E293B),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
                     ),
                     onSubmitted: (_) => _send(),
                   ),
@@ -255,10 +266,13 @@ class _AgentChatScreenState extends State<AgentChatScreen> {
                 FilledButton(
                   onPressed: _running ? null : _send,
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.purpleAccent,
-                    foregroundColor: Colors.black,
+                    backgroundColor: AppColors.neonViolet,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.all(14),
+                    minimumSize: const Size(48, 48),
+                    shape: const CircleBorder(),
                   ),
-                  child: const Icon(Icons.send),
+                  child: const Icon(Icons.send, size: 20),
                 ),
               ],
             ),
@@ -279,41 +293,86 @@ class _MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isUser = message.role == AgentRole.user;
     final isError = message.role == AgentRole.error;
-    final color = isError
-        ? const Color(0xFF7F1D1D)
-        : isUser
-            ? const Color(0xFF0EA5E9)
-            : const Color(0xFF1E293B);
+    final radius = BorderRadius.circular(AppRadii.card);
+    final           bubble = isUser
+        ? Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              gradient: AppGradients.hostAvatar,
+              borderRadius: radius,
+              boxShadow: AppGlow.cyan(strength: 0.3, blur: 14),
+            ),
+            child: _Content(
+                message: message,
+                isUser: true,
+                isError: false,
+                tts: tts),
+          )
+        : Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isError
+                  ? const Color(0xFF7F1D1D)
+                  : AppColors.bgElevated,
+              borderRadius: radius,
+              border: Border.all(
+                color: isError
+                    ? Colors.redAccent.withValues(alpha: 0.4)
+                    : AppColors.border,
+              ),
+            ),
+            child: _Content(
+                message: message,
+                isUser: false,
+                isError: isError,
+                tts: tts),
+          );
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.all(10),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: isError ? 0.6 : 0.9),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Flexible(
-              child: SelectableText(
-                message.text,
-                style: TextStyle(
-                  color: isError ? Colors.redAccent.shade100 : Colors.white,
-                  fontSize: 13,
-                  fontFamily: isUser ? null : 'monospace',
-                  height: 1.4,
-                ),
-              ),
-            ),
-            if (!isUser && !isError && tts != null && message.text.trim().isNotEmpty)
-              SpeakerButton(tts: tts!, text: message.text, compact: true),
-          ],
-        ),
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+        child: bubble,
       ),
+    );
+  }
+}
+
+class _Content extends StatelessWidget {
+  final AgentMessage message;
+  final bool isUser;
+  final bool isError;
+  final TextToSpeechVoice? tts;
+
+  const _Content({
+    required this.message,
+    required this.isUser,
+    required this.isError,
+    this.tts,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Flexible(
+          child: SelectableText(
+            message.text,
+            style: TextStyle(
+              color: isError ? Colors.redAccent.shade100 : Colors.white,
+              fontSize: 13,
+              fontFamily: isUser ? null : 'monospace',
+              height: 1.4,
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        if (!isUser && !isError && tts != null && message.text.trim().isNotEmpty)
+          SpeakerButton(tts: tts!, text: message.text, compact: true),
+      ],
     );
   }
 }

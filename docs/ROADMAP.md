@@ -88,6 +88,17 @@
 
 **Objetivo Etapa 1:** reemplazar Termius — terminal + SFTP + canva, con el celular como hub de sync.
 
+## ⏭️ Etapa 8 — Supervitaminas (ideas creativas aprobadas 2026-08)
+
+Cola de innovación (no bloquea Etapas 1–7). Detalle y gates en `docs/SUPER_PLAN.md`.
+
+- [ ] **8.1 — Sync CRDT**: canva como documento vivo (y-crdt/Automerge), converge sin conflictos, sync por deltas.
+- [ ] **8.2 — Canva = espejo del grafo LangGraph**: aristas del canva = edges del grafo; nodos animan su estado (bloqueado → trabajando → revisión) en vivo.
+- [ ] **8.3 — Hub elegible con failover**: si el celular está bajo de batería, el pve toma el rol de hub automáticamente.
+- [ ] **8.4 — SSH proxy opcional**: las llaves nunca salen del hub; la laptop pide conexión vía proxy con token efímero.
+- [ ] **8.5 — Warp-mode**: historial fuzzy por host + snippets sincronizados + autocompletado local.
+- [ ] **8.6 — Canva LOD**: quad-tree culling + clusters por zoom (10.000 nodos ≥ 30fps).
+
 ## ⏭️ Etapa 2 — Agentes IA (después; archivado en docs/legacy/)
 
 - [ ] Nodos de **agente IA** (opencode) en el canva, como ciudadanos de primera clase.

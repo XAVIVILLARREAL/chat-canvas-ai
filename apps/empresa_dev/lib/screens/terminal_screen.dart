@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:xterm/xterm.dart';
 import '../services/ssh_service.dart';
+import '../theme/app_theme.dart';
 
 class TerminalScreen extends StatefulWidget {
   final SshHost host;
@@ -111,13 +112,19 @@ class TerminalScreenState extends State<TerminalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
         title: Row(
           children: [
-            const Icon(Icons.dns, size: 18, color: Colors.lightBlueAccent),
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: AppGradients.hostAvatar,
+              ),
+              child: const Icon(Icons.dns, size: 14, color: Colors.white),
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -129,6 +136,7 @@ class TerminalScreenState extends State<TerminalScreen> {
           ],
         ),
         actions: [
+          _ConnStatusPill(connected: isConnected, connecting: _connecting),
           IconButton(
             icon: const Icon(Icons.keyboard, size: 18),
             onPressed: () => setState(() => _showSshKeys = !_showSshKeys),
@@ -149,13 +157,23 @@ class TerminalScreenState extends State<TerminalScreen> {
 
   Widget _buildBody() {
     if (_connecting) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 12),
-            Text('Conectando…', style: TextStyle(color: Colors.white70)),
+            const SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(strokeWidth: 3)),
+            const SizedBox(height: 16),
+            const Text('Estableciendo túnel SSH…',
+                style: TextStyle(color: Colors.white70)),
+            const SizedBox(height: 4),
+            Text(widget.host.host,
+                style: const TextStyle(
+                    color: Colors.white38,
+                    fontSize: 12,
+                    fontFamily: 'monospace')),
           ],
         ),
       );
@@ -167,11 +185,28 @@ class TerminalScreenState extends State<TerminalScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline, color: Colors.redAccent, size: 40),
-              const SizedBox(height: 12),
-              Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
-              const SizedBox(height: 16),
-              FilledButton(onPressed: _connect, child: const Text('Reintentar')),
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.redAccent.withValues(alpha: 0.1),
+                  border: Border.all(
+                      color: Colors.redAccent.withValues(alpha: 0.4)),
+                ),
+                child: const Icon(Icons.error_outline,
+                    color: Colors.redAccent, size: 32),
+              ),
+              const SizedBox(height: 14),
+              Text(_error!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white70)),
+              const SizedBox(height: 18),
+              FilledButton.icon(
+                onPressed: _connect,
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Reintentar'),
+              ),
             ],
           ),
         ),
@@ -218,13 +253,15 @@ class TerminalScreenState extends State<TerminalScreen> {
           child: Padding(
             padding: const EdgeInsets.all(2),
             child: Material(
-              color: const Color(0xFF1E293B),
-              borderRadius: BorderRadius.circular(8),
+              color: AppColors.bgPanel,
+              borderRadius: BorderRadius.circular(AppRadii.chip),
               child: InkWell(
                 onTap: () => _sendEscape(seq),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppRadii.chip),
                 child: Center(
-                  child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                  child: Text(label,
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 13)),
                 ),
               ),
             ),
@@ -232,7 +269,7 @@ class TerminalScreenState extends State<TerminalScreen> {
         );
 
     return Container(
-      color: const Color(0xFF0B1220),
+      color: AppColors.bgDeep,
       padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -252,6 +289,40 @@ class TerminalScreenState extends State<TerminalScreen> {
             key('Enter', '\r'),
           ]),
         ],
+      ),
+    );
+  }
+}
+
+/// Píldora de estado de conexión del terminal.
+class _ConnStatusPill extends StatelessWidget {
+  final bool connected;
+  final bool connecting;
+
+  const _ConnStatusPill({required this.connected, required this.connecting});
+
+  @override
+  Widget build(BuildContext context) {
+    final (color, label) = connected
+        ? (AppColors.neonGreen, 'CONECTADO')
+        : connecting
+            ? (AppColors.neonAmber, 'CONECTANDO')
+            : (Colors.white38, 'DESCONECTADO');
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.only(right: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: color.withValues(alpha: 0.4)),
+        ),
+        child: Text(label,
+            style: TextStyle(
+                color: color,
+                fontSize: 9,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8)),
       ),
     );
   }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/skill.dart';
 import '../services/skill_lab.dart';
 import '../services/dialect_exporter.dart';
+import '../theme/app_theme.dart';
+import '../widgets/neon_dialog.dart';
 
 /// Laboratorio sandbox: input → ranking en vivo de skills con confianza,
 /// por qué, y exportación del resultado al dialecto elegido.
@@ -34,6 +36,7 @@ class _SkillLabScreenState extends State<SkillLabScreen> {
     final matches = results.where((r) => r.score > 0).toList();
 
     return Scaffold(
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
         title: const Text('Laboratorio de skills'),
         actions: [
@@ -46,6 +49,9 @@ class _SkillLabScreenState extends State<SkillLabScreen> {
             ),
           DropdownButton<Dialect>(
             value: _dialect,
+            dropdownColor: AppColors.bgElevated,
+            style: const TextStyle(color: Colors.white),
+            iconEnabledColor: AppColors.neonCyan,
             items: [
               for (final d in DialectExporter.dialects())
                 DropdownMenuItem(
@@ -68,7 +74,6 @@ class _SkillLabScreenState extends State<SkillLabScreen> {
               decoration: const InputDecoration(
                 labelText: 'Prompt / comando',
                 hintText: 'Escribe algo y mira qué skills se activarían…',
-                border: OutlineInputBorder(),
               ),
             ),
           ),
@@ -78,35 +83,56 @@ class _SkillLabScreenState extends State<SkillLabScreen> {
                     child: Text('sin coincidencias: ninguna skill se activa'),
                   )
                 : ListView(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                     children: [
                       for (final r in matches)
-                        ListTile(
-                          leading: CircleAvatar(
-                            radius: 18,
-                            backgroundColor:
-                                Colors.blue.withValues(alpha: r.confidence),
-                            child: Text(
-                              (r.confidence * 100).round().toString(),
-                              style: const TextStyle(fontSize: 11),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 3),
+                          child: Material(
+                            color: AppColors.bgPanel,
+                            borderRadius:
+                                BorderRadius.circular(AppRadii.input),
+                            child: ListTile(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      AppRadii.input)),
+                              leading: CircleAvatar(
+                                radius: 18,
+                                backgroundColor: AppColors.neonCyan
+                                    .withValues(alpha: r.confidence * 0.7),
+                                child: Text(
+                                  (r.confidence * 100).round().toString(),
+                                  style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white),
+                                ),
+                              ),
+                              title: Text(r.skill.name,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600)),
+                              subtitle: Text(
+                                r.reasons.join(', '),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    color: Colors.white38, fontSize: 11),
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.ios_share),
+                                tooltip: 'Exportar',
+                                onPressed: () => _export(context, r.skill),
+                              ),
                             ),
-                          ),
-                          title: Text(r.skill.name),
-                          subtitle: Text(
-                            r.reasons.join(', '),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.ios_share),
-                            tooltip: 'Exportar',
-                            onPressed: () => _export(context, r.skill),
                           ),
                         ),
                       const Padding(
                         padding: EdgeInsets.all(16),
                         child: Text(
                           'Export: genera el SKILL.md del dialecto seleccionado.',
-                          style: TextStyle(fontSize: 12),
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.white38),
                         ),
                       ),
                     ],
@@ -119,17 +145,43 @@ class _SkillLabScreenState extends State<SkillLabScreen> {
 
   void _export(BuildContext context, Skill skill) {
     final text = DialectExporter.render(skill, _dialect);
-    showDialog<void>(
+    final label = DialectExporter.dialects()
+        .firstWhere((d) => d.dialect == _dialect)
+        .label;
+    showNeonDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Export ${skill.name} (${DialectExporter.dialects().firstWhere((d) => d.dialect == _dialect).label})'),
-        content: SingleChildScrollView(
-          child: SelectableText(text, style: const TextStyle(fontFamily: 'monospace', fontSize: 12)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cerrar'),
+      glow: AppColors.neonCyan,
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Export $label · ${skill.name}',
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700)),
+          const SizedBox(height: 16),
+          Container(
+            constraints: const BoxConstraints(maxHeight: 320),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.bgPanel,
+              borderRadius: BorderRadius.circular(AppRadii.input),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: SingleChildScrollView(
+              child: SelectableText(text,
+                  style: const TextStyle(
+                      fontFamily: 'monospace', fontSize: 12, height: 1.4)),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cerrar'),
+            ),
           ),
         ],
       ),

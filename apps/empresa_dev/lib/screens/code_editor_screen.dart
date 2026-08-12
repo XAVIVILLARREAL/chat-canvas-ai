@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/project_service.dart';
+import '../theme/app_theme.dart';
 
 enum _SaveState { saved, modified, saving, error }
 
@@ -80,11 +81,15 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
       focusNode: FocusNode()..requestFocus(),
       onKeyEvent: _onKey,
       child: Scaffold(
-        backgroundColor: const Color(0xFF0B1220),
+        backgroundColor: AppColors.bgDeep,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF0F172A),
-          foregroundColor: Colors.white,
-          title: Text(_fileName, style: const TextStyle(fontSize: 15)),
+          title: Row(
+            children: [
+              const Icon(Icons.code, color: AppColors.neonCyan, size: 18),
+              const SizedBox(width: 8),
+              Text(_fileName, style: const TextStyle(fontSize: 15)),
+            ],
+          ),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 8),
@@ -97,22 +102,31 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
             ),
           ],
         ),
-        body: TextField(
-          controller: _controller,
-          maxLines: null,
-          expands: true,
-          keyboardType: TextInputType.multiline,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontFamily: 'monospace',
-            height: 1.4,
+        body: Container(
+          margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.bgPanel,
+            borderRadius: BorderRadius.circular(AppRadii.card),
+            border: Border.all(color: AppColors.border),
           ),
-          decoration: const InputDecoration(
-            hintText: 'Archivo vacío',
-            hintStyle: TextStyle(color: Colors.white24),
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.all(16),
+          clipBehavior: Clip.antiAlias,
+          child: TextField(
+            controller: _controller,
+            maxLines: null,
+            expands: true,
+            keyboardType: TextInputType.multiline,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontFamily: 'monospace',
+              height: 1.4,
+            ),
+            decoration: const InputDecoration(
+              hintText: 'Archivo vacío',
+              hintStyle: TextStyle(color: Colors.white24),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(16),
+            ),
           ),
         ),
       ),
