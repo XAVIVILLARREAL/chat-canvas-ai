@@ -82,6 +82,7 @@ cd apps/empresa_dev && flutter build windows --release           # build desktop
 - **Celular como hub**: servidor embebido (dart:io) + **Tailscale** para sync global. → `ADR-002`.
 - **DB local:** SQLite (drift) en cada dispositivo; el hub es la autoridad.
 - **La conexión SSH es directa** del dispositivo al servidor; el hub sincroniza config/estado.
+- **Un solo motor de canva**: `CanvaView` + nodos extensibles (`CanvaNodeType`) + workspaces (documentos) + vistas por dominio. No hay un canva por dominio. → `ADR-004`.
 
 ## Stack
 
