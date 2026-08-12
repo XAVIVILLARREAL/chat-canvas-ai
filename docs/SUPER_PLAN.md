@@ -13,6 +13,7 @@
 | Hub celular + sync | ✅ hecho | `lib/services/hub_server.dart`, `sync_client.dart`, `sync_integration_test.dart` |
 | Sesiones/tabs | ✅ hecho | `lib/screens/tabs_screen.dart`, `sessions_store.dart` |
 | Publicación (Play/App Store/releases) | ❌ pendiente | — |
+| **Empresa Autónoma Fase 0 (SDD-115)** | ✅ committeado (`faf129f`) | `empresa_autonoma/`: `graph.py` (grafo plan→implementar→revisar→merge con gate humano), `roles.py` (7 roles), `tests/test_graph.py` headless |
 
 ## Comandos maestros de comprobación (corren en cualquier fase)
 
@@ -22,6 +23,8 @@ flutter test --exclude-tags integration      # suite unit/widget verde
 dart run tool/hub_smoke.dart                 # smoke del hub OK
 flutter build apk --debug --no-tree-shake-icons
 # Windows: cmake manual (ver AGENTS.md "Build Commands")
+# Servicio empresa_autonoma (Fase 0):
+cd empresa_autonoma && .venv/Scripts/python -m pytest
 ```
 
 ---
@@ -146,14 +149,14 @@ flutter build apk --debug --no-tree-shake-icons
 
 **Objetivo:** el agente IA trabaja dentro del canva; cada propuesta es un nodo-diff aceptable o rechazable.
 
-- [ ] Agente conectado al editor + canva (opencode CLI de legacy o API LLM directa).
-- [ ] Cada propuesta = nodo-diff con preview; aceptar/rechazar; historial navegable.
+- [x] Agente conectado al editor + canva (opencode CLI de legacy o API LLM directa). *(SDD-118: `packages/vibecoding_core/` + `vibecoding_screen.dart` + nodo `proposal` en canva)*
+- [x] Cada propuesta = nodo-diff con preview; aceptar/rechazar; historial navegable. *(DiffPreview + VibecodingStore, historial persistido)*
 
 **Pruebas de comprobación (gate):**
-- [ ] Unit: pipeline parche → nodo-diff; transiciones de estado aceptar/rechazar/revertir.
-- [ ] Widget: chat + nodo-diff; aplicar cambio y revertir sin estado residual.
-- [ ] Integration: agente real propone un cambio en un fixture; aplicado, los tests siguen verdes.
-- [ ] **Dogfood:** una feature real de este repo implementada 100% vía vibecoding desde la app.
+- [x] Unit: pipeline parche → nodo-diff; transiciones de estado aceptar/rechazar/revertir. *(31 tests: transiciones, conflictos, anti-traversal, filtrado de artefactos generados)*
+- [x] Widget: chat + nodo-diff; aplicar cambio y revertir sin estado residual.
+- [x] Integration: agente real propone un cambio en un fixture; aplicado, los tests siguen verdes. *(`vibecoding_integration_test.dart`, opencode real)*
+- [x] **Dogfood:** una feature real de este repo implementada 100% vía vibecoding desde la app. *(2026-08-11: `relativeTimeDetailed` en `vibecoding_core` — generada por opencode real, aplicada con `--apply`, suite 31+143 verdes. El dogfood destapó y arregló 3 bugs del pipeline: pubspec_overrides en la copia aislada, `.dart_tool/` como edits, y prompts manglados por cmd/argv de Windows — fixes `--prompt-file` + argv-list al `.exe` nativo. Detalle en SDD-118)*
 
 ---
 
@@ -169,6 +172,181 @@ flutter build apk --debug --no-tree-shake-icons
 - [ ] Script E2E web: conectar SSH, abrir archivo, editar, guardar — sin intervención humana.
 - [ ] Patrol: mismo flujo crítico en Android.
 - [ ] CI: un PR con feature + SDD + tests + E2E pasa completo.
+
+---
+
+## Etapa 8 — Supervitaminas (ideas creativas aprobadas 2026-08)
+
+> **Estado:** cola de innovación. No bloquea Etapas 1–7. Se priorizan al cierre de Etapa 7
+> (o antes si un gate abre ventana). Fuente: análisis de visión 2026-08 (AGENTS.md).
+
+### 8.1 — Sync CRDT (convergencia sin conflictos)
+
+**Problema que resuelve:** el sync actual es snapshot + last-write-wins; ediciones
+simultáneas en 2 dispositivos pierden trabajo.
+
+**Idea:** reemplazar el snapshot LWW por un **CRDT** (y-crdt / Automerge). El canva
+se vuelve un documento vivo que converge solo, por deltas, sin autoridad central y
+con offline-first real. Mismo espíritu que "varios agentes trabajando en paralelo".
+
+- [ ] Evaluar y-crdt / Automerge en Dart (¿Dart puro o FFI?).
+- [ ] Migrar tabla `canva_nodos`/`canva_edges` a estado CRDT.
+- [ ] Sync por deltas (no snapshots enteros) sobre el WebSocket del hub.
+- [ ] Test: editar canva en 2 dispositivos a la vez → converge sin pérdida.
+
+**Gate:** 2 dispositivos offline, editan, reconectan → el canva converge sin conflicto.
+
+### 8.2 — El canva ES la vista viva del grafo LangGraph
+
+**Problema que resuelve:** el canva muestra hosts y la empresa (Python) orquesta por
+separado; la UI no refleja el estado real del trabajo.
+
+**Idea:** cada nodo-agente/tarea se suscribe al checkpoint de su nodo del grafo
+(`astream_events`), y la **arista entre nodos del canva = edge real del grafo**.
+La transición "bloqueado → trabajando → en revisión" anima el nodo en vivo.
+El canva pasa de mapa de infraestructura a espejo de la oficina en tiempo real.
+
+- [ ] WebSocket del hub → servicio Python (estado del grafo por thread/empresa).
+- [ ] Modelo `GraphState` en `agent_core` (nodo, estado, transición, checkpoint).
+- [ ] Aristas del canva ligadas a edges del grafo; animación de transición de estado.
+- [ ] Nodo bloqueado/en revisión → glow rojo/amarillo + owner visible.
+
+**Gate:** un nodo-agente cambia de estado en la empresa y el canva lo anima en vivo.
+
+### 8.3 — Hub con failover y descarga de batería
+
+**Problema que resuelve:** el gate "hub no agota batería en 24h" depende de que el
+celular aguante; si está bajo o dormido, el sync muere.
+
+**Idea:** hub **elegible** (election sobre Tailscale): cuando el celular está bajo de
+batería o en reposo profundo, el pve (siempre encendido) toma el rol de hub
+automáticamente; el celular vuelve a ser hub al cargar. Privado, sin nube, con
+failover gratis.
+
+- [ ] Protocolo de elección de hub (heartbeat + prioridad + takeover).
+- [ ] Promoción/democión transparente para los clientes (misma URL/alias Tailscale).
+- [ ] Política de batería: umbral → ceder rol al pve.
+- [ ] Panel de estado del hub (quién es hub, batería, último sync) en el canva.
+
+**Gate:** bajar la batería del celular a <20% → el sync continúa vía pve sin tocar la app.
+
+### 8.4 — SSH proxy opcional desde el hub
+
+**Problema que resuelve:** si una laptop se compromete, las llaves guardadas en ella
+se roban; el hub guarda las llaves pero la conexión es directa.
+
+**Idea:** toggle "proxy SSH": las laptops piden al hub que abra la conexión con las
+llaves (que NUNCA salen del hub). La laptop solo ve el flujo del terminal, no la llave.
+Modo por defecto sigue siendo conexión directa.
+
+- [ ] Modo "passthrough" en el hub: abrir SSH/SFTP en el hub, reenviar stream al cliente.
+- [ ] Auth por token de sesión efímero (no reutilizable).
+- [ ] Indicador en el canva: conexión directa vs proxy (icono).
+
+**Gate:** laptop sin llaves conecta a un host vía proxy; la llave jamás aparece en la laptop.
+
+### 8.5 — Warp-mode: autocompletado y snippets locales
+
+**Problema que resuelve:** el terminal es "pelado"; Termius cobra por esto.
+
+**Idea:** historial por host con búsqueda fuzzy, snippets compartidos por sync, y
+autocompletado basado en historial LOCAL (sin red, sin LLM). Barato, mágico, y es el
+80% del valor que la gente paga.
+
+- [ ] Store de historial por host + búsqueda fuzzy (Ctrl+R custom).
+- [ ] Snippets sincronizados (tabla nueva + sync CRDT/LWW).
+- [ ] Sugerencias inline sobre el prompt del terminal.
+
+**Gate:** repetir un comando de ayer → aparece en 2 pulsaciones de Ctrl+R.
+
+### 8.6 — Canva con quad-tree culling + LOD por zoom
+
+**Problema que resuelve:** el rendimiento con miles de nodos (Etapa 5 marca el miedo).
+
+**Idea:** renderizar solo nodos dentro del viewport (**quad-tree espacial**), y en
+zoom-out los nodos se agrupan en **clusters agregados** (grupo + contador) en vez de
+dibujar 5.000 cuadritos.
+
+- [ ] Índice espacial quad-tree sobre posiciones del canva.
+- [ ] Culling por viewport (solo se dibuja lo visible).
+- [ ] Clustering por zoom (agrupar por cercanía/paquete) + contador.
+- [ ] Benchmark: 5.000 nodos a ≥ 30fps con zoom-out extremo.
+
+**Gate:** 10.000 nodos, zoom-out total, ≥ 30fps (baseline vs benchmark Etapa 5).
+
+---
+
+## Visión — Empresa Autónoma de Desarrollo (CrewAI + LangGraph) — SDD-115
+
+> **Estado:** Fase 0 **committeada** (`faf129f`). El servicio Python
+> `empresa_autonoma/` orquesta la oficina; la app Flutter NUNCA ejecuta agentes,
+> solo habla con el servicio (FastAPI/WS, puerto 8100). Async + paralelo por
+> defecto (`akickoff_for_each`, `Send`), human-in-the-loop (`interrupt()`),
+> checkpoints (`Crew.from_checkpoint()`), observabilidad → canva.
+
+### Fase 0 — Fundación (✅ hecha)
+
+- [x] Grafo LangGraph base: `plan → implementar → revisar → (gate humano) → merge`.
+  *(SDD-115, `empresa_autonoma/empresa_autonoma/graph.py`)*
+- [x] Roles de oficina como dataclasses (`roles.py`: producto, arquitecto, dev,
+  QA, devops, revisor, PM; estados `OfficeState` para la oficina animada).
+- [x] Testeable headless sin LLM (`AgenteImplementador` inyectable).
+
+**Pruebas de comprobación (gate):**
+- [x] `pytest` verde en `empresa_autonoma/tests/test_graph.py` (grafo completo,
+  gate humano con `approved: false` → se detiene en END).
+
+### Fase 1 — Crews a medida (⬜)
+
+- [ ] Roles + delegación CrewAI; el usuario arma equipos en la app → manifiesto
+  versionado; cada agente = nodo del canva.
+- [ ] Manifiesto de equipo (formato buzz Persona Pack adaptado — copia.md 2.1).
+- [ ] **Comunicación de agentes por A2A** (ADR-003, SDD-119): cada runtime
+  (opencode/claude/codex) expone un **Agent Card** y habla por A2A (JSON-RPC 2.0 +
+  SSE); el orquestador crea Tasks cuyo lifecycle alimenta los estados de la
+  oficina (`working/blocked/waiting_approval`). CrewAI↔LangGraph siguen por
+  canales nativos (mismo proceso).
+
+**Pruebas de comprobación (gate):**
+- [ ] Un equipo se arma en la app, se versiona como manifiesto y su crew ejecuta
+  una tarea mock con el grafo headless.
+- [ ] A2A (SDD-119): `pytest` verde (tasks + agent card + server con adapter
+  fake) y un runtime real (opencode) ejecuta una tarea vía A2A con su estado
+  visible en el canva.
+
+### Fase 2 — Paralelismo real (⬜)
+
+- [ ] `akickoff_for_each` + API `Send` de LangGraph; cada empresa = subgrafo.
+- [ ] Aislamiento por worktree (concepto Zed 8.6 / copia.md Z8).
+
+**Pruebas de comprobación (gate):**
+- [ ] 2 tareas ejecutan en paralelo sobre worktrees distintos sin pisarse.
+
+### Fase 3 — Oficina animada estilo juego (⬜)
+
+- [ ] Personajes/estados visibles (glassmorphism neón); el canva ES la oficina.
+- [ ] Estados desde `OfficeState` (idle/working/blocked/waiting_approval/done).
+
+**Pruebas de comprobación (gate):**
+- [ ] Un agente pasa trabajando→bloqueado→en revisión y el canva lo anima en vivo.
+
+### Fase 4 — Integración real con repo (⬜)
+
+- [ ] Leer issues/PRs, crear ramas y PRs reales con aprobación humana (`interrupt()`).
+- [ ] Tracker estilo Plane/Linear: tarjetas = nodos del canva; dependencias/blockers.
+
+**Pruebas de comprobación (gate):**
+- [ ] Una tarea llega de un issue real, la empresa la implementa y deja el PR en
+  borrador esperando aprobación; mover la tarjeta de columna cambia el nodo.
+
+### Fase 5 — Autonomía supervisada (⬜)
+
+- [ ] End-to-end con gates de aprobación, checkpoints y trazabilidad (auditoría
+  completa por tarjeta).
+
+**Pruebas de comprobación (gate):**
+- [ ] Épica completa end-to-end; la máquina cae a mitad y se reanuda desde el
+  checkpoint sin perder trabajo.
 
 ---
 

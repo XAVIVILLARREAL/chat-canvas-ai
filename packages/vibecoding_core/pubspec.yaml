@@ -1,0 +1,11 @@
+name: vibecoding_core
+description: "Pipeline de vibecoding en Dart puro: parseo de diffs unificados, propuestas patch (nodo-diff) y aislamiento por copia del proyecto."
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.8.1
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.25.0

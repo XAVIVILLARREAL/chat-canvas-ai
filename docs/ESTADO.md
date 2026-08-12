@@ -2,6 +2,7 @@
 
 > **Última actualización:** 2026-08-11 · último commit `2c88598` (Etapa 5 = grafo 2D+3D) · rama `main`, push OK.
 > Fuente de verdad de fases/gates: `docs/SUPER_PLAN.md`. Las features se diseñan en `docs/SDDs/` (siguiendo `SDD-XXX`).
+> Plan maestro consolidado (todo lo que falta, con gates): `plan.md` (raíz del repo).
 
 ## Resumen ejecutivo
 
@@ -12,6 +13,15 @@ de skills con laboratorio, y **grafo del proyecto en 2D y 3D** (Two.js local +
 WebView2 en Windows). La fase en curso según SUPER_PLAN es la **Etapa 6 —
 Vibecoding** (no iniciada). Todo el código automatizado de Etapas 1–5 está
 verde; quedan **gates manuales** (listados abajo) que requieren mano humana.
+
+**Visión empresa autónoma (CrewAI+LangGraph):** la **Fase 0 ya está committeada**
+(`faf129f`, SDD-115): servicio Python `empresa_autonoma/` con grafo
+`plan→implementar→revisar→aprobación→merge` testeable headless, roles de
+oficina (`roles.py`) y `pytest` verde. Fases 1–5 pendientes (detalle en
+`plan.md` §6). **Comunicación de agentes:** ADR-003 acepta **A2A** como
+protocolo en la frontera orquestador↔runtimes (opencode/claude/codex/externos);
+SDD-119 lo diseña para Fase 1 (Agent Cards + Task lifecycle → estados de la
+oficina). CrewAI↔LangGraph siguen por canales nativos (mismo proceso).
 
 ## Estado por fase (2026-08-11)
 
@@ -24,11 +34,13 @@ verde; quedan **gates manuales** (listados abajo) que requieren mano humana.
 | Etapa 4 — Canva `.md` + backlinks + dogfood docs/ | ✅ automatizado | manual: 5 notas enlazadas cerrar/reabrir |
 | Etapa 4b — Skills builder + lab + export + dogfood duro | ✅ automatizado (6 tests `--tags skills`) | manual: crear → probar → exportar → reiniciar opencode → trigger real |
 | **Etapa 5 — Grafo 2D + 3D** | ✅ automatizado (`68f742a` + `2c88598`) | **manual: cargar este repo en desktop y navegar 2D/3D** (commits `68f742a`, `2c88598`) |
-| Etapa 6 — Vibecoding | ⬜ **siguiente fase** | — |
+| **Etapa 6 — Vibecoding (SDD-118)** | ✅ automatizado + **dogfood ✅** | gates manuales abajo |
 | Etapa 7 — SDD++ + Playwright | ⬜ no iniciada | — |
+| **Visión Empresa Autónoma (SDD-115)** | **Fase 0 ✅** (`faf129f`); Fases 1–5 ⬜ | servicios/crews reales, paralelismo, oficina animada |
 
 ### Gates manuales pendientes (bloquean solo el cierre de fase, no el código)
 
+- Etapa 6 (manual): generar una propuesta desde la UI de Vibecoding de la app sobre un repo real y aceptarla. **Dogfood (código): ✅ hecho 2026-08-11** — `relativeTimeDetailed` en `vibecoding_core` generada por opencode real y aplicada; el dogfood arregló 3 bugs del pipeline (pubspec_overrides en copia, `.dart_tool/` como edits, prompts manglados por cmd — fix `--prompt-file` + argv-list).
 - Etapa 4: crear 5 notas enlazadas, navegar backlinks, cerrar/reabrir persiste.
 - Etapa 4b: ciclo real crear skill → probar → exportar a `.opencode/skills/` → reiniciar opencode → trigger.
 - Etapa 5: `flutter run -d windows` → menú "Grafo del proyecto" → cargar **este repo** → navegar 2D y 3D.
@@ -44,7 +56,9 @@ packages/ssh_core/      # SshHost, DevSession, SyncSnapshot, HostRecord
 packages/canva_core/    # CanvaNode/CanvaState, CanvasNode/CanvasNodeId/NodeKind
 packages/agent_core/    # AgentMessage, AgentDetector, manifiestos
 packages/graph_core/    # Graph/GraphNode/GraphEdge, RelationIndexer, ForceSimulation, buildGraph3dHtml
-melos.yaml              # orquestación (SIN commitear aún: reorg ajeno pendiente de versionar)
+empresa_autonoma/       # Servicio Python CrewAI+LangGraph — **Fase 0 committeada** (`faf129f`): graph.py, roles.py, tests headless
+melos.yaml              # orquestación (✅ YA versionado)
+buzz/ herdr/ reference/zed/   # Repos de referencia (frescos 2026-08-11; buzz/herdr Apache-2.0, zed GPL-3.0 solo conceptos)
 ```
 
 **Reglas:** la app nunca importa paquetes por ruta relativa; el código
@@ -56,8 +70,9 @@ reutilizable va a packages (Dart puro); dirección de dependencias
 ```powershell
 # Suite automatizada (origen git: apps/empresa_dev)
 flutter analyze                                        # 0 issues
-flutter test --exclude-tags integration                # 124 tests verdes
+flutter test --exclude-tags integration                # 143 tests verdes
 flutter test --tags skills                             # dogfood 4b: laboratorio contra .opencode/skills reales
+flutter test test/vibecoding_integration_test.dart     # E2E opencode real (vibe_demo), ~8s, requiere opencode
 dart test     # en packages/graph_core (12 tests)      # unit core
 dart run benchmark/graph_benchmark.dart                # 5.000 nodos ~8 ms/frame
 
@@ -72,6 +87,10 @@ powershell -NoProfile -File tools\capture_app.ps1       # mientras corre el E2E 
 
 # APK Android:
 flutter build apk --debug --no-tree-shake-icons
+
+# Servicio empresa_autonoma (Fase 0, SDD-115):
+cd empresa_autonoma && .venv/Scripts/python -m pytest     # tests headless del grafo
+# .venv/Scripts/python -m uvicorn empresa_autonoma.server:app --port 8100  (cuando exista server.py)
 ```
 
 ## Infraestructura y lecciones duras (NO repetir errores)
@@ -99,21 +118,33 @@ flutter build apk --debug --no-tree-shake-icons
 
 ## Pendientes de infraestructura/repo (no bloquean desarrollo)
 
-- `melos.yaml`, `packages/*/pubspec.yaml`, `.gitmodules`, `reference/`:
-  untracked del reorg monorepo hecho fuera de sesión — **versionarlos
-  deliberadamente** cuando se decida (commit ajeno mezclado con Etapa 4b en
-  `784eb4b`, no reescribir historia).
-- `AGENTS.md` tiene trabajo sin commitear (visión empresa autónoma extendida).
+- ✅ **Resuelto:** `melos.yaml` y `packages/*/pubspec.yaml` YA están versionados
+  (verificado 2026-08-11), aunque ESTADO/SUPER_PLAN anteriores decían lo contrario.
+- ✅ **Resuelto (sísmica visual 2026-08-11):** toda la app migrada a Glassmorphism
+  Neón (SDD-114): `app_theme.dart` ampliado (tokens/gradientes/glows + temas
+  globales), `neon_dialog.dart`/`neon_sheet.dart` nuevos, `NeonCard` con luz de
+  borde y hover, y rediseño de main/tabs/canva/hub/sftp/terminal/agente/editor/
+  skills/grafo. `flutter analyze` 0 + 124 tests verdes. Pendiente: commitear.
+- `AGENTS.md` tiene trabajo sin commitear (visión empresa autónoma extendida +
+  retoque visual glassmorphism) — commitear deliberadamente cuando se decida.
 - `sync_integration_test.dart` falla sin Tailscale (esperado).
 - Origin de git lleva `x-access-token` en la URL — no exponer en logs.
+- Repos de referencia verificados frescos (11-08-2026): `buzz` `be48ce9`,
+  `herdr` `ddffb6e`, `reference/zed` `daec37b` (submodule).
 
 ## Cómo continuar (Etapa 6 — Vibecoding)
 
-1. Leer `docs/SDDs/` y escribir `SDD-118-etapa6-vibecoding.md` (SDD primero).
-2. Pipeline: propuesta del agente (opencode CLI vía `AgentCommandRunner`) →
-   parche → nodo-diff (aceptar/rechazar/revertir) → historial.
-3. TDD: unit pipeline + widget chat/nodo-diff + integration agente real sobre
-   fixture + **dogfood: una feature real de este repo implementada 100% vía
-   vibecoding desde la app** (gate).
-4. Al cerrar: marcar SUPER_PLAN, CI local (analyze + tests + build), probar en
-   ≥2 plataformas, evidencia, commit de cierre + push.
+1. ✅ SDD-118 escrito y slices 6.1–6.4 cerrados (17+20 unit/widget + E2E real con
+   opencode sobre `test/fixtures/vibe_demo/`).
+2. ✅ **Dogfood (gate) — 2026-08-11:** `relativeTimeDetailed` implementada 100%
+   vía vibecoding (opencode real sobre `packages/vibecoding_core` con
+   `tool/vibecoding_dogfood.dart --prompt-file ... --apply`) → aplicada y suite
+   verde (31 unit vibecoding_core + 143 app + analyze 0). El dogfood arregló 3
+   bugs: (1) `pubspec_overrides.yaml` en la copia aislada; (2) `.dart_tool/` y
+   `build/` generados por el agente entraban como edits; (3) prompts con `"`,
+   `->` o `&` se manglaban por el argv de `dart.bat` y el escaping JSON vs cmd
+   → `--prompt-file` (prompt por archivo UTF-8) + `AgentCommandRunnerAdapter`
+   por argv-list al `opencode.exe` nativo (sin cmd; patrón `/s /c ""...""`
+   solo para el shim `.cmd`).
+3. Al cerrar: marcar SUPER_PLAN, CI local (analyze + tests + build), probar en
+   ≥2 plataformas, evidencia, commit de cierre + push, y definir SDD-119 (Etapa 7).

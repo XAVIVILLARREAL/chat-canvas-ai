@@ -1,8 +1,10 @@
-# melos_managed_dependency_overrides: agent_core,canva_core,ssh_core
+# melos_managed_dependency_overrides: agent_core,canva_core,ssh_core,graph_core
 dependency_overrides:
   agent_core:
     path: ..\\..\\packages\\agent_core
   canva_core:
     path: ..\\..\\packages\\canva_core
+  graph_core:
+    path: ..\\..\\packages\\graph_core
   ssh_core:
     path: ..\\..\\packages\\ssh_core

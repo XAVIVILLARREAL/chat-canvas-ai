@@ -49,6 +49,8 @@ dependencies:
     path: ../../packages/agent_core
   graph_core:
     path: ../../packages/graph_core
+  vibecoding_core:
+    path: ../../packages/vibecoding_core
   webview_windows: ^0.4.0
 
 dev_dependencies:

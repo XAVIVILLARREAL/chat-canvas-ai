@@ -52,6 +52,7 @@ class AgentCommandRunner {
   Future<AgentCommandResult> run(
     String command, {
     Duration? timeout,
+    String? workingDirectory,
   }) async {
     final notFound = _missingExecutable(command);
     if (notFound != null) {
@@ -66,7 +67,11 @@ class AgentCommandRunner {
         'cmd',
         ['/d', '/c', command],
         environment: env,
+        workingDirectory: workingDirectory,
       );
+      // opencode (node) muere con EUNKNOWN si stdin queda en pipe abierto sin
+      // TTY: cerramos para que detecte EOF (mismo fix que OpenCodeAgentRunner).
+      proc.stdin.close();
       final outBuf = StringBuffer();
       final errBuf = StringBuffer();
       final utf8Lenient = const Utf8Decoder(allowMalformed: true);
