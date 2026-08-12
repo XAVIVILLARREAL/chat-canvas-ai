@@ -267,12 +267,12 @@ autocompletado basado en historial LOCAL (sin red, sin LLM). Barato, mágico, y 
 zoom-out los nodos se agrupan en **clusters agregados** (grupo + contador) en vez de
 dibujar 5.000 cuadritos.
 
-- [ ] Índice espacial quad-tree sobre posiciones del canva.
-- [ ] Culling por viewport (solo se dibuja lo visible).
-- [ ] Clustering por zoom (agrupar por cercanía/paquete) + contador.
-- [ ] Benchmark: 5.000 nodos a ≥ 30fps con zoom-out extremo.
+- [x] Índice espacial quad-tree sobre posiciones del canva. *(SDD-121, `packages/spatial_core`: `QuadTree` con `queryRect`/`queryCircle`/`update`/`remove`; `packages/canva_core`: `CanvaCuller` + `CanvaClusterer` + `CanvaRect`. Fix importante: `isLeaf` con los 4 hijos — un nodo interno post-`cover` puede tener UN solo hijo)*
+- [x] Culling por viewport (solo se dibuja lo visible). *(`canva_screen` LOD: `TransformationController` + `CanvaCuller.visibleIn` con margen; en modo LOD los nodos se dibujan con UN solo `CustomPainter` — evita el bug del engine 3.32 con miles de widgets pesados + `BackdropFilter`)*
+- [x] Clustering por zoom (agrupar por cercanía + contador). *(`CanvaClusterer` + chip con glow; tap en cluster → zoom-in 2x)*
+- [x] Benchmark: 10.000 nodos, zoom-out total, ≥ 30fps + evidencia. *(`integration_test/canva_perf_test.dart` -d windows: zoom 1.0 = 2009/10000 dibujados @ 3.53 ms/frame; zoom-out = 18 clusters @ 2.21 ms/frame; 0 tardíos. Evidencia `data/evidence/etapa86-benchmark.md`)*
 
-**Gate:** 10.000 nodos, zoom-out total, ≥ 30fps (baseline vs benchmark Etapa 5).
+**Gate:** 10.000 nodos, zoom-out total, ≥ 30fps (baseline vs benchmark Etapa 5). ✅ **CUMPLIDO 2026-08-12.**
 
 ---
 

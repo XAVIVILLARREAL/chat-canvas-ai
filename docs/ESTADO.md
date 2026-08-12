@@ -1,6 +1,6 @@
 # ESTADO ACTUAL — Empresa Dev
 
-> **Última actualización:** 2026-08-12 · Etapa 7 en curso (E2E web + CI) · rama `main`.
+> **Última actualización:** 2026-08-12 · Etapa 8.6 (canva LOD) ✅ · rama `main`.
 > Fuente de verdad de fases/gates: `docs/SUPER_PLAN.md`. Las features se diseñan en `docs/SDDs/` (siguiendo `SDD-XXX`).
 > Plan maestro consolidado (todo lo que falta, con gates): `plan.md` (raíz del repo).
 
@@ -40,6 +40,7 @@ oficina). CrewAI↔LangGraph siguen por canales nativos (mismo proceso).
 | **Etapa 5 — Grafo 2D + 3D** | ✅ automatizado (`68f742a` + `2c88598`) | **manual: cargar este repo en desktop y navegar 2D/3D** (commits `68f742a`, `2c88598`) |
 | **Etapa 6 — Vibecoding (SDD-118)** | ✅ automatizado + **dogfood ✅** | gates manuales abajo |
 | **Etapa 7 — SDD++ + Playwright E2E (SDD-120)** | **E2E web ✅** (2026-08-12: `tool/e2e_web.ps1` + `playwright.config.js` + `e2e_web.spec.js`, chromium headless 12–14s); CI job `e2e-web` ✅; patrol test versionado ⬜ ejecución manual | **manual: patrol en Android real** |
+| **Etapa 8.6 — Canva LOD (SDD-121)** | **✅ COMPLETADA 2026-08-12**: quad-tree (`packages/spatial_core`), `CanvaCuller`/`CanvaClusterer` (`packages/canva_core`), culling + clusters + canvas único en `canva_screen`, benchmark 10k @ 3.5/2.2 ms/frame. Evidencia `data/evidence/etapa86-benchmark.md`. Bug engine 3.32 (`mergeWith`) resuelto con render por CustomPainter en LOD | — |
 | **Visión Empresa Autónoma (SDD-115)** | **Fase 0 ✅** (`faf129f`); Fases 1–5 ⬜ | servicios/crews reales, paralelismo, oficina animada |
 
 ### Gates manuales pendientes (bloquean solo el cierre de fase, no el código)

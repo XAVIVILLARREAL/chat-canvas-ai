@@ -1,4 +1,5 @@
 export 'canvas_node.dart';
+export 'canva_culling.dart';
 
 enum CanvaNodeType { host, note, container, agent, proposal }
 

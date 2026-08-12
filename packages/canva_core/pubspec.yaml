@@ -9,6 +9,8 @@ environment:
 dependencies:
   agent_core:
     path: ../agent_core
+  spatial_core:
+    path: ../spatial_core
 
 dev_dependencies:
   lints: ^5.0.0

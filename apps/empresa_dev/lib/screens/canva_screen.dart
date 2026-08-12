@@ -53,10 +53,28 @@ class CanvaScreen extends StatefulWidget {
 }
 
 class _CanvaScreenState extends State<CanvaScreen> {
+  // Umbrales LOD (tuneables; los tests los fijan explícitamente).
+  static const _kLodThreshold = 300;
+  static const _kClusterScale = 0.6;
+  static const _kClusterCellSize = 160.0;
+  // Tamaño del card de nodo en coords del canva (dibujado en el canvas LOD).
+  static const _kLodNodeW = 150.0;
+  static const _kLodNodeH = 44.0;
+
   CanvaState _state = CanvaState.empty();
   bool _loading = true;
   String? _connectModeFromId;
   final _noteController = TextEditingController();
+
+  late final TransformationController _tc =
+      TransformationController()..addListener(_onTransformChanged);
+  CanvaCuller? _culler;
+  /// Nodos del último frame LOD (para hit-test manual sobre el canvas).
+  List<CanvaNode>? _lastLodNodes;
+
+  void _onTransformChanged() {
+    if (mounted) setState(() {});
+  }
 
   @override
   void initState() {
@@ -69,6 +87,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
     if (!mounted) return;
     setState(() {
       _state = s;
+      _culler = null;
       _loading = false;
     });
   }
@@ -77,10 +96,77 @@ class _CanvaScreenState extends State<CanvaScreen> {
     await widget.store.save(_state);
   }
 
+  /// Nodos a renderizar en este frame (culling + clusters por zoom).
+  /// Modo simple (≤ [ _kLodThreshold]) = comportamiento histórico completo.
+  ({List<CanvaNode> nodes, List<CanvaCluster> clusters}) _lodRender(Rect viewport) {
+    final nodes = _state.nodes;
+    if (nodes.length <= _kLodThreshold) {
+      _culler = null;
+      _lastLodNodes = null;
+      return (nodes: nodes, clusters: const []);
+    }
+    _culler ??= CanvaCuller(nodes);
+    final inv = Matrix4.tryInvert(_tc.value) ?? Matrix4.identity();
+    final rect = MatrixUtils.transformRect(inv, viewport);
+    final visible = _culler!.visibleIn(CanvaRect(
+      x: rect.left,
+      y: rect.top,
+      width: rect.width,
+      height: rect.height,
+    ));
+    final scale = _tc.value.getMaxScaleOnAxis();
+    if (scale < _kClusterScale) {
+      final clusterer = CanvaClusterer(visible, cellSize: _kClusterCellSize);
+      final standalone = clusterer.standaloneFor(scale);
+      _lastLodNodes = standalone;
+      return (
+        nodes: standalone,
+        clusters: clusterer.clustersFor(scale),
+      );
+    }
+    _lastLodNodes = visible;
+    return (nodes: visible, clusters: const []);
+  }
+
+  /// Hit-test manual sobre el canvas LOD (coords del canva).
+  CanvaNode? _nodeAt(Offset p) {
+    final nodes = _lastLodNodes;
+    if (nodes == null) return null;
+    for (final n in nodes) {
+      if (p.dx >= n.x &&
+          p.dx <= n.x + _kLodNodeW &&
+          p.dy >= n.y &&
+          p.dy <= n.y + _kLodNodeH) {
+        return n;
+      }
+    }
+    return null;
+  }
+
+  void _onLodNodeTap(Offset canvaPos) {
+    final n = _nodeAt(canvaPos);
+    if (n != null) _onNodeTap(n);
+  }
+
+  void _onLodNodeLongPress(Offset canvaPos) {
+    final n = _nodeAt(canvaPos);
+    if (n != null && n.type == CanvaNodeType.host) _startConnect(n.id);
+  }
+
+  /// Zoom-in 2x centrado en el centroide del cluster.
+  void _zoomToCluster(CanvaCluster c) {
+    final m = Matrix4.identity()
+      ..translate(c.x, c.y)
+      ..scale(2.0)
+      ..translate(-c.x, -c.y);
+    _tc.value = _tc.value.clone()..multiply(m);
+  }
+
   String _newId() => CanvasNodeId.generate().value;
 
   void _addHostNode(SshHost host) {
     setState(() {
+      _culler = null;
       _state.nodes.add(CanvaNode(
         id: _newId(),
         type: CanvaNodeType.host,
@@ -139,6 +225,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
     ).then((text) {
       if (text != null && text.trim().isNotEmpty) {
         setState(() {
+          _culler = null;
           _state.nodes.add(CanvaNode(
             id: _newId(),
             type: CanvaNodeType.note,
@@ -155,6 +242,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
 
   void _addAgent({String agentName = 'dev'}) {
     setState(() {
+      _culler = null;
       _state.nodes.add(CanvaNode(
         id: _newId(),
         type: CanvaNodeType.agent,
@@ -283,6 +371,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
                     onTap: () {
                       Navigator.pop(context);
                       setState(() {
+                        _culler = null;
                         _state.nodes.add(CanvaNode(
                           id: _newId(),
                           type: CanvaNodeType.proposal,
@@ -322,6 +411,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
           allNodes: _state.nodes,
           onSave: (updated) {
             setState(() {
+              _culler = null;
               updated
                 ..x = node.x
                 ..y = node.y
@@ -339,6 +429,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
 
   void _createLinkedNode(CanvaNode from, String title) {
     setState(() {
+      _culler = null;
       final created = CanvaNode(
         id: _newId(),
         type: CanvaNodeType.note,
@@ -452,55 +543,106 @@ class _CanvaScreenState extends State<CanvaScreen> {
           : Stack(
               children: [
                 Positioned.fill(
-                  child: InteractiveViewer(
-                    constrained: false,
-                    minScale: 0.3,
-                    maxScale: 3,
-                    boundaryMargin: const EdgeInsets.all(4000),
-                    child: SizedBox(
-                      width: 3000,
-                      height: 2000,
-                      child: Stack(
-                        children: [
-                          // conexiones
-                          Positioned.fill(
-                            child: CustomPaint(
-                              painter: _EdgesPainter(
-                                edges: _state.edges,
-                                nodes: _state.nodes,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final viewport = Offset.zero & constraints.biggest;
+                      final render = _lodRender(viewport);
+                      final byId = {
+                        for (final n in render.nodes) n.id: n,
+                      };
+                      final visibleEdges = [
+                        for (final e in _state.edges)
+                          if (byId.containsKey(e.fromNodeId) &&
+                              byId.containsKey(e.toNodeId))
+                            e,
+                      ];
+                      return InteractiveViewer(
+                        transformationController: _tc,
+                        constrained: false,
+                        minScale: 0.3,
+                        maxScale: 3,
+                        boundaryMargin: const EdgeInsets.all(4000),
+                        child: SizedBox(
+                          width: 3000,
+                          height: 2000,
+                          child: Stack(
+                            children: [
+                              // conexiones (solo extremos visibles)
+                              Positioned.fill(
+                                child: CustomPaint(
+                                  painter: _EdgesPainter(
+                                    edges: visibleEdges,
+                                    byId: byId,
+                                  ),
+                                ),
                               ),
-                            ),
+                              // clusters en zoom-out
+                              for (final c in render.clusters)
+                                Positioned(
+                                  left: c.x - 22,
+                                  top: c.y - 22,
+                                  child: _ClusterChip(
+                                    count: c.count,
+                                    onTap: () => _zoomToCluster(c),
+                                  ),
+                                ),
+                              // nodos: modo simple = widget por nodo (drag
+                              // fino); LOD = canvas único (miles de nodos sin
+                              // widgets pesados → evita el bug del engine y
+                              // mantiene 30fps).
+                              if (_state.nodes.length <= _kLodThreshold)
+                                for (final node in render.nodes)
+                                  Positioned(
+                                    left: node.x,
+                                    top: node.y,
+                                    child: _DraggableNode(
+                                      node: node,
+                                      connectMode:
+                                          _connectModeFromId == node.id,
+                                      onPositionChanged: (dx, dy) {
+                                        node.x = dx;
+                                        node.y = dy;
+                                        _culler?.move(node.id, dx, dy);
+                                        _save();
+                                      },
+                                      onTap: () => _onNodeTap(node),
+                                      onDoubleTap:
+                                          node.type == CanvaNodeType.note
+                                              ? () => _openMdNode(node)
+                                              : node.type ==
+                                                          CanvaNodeType.agent &&
+                                                      _skillFromNode(node) !=
+                                                          null
+                                                  ? () => _openSkillBuilder(
+                                                      initial:
+                                                          _skillFromNode(node))
+                                                  : null,
+                                      onLongPress:
+                                          node.type == CanvaNodeType.host
+                                              ? () =>
+                                                  _startConnect(node.id)
+                                              : null,
+                                    ),
+                                  )
+                              else
+                                Positioned.fill(
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTapUp: (d) =>
+                                        _onLodNodeTap(d.localPosition),
+                                    onLongPressStart: (d) =>
+                                        _onLodNodeLongPress(d.localPosition),
+                                    child: CustomPaint(
+                                      painter: _LodCanvasPainter(
+                                          nodes: render.nodes),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
-                          // nodos
-                          for (final node in _state.nodes)
-                            Positioned(
-                              left: node.x,
-                              top: node.y,
-                              child: _DraggableNode(
-                                node: node,
-                                connectMode: _connectModeFromId == node.id,
-                                onPositionChanged: (dx, dy) {
-                                  node.x = dx;
-                                  node.y = dy;
-                                  _save();
-                                },
-                                onTap: () => _onNodeTap(node),
-                                onDoubleTap:
-                                    node.type == CanvaNodeType.note
-                                        ? () => _openMdNode(node)
-                                        : node.type == CanvaNodeType.agent &&
-                                                _skillFromNode(node) != null
-                                            ? () => _openSkillBuilder(
-                                                initial: _skillFromNode(node))
-                                            : null,
-                                onLongPress: node.type == CanvaNodeType.host
-                                    ? () => _startConnect(node.id)
-                                    : null,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Positioned(
@@ -817,6 +959,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
     if (dir == null || !mounted) return;
     final built = DocsMapBuilder.build(dir);
     setState(() {
+      _culler = null;
       _state = built;
     });
     _save();
@@ -846,6 +989,7 @@ class _CanvaScreenState extends State<CanvaScreen> {
 
   @override
   void dispose() {
+    _tc.dispose();
     _noteController.dispose();
     super.dispose();
   }
@@ -1013,17 +1157,115 @@ class _DraggableNodeState extends State<_DraggableNode> {
   }
 }
 
-class _EdgesPainter extends CustomPainter {
-  final List<CanvaEdge> edges;
+/// Render LOD de miles de nodos con UN solo CustomPainter: dibuja los cards
+/// (RRect + borde) y los labels SOLO si hay pocos nodos visibles. Evita
+/// construir miles de widgets pesados (sombras/AnimatedContainer), que rompen
+/// el engine 3.32 con `BackdropFilter` y matan los fps.
+class _LodCanvasPainter extends CustomPainter {
   final List<CanvaNode> nodes;
 
-  _EdgesPainter({required this.edges, required this.nodes});
+  // Labels como texto de canvas solo si hay pocos nodos visibles.
+  static const _labelMax = 250;
+
+  _LodCanvasPainter({required this.nodes});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final drawLabels = nodes.length <= _labelMax;
+    for (final n in nodes) {
+      final color = Color(n.colorValue);
+      final rrect = RRect.fromRectAndRadius(
+        Rect.fromLTWH(n.x, n.y, 150, 44),
+        const Radius.circular(10),
+      );
+      canvas.drawRRect(rrect, Paint()..color = color.withValues(alpha: 0.65));
+      canvas.drawRRect(
+        rrect,
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.15)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1,
+      );
+      if (drawLabels) {
+        final tp = TextPainter(
+          text: TextSpan(
+            text: n.label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          maxLines: 1,
+          ellipsis: '…',
+          textDirection: TextDirection.ltr,
+        )..layout(maxWidth: 150 - 12);
+        tp.paint(canvas, Offset(n.x + 8, n.y + (44 - tp.height) / 2));
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _LodCanvasPainter oldDelegate) =>
+      oldDelegate.nodes != nodes;
+}
+
+/// Chip de cluster (zoom-out): círculo con contador + glow; tap = zoom-in 2x.
+class _ClusterChip extends StatelessWidget {  final int count;
+  final VoidCallback onTap;
+
+  const _ClusterChip({required this.count, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 44,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.neonViolet.withValues(alpha: 0.8),
+              AppColors.neonCyan.withValues(alpha: 0.35),
+            ],
+          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.neonViolet.withValues(alpha: 0.45),
+              blurRadius: 18,
+            ),
+          ],
+        ),
+        child: Text(
+          '$count',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EdgesPainter extends CustomPainter {
+  final List<CanvaEdge> edges;
+  final Map<String, CanvaNode> byId;
+
+  _EdgesPainter({required this.edges, required this.byId});
 
   @override
   void paint(Canvas canvas, Size size) {
     for (final e in edges) {
-      final from = nodes.where((n) => n.id == e.fromNodeId).firstOrNull;
-      final to = nodes.where((n) => n.id == e.toNodeId).firstOrNull;
+      final from = byId[e.fromNodeId];
+      final to = byId[e.toNodeId];
       if (from == null || to == null) continue;
       final color = Color(from.colorValue);
       final a = Offset(from.x + 85, from.y + 28);
@@ -1055,5 +1297,5 @@ class _EdgesPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _EdgesPainter oldDelegate) =>
-      oldDelegate.edges != edges || oldDelegate.nodes != nodes;
+      oldDelegate.edges != edges || oldDelegate.byId != byId;
 }
