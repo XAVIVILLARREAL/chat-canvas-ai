@@ -1,7 +1,7 @@
 # SDD-122 — Etapa 8.5: Warp-mode — historial por host + búsqueda fuzzy + sugerencias
 
 > **Proyecto:** empresa_dev — Etapa 8.5 del SUPER_PLAN (cola de innovación).
-> **Fecha:** 2026-08-12. **Estado: ✅ 8.5.1 + 8.5.2 completados** (19 unit warp_core + 5 widget). 8.5.3 (snippets + sync) pendiente.
+> **Fecha:** 2026-08-12. **Estado: ✅ 8.5.1 + 8.5.2 + 8.5.3 (local) completados** (24 unit warp_core + 7 widget). Sync LWW de snippets por el hub pendiente.
 
 ## Objetivo
 
@@ -89,10 +89,12 @@ class FuzzyMatch { final CommandRecord record; final double score; }
 fuzzy lista el comando histórico; Enter envía la línea al shell (mock shell);
 Tab acepta la sugerencia; los tests existentes del terminal pasan intactos.
 
-### 8.5.3 — Snippets + sync (posterior)
+### 8.5.3 — Snippets + sync
 
-- Store de snippets por host + insertar desde botón/barra.
-- Sincronización vía sync LWW (tabla nueva en el hub) — depende de la
+- [x] Store de snippets por host (`SnippetStore` en warp_core: CRUD + JSON) + UI
+  en el terminal (botón ⚡ → hoja de cristal: tap inserta el comando en el
+  prompt, borrar, crear con nombre+texto). *(2 tests widget)*
+- [ ] Sincronización vía sync LWW por el hub (tabla nueva) — depende de la
   infraestructura de sync existente.
 
 ## Contratos de integración

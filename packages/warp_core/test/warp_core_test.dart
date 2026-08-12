@@ -179,4 +179,54 @@ void main() {
       expect(finder.rank(recs(['ls']), 'zz'), isEmpty);
     });
   });
+
+  group('SnippetStore', () {
+    test('add + list round-trip en memoria', () async {
+      final store = SnippetStore();
+      final s = await store.add('pve', name: 'logs', text: 'journalctl -f');
+      expect(s.id, isNotEmpty);
+      final list = await store.list('pve');
+      expect(list.single.name, 'logs');
+      expect(list.single.text, 'journalctl -f');
+    });
+
+    test('persistencia JSON round-trip', () async {
+      final dir = Directory.systemTemp.createTempSync('snippet_test');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final store = SnippetStore(dir: dir);
+      await store.add('pve', name: 'status', text: 'git status');
+      await store.add('pve', name: 'uptime', text: 'uptime -p');
+
+      final reloaded = SnippetStore(dir: dir);
+      final list = await reloaded.list('pve');
+      expect(list.map((s) => s.name).toSet(), {'status', 'uptime'});
+      expect(File('${dir.path}/snippets.json').existsSync(), isTrue);
+    });
+
+    test('remove elimina por id sin tocar otros', () async {
+      final store = SnippetStore();
+      final a = await store.add('pve', name: 'a', text: 'x');
+      final b = await store.add('pve', name: 'b', text: 'y');
+      await store.remove('pve', a.id);
+      final list = await store.list('pve');
+      expect(list.map((s) => s.id), [b.id]);
+    });
+
+    test('update cambia nombre/texto', () async {
+      final store = SnippetStore();
+      final s = await store.add('pve', name: 'old', text: 'x');
+      await store.update('pve', s.id, name: 'new', text: 'y');
+      final updated = (await store.list('pve')).single;
+      expect(updated.name, 'new');
+      expect(updated.text, 'y');
+    });
+
+    test('hosts aislados', () async {
+      final store = SnippetStore();
+      await store.add('pve', name: 'a', text: 'x');
+      await store.add('otro', name: 'b', text: 'y');
+      expect((await store.list('pve')).single.name, 'a');
+      expect((await store.list('otro')).single.name, 'b');
+    });
+  });
 }

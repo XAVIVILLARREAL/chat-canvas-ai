@@ -178,6 +178,118 @@ class CommandHistoryStore {
 }
 
 // ---------------------------------------------------------------------------
+// SnippetStore: snippets por host (Warp-mode 8.5.3), persistente en JSON.
+// ---------------------------------------------------------------------------
+
+class Snippet {
+  final String id;
+  final String name;
+  final String text;
+
+  const Snippet({required this.id, required this.name, required this.text});
+
+  Map<String, Object?> toJson() => {'id': id, 'name': name, 'text': text};
+
+  static Snippet fromJson(Map<String, Object?> j) => Snippet(
+        id: j['id'] as String,
+        name: j['name'] as String,
+        text: j['text'] as String,
+      );
+}
+
+class SnippetStore {
+  static const maxPerHost = 100;
+
+  final Directory? dir;
+  final Map<String, List<Snippet>> _data = {};
+  bool _loaded = false;
+
+  SnippetStore({this.dir});
+
+  Future<Map<String, List<Snippet>>> _all() async {
+    if (!_loaded) {
+      await _load();
+      _loaded = true;
+    }
+    return _data;
+  }
+
+  Future<void> _load() async {
+    if (dir == null) return;
+    final file = File('${dir!.path}/snippets.json');
+    if (!file.existsSync()) return;
+    try {
+      final json = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+      json.forEach((host, list) {
+        _data[host] = [
+          for (final e in (list as List))
+            Snippet.fromJson((e as Map).cast<String, Object?>()),
+        ];
+      });
+    } catch (_) {
+      _data.clear();
+    }
+  }
+
+  Future<void> _persist() async {
+    if (dir == null) return;
+    final file = File('${dir!.path}/snippets.json');
+    final json = {
+      for (final e in _data.entries)
+        e.key: [for (final s in e.value) s.toJson()],
+    };
+    file.writeAsStringSync(jsonEncode(json));
+  }
+
+  Future<List<Snippet>> list(String host) async =>
+      List.unmodifiable((await _all())[host] ?? const []);
+
+  static int _seq = 0;
+
+  /// Añade un snippet para [host]; devuelve el snippet creado.
+  Future<Snippet> add(String host,
+      {required String name, required String text}) async {
+    final all = await _all();
+    final list = all.putIfAbsent(host, () => []);
+    final now = DateTime.now();
+    final id =
+        's${now.millisecondsSinceEpoch}:${now.microsecondsSinceEpoch % 1000000}:${_seq++}';
+    final snippet = Snippet(
+        id: id, name: name.trim(), text: text.trimRight());
+    list.add(snippet);
+    if (list.length > maxPerHost) {
+      list.removeRange(0, list.length - maxPerHost);
+    }
+    await _persist();
+    return snippet;
+  }
+
+  Future<void> remove(String host, String id) async {
+    final all = await _all();
+    final list = all[host];
+    if (list == null) return;
+    list.removeWhere((s) => s.id == id);
+    await _persist();
+  }
+
+  Future<void> update(String host, String id,
+      {String? name, String? text}) async {
+    final all = await _all();
+    final list = all[host];
+    if (list == null) return;
+    final idx = list.indexWhere((s) => s.id == id);
+    if (idx < 0) return;
+    final current = list[idx];
+    list[idx] = Snippet(
+      id: current.id,
+      name: name ?? current.name,
+      text: text ?? current.text,
+    );
+    await _persist();
+  }
+}
+
+// ---------------------------------------------------------------------------
 // FuzzyFinder: ranking por subsecuencia + scoring (contigüidad, inicio de
 // palabra) con recencia como desempate.
 // ---------------------------------------------------------------------------

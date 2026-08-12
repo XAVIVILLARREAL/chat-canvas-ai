@@ -66,13 +66,14 @@ void main() {
   final host = SshHost(name: 'pve', host: '100.101.69.79', username: 'root');
 
   Future<_FakeSession> pumpTerminal(WidgetTester tester,
-      {CommandHistoryStore? store}) async {
+      {CommandHistoryStore? store, SnippetStore? snippetStore}) async {
     final session = _FakeSession();
     await tester.pumpWidget(MaterialApp(
       home: TerminalScreen(
         host: host,
         service: _FakeService(session),
         historyStore: store ?? CommandHistoryStore(),
+        snippetStore: snippetStore ?? SnippetStore(),
       ),
     ));
     await tester.pumpAndSettle();
@@ -175,6 +176,52 @@ void main() {
       expect(find.byType(TextField), findsNothing,
           reason: 'Ctrl+Shift+R no abre la búsqueda');
       expect(session.written, isEmpty);
+    });
+  });
+
+  group('Snippets (slice 8.5.3)', () {
+    testWidgets('el botón abre la hoja y tap inserta el snippet en el shell',
+        (tester) async {
+      final snippets = SnippetStore();
+      await snippets.add('pve', name: 'logs', text: 'journalctl -f');
+      final session = await pumpTerminal(tester, snippetStore: snippets);
+
+      await tester.tap(find.byTooltip('Snippets'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('logs'), findsOneWidget);
+      expect(find.text('journalctl -f'), findsOneWidget);
+
+      await tester.tap(find.text('logs'));
+      await tester.pumpAndSettle();
+
+      expect(session.written.any((w) => w.contains('journalctl -f')), isTrue,
+          reason: 'tap en snippet escribe el comando en el prompt');
+      expect(find.text('logs'), findsNothing,
+          reason: 'la hoja se cierra al insertar');
+    });
+
+    testWidgets('crear snippet desde la hoja lo guarda por host',
+        (tester) async {
+      final snippets = SnippetStore();
+      await pumpTerminal(tester, snippetStore: snippets);
+
+      await tester.tap(find.byTooltip('Snippets'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Sin snippets'), findsOneWidget);
+
+      await tester.tap(find.text('Nuevo snippet'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Nombre'), 'status');
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Comando'), 'git status');
+      await tester.tap(find.text('Guardar'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('status'), findsOneWidget);
+      expect((await snippets.list('pve')).single.text, 'git status');
     });
   });
 }

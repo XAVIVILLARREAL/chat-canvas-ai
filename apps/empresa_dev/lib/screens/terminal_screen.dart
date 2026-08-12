@@ -9,6 +9,8 @@ import 'package:warp_core/warp_core.dart';
 import 'package:xterm/xterm.dart';
 import '../services/ssh_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/neon_dialog.dart';
+import '../widgets/neon_sheet.dart';
 
 class TerminalScreen extends StatefulWidget {
   final SshHost host;
@@ -18,11 +20,15 @@ class TerminalScreen extends StatefulWidget {
   /// tests (memoria); por defecto se persiste en documents/history.json.
   final CommandHistoryStore? historyStore;
 
+  /// Snippets por host (Warp-mode 8.5.3). Inyectable para tests.
+  final SnippetStore? snippetStore;
+
   const TerminalScreen({
     super.key,
     required this.host,
     required this.service,
     this.historyStore,
+    this.snippetStore,
   });
 
   @override
@@ -44,6 +50,7 @@ class TerminalScreenState extends State<TerminalScreen> {
   late final CommandLineTracker _tracker =
       CommandLineTracker(onCommand: _onCommandCaptured);
   CommandHistoryStore? _history;
+  SnippetStore? _snippets;
   bool _showHistorySearch = false;
   String? _suggestion;
 
@@ -62,6 +69,7 @@ class TerminalScreenState extends State<TerminalScreen> {
     super.initState();
     _terminal.onOutput = _onOutput;
     _history = widget.historyStore;
+    _snippets = widget.snippetStore;
     if (_history == null) _initHistory();
     _connect();
   }
@@ -70,6 +78,7 @@ class TerminalScreenState extends State<TerminalScreen> {
     final dir = await getApplicationDocumentsDirectory();
     if (!mounted) return;
     _history = CommandHistoryStore(dir: Directory('${dir.path}/warp'));
+    _snippets = SnippetStore(dir: Directory('${dir.path}/warp'));
   }
 
   void _onOutput(String data) {
@@ -127,6 +136,32 @@ class TerminalScreenState extends State<TerminalScreen> {
     shell.write(Uint8List.fromList(utf8.encode('$command\r')));
     _history?.add(widget.host.name, command);
     setState(() => _showHistorySearch = false);
+  }
+
+  /// Inserta un snippet en el prompt (como texto tecleado, sin Enter).
+  void _insertSnippet(String text) {
+    final shell = _shell;
+    if (shell == null) return;
+    shell.write(Uint8List.fromList(utf8.encode(text)));
+  }
+
+  /// Hoja de snippets por host (Warp-mode 8.5.3): insertar/borrar/crear.
+  Future<void> _showSnippets() async {
+    final store = _snippets;
+    if (store == null) return;
+    showNeonSheet(
+      context: context,
+      glow: AppColors.neonCyan,
+      isScrollControlled: true,
+      child: _SnippetSheet(
+        store: store,
+        host: widget.host.name,
+        onInsert: (text) {
+          Navigator.pop(context);
+          _insertSnippet(text);
+        },
+      ),
+    );
   }
 
   void _sendEscape(String seq) {
@@ -216,6 +251,11 @@ class TerminalScreenState extends State<TerminalScreen> {
         ),
         actions: [
           _ConnStatusPill(connected: isConnected, connecting: _connecting),
+          IconButton(
+            icon: const Icon(Icons.bolt, size: 18),
+            onPressed: _showSnippets,
+            tooltip: 'Snippets',
+          ),
           IconButton(
             icon: const Icon(Icons.keyboard, size: 18),
             onPressed: () => setState(() => _showSshKeys = !_showSshKeys),
@@ -463,6 +503,190 @@ class _ConnStatusPill extends StatelessWidget {
                 fontSize: 9,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.8)),
+      ),
+    );
+  }
+}
+
+/// Hoja de snippets por host (Warp-mode 8.5.3): lista + crear + borrar.
+class _SnippetSheet extends StatefulWidget {
+  final SnippetStore store;
+  final String host;
+  final void Function(String text) onInsert;
+
+  const _SnippetSheet({
+    required this.store,
+    required this.host,
+    required this.onInsert,
+  });
+
+  @override
+  State<_SnippetSheet> createState() => _SnippetSheetState();
+}
+
+class _SnippetSheetState extends State<_SnippetSheet> {
+  List<Snippet> _snippets = const [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _reload();
+  }
+
+  Future<void> _reload() async {
+    final list = await widget.store.list(widget.host);
+    if (!mounted) return;
+    setState(() {
+      _snippets = list;
+      _loading = false;
+    });
+  }
+
+  Future<void> _addSnippet() async {
+    final nameCtrl = TextEditingController();
+    final textCtrl = TextEditingController();
+    final result = await showNeonDialog<(String, String)>(
+      context: context,
+      glow: AppColors.neonCyan,
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('Nuevo snippet',
+              style: TextStyle(
+                  color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 16),
+          TextField(
+            controller: nameCtrl,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Nombre'),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: textCtrl,
+            maxLines: 3,
+            style: const TextStyle(fontFamily: 'monospace'),
+            decoration: const InputDecoration(
+                labelText: 'Comando', hintText: 'p.ej. journalctl -f'),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancelar'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: FilledButton.icon(
+                  onPressed: () => Navigator.pop(
+                      ctx, (nameCtrl.text.trim(), textCtrl.text.trimRight())),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Guardar'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+    if (result == null || result.$1.isEmpty) return;
+    await widget.store.add(widget.host, name: result.$1, text: result.$2);
+    await _reload();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 8, bottom: 8),
+            child: Text('Snippets',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700)),
+          ),
+          if (_loading)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            )
+          else if (_snippets.isEmpty)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('Sin snippets. Crea uno con "Nuevo snippet".',
+                  style: TextStyle(color: Colors.white54, fontSize: 12)),
+            )
+          else
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final s in _snippets)
+                    ListTile(
+                      dense: true,
+                      leading: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: AppColors.neonCyan.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(AppRadii.chip),
+                          border: Border.all(
+                              color:
+                                  AppColors.neonCyan.withValues(alpha: 0.25)),
+                        ),
+                        child: const Icon(Icons.bolt,
+                            color: AppColors.neonCyan, size: 18),
+                      ),
+                      title: Text(s.name,
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                        s.text,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: Colors.white38,
+                            fontSize: 11,
+                            fontFamily: 'monospace'),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete_outline,
+                            color: Colors.white38, size: 18),
+                        onPressed: () async {
+                          await widget.store.remove(widget.host, s.id);
+                          await _reload();
+                        },
+                      ),
+                      onTap: () => widget.onInsert(s.text),
+                    ),
+                ],
+              ),
+            ),
+          const Divider(height: 16),
+          NeonSheetTile(
+            icon: Icons.add,
+            iconColor: AppColors.neonCyan,
+            title: 'Nuevo snippet',
+            subtitle: 'Comando rápido para ${widget.host}',
+            onTap: _addSnippet,
+          ),
+        ],
       ),
     );
   }
