@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dartssh2/dartssh2.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:warp_core/warp_core.dart';
 import 'package:xterm/xterm.dart';
 import '../services/ssh_service.dart';
 import '../theme/app_theme.dart';
@@ -12,7 +14,16 @@ class TerminalScreen extends StatefulWidget {
   final SshHost host;
   final SshService service;
 
-  const TerminalScreen({super.key, required this.host, required this.service});
+  /// Historial de comandos por host (Warp-mode, Etapa 8.5). Inyectable para
+  /// tests (memoria); por defecto se persiste en documents/history.json.
+  final CommandHistoryStore? historyStore;
+
+  const TerminalScreen({
+    super.key,
+    required this.host,
+    required this.service,
+    this.historyStore,
+  });
 
   @override
   State<TerminalScreen> createState() => TerminalScreenState();
@@ -29,6 +40,13 @@ class TerminalScreenState extends State<TerminalScreen> {
   String? _error;
   bool _showSshKeys = false;
 
+  // Warp-mode (Etapa 8.5): historial por host + búsqueda fuzzy + sugerencia.
+  late final CommandLineTracker _tracker =
+      CommandLineTracker(onCommand: _onCommandCaptured);
+  CommandHistoryStore? _history;
+  bool _showHistorySearch = false;
+  String? _suggestion;
+
   /// Acceso al emulador de terminal (para tests y extensión).
   Terminal get terminal => _terminal;
   SSHSession? get shell => _shell;
@@ -43,11 +61,72 @@ class TerminalScreenState extends State<TerminalScreen> {
   void initState() {
     super.initState();
     _terminal.onOutput = _onOutput;
+    _history = widget.historyStore;
+    if (_history == null) _initHistory();
     _connect();
   }
 
+  Future<void> _initHistory() async {
+    final dir = await getApplicationDocumentsDirectory();
+    if (!mounted) return;
+    _history = CommandHistoryStore(dir: Directory('${dir.path}/warp'));
+  }
+
   void _onOutput(String data) {
-    _shell?.write(Uint8List.fromList(utf8.encode(data)));
+    if (_shell != null) {
+      _shell!.write(Uint8List.fromList(utf8.encode(data)));
+    }
+    _tracker.feed(data);
+    _updateSuggestion();
+  }
+
+  void _onCommandCaptured(String line) {
+    if (_shell == null) return;
+    _history?.add(widget.host.name, line);
+    _updateSuggestion();
+  }
+
+  Future<void> _updateSuggestion() async {
+    final history = _history;
+    final current = _tracker.currentLine;
+    if (history == null || current.isEmpty || _shell == null) {
+      if (_suggestion != null && mounted) setState(() => _suggestion = null);
+      return;
+    }
+    final results = await history.search(widget.host.name, current);
+    final best = results.isNotEmpty && results.first.command != current
+        ? results.first.command
+        : null;
+    if (!mounted) return;
+    final next = best;
+    if (next != _suggestion) setState(() => _suggestion = next);
+  }
+
+  /// Acepta la sugerencia: completa la línea actual (o la reemplaza).
+  void _acceptSuggestion() {
+    final s = _suggestion;
+    final current = _tracker.currentLine;
+    final shell = _shell;
+    if (s == null || shell == null) return;
+    if (s.startsWith(current)) {
+      final tail = s.substring(current.length);
+      shell.write(Uint8List.fromList(utf8.encode(tail)));
+      _tracker.feed(tail);
+    } else {
+      shell.write(Uint8List.fromList(utf8.encode('\x15$s')));
+      _tracker
+        ..reset()
+        ..feed(s);
+    }
+    _updateSuggestion();
+  }
+
+  void _executeHistoryCommand(String command) {
+    final shell = _shell;
+    if (shell == null) return;
+    shell.write(Uint8List.fromList(utf8.encode('$command\r')));
+    _history?.add(widget.host.name, command);
+    setState(() => _showHistorySearch = false);
   }
 
   void _sendEscape(String seq) {
@@ -146,7 +225,7 @@ class TerminalScreenState extends State<TerminalScreen> {
           IconButton(
             icon: const Icon(Icons.refresh, size: 18),
             onPressed: _connect,
-            tooltip: 'Reconectar (Ctrl+R)',
+            tooltip: 'Reconectar (Ctrl+Shift+R)',
           ),
           const SizedBox(width: 4),
         ],
@@ -212,42 +291,103 @@ class TerminalScreenState extends State<TerminalScreen> {
         ),
       );
     }
-    return Column(
+    return Stack(
       children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: TerminalView(
-              _terminal,
-              focusNode: _termFocus,
-              autofocus: true,
-              backgroundOpacity: 1,
-              // En desktop el teclado físico debe mandar directamente al
-              // terminal (sin IME), si no, las letras se pierden y no se
-              // puede escribir.
-              hardwareKeyboardOnly: !Platform.isAndroid && !Platform.isIOS,
-              onKeyEvent: (node, event) {
-                if (event is! KeyDownEvent) return KeyEventResult.ignored;
-                final logical = event.logicalKey;
-                final ctrl = HardwareKeyboard.instance.isControlPressed;
-                if (ctrl && logical == LogicalKeyboardKey.keyR) {
-                  _connect();
-                  return KeyEventResult.handled;
-                }
-                if (ctrl && logical == LogicalKeyboardKey.keyL) {
-                  _sendEscape('\x1b[2J\x1b[H');
-                  return KeyEventResult.handled;
-                }
-                return KeyEventResult.ignored;
-              },
+        Column(
+          children: [
+            if (_suggestion != null) _buildSuggestionBar(),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: TerminalView(
+                  _terminal,
+                  focusNode: _termFocus,
+                  autofocus: true,
+                  backgroundOpacity: 1,
+                  // En desktop el teclado físico debe mandar directamente al
+                  // terminal (sin IME), si no, las letras se pierden y no se
+                  // puede escribir.
+                  hardwareKeyboardOnly: !Platform.isAndroid && !Platform.isIOS,
+                  onKeyEvent: (node, event) {
+                    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+                    final logical = event.logicalKey;
+                    final ctrl = HardwareKeyboard.instance.isControlPressed;
+                    final shift = HardwareKeyboard.instance.isShiftPressed;
+                    if (ctrl && shift && logical == LogicalKeyboardKey.keyR) {
+                      _connect();
+                      return KeyEventResult.handled;
+                    }
+                    if (ctrl && !shift && logical == LogicalKeyboardKey.keyR) {
+                      if (!_showHistorySearch) {
+                        setState(() => _showHistorySearch = true);
+                      }
+                      return KeyEventResult.handled;
+                    }
+                    if (logical == LogicalKeyboardKey.tab &&
+                        _suggestion != null) {
+                      _acceptSuggestion();
+                      return KeyEventResult.handled;
+                    }
+                    if (ctrl && logical == LogicalKeyboardKey.keyL) {
+                      _sendEscape('\x1b[2J\x1b[H');
+                      return KeyEventResult.handled;
+                    }
+                    return KeyEventResult.ignored;
+                  },
+                ),
+              ),
+            ),
+            if (_showSshKeys) _buildSshKeys(),
+          ],
+        ),
+        if (_showHistorySearch && _history != null)
+          Positioned.fill(
+            child: _HistorySearchOverlay(
+              store: _history!,
+              host: widget.host.name,
+              onExecute: _executeHistoryCommand,
+              onClose: () => setState(() => _showHistorySearch = false),
             ),
           ),
-        ),
-        if (_showSshKeys) _buildSshKeys(),
       ],
     );
   }
 
+  /// Barra de sugerencia inline: muestra el mejor match del historial.
+  Widget _buildSuggestionBar() {
+    return Material(
+      color: AppColors.bgPanel,
+      child: InkWell(
+        onTap: _acceptSuggestion,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Row(
+            children: [
+              const Icon(Icons.tab, size: 14, color: AppColors.neonCyan),
+              const SizedBox(width: 8),
+              const Text('Tab',
+                  style: TextStyle(
+                      color: AppColors.neonCyan,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  _suggestion!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                      fontFamily: 'monospace'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
   Widget _buildSshKeys() {
     Widget key(String label, String seq) => Expanded(
           child: Padding(
@@ -330,5 +470,199 @@ class _ConnStatusPill extends StatelessWidget {
 
 String utf8Decode(List<int> bytes) {
   return utf8.decode(bytes, allowMalformed: true);
+}
+
+/// Overlay de búsqueda fuzzy del historial por host (Ctrl+R, Warp-mode).
+/// TextField + lista de resultados; ↑/↓ navegan, Enter ejecuta, Esc cierra.
+class _HistorySearchOverlay extends StatefulWidget {
+  final CommandHistoryStore store;
+  final String host;
+  final void Function(String command) onExecute;
+  final VoidCallback onClose;
+
+  const _HistorySearchOverlay({
+    required this.store,
+    required this.host,
+    required this.onExecute,
+    required this.onClose,
+  });
+
+  @override
+  State<_HistorySearchOverlay> createState() => _HistorySearchOverlayState();
+}
+
+class _HistorySearchOverlayState extends State<_HistorySearchOverlay> {
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _focus = FocusNode();
+  List<CommandRecord> _results = const [];
+  int _selected = -1;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.onKeyEvent = _onKey;
+    _focus.addListener(() {
+      if (!_focus.hasFocus) widget.onClose();
+    });
+    _search('');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focus.dispose();
+    super.dispose();
+  }
+
+  Future<void> _search(String query) async {
+    setState(() => _loading = true);
+    final results = await widget.store.search(widget.host, query);
+    if (!mounted) return;
+    setState(() {
+      _results = results;
+      _selected = results.isEmpty ? -1 : 0;
+      _loading = false;
+    });
+  }
+
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      widget.onClose();
+      return KeyEventResult.handled;
+    }
+    if (_results.isEmpty) return KeyEventResult.ignored;
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      setState(() => _selected = (_selected + 1) % _results.length);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      setState(() =>
+          _selected = (_selected - 1 + _results.length) % _results.length);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onClose,
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.45),
+        alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: () {},
+          child: Container(
+            width: 520,
+            constraints: const BoxConstraints(maxHeight: 420),
+            margin: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.bgPanelHi,
+              borderRadius: BorderRadius.circular(AppRadii.card),
+              border: Border.all(color: AppColors.border),
+              boxShadow: AppGlow.violet(strength: 0.25, blur: 30),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _controller,
+                  focusNode: _focus,
+                  autofocus: true,
+                  onChanged: _search,
+                  onSubmitted: (value) {
+                    if (_selected >= 0 && _selected < _results.length) {
+                      widget.onExecute(_results[_selected].command);
+                    } else if (value.trim().isNotEmpty) {
+                      widget.onExecute(value.trim());
+                    }
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Buscar comando (Ctrl+R)…',
+                    prefixIcon: const Icon(Icons.search, size: 18),
+                    suffixIcon: const Icon(Icons.north_west, size: 14),
+                    isDense: true,
+                    filled: true,
+                    fillColor: Colors.black.withValues(alpha: 0.3),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppRadii.chip),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                ),
+                const SizedBox(height: 8),
+                Flexible(
+                  child: _loading
+                      ? const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : _results.isEmpty
+                          ? const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Text('Sin resultados',
+                                  style: TextStyle(color: Colors.white54)),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: _results.length,
+                              itemBuilder: (context, i) => InkWell(
+                                onTap: () =>
+                                    widget.onExecute(_results[i].command),
+                                child: Container(
+                                  color: i == _selected
+                                      ? AppColors.neonViolet
+                                          .withValues(alpha: 0.22)
+                                      : null,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 6),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        i == _selected
+                                            ? Icons.north_west
+                                            : Icons.subdirectory_arrow_right,
+                                        size: 14,
+                                        color: i == _selected
+                                            ? AppColors.neonViolet
+                                            : Colors.white38,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          _results[i].command,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                            fontFamily: 'monospace',
+                                            fontWeight: i == _selected
+                                                ? FontWeight.w700
+                                                : FontWeight.w400,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 

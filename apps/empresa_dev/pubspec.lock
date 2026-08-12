@@ -774,6 +774,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "15.0.0"
+  warp_core:
+    dependency: "direct main"
+    description:
+      path: "../../packages/warp_core"
+      relative: true
+    source: path
+    version: "0.1.0"
   watcher:
     dependency: transitive
     description:
