@@ -1,6 +1,6 @@
 # ESTADO ACTUAL — Empresa Dev
 
-> **Última actualización:** 2026-08-12 · Etapa 8.6 ✅ + 8.5 ✅ (incl. sync LWW) + 8.2 ✅ + ADR-004/CanvaView ✅ · rama `main`.
+> **Última actualización:** 2026-08-12 · Etapa 8.6 ✅ + 8.5 ✅ + 8.2 ✅ + 8.4 ✅ + ADR-004/CanvaView ✅ · rama `main`.
 > Fuente de verdad de fases/gates: `docs/SUPER_PLAN.md`. Las features se diseñan en `docs/SDDs/` (siguiendo `SDD-XXX`).
 > Plan maestro consolidado (todo lo que falta, con gates): `plan.md` (raíz del repo).
 
@@ -44,6 +44,7 @@ oficina). CrewAI↔LangGraph siguen por canales nativos (mismo proceso).
 | **Etapa 8.5 — Warp-mode (SDD-122)** | **✅ 8.5.1–3 2026-08-12**: `packages/warp_core` (tracker + historial JSON por host + fuzzy + snippets), terminal con Ctrl+R overlay + sugerencia inline + hoja de snippets, **sync LWW por el hub** (`SnippetRecord` en `SyncSnapshot`). 29 unit warp_core + 4 ssh_core + 7 widget. Pendiente: gate de red real (Tailscale) | — |
 | **ADR-004 + SDD-123 — CanvaView** | **✅ 2026-08-12**: decisión "un solo motor de canva" + extracción de `CanvaView` (`lib/widgets/canva_view.dart`) reutilizable; `CanvaScreen` delega. 9 tests canva intactos + 3 de aislamiento; 166 tests + analyze 0 | — |
 | **Etapa 8.2 — Oficina (SDD-124)** | **✅ 8.2.1–2 2026-08-12**: `agent_core` `OfficeState`/`AgentRuntimeStatus`/`StatusNotifier`/`SimulatedOffice`; `OfficeScreen` = `CanvaView` con glow por estado + menú Oficina. 9 unit + 2 widget. Pendiente: bridge hub→Python (8.2.3, Fase 1) | — |
+| **Etapa 8.4 — SSH proxy (SDD-125)** | **✅ 2026-08-12**: `SshProxyService` + tokens efímeros (`ProxyTokenStore`) + relay WS en `hub_server` + `SshProxyClient`; la llave nunca sale del hub (solo texto). 10 unit + 3 relay localhost; 181 tests app. Pendiente: indicador canva directo/proxy y gate Tailscale real | — |
 | **Visión Empresa Autónoma (SDD-115)** | **Fase 0 ✅** (`faf129f`); Fases 1–5 ⬜ | servicios/crews reales, paralelismo, oficina animada |
 
 ### Gates manuales pendientes (bloquean solo el cierre de fase, no el código)

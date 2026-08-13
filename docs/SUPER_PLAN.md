@@ -239,11 +239,11 @@ se roban; el hub guarda las llaves pero la conexión es directa.
 llaves (que NUNCA salen del hub). La laptop solo ve el flujo del terminal, no la llave.
 Modo por defecto sigue siendo conexión directa.
 
-- [ ] Modo "passthrough" en el hub: abrir SSH/SFTP en el hub, reenviar stream al cliente.
-- [ ] Auth por token de sesión efímero (no reutilizable).
+- [x] Modo "passthrough" en el hub: abrir SSH/SFTP en el hub, reenviar stream al cliente. *(SDD-125: `SshProxyService` + `SshForward` + relay WS `ssh` en `hub_server` + `SshProxyClient`; la llave solo vive en el `SshHost` del hub)*
+- [x] Auth por token de sesión efímero (no reutilizable). *(`ProxyTokenStore`: `Random.secure`, TTL, por host)*
 - [ ] Indicador en el canva: conexión directa vs proxy (icono).
 
-**Gate:** laptop sin llaves conecta a un host vía proxy; la llave jamás aparece en la laptop.
+**Gate:** laptop sin llaves conecta a un host vía proxy; la llave jamás aparece en la laptop. *(automatizado con fake session + hub localhost real: el stream solo transporta texto; verificación real con Tailscale = manual)*
 
 ### 8.5 — Warp-mode: autocompletado y snippets locales
 

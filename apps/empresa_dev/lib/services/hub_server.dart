@@ -3,14 +3,20 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:ssh_core/sync_snapshot.dart';
+import 'ssh_proxy.dart';
 
 class HubServer {
   HttpServer? _server;
   final List<WebSocket> _clients = [];
+  final Map<WebSocket, Map<String, SshForward>> _forwards = {};
   String _token = '';
   SyncSnapshot _snapshot = SyncSnapshot.empty();
   int _port = 0;
   String _ip = '0.0.0.0';
+
+  /// Proxy SSH (Etapa 8.4): si está inyectado, el hub puede abrir forwards con
+  /// tokens efímeros — la llave nunca sale del hub.
+  SshProxyService? proxy;
 
   SyncSnapshot get snapshot => _snapshot;
   int get port => _port;
@@ -51,8 +57,8 @@ class HubServer {
         _clients.add(ws);
         ws.listen(
           (data) => _onMessage(ws, data),
-          onDone: () => _clients.remove(ws),
-          onError: (_) => _clients.remove(ws),
+          onDone: () => _onClientGone(ws),
+          onError: (_) => _onClientGone(ws),
         );
       }).catchError((_) {});
       return;
@@ -101,10 +107,57 @@ class HubServer {
       final msg = jsonDecode(data as String) as Map<String, dynamic>;
       if (msg['type'] == 'ping') {
         ws.add(jsonEncode({'type': 'pong'}));
+        return;
+      }
+      if (msg['type'] == 'ssh') {
+        _onSshMessage(ws, msg);
       }
     } catch (_) {
       // ignorar
     }
+  }
+
+  /// Relay de SSH proxy (Etapa 8.4): open / write / close. El hub abre la
+  /// sesión con la llave local y relaya SOLO texto al cliente.
+  Future<void> _onSshMessage(WebSocket ws, Map<String, dynamic> msg) async {
+    final action = msg['action'] as String? ?? '';
+    final hostId = msg['hostId'] as String? ?? '';
+    final proxy = this.proxy;
+    switch (action) {
+      case 'open':
+        if (proxy == null) {
+          ws.add(jsonEncode(
+              {'type': 'ssh', 'action': 'error', 'hostId': hostId, 'message': 'proxy no disponible'}));
+          return;
+        }
+        try {
+          final forward =
+              await proxy.openForward(hostId, msg['token'] as String? ?? '');
+          (_forwards[ws] ??= {})[hostId] = forward;
+          forward.output.listen((text) {
+            try {
+              ws.add(jsonEncode(
+                  {'type': 'ssh', 'action': 'data', 'hostId': hostId, 'data': text}));
+            } catch (_) {}
+          });
+          ws.add(jsonEncode({'type': 'ssh', 'action': 'opened', 'hostId': hostId}));
+        } catch (e) {
+          ws.add(jsonEncode(
+              {'type': 'ssh', 'action': 'error', 'hostId': hostId, 'message': '$e'}));
+        }
+        break;
+      case 'write':
+        _forwards[ws]?[hostId]?.write(msg['data'] as String? ?? '');
+        break;
+      case 'close':
+        _forwards[ws]?.remove(hostId)?.close();
+        break;
+    }
+  }
+
+  void _onClientGone(WebSocket ws) {
+    _clients.remove(ws);
+    _forwards.remove(ws)?.forEach((_, f) => f.close());
   }
 
   /// El hub actualiza su snapshot y propaga a los clientes.
