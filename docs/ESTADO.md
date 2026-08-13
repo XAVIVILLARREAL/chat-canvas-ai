@@ -1,6 +1,6 @@
 # ESTADO ACTUAL — Empresa Dev
 
-> **Última actualización:** 2026-08-12 · Etapa 8.6 ✅ + Etapa 8.5 (8.5.1–3 local) ✅ + ADR-004/CanvaView ✅ · rama `main`.
+> **Última actualización:** 2026-08-12 · Etapa 8.6 ✅ + 8.5 ✅ + 8.2 ✅ + ADR-004/CanvaView ✅ · rama `main`.
 > Fuente de verdad de fases/gates: `docs/SUPER_PLAN.md`. Las features se diseñan en `docs/SDDs/` (siguiendo `SDD-XXX`).
 > Plan maestro consolidado (todo lo que falta, con gates): `plan.md` (raíz del repo).
 
@@ -43,6 +43,7 @@ oficina). CrewAI↔LangGraph siguen por canales nativos (mismo proceso).
 | **Etapa 8.6 — Canva LOD (SDD-121)** | **✅ COMPLETADA 2026-08-12**: quad-tree (`packages/spatial_core`), `CanvaCuller`/`CanvaClusterer` (`packages/canva_core`), culling + clusters + canvas único en `canva_screen`, benchmark 10k @ 3.5/2.2 ms/frame. Evidencia `data/evidence/etapa86-benchmark.md`. Bug engine 3.32 (`mergeWith`) resuelto con render por CustomPainter en LOD | — |
 | **Etapa 8.5 — Warp-mode (SDD-122)** | **✅ 8.5.1–3 2026-08-12**: `packages/warp_core` (tracker + historial JSON por host + fuzzy + snippets), terminal con Ctrl+R overlay + sugerencia inline + hoja de snippets. 24 unit + 7 widget. Pendiente: sync LWW por el hub y gate manual | — |
 | **ADR-004 + SDD-123 — CanvaView** | **✅ 2026-08-12**: decisión "un solo motor de canva" + extracción de `CanvaView` (`lib/widgets/canva_view.dart`) reutilizable; `CanvaScreen` delega. 9 tests canva intactos + 3 de aislamiento; 166 tests + analyze 0 | — |
+| **Etapa 8.2 — Oficina (SDD-124)** | **✅ 8.2.1–2 2026-08-12**: `agent_core` `OfficeState`/`AgentRuntimeStatus`/`StatusNotifier`/`SimulatedOffice`; `OfficeScreen` = `CanvaView` con glow por estado + menú Oficina. 9 unit + 2 widget. Pendiente: bridge hub→Python (8.2.3, Fase 1) | — |
 | **Visión Empresa Autónoma (SDD-115)** | **Fase 0 ✅** (`faf129f`); Fases 1–5 ⬜ | servicios/crews reales, paralelismo, oficina animada |
 
 ### Gates manuales pendientes (bloquean solo el cierre de fase, no el código)

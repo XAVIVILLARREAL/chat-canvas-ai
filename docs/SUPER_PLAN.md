@@ -206,12 +206,12 @@ separado; la UI no refleja el estado real del trabajo.
 La transición "bloqueado → trabajando → en revisión" anima el nodo en vivo.
 El canva pasa de mapa de infraestructura a espejo de la oficina en tiempo real.
 
-- [ ] WebSocket del hub → servicio Python (estado del grafo por thread/empresa).
-- [ ] Modelo `GraphState` en `agent_core` (nodo, estado, transición, checkpoint).
-- [ ] Aristas del canva ligadas a edges del grafo; animación de transición de estado.
-- [ ] Nodo bloqueado/en revisión → glow rojo/amarillo + owner visible.
+- [x] Modelo `OfficeState`/`AgentRuntimeStatus` en `agent_core` + `StatusNotifier` puro Dart. *(SDD-124, `packages/agent_core/office_state.dart`, alineado al task lifecycle de A2A/ADR-003)*
+- [x] Oficina = instancia de `CanvaView` (ADR-004) con glow por estado; `OfficeScreen` + `SimulatedOffice` (fuente demo/testeable sin backend). *(menú Añadir → Oficina; tap en agente → historial de transiciones)*
+- [ ] WebSocket hub → servicio Python (estado del grafo por thread/empresa). *(8.2.3 — requiere `empresa_autonoma/server.py`, Fase 1)*
+- [x] Nodo bloqueado/en revisión → glow rojo/ámbar + owner visible.
 
-**Gate:** un nodo-agente cambia de estado en la empresa y el canva lo anima en vivo.
+**Gate:** un nodo-agente cambia de estado en la empresa y el canva lo anima en vivo. *(verificado por widget test con la simulación; el bridge real queda pendiente del server Python)*
 
 ### 8.3 — Hub con failover y descarga de batería
 

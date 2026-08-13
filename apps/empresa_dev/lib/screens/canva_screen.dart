@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:canva_core/canva.dart';
+import 'package:agent_core/office_state.dart' show SimulatedOffice;
 import 'package:graph_core/graph_core.dart';
 import 'package:vibecoding_core/vibecoding_core.dart';
 import '../models/skill.dart';
@@ -25,6 +26,7 @@ import '../widgets/neon_sheet.dart';
 import 'agent_chat_screen.dart';
 import 'code_editor_screen.dart';
 import 'md_node_screen.dart';
+import 'office_screen.dart';
 import 'project_graph_screen.dart';
 import 'project_tree_screen.dart';
 import 'proposal_node_screen.dart';
@@ -624,6 +626,16 @@ class _CanvaScreenState extends State<CanvaScreen> {
               _openProjectGraph();
             },
           ),
+          NeonSheetTile(
+            icon: Icons.badge,
+            iconColor: AppColors.neonGreen,
+            title: 'Oficina',
+            subtitle: 'Agentes-empleados con estado en vivo',
+            onTap: () {
+              Navigator.pop(context);
+              _openOffice();
+            },
+          ),
           const Divider(height: 24),
           NeonSheetTile(
             icon: Icons.auto_fix_high,
@@ -654,6 +666,24 @@ class _CanvaScreenState extends State<CanvaScreen> {
     final content = node.content;
     if (content == null || content.trim().isEmpty) return null;
     return Skill.fromMarkdown(content);
+  }
+
+  Future<void> _openOffice() async {
+    if (kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Oficina disponible solo en desktop')),
+      );
+      return;
+    }
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => OfficeScreen(office: SimulatedOffice()),
+      ),
+    );
   }
 
   Future<void> _openProjectGraph() async {
