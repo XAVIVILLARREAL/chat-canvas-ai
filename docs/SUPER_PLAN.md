@@ -189,12 +189,12 @@ simultáneas en 2 dispositivos pierden trabajo.
 se vuelve un documento vivo que converge solo, por deltas, sin autoridad central y
 con offline-first real. Mismo espíritu que "varios agentes trabajando en paralelo".
 
-- [ ] Evaluar y-crdt / Automerge en Dart (¿Dart puro o FFI?).
-- [ ] Migrar tabla `canva_nodos`/`canva_edges` a estado CRDT.
-- [ ] Sync por deltas (no snapshots enteros) sobre el WebSocket del hub.
-- [ ] Test: editar canva en 2 dispositivos a la vez → converge sin pérdida.
+- [x] Evaluar y-crdt / Automerge en Dart. *(SDD-127: `ydart` (binding Yrs) descartado (muerto); **`crdt` 5.1.3** elegido — Dart nativo, HLC, `MapCrdt` storage-agnostic, en producción)*
+- [x] Núcleo CRDT del canva. *(`packages/crdt_core`: `CanvaCrdt` = `CanvaState ↔ MapCrdt` con HLC; delete-vs-edit resuelto por HLC)*
+- [ ] Migrar el sync del canva a `CanvaCrdt` (deltas sobre el WS del hub, no snapshots LWW).
+- [x] Test: editar canva en 2 dispositivos a la vez → converge sin pérdida. *(GATE ✅: unit `crdt_core` — ediciones paralelas convergen, delete más nuevo gana, merge idempotente/conmutativo)*
 
-**Gate:** 2 dispositivos offline, editan, reconectan → el canva converge sin conflicto.
+**Gate:** 2 dispositivos offline, editan, reconectan → el canva converge sin conflicto. *(automatizado por unit; gate real con Tailscale = manual)*
 
 ### 8.2 — El canva ES la vista viva del grafo LangGraph
 
