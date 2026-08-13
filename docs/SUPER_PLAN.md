@@ -223,12 +223,12 @@ batería o en reposo profundo, el pve (siempre encendido) toma el rol de hub
 automáticamente; el celular vuelve a ser hub al cargar. Privado, sin nube, con
 failover gratis.
 
-- [ ] Protocolo de elección de hub (heartbeat + prioridad + takeover).
-- [ ] Promoción/democión transparente para los clientes (misma URL/alias Tailscale).
-- [ ] Política de batería: umbral → ceder rol al pve.
+- [x] Protocolo de elección de hub (heartbeat + prioridad + takeover). *(SDD-126: `HubElection` lógica pura con reloj inyectable — timeout→candidate→hub, prioridad desempata, batería baja→cede; `HubElectionService` + `ElectionTransport`)*
+- [ ] Promoción/democión transparente para los clientes (misma URL/alias Tailscale). *(requiere el transporte real)*
+- [x] Política de batería: umbral → ceder rol al pve. *(lógica `lowBattery` → standby; wiring real de batería pendiente)*
 - [ ] Panel de estado del hub (quién es hub, batería, último sync) en el canva.
 
-**Gate:** bajar la batería del celular a <20% → el sync continúa vía pve sin tocar la app.
+**Gate:** bajar la batería del celular a <20% → el sync continúa vía pve sin tocar la app. *(automatizado: elección por unit; gate real con Tailscale = manual)*
 
 ### 8.4 — SSH proxy opcional desde el hub
 
