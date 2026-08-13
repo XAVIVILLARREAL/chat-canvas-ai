@@ -1,7 +1,7 @@
 # SDD-122 — Etapa 8.5: Warp-mode — historial por host + búsqueda fuzzy + sugerencias
 
 > **Proyecto:** empresa_dev — Etapa 8.5 del SUPER_PLAN (cola de innovación).
-> **Fecha:** 2026-08-12. **Estado: ✅ 8.5.1 + 8.5.2 + 8.5.3 (local) completados** (24 unit warp_core + 7 widget). Sync LWW de snippets por el hub pendiente.
+> **Fecha:** 2026-08-12. **Estado: ✅ 8.5.1 + 8.5.2 + 8.5.3 (local + sync LWW) completados** (24→29 unit warp_core + 4 ssh_core + 7 widget). Gate de red real pendiente (Tailscale).
 
 ## Objetivo
 
@@ -94,8 +94,11 @@ Tab acepta la sugerencia; los tests existentes del terminal pasan intactos.
 - [x] Store de snippets por host (`SnippetStore` en warp_core: CRUD + JSON) + UI
   en el terminal (botón ⚡ → hoja de cristal: tap inserta el comando en el
   prompt, borrar, crear con nombre+texto). *(2 tests widget)*
-- [ ] Sincronización vía sync LWW por el hub (tabla nueva) — depende de la
-  infraestructura de sync existente.
+- [x] **Sync LWW**: `SnippetRecord` en `SyncSnapshot` (`ssh_core`), `Snippet`
+  con `updatedAt`, `SnippetStore.exportRecords()`/`mergeRecords()` (LWW por
+  updatedAt). El hub exporta snippets en su snapshot y el cliente los mergea
+  (`hub_screen`, `main`). *(5 tests unit warp_core + 2 ssh_core)*
+- [ ] Gate de red: 2 dispositivos en el tailnet sincronizan snippets (manual).
 
 ## Contratos de integración
 

@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:warp_core/warp_core.dart';
 import 'services/ssh_service.dart';
 import 'services/canva_store.dart';
 import 'services/e2e_flags.dart';
@@ -47,6 +49,7 @@ class HostsScreen extends StatefulWidget {
 class _HostsScreenState extends State<HostsScreen> {
   final SshService _service = SshService();
   final SessionsStore _sessionsStore = SessionsStore();
+  SnippetStore? _snippetStore;
   String _view = 'tabs'; // 'tabs' | 'canva'
   final List<SshHost> _hosts = [
     SshHost(
@@ -66,6 +69,13 @@ class _HostsScreenState extends State<HostsScreen> {
     _sessionsStore.load().then((_) {
       if (mounted) setState(() => _view = _sessionsStore.lastTab);
     });
+    _initSnippets();
+  }
+
+  Future<void> _initSnippets() async {
+    final dir = await getApplicationDocumentsDirectory();
+    if (!mounted) return;
+    _snippetStore = SnippetStore(dir: Directory('${dir.path}/warp'));
   }
 
   // Para pruebas locales en Windows: lee la llave instalada en pve.
@@ -91,6 +101,7 @@ class _HostsScreenState extends State<HostsScreen> {
 
   Future<SyncSnapshot> _buildSnapshot() async {
     final canva = await CanvaStore().load();
+    final snippets = await _snippetStore?.exportRecords() ?? const [];
     return SyncSnapshot(
       version: 1,
       hosts: _hosts
@@ -106,13 +117,17 @@ class _HostsScreenState extends State<HostsScreen> {
       nodes: canva.nodes,
       edges: canva.edges,
       sessions: [],
+      snippets: snippets,
     );
   }
 
   void _openHub() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => HubScreen(getSnapshot: () async => _buildSnapshot()),
+        builder: (_) => HubScreen(
+          getSnapshot: () async => _buildSnapshot(),
+          snippetStore: _snippetStore,
+        ),
       ),
     );
   }

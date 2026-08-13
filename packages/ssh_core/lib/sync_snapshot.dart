@@ -73,12 +73,48 @@ class SessionRecord {
       );
 }
 
+/// Snippet por host del Warp-mode (Etapa 8.5) en el payload de sync.
+class SnippetRecord {
+  final String id;
+  final String host;
+  final String name;
+  final String text;
+
+  /// Epoch ms del último cambio (clave LWW del merge).
+  final int updatedAt;
+
+  const SnippetRecord({
+    required this.id,
+    required this.host,
+    required this.name,
+    required this.text,
+    required this.updatedAt,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'host': host,
+        'name': name,
+        'text': text,
+        'updatedAt': updatedAt,
+      };
+
+  factory SnippetRecord.fromJson(Map<String, dynamic> j) => SnippetRecord(
+        id: j['id'] as String,
+        host: j['host'] as String,
+        name: j['name'] as String? ?? '',
+        text: j['text'] as String? ?? '',
+        updatedAt: (j['updatedAt'] as num?)?.toInt() ?? 0,
+      );
+}
+
 class SyncSnapshot {
   int version;
   List<HostRecord> hosts;
   List<CanvaNode> nodes;
   List<CanvaEdge> edges;
   List<SessionRecord> sessions;
+  List<SnippetRecord> snippets;
 
   SyncSnapshot({
     required this.version,
@@ -86,7 +122,8 @@ class SyncSnapshot {
     required this.nodes,
     required this.edges,
     required this.sessions,
-  });
+    List<SnippetRecord>? snippets,
+  }) : snippets = snippets ?? [];
 
   factory SyncSnapshot.empty() => SyncSnapshot(
         version: 0,
@@ -102,6 +139,7 @@ class SyncSnapshot {
         'nodes': nodes.map((n) => n.toJson()).toList(),
         'edges': edges.map((e) => e.toJson()).toList(),
         'sessions': sessions.map((s) => s.toJson()).toList(),
+        'snippets': snippets.map((s) => s.toJson()).toList(),
       };
 
   factory SyncSnapshot.fromJson(Map<String, dynamic> j) => SyncSnapshot(
@@ -118,6 +156,9 @@ class SyncSnapshot {
         sessions: (j['sessions'] as List? ?? [])
             .map((e) => SessionRecord.fromJson(e as Map<String, dynamic>))
             .toList(),
+        snippets: (j['snippets'] as List? ?? [])
+            .map((e) => SnippetRecord.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
 
   String encode() => jsonEncode(toJson());
@@ -131,5 +172,6 @@ class SyncSnapshot {
         nodes: nodes,
         edges: edges,
         sessions: sessions,
+        snippets: snippets,
       );
 }

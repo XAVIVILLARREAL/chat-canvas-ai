@@ -5,6 +5,8 @@ library;
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:ssh_core/sync_snapshot.dart';
+
 // ---------------------------------------------------------------------------
 // CommandLineTracker: consume el input del usuario (Terminal.onOutput de
 // xterm.dart) y emite las líneas de comando completas al pulsar Enter.
@@ -186,14 +188,25 @@ class Snippet {
   final String name;
   final String text;
 
-  const Snippet({required this.id, required this.name, required this.text});
+  /// Epoch ms del último cambio — clave LWW del merge de sync.
+  final DateTime updatedAt;
 
-  Map<String, Object?> toJson() => {'id': id, 'name': name, 'text': text};
+  const Snippet({
+    required this.id,
+    required this.name,
+    required this.text,
+    required this.updatedAt,
+  });
+
+  Map<String, Object?> toJson() =>
+      {'id': id, 'name': name, 'text': text, 'updatedAt': updatedAt.toIso8601String()};
 
   static Snippet fromJson(Map<String, Object?> j) => Snippet(
         id: j['id'] as String,
         name: j['name'] as String,
         text: j['text'] as String,
+        updatedAt: DateTime.tryParse(j['updatedAt'] as String? ?? '') ??
+            DateTime.fromMillisecondsSinceEpoch(0),
       );
 }
 
@@ -255,7 +268,7 @@ class SnippetStore {
     final id =
         's${now.millisecondsSinceEpoch}:${now.microsecondsSinceEpoch % 1000000}:${_seq++}';
     final snippet = Snippet(
-        id: id, name: name.trim(), text: text.trimRight());
+        id: id, name: name.trim(), text: text.trimRight(), updatedAt: now);
     list.add(snippet);
     if (list.length > maxPerHost) {
       list.removeRange(0, list.length - maxPerHost);
@@ -284,8 +297,55 @@ class SnippetStore {
       id: current.id,
       name: name ?? current.name,
       text: text ?? current.text,
+      updatedAt: DateTime.now(),
     );
     await _persist();
+  }
+
+  /// Exporta todos los snippets como [SnippetRecord] (para el SyncSnapshot).
+  Future<List<SnippetRecord>> exportRecords() async {
+    final all = await _all();
+    return [
+      for (final e in all.entries)
+        for (final s in e.value)
+          SnippetRecord(
+            id: s.id,
+            host: e.key,
+            name: s.name,
+            text: s.text,
+            updatedAt: s.updatedAt.millisecondsSinceEpoch,
+          ),
+    ];
+  }
+
+  /// Merge LWW de snippets recibidos por sync: por id, gana el `updatedAt`
+  /// más reciente; los que no existen localmente se añaden.
+  Future<void> mergeRecords(List<SnippetRecord> records) async {
+    if (records.isEmpty) return;
+    final all = await _all();
+    var changed = false;
+    for (final r in records) {
+      final list = all.putIfAbsent(r.host, () => []);
+      final idx = list.indexWhere((s) => s.id == r.id);
+      if (idx < 0) {
+        list.add(Snippet(
+          id: r.id,
+          name: r.name,
+          text: r.text,
+          updatedAt: DateTime.fromMillisecondsSinceEpoch(r.updatedAt),
+        ));
+        changed = true;
+      } else if (list[idx].updatedAt.millisecondsSinceEpoch < r.updatedAt) {
+        list[idx] = Snippet(
+          id: r.id,
+          name: r.name,
+          text: r.text,
+          updatedAt: DateTime.fromMillisecondsSinceEpoch(r.updatedAt),
+        );
+        changed = true;
+      }
+    }
+    if (changed) await _persist();
   }
 }
 

@@ -9,6 +9,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "88.0.0"
+  agent_core:
+    dependency: transitive
+    description:
+      path: "../agent_core"
+      relative: true
+    source: path
+    version: "0.1.0"
   analyzer:
     dependency: transitive
     description:
@@ -41,6 +48,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
+  canva_core:
+    dependency: transitive
+    description:
+      path: "../canva_core"
+      relative: true
+    source: path
+    version: "0.1.0"
   cli_config:
     dependency: transitive
     description:
@@ -265,6 +279,20 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.2"
+  spatial_core:
+    dependency: transitive
+    description:
+      path: "../spatial_core"
+      relative: true
+    source: path
+    version: "0.1.0"
+  ssh_core:
+    dependency: "direct main"
+    description:
+      path: "../ssh_core"
+      relative: true
+    source: path
+    version: "0.1.0"
   stack_trace:
     dependency: transitive
     description:

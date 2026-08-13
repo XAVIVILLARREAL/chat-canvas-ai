@@ -254,7 +254,7 @@ autocompletado basado en historial LOCAL (sin red, sin LLM). Barato, mágico, y 
 80% del valor que la gente paga.
 
 - [x] Store de historial por host + búsqueda fuzzy (Ctrl+R custom). *(SDD-122, `packages/warp_core`: `CommandLineTracker` + `CommandHistoryStore` (JSON por host, dedupe, cap 500) + `FuzzyFinder`; `terminal_screen`: captura vía `Terminal.onOutput`, overlay Ctrl+R de cristal con navegación ↑/↓ + Enter ejecuta + Esc cierra; reconexión movida a Ctrl+Shift+R)*
-- [ ] Snippets: store por host + UI ✅ (8.5.3 local, `SnippetStore` en warp_core + hoja de cristal con insertar/crear/borrar); **falta sync LWW/CRDT por el hub**.
+- [x] Snippets: store por host + UI ✅ (8.5.3 local) + **sync LWW ✅**: `SnippetRecord` en `SyncSnapshot` (`ssh_core`) + `SnippetStore.exportRecords/mergeRecords` (LWW por updatedAt, `warp_core`); el hub exporta y el cliente mergea (`hub_screen`). Verificación de red real = gate manual con Tailscale.
 - [x] Sugerencias inline sobre el prompt del terminal. *(barra de sugerencia sobre el TerminalView con el mejor match + Tab para aceptar — completa o reemplaza la línea)*
 
 **Gate:** repetir un comando de ayer → aparece en 2 pulsaciones de Ctrl+R. *(Ctrl+R → aparece en la lista → Enter. Verificación manual pendiente en host real; automatizado: 24 unit warp_core + 7 widget)*

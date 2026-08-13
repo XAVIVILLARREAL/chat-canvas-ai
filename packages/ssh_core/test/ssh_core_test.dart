@@ -28,4 +28,29 @@ void main() {
     expect(back.nodes.length, 1);
     expect(back.nodes.first.label, 'pve');
   });
+
+  test('SyncSnapshot incluye snippets (Warp-mode sync) en el round-trip', () {
+    final snap = SyncSnapshot.empty()
+      ..snippets.add(SnippetRecord(
+        id: 's1',
+        host: 'pve',
+        name: 'logs',
+        text: 'journalctl -f',
+        updatedAt: 1750000000000,
+      ));
+    final back = SyncSnapshot.fromJson(snap.toJson());
+    expect(back.snippets, hasLength(1));
+    expect(back.snippets.first.host, 'pve');
+    expect(back.snippets.first.text, 'journalctl -f');
+    expect(back.snippets.first.updatedAt, 1750000000000);
+  });
+
+  test('SnippetRecord round-trip JSON', () {
+    final r = SnippetRecord(
+        id: 's1', host: 'pve', name: 'status', text: 'git status', updatedAt: 1);
+    final back = SnippetRecord.fromJson(r.toJson());
+    expect(back.id, 's1');
+    expect(back.name, 'status');
+    expect(back.updatedAt, 1);
+  });
 }

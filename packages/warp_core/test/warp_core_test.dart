@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:test/test.dart';
+import 'package:ssh_core/sync_snapshot.dart';
 import 'package:warp_core/warp_core.dart';
 
 void main() {
@@ -227,6 +228,69 @@ void main() {
       await store.add('otro', name: 'b', text: 'y');
       expect((await store.list('pve')).single.name, 'a');
       expect((await store.list('otro')).single.name, 'b');
+    });
+  });
+
+  group('SnippetStore sync (8.5 LWW)', () {
+    test('exportRecords incluye host y updatedAt', () async {
+      final store = SnippetStore();
+      await store.add('pve', name: 'logs', text: 'journalctl -f');
+      final records = await store.exportRecords();
+      expect(records.single.host, 'pve');
+      expect(records.single.name, 'logs');
+      expect(records.single.updatedAt, greaterThan(0));
+    });
+
+    test('merge une snippets de otro dispositivo (union)', () async {
+      final a = SnippetStore();
+      await a.add('pve', name: 'logs', text: 'journalctl -f');
+      final b = SnippetStore();
+      await b.add('pve', name: 'status', text: 'git status');
+
+      await a.mergeRecords(await b.exportRecords());
+      final list = await a.list('pve');
+      expect(list.map((s) => s.name).toSet(), {'logs', 'status'});
+    });
+
+    test('merge LWW: gana el updatedAt más reciente para el mismo id', () async {
+      final a = SnippetStore();
+      final sa = await a.add('pve', name: 'logs', text: 'viejo');
+      // Simular una edición más nueva en el otro dispositivo.
+      final remote = SnippetRecord(
+        id: sa.id,
+        host: 'pve',
+        name: 'logs',
+        text: 'journalctl -f',
+        updatedAt: sa.updatedAt.millisecondsSinceEpoch + 1000,
+      );
+      await a.mergeRecords([remote]);
+      expect((await a.list('pve')).single.text, 'journalctl -f');
+    });
+
+    test('merge LWW: el local más nuevo no se pisa', () async {
+      final a = SnippetStore();
+      final sa = await a.add('pve', name: 'logs', text: 'local nuevo');
+      final stale = SnippetRecord(
+        id: sa.id,
+        host: 'pve',
+        name: 'logs',
+        text: 'viejo remoto',
+        updatedAt: sa.updatedAt.millisecondsSinceEpoch - 1000,
+      );
+      await a.mergeRecords([stale]);
+      expect((await a.list('pve')).single.text, 'local nuevo');
+    });
+
+    test('round-trip por SyncSnapshot (export → decode → merge)', () async {
+      final store = SnippetStore();
+      await store.add('pve', name: 'uptime', text: 'uptime -p');
+      final snap = SyncSnapshot.empty()..snippets.addAll(await store.exportRecords());
+
+      final decoded = SyncSnapshot.decode(snap.encode());
+      final restored = SnippetStore();
+      await restored.mergeRecords(decoded.snippets);
+
+      expect((await restored.list('pve')).single.text, 'uptime -p');
     });
   });
 }

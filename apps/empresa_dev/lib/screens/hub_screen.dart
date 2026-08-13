@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:ssh_core/sync_snapshot.dart';
+import 'package:warp_core/warp_core.dart';
 import '../services/hub_server.dart';
 import '../services/sync_client.dart';
 import '../theme/app_theme.dart';
@@ -10,7 +11,11 @@ import '../widgets/glass_panel.dart';
 class HubScreen extends StatefulWidget {
   final Future<SyncSnapshot> Function() getSnapshot;
 
-  const HubScreen({super.key, required this.getSnapshot});
+  /// Warp-mode sync (8.5): el hub exporta snippets en su snapshot y el cliente
+  /// los mergea (LWW por updatedAt) en el store local.
+  final SnippetStore? snippetStore;
+
+  const HubScreen({super.key, required this.getSnapshot, this.snippetStore});
 
   @override
   State<HubScreen> createState() => _HubScreenState();
@@ -46,6 +51,7 @@ class _HubScreenState extends State<HubScreen> {
     final server = HubServer();
     await server.start(token: token, bindIp: '0.0.0.0', port: 8170);
     final snap = await widget.getSnapshot();
+    snap.snippets.addAll(await widget.snippetStore?.exportRecords() ?? const []);
     server.updateSnapshot(snap);
 
     _sub = server.onChange.listen((s) {
@@ -85,9 +91,10 @@ class _HubScreenState extends State<HubScreen> {
       return;
     }
     _sub = client.onRemote.listen((s) {
+      widget.snippetStore?.mergeRecords(s.snippets);
       if (mounted) {
         setState(() {
-          _status = 'Sincronizado: versión ${s.version}, ${s.hosts.length} hosts, ${s.nodes.length} nodos';
+          _status = 'Sincronizado: versión ${s.version}, ${s.hosts.length} hosts, ${s.nodes.length} nodos, ${s.snippets.length} snippets';
         });
       }
     });
