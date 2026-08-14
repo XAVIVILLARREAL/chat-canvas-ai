@@ -116,6 +116,10 @@ class SyncSnapshot {
   List<SessionRecord> sessions;
   List<SnippetRecord> snippets;
 
+  /// Changeset CRDT del canva (Etapa 8.1, opaco para ssh_core): si viene,
+  /// el destino lo mergea vía CanvaCrdt en vez de reemplazar (convergencia).
+  Map<String, dynamic>? canvaCrdt;
+
   SyncSnapshot({
     required this.version,
     required this.hosts,
@@ -123,6 +127,7 @@ class SyncSnapshot {
     required this.edges,
     required this.sessions,
     List<SnippetRecord>? snippets,
+    this.canvaCrdt,
   }) : snippets = snippets ?? [];
 
   factory SyncSnapshot.empty() => SyncSnapshot(
@@ -140,6 +145,7 @@ class SyncSnapshot {
         'edges': edges.map((e) => e.toJson()).toList(),
         'sessions': sessions.map((s) => s.toJson()).toList(),
         'snippets': snippets.map((s) => s.toJson()).toList(),
+        if (canvaCrdt != null) 'canvaCrdt': canvaCrdt,
       };
 
   factory SyncSnapshot.fromJson(Map<String, dynamic> j) => SyncSnapshot(
@@ -159,6 +165,7 @@ class SyncSnapshot {
         snippets: (j['snippets'] as List? ?? [])
             .map((e) => SnippetRecord.fromJson(e as Map<String, dynamic>))
             .toList(),
+        canvaCrdt: (j['canvaCrdt'] as Map<String, dynamic>?)?.cast<String, dynamic>(),
       );
 
   String encode() => jsonEncode(toJson());
@@ -173,5 +180,6 @@ class SyncSnapshot {
         edges: edges,
         sessions: sessions,
         snippets: snippets,
+        canvaCrdt: canvaCrdt,
       );
 }

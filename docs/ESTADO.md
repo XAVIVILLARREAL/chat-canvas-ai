@@ -46,7 +46,7 @@ oficina). CrewAI↔LangGraph siguen por canales nativos (mismo proceso).
 | **Etapa 8.2 — Oficina (SDD-124)** | **✅ 8.2.1–2 2026-08-12**: `agent_core` `OfficeState`/`AgentRuntimeStatus`/`StatusNotifier`/`SimulatedOffice`; `OfficeScreen` = `CanvaView` con glow por estado + menú Oficina. 9 unit + 2 widget. Pendiente: bridge hub→Python (8.2.3, Fase 1) | — |
 | **Etapa 8.4 — SSH proxy (SDD-125)** | **✅ 2026-08-12**: `SshProxyService` + tokens efímeros (`ProxyTokenStore`) + relay WS en `hub_server` + `SshProxyClient`; la llave nunca sale del hub (solo texto). 10 unit + 3 relay localhost; 181 tests app. Pendiente: indicador canva directo/proxy y gate Tailscale real | — |
 | **Etapa 8.3 — Hub failover (SDD-126)** | **✅ 8.3.1–2 2026-08-12**: `HubElection` (heartbeat + prioridad + takeover + batería) + `HubElectionService`/`ElectionTransport`. 9 tests. Pendiente: transporte Tailscale real + panel de estado | — |
-| **Etapa 8.1 — Sync CRDT (SDD-127)** | **✅ evaluación + núcleo 2026-08-12**: `ydart` descartado, `crdt` 5.1.3 elegido; `packages/crdt_core` (`CanvaCrdt` = CanvaState↔MapCrdt, HLC) con gate de convergencia. 5 tests. Pendiente: migrar el sync del canva a deltas CRDT | — |
+| **Etapa 8.1 — Sync CRDT (SDD-127)** | **✅ evaluación + núcleo + migración sync 2026-08-12**: `ydart` descartado, `crdt` 5.1.3 elegido; `packages/crdt_core` (`CanvaCrdt` + `CrdtSyncCanva`); el hub `/api/apply` CONVERGE el canva (ediciones concurrentes no se pierden). 8 unit + 1 hub localhost; 191 tests app. Pendiente: doc persistente por cliente + gate Tailscale | — |
 | **Visión Empresa Autónoma (SDD-115)** | **Fase 0 ✅** (`faf129f`); Fases 1–5 ⬜ | servicios/crews reales, paralelismo, oficina animada |
 
 ### Gates manuales pendientes (bloquean solo el cierre de fase, no el código)

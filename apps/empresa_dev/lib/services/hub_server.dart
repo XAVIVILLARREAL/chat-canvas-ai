@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crdt_core/canva_crdt.dart';
+import 'package:crdt_core/crdt_sync.dart';
 import 'package:ssh_core/sync_snapshot.dart';
 import 'ssh_proxy.dart';
 
@@ -17,6 +19,10 @@ class HubServer {
   /// Proxy SSH (Etapa 8.4): si está inyectado, el hub puede abrir forwards con
   /// tokens efímeros — la llave nunca sale del hub.
   SshProxyService? proxy;
+
+  /// Documento CRDT del canva (Etapa 8.1): el hub CONVERGE el canva de los
+  /// clientes en vez de reemplazarlo (LWW por nodo, no snapshot entero).
+  CanvaCrdt? _canvaDoc;
 
   SyncSnapshot get snapshot => _snapshot;
   int get port => _port;
@@ -87,11 +93,22 @@ class HubServer {
         try {
           final json = jsonDecode(utf8.decode(data)) as Map<String, dynamic>;
           final incoming = SyncSnapshot.fromJson(json);
-          // last-write-wins por version
-          if (incoming.version > _snapshot.version) {
-            _snapshot = incoming;
-            _broadcast(_snapshot);
-          }
+          // El canva se CONVERGE vía CRDT (Etapa 8.1): dos clientes que
+          // editaron en paralelo no se pisan; hosts/sessions/snippets siguen
+          // LWW por version.
+          _canvaDoc ??= CanvaCrdt.empty(
+              actor: 'hub:${DateTime.now().millisecondsSinceEpoch}');
+          final mergedCanva =
+              await CrdtSyncCanva(doc: _canvaDoc!).mergeIncoming(incoming);
+          _snapshot = SyncSnapshot(
+            version: incoming.version,
+            hosts: incoming.hosts,
+            nodes: mergedCanva.nodes,
+            edges: mergedCanva.edges,
+            sessions: incoming.sessions,
+            snippets: incoming.snippets,
+          );
+          _broadcast(_snapshot);
           _respondJson(req, {'ok': true, 'version': _snapshot.version});
         } catch (e) {
           _respondJson(req, {'error': 'payload invalido: $e'}, status: 400);

@@ -4,6 +4,7 @@
 /// editan en paralelo convergen sin pérdida.
 library;
 
+import 'package:crdt/crdt.dart' show Hlc, parseCrdtChangeset;
 import 'package:crdt/map_crdt.dart';
 import 'package:canva_core/canva.dart';
 
@@ -42,6 +43,24 @@ class CanvaCrdt {
   /// Mergea los cambios de [other] en este documento (convergencia).
   Future<void> merge(CanvaCrdt other) async {
     await _crdt.merge(other._crdt.getChangeset());
+  }
+
+  /// Cambios del documento listos para el wire (Hlc serializado a string).
+  Map<String, dynamic> changesetJson() {
+    final cs = _crdt.getChangeset();
+    return cs.map((table, records) => MapEntry(
+          table,
+          [
+            for (final r in records)
+              r.map((k, v) => MapEntry(k, v is Hlc ? v.toJson() : v)),
+          ],
+        ));
+  }
+
+  /// Mergea un changeset recibido por el wire (parsea Hlc de vuelta).
+  Future<void> mergeChangesetJson(Map<String, dynamic> json) async {
+    final parsed = parseCrdtChangeset(json);
+    await _crdt.merge(parsed);
   }
 
   /// Devuelve el estado actual (los registros borrados se excluyen).

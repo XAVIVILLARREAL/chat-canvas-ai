@@ -1,6 +1,8 @@
 import 'package:test/test.dart';
 import 'package:canva_core/canva.dart';
+import 'package:ssh_core/sync_snapshot.dart';
 import 'package:crdt_core/canva_crdt.dart';
+import 'package:crdt_core/crdt_sync.dart';
 
 CanvaNode node(String id, {String? label, double x = 10, double y = 20}) =>
     CanvaNode(id: id, type: CanvaNodeType.note, x: x, y: y, label: label ?? id);
@@ -101,6 +103,60 @@ void main() {
           r2.toState().nodes.map((n) => n.id).toSet());
       await r1.merge(devA); // idempotente
       expect(r1.toState().nodes.length, 3);
+    });
+
+    test('changesetJson → mergeChangesetJson round-trip conserva nodos', () async {
+      final a = await seeded(
+          CanvaState(nodes: [node('a')], edges: const []), 'devA');
+      await a.putNode(node('x'));
+      final json = a.changesetJson();
+
+      final fresh = CanvaCrdt.empty(actor: 'hub');
+      await fresh.mergeChangesetJson(json);
+      expect(fresh.toState().nodes.map((n) => n.id).toSet(), {'a', 'x'});
+    });
+  });
+
+  group('CrdtSyncCanva (merge en la capa de sync)', () {
+    SyncSnapshot snapOf(CanvaCrdt doc, {int version = 2}) {
+      final state = doc.toState();
+      return SyncSnapshot(
+        version: version,
+        hosts: const [],
+        nodes: state.nodes,
+        edges: state.edges,
+        sessions: const [],
+        canvaCrdt: doc.changesetJson(),
+      );
+    }
+
+    test('GATE: dos snapshots con changeset convergen en el hub sin pérdida',
+        () async {
+      final base = CanvaState(nodes: [node('a')], edges: const []);
+      final devA = await seeded(base, 'devA');
+      final devB = await seeded(base, 'devB');
+      await devA.putNode(node('x'));
+      await devB.putNode(node('y'));
+
+      final sync = CrdtSyncCanva(doc: CanvaCrdt.empty(actor: 'hub'));
+      await sync.mergeIncoming(snapOf(devA));
+      final merged = await sync.mergeIncoming(snapOf(devB));
+
+      expect(merged.nodes.map((n) => n.id).toSet(), {'a', 'x', 'y'},
+          reason: 'ambas ediciones sobreviven vía CRDT en el hub');
+    });
+
+    test('fallback sin changeset: siembra nodos planos', () async {
+      final legacy = SyncSnapshot(
+        version: 1,
+        hosts: const [],
+        nodes: [node('pve')],
+        edges: const [],
+        sessions: const [],
+      );
+      final sync = CrdtSyncCanva(doc: CanvaCrdt.empty(actor: 'hub'));
+      final merged = await sync.mergeIncoming(legacy);
+      expect(merged.nodes.map((n) => n.id).toSet(), {'pve'});
     });
   });
 }

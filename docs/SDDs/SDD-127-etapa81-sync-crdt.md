@@ -1,7 +1,7 @@
 # SDD-127 — Etapa 8.1: Sync CRDT para el canva
 
 > **Proyecto:** empresa_dev — Etapa 8.1 del SUPER_PLAN (cola de innovación).
-> **Fecha:** 2026-08-12. **Estado: ✅ evaluación + núcleo (8.1.1)** — `crdt_core` con gate de convergencia verde. Migración del sync del canva pendiente.
+> **Fecha:** 2026-08-12. **Estado: ✅ evaluación + núcleo + migración del sync** (gate de convergencia en hub real). Doc persistente por cliente = seguimiento.
 
 ## Objetivo
 
@@ -53,8 +53,9 @@ conflictos por `(timestamp, actor)`: "delete vs edit" = valor más nuevo gana;
 ## Gate
 
 - [x] 2 estados divergentes convergen sin pérdida (unit, gate 8.1).
-- [x] `dart analyze` 0 + tests del package verdes (5).
-- [ ] Migración real del sync del canva (seguimiento) + gate manual con Tailscale.
+- [x] `dart analyze` 0 + tests del package verdes (8) + app (191, incl. hub localhost).
+- [x] Migración del sync del canva: `/api/apply` converge vía `CrdtSyncCanva`.
+- [ ] Gate manual con Tailscale (2 dispositivos reales).
 
 ## Notas de cierre
 
@@ -65,3 +66,7 @@ conflictos por `(timestamp, actor)`: "delete vs edit" = valor más nuevo gana;
 - El HLC de `crdt` genera nodeId aleatorio por instancia: en un conflicto delete
   vs edit con el MISMO timestamp, gana el de nodeId mayor (no determinista).
   Para un borrado determinista, avanzar el reloj local antes (put previo).
+- `changesetJson()` serializa el Hlc a string; `mergeChangesetJson()` lo
+  re-parsea (`parseCrdtChangeset`). `SyncSnapshot.canvaCrdt` lo transporta opaco.
+- El cliente aún siembra un doc fresco por push (LWW por nodo en el hub); el doc
+  CRDT persistente por dispositivo (para deltas reales offline) es seguimiento.

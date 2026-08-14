@@ -53,6 +53,8 @@ dependencies:
     path: ../../packages/vibecoding_core
   warp_core:
     path: ../../packages/warp_core
+  crdt_core:
+    path: ../../packages/crdt_core
   webview_windows: ^0.4.0
 
 dev_dependencies:

@@ -302,6 +302,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  ssh_core:
+    dependency: "direct main"
+    description:
+      path: "../ssh_core"
+      relative: true
+    source: path
+    version: "0.1.0"
   stack_trace:
     dependency: transitive
     description:

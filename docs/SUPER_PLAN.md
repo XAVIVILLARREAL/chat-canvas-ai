@@ -191,10 +191,10 @@ con offline-first real. Mismo espíritu que "varios agentes trabajando en parale
 
 - [x] Evaluar y-crdt / Automerge en Dart. *(SDD-127: `ydart` (binding Yrs) descartado (muerto); **`crdt` 5.1.3** elegido — Dart nativo, HLC, `MapCrdt` storage-agnostic, en producción)*
 - [x] Núcleo CRDT del canva. *(`packages/crdt_core`: `CanvaCrdt` = `CanvaState ↔ MapCrdt` con HLC; delete-vs-edit resuelto por HLC)*
-- [ ] Migrar el sync del canva a `CanvaCrdt` (deltas sobre el WS del hub, no snapshots LWW).
-- [x] Test: editar canva en 2 dispositivos a la vez → converge sin pérdida. *(GATE ✅: unit `crdt_core` — ediciones paralelas convergen, delete más nuevo gana, merge idempotente/conmutativo)*
+- [x] Migración del sync del canva a CRDT en el hub. *(`SyncSnapshot.canvaCrdt` (changeset opaco) + `CrdtSyncCanva`; `/api/apply` CONVERGE el canva en vez de LWW-replace → ediciones concurrentes a nodos distintos no se pierden; doc persistente por cliente = seguimiento)*
+- [x] Test: editar canva en 2 dispositivos a la vez → converge sin pérdida. *(GATE ✅: unit `crdt_core` + hub localhost real — A añade x, B añade y, el hub conserva ambos)*
 
-**Gate:** 2 dispositivos offline, editan, reconectan → el canva converge sin conflicto. *(automatizado por unit; gate real con Tailscale = manual)*
+**Gate:** 2 dispositivos offline, editan, reconectan → el canva converge sin conflicto. *(automatizado por unit + hub localhost; gate real con Tailscale = manual)*
 
 ### 8.2 — El canva ES la vista viva del grafo LangGraph
 

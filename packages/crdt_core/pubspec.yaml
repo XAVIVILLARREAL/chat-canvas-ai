@@ -10,6 +10,8 @@ dependencies:
   crdt: ^5.1.3
   canva_core:
     path: ../canva_core
+  ssh_core:
+    path: ../ssh_core
 
 dev_dependencies:
   lints: ^5.0.0

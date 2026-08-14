@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:crdt_core/canva_crdt.dart';
 import 'package:warp_core/warp_core.dart';
 import 'services/ssh_service.dart';
 import 'services/canva_store.dart';
@@ -101,6 +102,11 @@ class _HostsScreenState extends State<HostsScreen> {
 
   Future<SyncSnapshot> _buildSnapshot() async {
     final canva = await CanvaStore().load();
+    // Changeset CRDT del canva (Etapa 8.1): el hub lo converge, no lo
+    // reemplaza. El doc persistente del cliente es seguimiento.
+    final canvaDoc = CanvaCrdt.empty(
+        actor: 'dev:${DateTime.now().millisecondsSinceEpoch}');
+    await canvaDoc.seed(canva);
     final snippets = await _snippetStore?.exportRecords() ?? const [];
     return SyncSnapshot(
       version: 1,
@@ -118,6 +124,7 @@ class _HostsScreenState extends State<HostsScreen> {
       edges: canva.edges,
       sessions: [],
       snippets: snippets,
+      canvaCrdt: canvaDoc.changesetJson(),
     );
   }
 
