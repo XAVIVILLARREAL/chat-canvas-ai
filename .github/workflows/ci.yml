@@ -6,33 +6,36 @@ on:
   pull_request:
 
 jobs:
-  analyze-test:
+  lint-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
+      - uses: pnpm/action-setup@v4
         with:
-          flutter-version: '3.32.2'
-          channel: stable
+          version: 9
 
-      - name: Instalar Melos
-        run: dart pub global activate melos
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
 
-      - name: Bootstrap
-        run: melos bootstrap
+      - uses: dtolnay/rust-toolchain@stable
 
-      - name: Análisis estático (packages)
-        run: melos exec -- "dart analyze ."
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
 
-      - name: Análisis de la app
-        run: cd apps/empresa_dev && flutter analyze
+      - name: Typecheck (tsgo)
+        run: pnpm typecheck
 
-      - name: Tests unitarios (packages)
-        run: melos exec -- "dart test"
+      - name: Lint (biome)
+        run: pnpm lint
 
-      - name: Tests de la app (sin integración)
-        run: cd apps/empresa_dev && flutter test --exclude-tags integration
+      - name: Tests frontend
+        run: pnpm test
+
+      - name: Tests Rust
+        run: cargo test --manifest-path src-tauri/Cargo.toml
 
   empresa-autonoma:
     runs-on: ubuntu-latest
@@ -43,42 +46,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Instalar servicio (mínimo para el grafo)
+      - name: Instalar servicio
         run: |
           python -m pip install --upgrade pip
           pip install langgraph typing-extensions pytest
 
-      - name: Tests headless del grafo (sin LLM)
+      - name: Tests del grafo
         run: cd empresa_autonoma && python -m pytest tests -q
-
-  # E2E web del flujo crítico (Etapa 7, SDD-120): build web con semántica,
-  # servidor estático y Playwright headless por PR.
-  e2e-web:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.32.2'
-          channel: stable
-
-      - name: Build web (semántica E2E)
-        run: cd apps/empresa_dev && flutter build web --debug --dart-define=E2E_WEB=true
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - name: Instalar Playwright
-        working-directory: apps/empresa_dev/tool
-        run: |
-          npm install
-          npx playwright install --with-deps chromium
-
-      - name: Servidor estático + E2E Playwright
-        working-directory: apps/empresa_dev/tool
-        run: |
-          python3 -m http.server 8765 --directory ../build/web &
-          sleep 2
-          npx playwright test

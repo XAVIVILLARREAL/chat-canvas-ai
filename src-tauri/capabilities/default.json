@@ -1,0 +1,19 @@
+{
+  "identifier": "main-capability",
+  "description": "Permisos para la ventana principal",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "notification:default",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
+    "global-shortcut:allow-is-registered",
+    "clipboard-manager:default",
+    "dialog:default",
+    "http:default",
+    "store:default",
+    "window-state:default",
+    "playwright:default"
+  ]
+}

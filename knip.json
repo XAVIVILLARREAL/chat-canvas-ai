@@ -1,0 +1,7 @@
+{
+  "$schema": "https://knip.dev/schema.json",
+  "entry": ["src/main.tsx"],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignore": ["src/bindings.ts"],
+  "ignoreDependencies": ["@types/react", "@types/react-dom"]
+}

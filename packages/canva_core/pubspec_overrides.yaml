@@ -1,4 +1,0 @@
-# melos_managed_dependency_overrides: agent_core
-dependency_overrides:
-  agent_core:
-    path: ..\\agent_core

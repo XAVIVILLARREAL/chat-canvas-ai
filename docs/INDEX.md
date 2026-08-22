@@ -1,0 +1,42 @@
+# INDEX DE DOCUMENTACION
+
+> Mapa completo de todos los .md del proyecto. Actualizado automaticamente.
+
+## Documentos principales
+
+| Documento | Descripcion | Ubicacion |
+|---|---|---|
+| AGENTS.md | Guia de trabajo para agentes AI | `./AGENTS.md` |
+| copia.md | Analisis maestro y lecciones de V3Code | `./copia.md` |
+| ESTADO.md | Estado actual (autoadministrado) | `./docs/ESTADO.md` |
+| CHANGELOG.md | Historial append-only | `./docs/CHANGELOG.md` |
+| INFRA.md | Mejoras de infraestructura | `./docs/INFRA.md` |
+| INDEX.md | Este archivo | `./docs/INDEX.md` |
+| RESPONSIVE.md | Guia de responsive design | `./docs/RESPONSIVE.md` |
+| ARQUITECTURA.md | Arquitectura del proyecto | `./docs/ARQUITECTURA.md` |
+
+## Directorios de documentacion
+
+| Directorio | Contenido |
+|---|---|
+| `docs/SDDs/` | Software Design Documents (creados por AI) |
+| `docs/ADRs/` | Architecture Decision Records (creados por AI) |
+| `reference/` | Recursos de diseno y arquitectura de referencia (`v3code`, `apple-design-skill`, `ui-ux-pro-max`, etc.) |
+| `_reciclaje/` | Archivos obsoletos de versiones anteriores |
+
+## ADRs vigentes
+
+| ADR | Tema | Estado |
+|---|---|---|
+| ADR-001 | Responsive Design y Cross-Platform | Aprobado |
+| ADR-002 | Arquitectura Hibrida Monorepo | Aprobado |
+
+## Documentos archivados (no vigentes)
+
+Los siguientes documentos estan en `_reciclaje/docs_obsoletos/` y no reflejan el estado actual:
+
+- ETAPA1.md, FUNDACION.md, PLAN.md, ROADMAP.md, PRODUCTO.md, SUPER_PLAN.md
+- ARQUITECTURA.md, MEJORAS.md
+- SDDs (SDD-102 a SDD-128) — eran de la version Flutter
+- ADRs (ADR-001 a ADR-005) — eran de la version Flutter
+- legacy/ — docs antiguos

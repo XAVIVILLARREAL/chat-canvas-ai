@@ -1,17 +1,24 @@
-# Monorepo raíz — Empresa Dev
+# Empresa Dev — Tauri (React + Rust)
 
-# Flutter/Dart (residuos de la raíz; la app tiene su propio .gitignore)
-.dart_tool/
-build/
-.packages
+# Dependencies
+node_modules/
+
+# Build
+dist/
+target/
+src-tauri/target/
+
+# Tauri
+src-tauri/WixTools/
+src-tauri/Frameworks/
+*.msi
+*.exe
 
 # IDE
 .idea/
 *.iml
-
-# Referencias externas (submodulos o clones; jamás se suben crudos)
-buzz/
-herdr/
+.vscode/
+!.vscode/extensions.json
 
 # Env
 .env
@@ -25,3 +32,10 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Reciclaje (no versionar)
+_reciclaje/
+
+# Reference materials (local only para diseno y arquitectura)
+reference/
+

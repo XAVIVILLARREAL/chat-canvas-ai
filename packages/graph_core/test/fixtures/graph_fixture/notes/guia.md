@@ -1,3 +1,0 @@
-# Guía
-
-Volver a [[index]].
