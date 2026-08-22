@@ -69,6 +69,8 @@
 - Creado ADR-003: Voz y Sincronizacion (Web Speech API + Edge TTS + WebSocket)
 - Creado ADR-004: Integracion GitHub (OAuth, repos, push/pull, PRs, issues)
 - Agregadas features pendientes a AGENTS.md (GitHub, Voz, Sync)
+- Actualizado ADR-003: Decision clara de NO implementar P2P/rsync, usar WebSocket + GitHub
+- Agregados 3 items a la vision: Git nativo, revision de errores, superposiciones de agentes
 - Agregada seccion "Codigo limpio y ordenado" con 6 reglas de orden, 6 de simpleza, anti-patrones y checklist
 
 ## 2026-08-21 (sesion 2)

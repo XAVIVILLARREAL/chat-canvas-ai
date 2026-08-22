@@ -35,21 +35,32 @@ Empresa Dev necesita:
 - Browser TTS nativo: Voces roboticas, poco naturales
 - Google Cloud TTS: De pago, requiere cuenta
 
-### 2. Sincronizacion: Sesiones + Config + Skills
+### 2. Sincronizacion: WebSocket + GitHub (NO P2P)
 
-**Que sincronizar (via WebSocket):**
-- **Sesiones** — estado de agentes, progreso, tareas
-- **Config** — preferencias, theme, atajos de teclado
-- **Skills creados** — JSON de skills del usuario
+**Decision clave:** NO implementar rsync ni sync P2P nativo.
 
-**Que NO sincronizar (via GitHub):**
-- **Codigo fuente** — GitHub ya maneja version control
-- **Documentacion** — vive en el repo
+**Por que NO P2P/rsync:**
+- Lo que sincronizamos es pequeno (sesiones ~10KB, config ~5KB, skills ~1KB)
+- GitHub ya maneja el codigo fuente
+- Conflictos sin servidor central son complejos de resolver
+- NAT traversal es fragil y requiere STUN/TURN servers
+- Ambos dispositivos deben estar online al mismo tiempo
 
-**Por que esta separacion:**
-- GitHub es experto en codigo (diff, merge, PRs)
-- WebSocket es experto en real-time (sesiones, config)
-- No reinventar la rueda
+**Estrategia de sync:**
+
+| Que sincronizar | Metodo | Por que |
+|---|---|---|
+| **Codigo fuente** | GitHub (Git) | Version control, diff, merge, PRs |
+| **Documentacion** | GitHub (Git) | Vive en el repo |
+| **Sesiones** | WebSocket | Real-time, ligero |
+| **Config** | WebSocket | Real-time, cambia poco |
+| **Skills** | WebSocket | JSON ligero |
+
+**Separacion clara:**
+```
+GitHub: Codigo y documentacion (version control)
+WebSocket: Estado y configuracion (real-time)
+```
 
 ### 3. Metodo de sync: WebSocket
 
@@ -70,15 +81,20 @@ Cliente (React) <--WebSocket--> Backend (Rust) <--WebSocket--> Otro Cliente
 - Merge manual para sesiones (el humano decide)
 - No hay conflictos para skills (creados localmente)
 
+**Tamano de datos sincronizados:**
+- Sesiones: ~10KB por sesion
+- Config: ~5KB total
+- Skills: ~1KB cada uno
+- Total tipico: <50KB por sync
+
 ## Stack tecnologico
 
 | Componente | Tecnologia | Paquete |
 |---|---|---|
 | STT | Web Speech API | Nativo del browser |
 | TTS | Edge TTS | WebSocket directo |
-| OAuth GitHub | Tauri OAuth | `tauri-plugin-oauth` |
-| GitHub API | octocrab | `octocrab` (Rust) |
-| Sync sessions | WebSocket | `tokio-tungstenite` (Rust) |
+| Sync sessions/config | WebSocket | `tokio-tungstenite` (Rust) |
+| Codigo/documentacion | GitHub | `octocrab` + `git2` (Rust) |
 | SQLite | sqlx | `sqlx` (Rust) |
 
 ## Consecuencias
@@ -88,16 +104,20 @@ Cliente (React) <--WebSocket--> Backend (Rust) <--WebSocket--> Otro Cliente
 - TTS gratis y voces naturales
 - Sync real-time via WebSocket
 - GitHub para codigo (no reinventar)
+- Sin servidor centralizado para codigo
+- Sin complejidad de NAT traversal
 
 ### Negativas
 - Web Speech API no funciona en todos los browsers mobile
 - Edge TTS requiere conexion a internet
-- Sync via WebSocket requiere servidor centralizado
+- Sync via WebSocket requiere servidor ligero
+- Sin sync offline entre dispositivos (ambos deben estar online)
 
 ### Riesgos mitigados
 - Web Speech API tiene fallback a texto
 - Edge TTS tiene cache local
 - WebSocket tiene reconexion automatica
+- GitHub funciona offline (push despues)
 
 ## References
 

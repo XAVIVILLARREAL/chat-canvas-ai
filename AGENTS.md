@@ -24,6 +24,9 @@ Un sistema donde puedes:
 5. **Sincronizar entre dispositivos** — celular, desktop, y a futuro gafas de RA; continuar donde dejaste
 6. **Comunicarte con voz** — hablar con los agentes, que te respondan con TTS
 7. **Detectar actividad** — sonidos/notificaciones cuando un agente deja de trabajar o necesita aprobacion
+8. **Git nativo en la app** — push, pull, branches, pull requests todo desde la interfaz visual, sin terminal
+9. **Revision de errores** — el sistema detecta errores automaticamente y los asigna al agente correcto para su arreglo
+10. **Superposiciones de agentes** — cuando un agente falla, otro agente puede superponerse y tomar control de la tarea
 
 ### El diferenciador visual
 
