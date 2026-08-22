@@ -66,6 +66,9 @@
 - Creada estructura src-tauri/src/platforms/ para logica por plataforma
 - Agregadas 7 reglas de arquitectura a AGENTS.md
 - Agregada seccion "Arquitectura hibrida" a INFRA.md
+- Creado ADR-003: Voz y Sincronizacion (Web Speech API + Edge TTS + WebSocket)
+- Creado ADR-004: Integracion GitHub (OAuth, repos, push/pull, PRs, issues)
+- Agregadas features pendientes a AGENTS.md (GitHub, Voz, Sync)
 - Agregada seccion "Codigo limpio y ordenado" con 6 reglas de orden, 6 de simpleza, anti-patrones y checklist
 
 ## 2026-08-21 (sesion 2)
@@ -112,3 +115,8 @@
   - **DSPy**: Compiladores y optimizadores declarativos de prompts para el Skills Lab.
   - **Zed**: Context Servers over MCP y arquitectura de ultra-baja latencia en Rust.
 - Esquema de base de datos SQLite + `sqlite-vec` consolidado en `copia.md` para persistencia en Tauri (`sqlx`).
+
+## 2026-08-21 (sesion 5)
+
+- Creado docs/"referencia de diseno.md": catalogo completo de los 6 skills de diseno instalados (links, estrellas, rutas locales, uso, actualizacion) + evaluados no instalados
+- Actualizado INDEX.md con el nuevo documento

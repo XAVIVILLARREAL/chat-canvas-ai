@@ -11,6 +11,7 @@
 | ESTADO.md | Estado actual (autoadministrado) | `./docs/ESTADO.md` |
 | CHANGELOG.md | Historial append-only | `./docs/CHANGELOG.md` |
 | INFRA.md | Mejoras de infraestructura | `./docs/INFRA.md` |
+| referencia de diseno.md | Catalogo de skills de diseno en `reference/` con links | `./docs/referencia de diseno.md` |
 | INDEX.md | Este archivo | `./docs/INDEX.md` |
 | RESPONSIVE.md | Guia de responsive design | `./docs/RESPONSIVE.md` |
 | ARQUITECTURA.md | Arquitectura del proyecto | `./docs/ARQUITECTURA.md` |
@@ -30,6 +31,8 @@
 |---|---|---|
 | ADR-001 | Responsive Design y Cross-Platform | Aprobado |
 | ADR-002 | Arquitectura Hibrida Monorepo | Aprobado |
+| ADR-003 | Voz y Sincronizacion | Pendiente |
+| ADR-004 | Integracion GitHub | Pendiente |
 
 ## Documentos archivados (no vigentes)
 

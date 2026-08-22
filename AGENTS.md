@@ -462,3 +462,35 @@ La AI gestiona los documentos **sola**, sin intervencion humana. El humano solo 
 - Dashboard de la empresa (metricas, progreso)
 - Exportar resultados
 
+## Features pendientes (documentadas en ADRs)
+
+### Integracion GitHub (ADR-004)
+- Login con GitHub (OAuth)
+- Ver repos del usuario
+- Clonar repositorios
+- Push/Pull desde la app
+- Crear Pull Requests
+- Ver y crear Issues
+- Gestionar ramas
+
+### Voz (ADR-003)
+- STT: Web Speech API nativo del browser
+- TTS: Edge TTS (voces naturales en espanol)
+- Comandos de voz para agentes
+- Respuestas por voz de los agentes
+
+### Sincronizacion (ADR-003)
+- Sync sesiones via WebSocket (estado de agentes)
+- Sync config via WebSocket (preferencias)
+- Sync skills via WebSocket (skills creados)
+- Resolucion de conflictos (LWW para config, merge manual para sesiones)
+
+### Documentacion de ADRs
+
+| ADR | Tema | Estado |
+|---|---|---|
+| ADR-001 | Responsive Design y Cross-Platform | Aprobado |
+| ADR-002 | Arquitectura Hibrida Monorepo | Aprobado |
+| ADR-003 | Voz y Sincronizacion | Pendiente |
+| ADR-004 | Integracion GitHub | Pendiente |
+
