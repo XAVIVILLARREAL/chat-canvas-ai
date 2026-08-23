@@ -96,64 +96,49 @@ Filtrar por agente/etapa/estado-de-tests; indicadores de estancamiento ([I·I.2]
 
 ---
 
-# PLAN SS — Etapa 18: Canvas de Sesiones (cards vivas por agente)
+# PLAN CR — Etapa 18: CONTROL ROOM (sesiones + mapa global, fusionadas)
 
-**Entregable:** un lienzo donde cada conversación/sesión es una CARD viva — entras a hablarle (texto o voz), ves sus resultados, retomas donde quedó.
+> Depende de: A.0 tenants + ventanas anteriores + [K voz](./plan-k-voz.md). Unifica lo que eran dos ventanas: **las cards de sesión viva** Y **el mapa global** — es la mission control del sistema entero.
 
-| Fase | Contenido | Pruebas |
-|---|---|---|
-
-<a id="ss1"></a>
-### SS.1 — Cards de sesión
-Card por sesión ([A·A.0](./plan-a-chat-codex.md#a0) scoped): avatar del agente ([N·N.6](./plan-n-empresas-autonomas.md#n6)), último mensaje, estado (activa/en-espera/terminada), mini-rail de rungs, coste acumulado; layout libre persistido (mismo motor de posiciones que [VI.2](#vi2))
-- **Pruebas:** E2E: cards aparecen/desaparecen con sesiones reales; layout persiste
-
-<a id="ss2"></a>
-### SS.2 — Acciones rápidas en card
-Hablar: abre chat de esa sesión anclado; 🎙️ push-to-talk directo ([K·K.2](./plan-k-voz.md#k2)); 🔊 escuchar último resumen en TTS ([K·K.1](./plan-k-voz.md#k1)); ver evidencia (salta a [KR.4](#kr4)); fork/resume ([A·A.4](./SDD-001-plan-base/plan-a-chat-codex.md#a4))
-- **Pruebas:** E2E humano: desde card, hablar por voz y recibir TTS sin abrir el chat completo
-
-<a id="ss3"></a>
-### SS.3 — Organización espacial semántica
-Agrupación opcional por agente/proyecto-tema usando el índice dual ([D·D.5](./plan-d-memoria-v3code.md#d5)): sesiones parecidas se atraen; buscador "sesiones sobre auth" las ilumina
-- **Pruebas:** Unit similitud→layout sugerido. E2E: buscar agrupa/ilumina correctamente
-
-**🚪 GATE SS:** lienzo con 12 sesiones históricas organizadas por tema; localizo "la sesión de auth", le hablo por voz desde la card, escucho su resumen, salto a su evidencia en el kanban. Video + suites verdes.
-
----
-
-# PLAN CR — Etapa 20: CONTROL ROOM (mapa maestro global)
-
-> Depende de: A.0 tenants + todas las ventanas anteriores. Es la vista que UNIFICA todo.
-
-**Entregable:** un solo lugar donde ves TODO — todos los proyectos, todas las sesiones de agentes trabajando en este momento, su salud y costos — y das órdenes por voz o texto a cualquiera de ellos.
+**Entregable:** un solo lugar donde ves TODOS los proyectos, TODAS las sesiones de agentes como cards vivas (hablarles, ver resultados, retomar), su salud y costos — y das órdenes por voz o texto a cualquiera.
 
 <a id="cr1"></a>
 ### CR.1 — Mapa global en vivo
-- Vista agregada cross-proyecto: cada proyecto como tarjeta-zona con sus agentes activos dentro (estados en tiempo real vía EventBus existente [C·C.1](./SDD-001-plan-base/plan-c-reasonix-deepseek.md#c1))
-- Métricas globales arriba: agentes corriendo · tareas activas · gasto hoy · alertas abiertas ([I·I.2](./SDD-001-plan-base/plan-i-revision-superposiciones.md#i2))
-- Drill-down: click zona → proyecto; click agente → su sesión/canva/evidencia sin perder el contexto global
+- Vista agregada cross-proyecto: cada proyecto como tarjeta-zona con sus agentes activos dentro (estados en tiempo real vía EventBus [C·C.1](./plan-c-reasonix-deepseek.md#c1))
+- Métricas globales: agentes corriendo · tareas activas · gasto hoy · alertas abiertas ([I·I.2](./plan-i-revision-superposiciones.md#i2))
+- Drill-down sin perder contexto global
 - **Pruebas:** E2E humano: 3 proyectos con actividad simulada → mapa refleja estados <1s tras cada evento
 
 <a id="cr2"></a>
-### CR.2 — Órdenes maestras por voz/texto
-- Composer global con STT/TTS ([K](./plan-k-voz.md)): "pausa el dev del proyecto café", "dale prioridad al fix de login", "resume qué hizo QA hoy" — el comando enruta al proyecto/agente correcto con confirmación de destino antes de ejecutar
+### CR.2 — Cards de sesión vivas
+Card por sesión ([A·A.0](./plan-a-chat-codex.md#a0) scoped): avatar del agente ([N·N.6](./plan-n-empresas-autonomas.md#n6)), último mensaje, estado (activa/en-espera/terminada), mini-rail de rungs, coste acumulado; layout libre persistido (mismo motor de posiciones que [VI.2](#vi2))
+- **Pruebas:** E2E: cards aparecen/desaparecen con sesiones reales; layout persiste
+- **Acciones rápidas desde la card**: abrir chat anclado · 🎙️ push-to-talk directo ([K·K.2](./plan-k-voz.md#k2)) · 🔊 escuchar último resumen TTS ([K·K.1](./plan-k-voz.md#k1)) · ver evidencia (salta a [KR.4](#kr4)) · fork/resume
+- **Pruebas:** E2E humano: cards aparecen/desaparecen con sesiones reales; hablar por voz desde la card y recibir TTS sin abrir el chat
+
+<a id="cr3"></a>
+### CR.3 — Órdenes maestras por voz/texto
+- Composer global con STT/TTS: "pausa el dev del proyecto café", "dale prioridad al fix de login", "resume qué hizo QA hoy" — enrutamiento al proyecto/agente correcto CON confirmación de destino antes de ejecutar
 - Órdenes grupales: "pausa TODOS los agentes", "modo economía en todo"
 - Cada orden queda como rung DECISION auditado en el Ledger del proyecto afectado
 - **Pruebas:** Integration routing comando→destino correcto. E2E humano: 5 órdenes habladas consecutivas, todas enrutadas y confirmadas
 
-<a id="cr3"></a>
-### CR.3 — Alertas y modo vigilancia
+<a id="cr4"></a>
+### CR.4 — Organización espacial semántica
+Agrupación opcional por agente/proyecto-tema usando el índice dual ([D·D.5](./plan-d-memoria-v3code.md#d5)): sesiones parecidas se atraen; buscador "sesiones sobre auth" las ilumina
+- **Pruebas:** Unit similitud→layout sugerido. E2E: buscar agrupa/ilumina correctamente
+
+<a id="cr5"></a>
+### CR.5 — Alertas y modo vigilancia
 - Modo "vigilancia": pantalla dedicada que solo muestra excepciones (bloqueados, presupuestos al 80%+, tests rotos en main) usando la política de interrupción [K·K.3](./plan-k-voz.md#k3)
 - Sonido/visual diferenciado por severidad; acuse recibo desde la misma pantalla
 - **Pruebas:** E2E: inyectar eventos de severidad mixta → solo los que superan umbral aparecen; acuse limpia alerta
 
 ## 🚪 GATE CR (demo verificable)
 
-Demo de misión control: 4 proyectos vivos en pantalla, agentes trabajando en 3 de ellos; por voz pido "resumen del proyecto cafetería" → TTS responde; detecto un agente bloqueado en el mapa → le hablo directo desde su card → se desbloquea; pauso toda una empresa por voz. Video + suites verdes.
+Demo de misión control: 4 proyectos vivos, agentes trabajando en 3; el mapa muestra las cards de sesión en tiempo real; por voz pido "resumen del proyecto cafetería" → TTS responde; hablo directo a un agente desde su card; detecto uno bloqueado → le doy orden → se desbloquea; pauso toda una empresa por voz. Video + suites verdes.
 
 ---
-[← Maestro](./README.md) · [← PLAN SS](./plan-ss-canvas-sesiones.md)
 
 # PLAN 3D — Etapa 19: Preparación espacial (gafas/futuro)
 
@@ -178,10 +163,9 @@ Reutiliza el motor de [PLAN J](./plan-j-grafo3d-repomap.md#j3) para navegar graf
 |---|---|
 | VI Grafo documentos | 2–2.5 |
 | KR Kanban resultados | 2–2.5 |
-| SS Canvas sesiones | 1.5–2 |
-| CR Control Room | 1.5–2 |
+| CR Control Room (sesiones+mapa+órdenes fusionadas) | 2.5–3 |
 | 3D preparación | 1–1.5 |
-| **Total intermedio** | **~8–10.5 semanas** (VI/KR paralelos tras F+H; SS tras K; CR al final — es la vista que unifica) |
+| **Total intermedio** | **~7.5–10 semanas** (VI/KR paralelos tras F+H; CR al final — es la vista que unifica) |
 
 ## Reglas
 
