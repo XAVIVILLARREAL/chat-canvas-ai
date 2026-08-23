@@ -37,6 +37,13 @@ Un skill = contrato estructurado: `{nombre, rol, triggers, instrucciones, herram
 - Re-compilar instrucciones del skill comparando tasa de éxito de sus pruebas históricas (motor H); sugerir mejora aceptada por humano (gobernanza varve: propuesta→aceptación)
 - **Pruebas:** Integration con corpus del motor de pruebas
 
+<a id="g6"></a>
+### G.6 — Rutinas por demostración "follow along" (patrón Grok Bot)
+- Modo GRABAR: el humano hace el trabajo una vez (en la app o CLI) mientras el sistema observa acciones y contexto
+- Al terminar → propone un skill editable con los pasos detectados; el humano corrige/ajusta y acepta (gobernanza [D·D.4](./plan-d-memoria-v3code.md#d4))
+- La rutina aceptada se re-ejecuta on-demand o programada, y mejora con cada corrección
+- **Pruebas:** Integration: sesión grabada de N pasos → skill propuesto con N pasos correctos; corrección humana se persiste. E2E humano: grabo "preparar release" → skill creado → lo ejecuto programado
+
 ## 🚪 GATE G (demo verificable)
 
 Desde cero y sin YAML: creo skill "QA-Tester" (rol qa, triggers "revisar/tests", tools read+test, modelo flash) → lo compilo → lo pruebo en el laboratorio contra un mini-proyecto → veo respuesta y costo → lo exporto como subagent-profile de Reasonix y funciona en CLI. Suite humana ampliada verde.

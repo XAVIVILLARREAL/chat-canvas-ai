@@ -33,6 +33,13 @@
 - La prueba de fuego: empresa 3-agentes (PM flash + dev flash + QA reasoner) construye una mini-app real dentro del workspace, con tests verdes, revisada ([I·I.1](./plan-i-revision-superposiciones.md#i1)), commiteada a GitHub local — humana solo aprueba hitos
 - **Pruebas:** E2E largo REAL con DeepSeek: objetivo "todo-list app con tests" entregado; video completo
 
+<a id="n6"></a>
+### N.6 — Group chat de la empresa + rutinas programadas (patrón Grok Bot)
+- **Group chat visible**: PM, devs y QA conversan en un hilo compartido — pasan ownership, piden contexto, resuelven dudas entre ellos; el humano LEE el trabajo social en vivo e interviene solo en judgment calls (ellos se coordinan solos)
+- **Rutinas programadas**: scheduler de trabajos recurrentes por empresa ("triage de bugs cada noche", "scoreboard lunes 9am") disparando skills/empresas sin humano presente
+- **Digest automático** diario/semanal: qué hizo cada agente, costos, bloqueos, próximos pasos — generado del Ledger y archivado
+- **Pruebas:** Integration: 3 agentes en group chat resuelven handoff sin humano (scripted). E2E humano: observo la conversación grupal en vivo; programo rutina nocturna y verifico ejecución + digest matutino
+
 ## 🚪 GATE N (el gate histórico)
 
 **La primera empresa autónoma entrega software real de principio a fin:** objetivo hablado/escrito → PM planifica → devs implementan en worktrees paralelos → QA prueba → reviewer revisa → humano aprueba hitos con evidencia → código en git con PR. Presupuesto respetado. Auditoría completa reproducible (replay). Video documental + todas las suites humanas históricas en verde.

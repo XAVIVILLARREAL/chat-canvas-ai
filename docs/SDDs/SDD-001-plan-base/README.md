@@ -1,7 +1,7 @@
 # SDD-001 · Roadmap Maestro — Empresa Dev
 
 > Fecha: 2026-08-22 · Estado: Propuesto · v3 MEGA-PLAN (15 etapas, ~70 fases)
-> Investigación profunda: OpenAI Codex (docs oficiales), Reasonix v1.23 (verificado EN VIVO en este servidor), V3Code (sitio oficial + spec copia.md) + patrones robados de varve/codevira.
+> Investigación profunda: OpenAI Codex (docs oficiales), Reasonix v1.23 (verificado EN VIVO en este servidor), V3Code (sitio oficial + spec copia.md), **Grok Bot xAI/Cursor** ([SDD-004](../SDD-004-analisis-grokbot.md): group chat de agentes, rutinas por demostración, proactividad, pipeline de bugs) + patrones de varve/codevira.
 > Pruebas: [SDD-002](../SDD-002-testing-spec-driven.md) — toda fase pasa las 4 capas; todo gate cierra con suite humana.
 
 ## Objetivo final
@@ -35,7 +35,7 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 | 6 | Canva ReactFlow + Oficina | [plan-f](./plan-f-canva-oficina.md) | F.1–F.6 | Nodos-agentes animados arrastrables |
 | 7 | Skills Lab | [plan-g](./plan-g-skills-lab.md) | G.1–G.4 | Crear/probar/exportar skills sin YAML |
 | 8 | Motor de pruebas y resultados | [plan-h](./plan-h-motor-pruebas.md) | H.1–H.6 | Agentes demuestran con tests, no promesas |
-| 9 | Revisión auto + Superposiciones | [plan-i](./plan-i-revision-superposiciones.md) | I.1–I.5 | El sistema detecta y corrige solo |
+| 9 | Revisión auto + Superposiciones | [plan-i](./plan-i-revision-superposiciones.md) | I.1–I.6 | El sistema detecta y corrige solo |
 | 10 | Grafo 3D Repo-Map | [plan-j](./plan-j-grafo3d-repomap.md) | J.1–J.3 | Repo entero en <1000 tokens + visual 3D |
 | 11 | Voz | [plan-k](./plan-k-voz.md) | K.1–K.3 | Hablas, los agentes responden |
 | 12 | Sync multi-device + Co-Work | [plan-l](./plan-l-sync-cowork.md) | L.1–L.3 | Continúas donde dejaste, en cualquier dispositivo |
@@ -121,7 +121,7 @@ Reglas transversales intocables: secretos SOLO en Rust · un trait por capacidad
 | Visual + Skills + Pruebas | 6–8 | 5–7 sem |
 | Inteligencia (revisión, 3D, voz, sync, git) | 9–13 | 5–7 sem |
 | Empresas autónomas + marketplace | 14–15 | 4–6 sem |
-| **Total** | 15 etapas | **~19–26 semanas** |
+| **Total** | 15 etapas | **~20–27 semanas** (+GrokBot fases G.6/I.6/N.6)
 
 Valor usable continuo: chat desde semana 2, paneles semana 4, memoria semana 7, canva semana 10…
 

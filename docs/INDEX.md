@@ -14,6 +14,7 @@
 | SDD-001 | Plan Base: maestro + 5 planes referenciados (Chat Codex, Sidepanels Lovable, Reasonix+DeepSeek, Memoria V3Code, Integración) | `./docs/SDDs/SDD-001-plan-base/README.md` |
 | SDD-002 | Sistema de pruebas spec-driven + suite Playwright humano | `./docs/SDDs/SDD-002-testing-spec-driven.md` |
 | SDD-003 | Torneo 500 ideas → 20 ganadoras (backlog vivo incluido) | `./docs/SDDs/SDD-003-torneo-500-ideas.md` |
+| SDD-004 | Análisis Grok Bot (xAI/Cursor): 12 ideas robadas mapeadas | `./docs/SDDs/SDD-004-analisis-grokbot.md` |
 | referencia de diseno.md | Catalogo de skills de diseno en `reference/` con links | `./docs/referencia de diseno.md` |
 | INDEX.md | Este archivo | `./docs/INDEX.md` |
 | RESPONSIVE.md | Guia de responsive design | `./docs/RESPONSIVE.md` |

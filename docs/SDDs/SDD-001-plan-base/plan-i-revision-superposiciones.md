@@ -36,6 +36,13 @@
 - Cierre del ciclo SRE: el sistema mejora sus propios procesos con evidencia, no corazonadas
 - **Pruebas:** Integration con corpus sintético: 3 correcciones plantadas → propuesta generada una sola vez (dedup). E2E: propuesta visible, acepto, aparece como knowledge activo
 
+<a id="i6"></a>
+### I.6 — Proactividad + pipeline de bugs (patrón Grok Bot)
+- **Cola de sugerencias proativas** aprobables: "2 PRs sin revisar 24h, ¿los reviso?", "tests de main rotos desde ayer", "dependencia con CVE" — el agente DETECTA y PROPONE, el humano decide (gobernanza)
+- **Pipeline de bugs estilo Grok Bot**: error detectado (review/watchdog/consola) → crea tarea con pasos de reproducción → asigna al agente correcto por skill → fix entregado con test que fallaba/ahora pasa
+- Política de interrupción: bloqueos/aprobaciones interrumpen; progreso normal se agrupa en digest silencioso
+- **Pruebas:** Integration: bug plantado en fixture → tarea creada con repro correcta y asignada. E2E humano: sugerencia proativa visible → acepto → pipeline ejecuta completo
+
 ## 🚪 GATE I (demo verificable)
 
 Demo 1: tarea aprobada con bug escondido → review automático lo marca con file:line antes del merge humano. Demo 2: mato el proveedor a mitad de tarea → watchdog declara blocked → suplente toma control usando memoria del Ledger → entrega. Video + suites humanas.
