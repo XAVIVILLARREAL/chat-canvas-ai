@@ -113,7 +113,88 @@ ETAPA 13:          + GitService (gitoxide/Rust o CLI git)
 ETAPA 14:          + CompanyOrchestrator (jerarquía líder→operativos sobre subagentes reasonix)
 ```
 
-**Prerequisito de Etapa 1**: [ADR-005](../ADRs/ADR-005-modelo-despliegue-dual.md) — refactor a workspace Cargo (crates core/tauri-shell/server) ANTES de codificar, para que "local o nube" sea propiedad del build y no una promesa. Habilita Etapa 12 (sync) y agentes always-on del servidor.
+**Prerequisito de Etapa 1**: [ADR-005](../ADRs/ADR-005-modelo-despliegue-dual.md) — refactor a workspace Cargo (crates core/tauri-shell/server) ANTES de codificar, para que "local o nube" sea propiedad del build y no una promesa. Habilita Etapa 12 (sync) y agentes always-on del servidor. ✅ **Ejecutado 2026-08-23**: workspace con `crates/core` (dominio compartido) + `crates/server` (axum, prueba viva: sirve el mismo dominio por HTTP) + `src-tauri` (shell fino).
+
+## 🔄 Cómo funciona la plataforma: multiplataforma + sync sin fricción (la explicación simple)
+
+> Esta sección define EL modelo mental del producto. Todo feature nuevo debe caber aquí sin excepciones.
+
+### La idea en una frase
+
+**Tu trabajo vive en un lugar; tus pantallas solo lo muestran.** Como WhatsApp: los mensajes no viven en tu celular ni en tu laptop, viven en el servicio — por eso empiezas en el celular y terminas en la laptop sin pensarlo.
+
+### Pieza 1 — Un solo cerebro, tres cuerpos
+
+Todo el "cerebro" del sistema (tipos de dominio, reglas de negocio, agentes, tareas) vive en UN crate de Rust llamado `empresa-dev-core`. Ese mismo cerebro se monta en tres cuerpos distintos:
+
+```
+                    ┌──────────────────────────┐
+                    │   crates/core            │
+                    │   (EL CEREBRO — Rust)    │
+                    │   Agentes · Tareas ·     │
+                    │   Skills · Sesiones      │
+                    └────────────┬─────────────┘
+                                 │  el mismo código, tres montajes:
+        ┌────────────────────────┼────────────────────────┐
+        ▼                        ▼                        ▼
+┌────────────────┐    ┌─────────────────────┐    ┌──────────────────┐
+│ APP DESKTOP    │    │ APP CELULAR         │    │ SERVIDOR (nube)  │
+│ (Tauri Win/Mac │    │ (Tauri iOS/Android) │    │ binario axum     │
+│  /Linux)       │    │                     │    │                  │
+└───────┬────────┘    └──────────┬──────────┘    └────────┬─────────┘
+        │ IPC local              │ IPC local              │ HTTP/WebSocket
+        │ (rápido, offline)      │ (rápido, offline)      │ (24/7, siempre)
+        └────────────────────────┼────────────────────────┘
+                                 ▼
+                    ┌──────────────────────────┐
+                    │  SYNC HUB (Etapa 12)     │
+                    │  CRDT Yrs + event log    │
+                    │  = la sala donde todo    │
+                    │    converge              │
+                    └──────────────────────────┘
+```
+
+- **Desktop/laptop:** cuerpo completo — puede trabajar SOLO (offline) porque lleva el cerebro adentro.
+- **Celular:** mismo cerebro, cuerpo más pequeño (UI adaptada, ADR-001) — también puede trabajar solo.
+- **Servidor:** el cerebro corriendo 24/7 sin pantalla — aquí trabajan los agentes cuando TÚ no estás conectado.
+
+### Pieza 2 — Tu sesión es un documento vivo, no una máquina
+
+Una sesión de trabajo NO es "la app abierta en tu laptop". Es un **documento sincronizado** (CRDT Yrs) + un **diario de eventos** (append-only):
+
+```
+SESIÓN = { doc vivo (canvas, chat, agentes, tareas) + diario de eventos }
+```
+
+Por eso da igual desde dónde abras: cualquier dispositivo descarga el documento y ya está DENTRO de tu sesión, con todo el historial. No hay "migrar" nada — solo leer el documento.
+
+### Pieza 3 — El viaje de tu trabajo entre dispositivos (paso a paso)
+
+1. **Lunes, laptop:** pides "arma una app de reservas". Los agentes planifican y escriben código.
+2. **Martes, camino al gym (celular):** abres la app → ves el MISMO canvas, el chat completo, y una notificación: *"QA encontró 2 tests fallando"*. Respondes desde el celular: *"corrígelos"*. Son 30 segundos de tu vida.
+3. **Martes noche, laptop otra vez:** todo lo que pasó sigue ahí — incluido lo que decidiste desde el celular. Los agentes NUNCA dejaron de trabajar: corren en el servidor.
+4. **Sin internet:** la app local sigue funcionando (lleva el cerebro adentro); al volver la conexión, el CRDT reconcilia automáticamente lo hecho offline. Sin botón de "sincronizar": no existe.
+
+### Pieza 4 — Git como memoria a largo plazo
+
+El servidor guarda cada proyecto como un **repositorio git bare** (tu "GitHub propio", ADR-005 D3):
+
+- Cada acción de un agente = commits en ramas → nada se pierde jamás, todo es revisable como diff
+- Puente a GitHub real vía octocrab: push/mirror/PRs cuando quieras publicar
+- Tu código propietario puede vivir SOLO en tu servidor self-hosted — nunca tiene que salir
+
+### Resumen de qué-corre-dónde
+
+| Dispositivo | UI | Ejecuta agentes | Guarda repos | Funciona offline |
+|---|---|---|---|---|
+| Laptop/desktop | ✅ completa | ✅ (modo local) | ✅ (modo local) | ✅ |
+| Celular/tablet | ✅ adaptada | ❌ delega | ❌ lee/escribe via hub | ✅ (cola cambios) |
+| Servidor | ❌ headless | ✅ **siempre (24/7)** | ✅ fuente canónica | n/a |
+| Browser (v2) | ✅ ligera | ❌ delega | ❌ via hub | parcial |
+
+**Regla de oro:** el dispositivo más pobre del mundo debe poder PARTICIPAR (ver, aprobar, chatear); el trabajo pesado nunca depende de que un dispositivo esté encendido.
+
+
 
 Reglas transversales intocables: **CADA PROYECTO ES UN TENANT** — todo dato lleva `project_id` desde el día 1 ([A·A.0](./plan-a-chat-codex.md#a0): cards + tabs + historial aislado; skills/MCP/agentes GLOBAL o COPIA LOCAL a decisión del usuario) · secretos SOLO en Rust · un trait por capacidad (provider/store/embeddings/router) · SQLite append-only para auditoría · fail-open en extras, fail-safe en datos · cada capa expone su contraparte MCP (visión V3Code).
 

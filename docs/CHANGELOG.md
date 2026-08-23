@@ -200,3 +200,10 @@ eference/ (clones shallow, depth 1):
   - D5: stack 100% Rust MIT/Apache (tokio/axum/sqlx/yrs/gitoxide/octocrab/bollard) — comercializable SaaS sin AGPL embebido
   - D6: tres modos de despliegue con un codebase: local-first / self-host docker / cloud multi-tenant futuro
   - Fases mapeadas al roadmap vigente: L nace el servidor, M sirve ambos backends git, N orquesta local vs sandbox
+- **ADR-005 D1 EJECUTADO — workspace Cargo**: la flexibilidad "local o nube" ya es propiedad del build
+  - crates/core (empresa-dev-core): dominio puro (Agent/Task, sin Tauri ni HTTP) — regla dura documentada en lib.rs
+  - src-tauri: shell fino que consume el core; comando draft_agent demuestra fábrica de dominio via core
+  - crates/server (empresa-dev-server): binario axum puerto 3030 — /healthz + /api/version + /api/domain/agent-demo sirven el MISMO tipo Agent por HTTP (prueba viva del modelo dual)
+  - Cargo.lock movido a raíz; perfiles dev/release al workspace; CI actualizado a cargo test/check --workspace
+  - Verificación verde: check/test --workspace ✓ · servidor smoke (healthz/version/agent-demo) ✓ · typecheck/biome/knip/vitest/build ✓ · E2E chromium 4/4 ✓
+- **Plan Base README — nueva sección "Cómo funciona la plataforma"**: modelo mental simple del producto (un core tres cuerpos, sesión = doc CRDT + diario, viaje laptop→celular paso a paso, git como memoria, tabla qué-corre-dónde)
