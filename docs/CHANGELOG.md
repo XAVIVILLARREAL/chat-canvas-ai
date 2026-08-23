@@ -13,6 +13,14 @@
 - Camino de escalado por fases: HOY Docker Compose + driver sandbox abstracto → tracción: k3s + CRD agent-sandbox (SIG-Apps Google, warm pools, hibernación, scale-to-zero KEDA) + gVisor → serio: namespaces endurecidos + Kata/Firecracker + CloudNativePG + Karpenter + OpenCost chargeback por tenant
 - Anti-trampas documentadas: KEDA ScaledJob para trabajos largos · PVC individual+s3 (no RWX) · LISTEN/NOTIFY requiere conexión no-pooled · tenant_id jamás como label Prometheus
 
+## 2026-08-23 (sesion 13)
+
+- **PLAN S Despliegue/Costos/Stack creado** (todo consolidado en la base): hosting 3 etapas CON PRECIOS REALES ago-2026 (Hetzner CAX21 ARM $11.5 MVP → CAX41+doble nodo → bare-metal ~$45/nodo; managed 4-7x más caro), reglas de dinero (B2 backups $3.5/TB-mes, R2 artefactos egresos $0, DeepSeek Flash $0.14/$0.28 cache-hit -98%, IaC obligatoria por DRAM shock/subidas 30-170%)
+- Stack servidor Rust FIJADO: tokio 1.52/axum 0.8.9/sqlx 0.9 offline-mode/sonic-rs hot-path/rustls-aws-lc/mold+cranelift+sccache/distroless-nonroot — versiones pinneadas ago-2026
+- Patrones Tauri obligatorios integrados a A.4: streaming via Channel<TokenEvent> batch 30ms en Rust (sobrevive background iOS), payloads binarios Channel<Vec<u8>> 11x@64KB, lazy Monaco/ReactFlow, degradación gráfica Linux planificada (WebKitGTK punto débil declarado), updater sin delta → sidecars lazy post-install
+- Presupuesto proyectado visión completa: MVP ~$21-42/mes · escala media ~$125-245/mes (costo lineal con uso, no con arquitectura)
+- Investigaciones completadas: hosting costos reales + stack Rust 2026 + Tauri 2.11 (completan K8s/sync/servidor-Rust de SDD-008)
+
 ## 2026-08-23
 
 - **SDD-003 Torneo de ideas**: 500 ideas generadas de productos de mercado (25 categorías × 20) → eliminatoria por categoría → 10 debates cruzados documentados → **20 ganadoras** con rúbrica Valor/Viabilidad/Mantenibilidad/Encaje ≥17

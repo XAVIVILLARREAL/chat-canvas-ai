@@ -56,6 +56,7 @@ trait AgentProvider {
   - Presets con nombre: **Auto** (workspace+al-salir), **Lectura**, **Plan**
   - Traducción a modos Reasonix (`ask/auto/plan/acceptEdits/dontAsk`) documentada para [PLAN C](./plan-c-reasonix-deepseek.md#c1)
 - Cards de tool-call: nombre + args colapsados + resultado + estado
+- **Streaming vía Command async + `Channel<TokenEvent>`** con batch ~30ms en Rust (patrón [PLAN S·S3](./plan-s-despliegue-costos.md)): el stream vive en reqwest/Rust y sobrevive al background del webview (iOS pausa fetch-SSE en JS)
 - Visor de diff unificado inline en el chat
 - Panel terminal colapsable (salida de comandos del agente)
 - **Slash commands**: `/resume` (dentro del proyecto actual), `/fork`, `/status`, `/permissions` (parser propio; `/compact` llega con [D](./plan-d-memoria-v3code.md#d1))

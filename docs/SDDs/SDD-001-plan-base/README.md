@@ -43,6 +43,7 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 | 14 | Empresas autónomas | [plan-n](./plan-n-empresas-autonomas.md) | N.1–N.5 | Empresa completa operada por agentes |
 | 15 | Marketplace + MCP público + v1.0 | [plan-o](./plan-o-marketplace-v1.md) | O.1–O.3 | Empresas empaquetables, release 1.0 |
 | P | **Centro MCP transversal** | [plan-p](./plan-p-centro-mcp.md) | P.1–P.4 | Conectar herramientas externas sin tocar JSON (o pegándolo) |
+| S | **Despliegue/Costos/Stack eficiente** | [plan-s](./plan-s-despliegue-costos.md) | S.1–S.4 | Hosting 3 etapas ($16→$600/mes), stack Rust fijado, patrones Tauri — datos ago-2026 |
 | C.5+D.8+H.9+A.6 | **Motor Contexto/Memoria/Caché configurable** | [SDD-006 investigación](../SDD-006-investigacion-cache-memoria.md) → fases en plan-c/d/h/a | — | KV-caché, compresión, memorias multi-tipo y respaldos por rol en 5 scopes |
 
 ```
