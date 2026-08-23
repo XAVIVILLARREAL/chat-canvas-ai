@@ -32,10 +32,26 @@ Cada proyecto-tenant ([A.0](./SDD-001-plan-base/plan-a-chat-codex.md#a0)) obtien
 
 | Fase | Contenido | Pruebas |
 |---|---|---|
-| VI.1 **Modelo de documentos** | Tabla `documents` (path, título IA, resumen IA, tags, embeddings opcionales vía [D·D.5](./SDD-001-plan-base/plan-d-memoria-v3code.md#d5)); watcher detecta .md nuevos/cambiados del workspace; indexador extrae enlaces wiki-style `[[enlace]]` y headings → edges | Cargo test parser enlaces/headings con fixture .md real. Integration: crear/editar/borrar doc actualiza grafo |
-| VI.2 **Layout IA del grafo** | Clustering automático por carpeta/tags/similitud; posiciones calculadas y PERSISTIDAS (terreno 3D); force-directed al abrir, pero posiciones humanas se respetan (drag = guardado) | Unit clustering determinista con seeds. E2E: arrastrar nodo, recargar app → posición conservada |
-| VI.3 **Canvas interactivo** | Render estilo Obsidian: nodos-tarjeta (título+tags+resumen-corto), edges curvos, zoom/pan fluido, minimap, búsqueda fuzzy que ilumina subgrafo, fisión/fusión visual por cluster; hover = preview del documento; click = abre en editor ([B·B.2](./SDD-001-plan-base/plan-b-sidepanels-lovable.md#b2)); look premium con liquid-glass/magic-ui de `reference/` | E2E humano: navegar grafo grande (>200 docs) sin jank; buscar→subgrafo resaltado; abrir doc desde nodo |
-| VI.4 **Edición humano+IA sobre el grafo** | Seleccionar N nodos → "sintetizar" genera doc-resumen enlazado (agente barato); "resumir" rellena resumen de un nodo; editar título/tags inline; TODO cambio humano marca el nodo como `human_touched` (lock suave: la IA no lo reorganiza sin permiso — coherente con [D·D.2](./SDD-001-plan-base/plan-d-memoria-v3code.md#d2)); deshacer global | Integration síntesis crea doc+edges. E2E humano: selecciona 3 notas→sintetiza→edita resultado→deshacer→re-hacer |
+
+<a id="vi1"></a>
+### VI.1 — Modelo de documentos
+Tabla `documents` (path, título IA, resumen IA, tags, embeddings opcionales vía [D·D.5](./SDD-001-plan-base/plan-d-memoria-v3code.md#d5)); watcher detecta .md nuevos/cambiados del workspace; indexador extrae enlaces wiki-style `[[enlace]]` y headings → edges
+- **Pruebas:** Cargo test parser enlaces/headings con fixture .md real. Integration: crear/editar/borrar doc actualiza grafo
+
+<a id="vi2"></a>
+### VI.2 — Layout IA del grafo
+Clustering automático por carpeta/tags/similitud; posiciones calculadas y PERSISTIDAS (terreno 3D); force-directed al abrir, pero posiciones humanas se respetan (drag = guardado)
+- **Pruebas:** Unit clustering determinista con seeds. E2E: arrastrar nodo, recargar app → posición conservada
+
+<a id="vi3"></a>
+### VI.3 — Canvas interactivo
+Render estilo Obsidian: nodos-tarjeta (título+tags+resumen-corto), edges curvos, zoom/pan fluido, minimap, búsqueda fuzzy que ilumina subgrafo, fisión/fusión visual por cluster; hover = preview del documento; click = abre en editor ([B·B.2](./SDD-001-plan-base/plan-b-sidepanels-lovable.md#b2)); look premium con liquid-glass/magic-ui de `reference/`
+- **Pruebas:** E2E humano: navegar grafo grande (>200 docs) sin jank; buscar→subgrafo resaltado; abrir doc desde nodo
+
+<a id="vi4"></a>
+### VI.4 — Edición humano+IA sobre el grafo
+Seleccionar N nodos → "sintetizar" genera doc-resumen enlazado (agente barato); "resumir" rellena resumen de un nodo; editar título/tags inline; TODO cambio humano marca el nodo como `human_touched` (lock suave: la IA no lo reorganiza sin permiso — coherente con [D·D.2](./SDD-001-plan-base/plan-d-memoria-v3code.md#d2)); deshacer global
+- **Pruebas:** Integration síntesis crea doc+edges. E2E humano: selecciona 3 notas→sintetiza→edita resultado→deshacer→re-hacer
 
 **🚪 GATE VI:** abro el grafo de ESTE mismo proyecto: veo clusters reales (docs/, SDDs/, ADRs/), busco "kanban" y solo ese subgrafo brilla, sintetizo 3 ADRs en una nota nueva enlazada, muevo nodos y mi layout sobrevive reinicios. Video + suites verdes.
 
@@ -47,11 +63,31 @@ Cada proyecto-tenant ([A.0](./SDD-001-plan-base/plan-a-chat-codex.md#a0)) obtien
 
 | Fase | Contenido | Pruebas |
 |---|---|---|
-| KR.1 **Tablero de resultados** | Columnas objetivo→en-curso→verificado→entregado (ciclo SOP); cards = tareas ([H·H.1](./SDD-001-plan-base/plan-h-motor-pruebas.md#h1)) enriquecidas con evidencia: mini-gráfica de tests, contador criterios ✓, coste, duración | Unit estados. E2E: tarea avanza columnas automáticamente con eventos reales |
-| KR.2 **Bloques animados de pruebas** | Al correr tests ([H·H.2](./SDD-001-plan-base/plan-h-motor-pruebas.md#h2)): bloque de la card se llena verde test-por-test (Playwright results parseados); fallo → bloque rojo pulsante + diff clicable; animación de "batería completada" al pasar todos (confetti sutil opcional, respeta reduced-motion) | Parser resultados Playwright/vitest→eventos UI. E2E con mock runner: secuencia animada correcta |
-| KR.3 **Modo autonomía prolongada** | Botón "trabaja X horas": cola de tareas del proyecto se consume sola; kanban muestra progreso en vivo, digest cada N tareas ([N·N.6](./SDD-001-plan-base/plan-n-empresas-autonomas.md#n6)), presupuesto visible y corte seguro ([N·N.3](./SDD-001-plan-base/plan-n-empresas-autonomas.md#n3)) | Integration: cola mock de 20 tareas → consumo ordenado + corte por presupuesto. Chaos: provider cae a mitad → pausa limpia |
-| KR.4 **Vista evidencia por etapa** | Click en card → panel lateral con timeline de rungs de ESA tarea ([D·D.1](./plan-d-memoria-v3code.md#d1)): plan→diffs→tests→review ([I·I.1](./plan-i-revision-superposiciones.md#i1)) con thumbnails de screenshots de la suite humana cuando existan | E2E humano: recorrer evidencia completa de una tarea sin salir del kanban |
-| KR.5 **Filtros y salud del board** | Filtrar por agente/etapa/estado-de-tests; indicadores de estancamiento ([I·I.2](./plan-i-revision-superposiciones.md#i2)) y flaky cuarentena ([H·H.8](./plan-h-motor-pruebas.md#h8)) visibles en las cards | E2E: filtros combinados; card estancada muestra badge |
+
+<a id="kr1"></a>
+### KR.1 — Tablero de resultados
+Columnas objetivo→en-curso→verificado→entregado (ciclo SOP); cards = tareas ([H·H.1](./SDD-001-plan-base/plan-h-motor-pruebas.md#h1)) enriquecidas con evidencia: mini-gráfica de tests, contador criterios ✓, coste, duración
+- **Pruebas:** Unit estados. E2E: tarea avanza columnas automáticamente con eventos reales
+
+<a id="kr2"></a>
+### KR.2 — Bloques animados de pruebas
+Al correr tests ([H·H.2](./SDD-001-plan-base/plan-h-motor-pruebas.md#h2)): bloque de la card se llena verde test-por-test (Playwright results parseados); fallo → bloque rojo pulsante + diff clicable; animación de "batería completada" al pasar todos (confetti sutil opcional, respeta reduced-motion)
+- **Pruebas:** Parser resultados Playwright/vitest→eventos UI. E2E con mock runner: secuencia animada correcta
+
+<a id="kr3"></a>
+### KR.3 — Modo autonomía prolongada
+Botón "trabaja X horas": cola de tareas del proyecto se consume sola; kanban muestra progreso en vivo, digest cada N tareas ([N·N.6](./SDD-001-plan-base/plan-n-empresas-autonomas.md#n6)), presupuesto visible y corte seguro ([N·N.3](./SDD-001-plan-base/plan-n-empresas-autonomas.md#n3))
+- **Pruebas:** Integration: cola mock de 20 tareas → consumo ordenado + corte por presupuesto. Chaos: provider cae a mitad → pausa limpia
+
+<a id="kr4"></a>
+### KR.4 — Vista evidencia por etapa
+Click en card → panel lateral con timeline de rungs de ESA tarea ([D·D.1](./plan-d-memoria-v3code.md#d1)): plan→diffs→tests→review ([I·I.1](./plan-i-revision-superposiciones.md#i1)) con thumbnails de screenshots de la suite humana cuando existan
+- **Pruebas:** E2E humano: recorrer evidencia completa de una tarea sin salir del kanban
+
+<a id="kr5"></a>
+### KR.5 — Filtros y salud del board
+Filtrar por agente/etapa/estado-de-tests; indicadores de estancamiento ([I·I.2](./plan-i-revision-superposiciones.md#i2)) y flaky cuarentena ([H·H.8](./plan-h-motor-pruebas.md#h8)) visibles en las cards
+- **Pruebas:** E2E: filtros combinados; card estancada muestra badge
 
 **🚪 GATE KR:** activo "trabaja 4 horas" con 15 tareas → me alejo → vuelvo: el tablero muestra bloques verdes animados de tests, 12 entregadas, 2 en revisión con risk-score, 1 bloqueada con causa; abro evidencia de cualquiera y todo está ahí. Video timelapse + suites verdes.
 
@@ -63,9 +99,21 @@ Cada proyecto-tenant ([A.0](./SDD-001-plan-base/plan-a-chat-codex.md#a0)) obtien
 
 | Fase | Contenido | Pruebas |
 |---|---|---|
-| SS.1 **Cards de sesión** | Card por sesión ([A·A.0](./plan-a-chat-codex.md#a0) scoped): avatar del agente ([N·N.6](./plan-n-empresas-autonomas.md#n6)), último mensaje, estado (activa/en-espera/terminada), mini-rail de rungs, coste acumulado; layout libre persistido (mismo motor de posiciones que [VI.2](#vi2)) | E2E: cards aparecen/desaparecen con sesiones reales; layout persiste |
-| SS.2 **Acciones rápidas en card** | Hablar: abre chat de esa sesión anclado; 🎙️ push-to-talk directo ([K·K.2](./plan-k-voz.md#k2)); 🔊 escuchar último resumen en TTS ([K·K.1](./plan-k-voz.md#k1)); ver evidencia (salta a [KR.4](#kr4)); fork/resume ([A·A.4](./SDD-001-plan-base/plan-a-chat-codex.md#a4)) | E2E humano: desde card, hablar por voz y recibir TTS sin abrir el chat completo |
-| SS.3 **Organización espacial semántica** | Agrupación opcional por agente/proyecto-tema usando el índice dual ([D·D.5](./plan-d-memoria-v3code.md#d5)): sesiones parecidas se atraen; buscador "sesiones sobre auth" las ilumina | Unit similitud→layout sugerido. E2E: buscar agrupa/ilumina correctamente |
+
+<a id="ss1"></a>
+### SS.1 — Cards de sesión
+Card por sesión ([A·A.0](./plan-a-chat-codex.md#a0) scoped): avatar del agente ([N·N.6](./plan-n-empresas-autonomas.md#n6)), último mensaje, estado (activa/en-espera/terminada), mini-rail de rungs, coste acumulado; layout libre persistido (mismo motor de posiciones que [VI.2](#vi2))
+- **Pruebas:** E2E: cards aparecen/desaparecen con sesiones reales; layout persiste
+
+<a id="ss2"></a>
+### SS.2 — Acciones rápidas en card
+Hablar: abre chat de esa sesión anclado; 🎙️ push-to-talk directo ([K·K.2](./plan-k-voz.md#k2)); 🔊 escuchar último resumen en TTS ([K·K.1](./plan-k-voz.md#k1)); ver evidencia (salta a [KR.4](#kr4)); fork/resume ([A·A.4](./SDD-001-plan-base/plan-a-chat-codex.md#a4))
+- **Pruebas:** E2E humano: desde card, hablar por voz y recibir TTS sin abrir el chat completo
+
+<a id="ss3"></a>
+### SS.3 — Organización espacial semántica
+Agrupación opcional por agente/proyecto-tema usando el índice dual ([D·D.5](./plan-d-memoria-v3code.md#d5)): sesiones parecidas se atraen; buscador "sesiones sobre auth" las ilumina
+- **Pruebas:** Unit similitud→layout sugerido. E2E: buscar agrupa/ilumina correctamente
 
 **🚪 GATE SS:** lienzo con 12 sesiones históricas organizadas por tema; localizo "la sesión de auth", le hablo por voz desde la card, escucho su resumen, salto a su evidencia en el kanban. Video + suites verdes.
 
@@ -75,8 +123,16 @@ Cada proyecto-tenant ([A.0](./SDD-001-plan-base/plan-a-chat-codex.md#a0)) obtien
 
 | Fase | Contenido | Pruebas |
 |---|---|---|
-| 3D.1 **Modelo espacial transversal** | Todas las ventanas guardan `{x,y,z?,cluster,camera}` en el modelo de datos; exportador a formato escena (JSON espacial) común para las 4 ventanas | Unit schema escena. Roundtrip export/import |
-| 3D.2 **Visor 3D unificado (prototipo)** | Reutiliza el motor de [PLAN J](./plan-j-grafo3d-repomap.md#j3) para navegar grafo-docs + kanban + sesiones como capas 3D de un mismo mundo; controles orbit/touch; LOD | Demo navegación de las 3 capas; perf 60fps con datos reales del proyecto |
+
+<a id="3d1"></a>
+### 3D.1 — Modelo espacial transversal
+Todas las ventanas guardan `{x,y,z?,cluster,camera}` en el modelo de datos; exportador a formato escena (JSON espacial) común para las 4 ventanas
+- **Pruebas:** Unit schema escena. Roundtrip export/import
+
+<a id="3d2"></a>
+### 3D.2 — Visor 3D unificado (prototipo)
+Reutiliza el motor de [PLAN J](./plan-j-grafo3d-repomap.md#j3) para navegar grafo-docs + kanban + sesiones como capas 3D de un mismo mundo; controles orbit/touch; LOD
+- **Pruebas:** Demo navegación de las 3 capas; perf 60fps con datos reales del proyecto
 
 **🚪 GATE 3D:** prototipo navegable del "mundo Empresa Dev" en 3D con los documentos, el tablero y las sesiones flotando por clusters — prueba de concepto para gafas. Video.
 
