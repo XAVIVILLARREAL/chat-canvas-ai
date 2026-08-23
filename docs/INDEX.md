@@ -11,6 +11,9 @@
 | ESTADO.md | Estado actual (autoadministrado) | `./docs/ESTADO.md` |
 | CHANGELOG.md | Historial append-only | `./docs/CHANGELOG.md` |
 | INFRA.md | Mejoras de infraestructura | `./docs/INFRA.md` |
+| SDD-001 | Plan Base: maestro + 5 planes referenciados (Chat Codex, Sidepanels Lovable, Reasonix+DeepSeek, Memoria V3Code, Integración) | `./docs/SDDs/SDD-001-plan-base/README.md` |
+| SDD-002 | Sistema de pruebas spec-driven + suite Playwright humano | `./docs/SDDs/SDD-002-testing-spec-driven.md` |
+| SDD-003 | Torneo 500 ideas → 20 ganadoras (backlog vivo incluido) | `./docs/SDDs/SDD-003-torneo-500-ideas.md` |
 | referencia de diseno.md | Catalogo de skills de diseno en `reference/` con links | `./docs/referencia de diseno.md` |
 | INDEX.md | Este archivo | `./docs/INDEX.md` |
 | RESPONSIVE.md | Guia de responsive design | `./docs/RESPONSIVE.md` |
@@ -20,7 +23,7 @@
 
 | Directorio | Contenido |
 |---|---|
-| `docs/SDDs/` | Software Design Documents (creados por AI) |
+| `docs/SDDs/` | Software Design Documents (creados por AI) — SDD-001 Plan Base vigente |
 | `docs/ADRs/` | Architecture Decision Records (creados por AI) |
 | `reference/` | Recursos de diseno y arquitectura de referencia (`v3code`, `apple-design-skill`, `ui-ux-pro-max`, etc.) |
 | `_reciclaje/` | Archivos obsoletos de versiones anteriores |

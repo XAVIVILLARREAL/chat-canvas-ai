@@ -1,7 +1,17 @@
 import { useAppStore } from "./stores/app-store";
 
 export function App() {
-  const { agents, selectedAgent, selectAgent } = useAppStore();
+  const { agents, selectedAgent, selectAgent, addAgent } = useAppStore();
+
+  const handleCreateAgent = () => {
+    addAgent({
+      id: crypto.randomUUID(),
+      name: `Agente ${agents.length + 1}`,
+      role: "dev",
+      status: "idle",
+      skills: [],
+    });
+  };
 
   return (
     <div className="app">
@@ -17,7 +27,11 @@ export function App() {
             {agents.length === 0 ? (
               <div className="empty-state">
                 <p>No hay agentes creados</p>
-                <button type="button" className="btn-primary">
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={handleCreateAgent}
+                >
                   Crear primer agente
                 </button>
               </div>

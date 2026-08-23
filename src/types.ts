@@ -1,12 +1,6 @@
-export type AgentStatus = "idle" | "working" | "blocked" | "error";
+type AgentStatus = "idle" | "working" | "blocked" | "error";
 
-export type AgentRole =
-  | "dev"
-  | "qa"
-  | "reviewer"
-  | "pm"
-  | "devops"
-  | "designer";
+type AgentRole = "dev" | "qa" | "reviewer" | "pm" | "devops" | "designer";
 
 export interface Agent {
   id: string;

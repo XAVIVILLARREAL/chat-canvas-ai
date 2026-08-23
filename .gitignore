@@ -39,3 +39,8 @@ _reciclaje/
 # Reference materials (local only para diseno y arquitectura)
 reference/
 
+
+# Evidencia de pruebas (generada, no versionar)
+evidence/
+test-results/
+src-tauri/gen/

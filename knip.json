@@ -1,7 +1,6 @@
 {
   "$schema": "https://knip.dev/schema.json",
-  "entry": ["src/main.tsx"],
-  "project": ["src/**/*.{ts,tsx}"],
-  "ignore": ["src/bindings.ts"],
-  "ignoreDependencies": ["@types/react", "@types/react-dom"]
+  "entry": ["index.html"],
+  "project": ["src/**/*.{ts,tsx}", "e2e/**/*.{ts,tsx}"],
+  "ignoreDependencies": ["@srsholmes/tauri-playwright"]
 }

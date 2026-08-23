@@ -2,6 +2,36 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-23
+
+- **SDD-003 Torneo de ideas**: 500 ideas generadas de productos de mercado (25 categorías × 20) → eliminatoria por categoría → 10 debates cruzados documentados → **20 ganadoras** con rúbrica Valor/Viabilidad/Mantenibilidad/Encaje ≥17
+- Ganadoras clave base: prefijo estable caché + auto-compacción + dashboard cache_hit (Reasonix real), medidor/debug-view de contexto, cola de mensajes, @menciones, revisión por hunks, consola-preview→agente, blame-rung V3Code, checkpoints reset, golden outputs skills, cuarentena flaky, risk-score, merge train, best-of-N, ⌘K paleta
+- Las 480 no ganadoras quedan como backlog vivo re-visible al cerrar cada etapa
+- Confirmados los 3 pilares de la BASE: interfaz Codex completa / caché optimizado Reasonix / 6 capas memoria V3Code (mapeo capa→fase explícito en SDD-003)
+- Nuevas fases planificadas: C.5, A.5, B.6-B.8, D.7, F.7, H.7-H.8 (+ampliaciones G.4/N.2/I.4) — cada ganadora con sus 4 capas de prueba definidas
+
+- **SDD-001 v3.1 — robo de ideas ganadoras (ronda 2)**: incorporadas a los planes TODAS las ideas no usadas de copia.md + patrones hermanos
+- Shadow Workspace (H.5) + bucle auto-corrección silencioso con rungs SELF_FIX y auto-purgado (H.6) — copia.md §Cursor/Capa1
+- Fast Apply / escritura especulativa streaming (B.5) — copia.md §Cursor/Morph
+- Gobernanza de decisiones varve: proposed→accepted→violated, evidencia obligatoria, scopes file-glob (D.4)
+- Grafo dual semántico sqlite-vec acelerado con Ollama qwen3-embedding del ERP — sin servicios nuevos (D.5)
+- Memory router fino + shards temáticos + aging policy + checkpoints git-backed V3Code (D.6)
+- Approvals reviewer agéntico auto_review + reglas granulares por prefijo (I.4) — Codex
+- Reflect: aprender lecciones de transcripciones pasadas sin LLM (I.5) — codevira
+- Tool-gating estricto por rol en skills (G.2) — Cline/RooCode
+- Worktrees paralelos por operativo + artefactos SOP tipados viajando por edges (N.2)
+- MCP público del cerebro hacia agentes externos (O.2) — V3Code/Zed
+- Sección "EL PRODUCTO" en README maestro: el flujo estrella que combina todas las features ganadoras
+- Red re-verificada: 112 links entre 16 archivos, 33 anclajes usados / 49 definidos, 0 rotos
+
+- **SDD-001 v3 MEGA-PLAN**: roadmap expandido a 15 etapas (~60 fases) tras investigación profunda de las 3 fuentes
+- Investigación V3Code oficial (v3code.dev): memory rail rungs clicables, time scrubber, auto-router visible, checkpoints, agentes en workspace propio paralelo, MCP
+- Descubiertos subagentes built-in de Reasonix: explore/research/review/security-review → integrados a etapas 9 (revisión auto) y 14 (empresas)
+- Patrones robados a varve/codevira: gobernanza decisiones proposed→accepted, memory_pack con presupuesto tokens, locks content-aware por símbolo, decisions.md commiteado
+- Nuevos planes: plan-f canva+oficina (ReactFlow+Animated Beams+Kanban), plan-g skills lab (compilador dialectos incl reasonix subagent), plan-h motor pruebas (sandbox+readiness checks), plan-i revisión auto+superposiciones, plan-j grafo3D repo-map pagerank, plan-k voz (Edge TTS/Web Speech), plan-l sync multi-device+Co-Work CRDT, plan-m GitHub nativo (device flow+PRs+decisions.md), plan-n empresas autónomas (jerarquía+presupuesto+kill-switch+dashboard), plan-o marketplace+v1.0
+- README maestro reescrito con mapa 15 etapas, grafo dependencias, estimación global ~19-26 semanas
+- Red de referencias verificada: 94 links entre 16 archivos, 16/16 anclajes usados resueltos
+
 ## 2026-08-21
 
 - **RESET COMPLETO** — Migration de Flutter a Tauri (React + Rust)
@@ -122,3 +152,26 @@
 
 - Creado docs/"referencia de diseno.md": catalogo completo de los 6 skills de diseno instalados (links, estrellas, rutas locales, uso, actualizacion) + evaluados no instalados
 - Actualizado INDEX.md con el nuevo documento
+
+## 2026-08-22
+
+- **Sesión servidor Linux headless**: clonado repo en /workspace, deps instaladas, auditoría INFRA completa
+- Fix vite.config.ts: minify esbuild→oxc (Vite 8/Rolldown ya no bundla esbuild), __dirname→import.meta.dirname
+- Instalado Rust 1.98 + deps sistema Tauri Linux (webkit2gtk-4.1, gtk-3, ayatana-appindicator, rsvg, xdo)
+- Fix Cargo.toml: tauri-plugin-playwright deja de ser optional (tauri-build valida permiso playwright:default); runtime sigue gated por feature e2e-testing
+- Fix lib.rs: migrado a API real tauri-specta rc25 (collect_commands!, specta_typescript::Typescript, invoke_handler(builder), mount_events en setup)
+- Generados iconos Tauri completos (32x32→1024, icns/ico, android/ios) via @tauri-apps/cli icon
+- Agregado vitest + vitest.config.ts (scoped src/**, --passWithNoTests) — antes tomaba specs de Playwright
+- knip limpio: entry index.html, scope src+e2e, ignore @srsholmes/tauri-playwright (reservado modo tauri)
+- Eliminado src/index.ts placeholder vacío; types.ts sin exports internos; removido devDep @vitejs/plugin-react-swc (sin uso)
+- Verificación completa verde: typecheck/lint/lint:oxc/knip/vitest/build 198ms/cargo test/E2E chromium 4 passed
+- Spike reasonix v1.23.0: default deepseek-v4-flash; modos serve (HTTP+SSE), acp (stdio), run --events-jsonl, task --json confirmados
+- **Creado SDD-001-plan-base**: super plan en 5 planes (A chat Codex-core, B sidepanels Lovable, C Reasonix+DeepSeek runtime, D memoria V3Code 3 capas, E integración total) con fases, pruebas y gates verificables
+- SDD-001 v2 optimizado tras investigación de las 3 fuentes: mapeo explícito de qué copiar de Codex (2 perillas, diff con feedback, slash commands), Reasonix verificado en vivo (eventos/metrics/trajectory/permisos) y V3Code (artefactos ausentes → fase D.0 restauración)
+- Hallazgo clave: ~31k tokens base por run Reasonix ($0.0043 trivial) → enrutamiento por costo (simple→DeepSeekDirect, tools→flash, plan→reasoner); estimación total 4.5-6 semanas
+- **Reestructurado SDD-001 a carpeta referenciada**: docs/SDDs/SDD-001-plan-base/ con README maestro + un archivo por plan (plan-a…plan-e), cross-links entre todos
+- **Creado SDD-002-testing-spec-driven.md**: sistema de pruebas spec-driven con 4 capas (unit/integración/E2E funcional/E2E humano)
+- **Infraestructura Playwright HUMANO**: e2e/playwright.human.config.ts (video siempre, secuencial, desktop+mobile) + e2e/human/human-fixture.ts (h.step con screenshot por paso, humanClick con hover+pausas, humanFill carácter a carácter 40-120ms, humanThink, humanWheel) + 4 suites: boot, create-agent, keyboard-nav, responsive — **12/12 passed** (desktop 1440 + Pixel 7)
+- Fix UI real: botón "Crear primer agente" ahora conectado al store (addAgent) — era un botón muerto sin onClick
+- Script nuevo: pnpm test:e2e:human · Reglas del SDD-001 actualizadas: cada gate exige suite humana ampliada
+- Actualizado ESTADO.md e INDEX.md
