@@ -15,7 +15,7 @@
 
 <a id="d1"></a>
 ### D.1 — Capa 1: Decision Ledger
-- Tabla `event_stream` **append-only**: `session_id, event_type(PROMPT/DIFF/DECISION/TEST_RESULT), summary, payload JSON, lines_added/deleted`
+- Tabla `event_stream` **append-only** con `project_id` (el Ledger de cada tenant-proyecto es independiente): `session_id, event_type(PROMPT/DIFF/DECISION/TEST_RESULT), summary, payload JSON, lines_added/deleted`
 - Fuente primaria: `--trajectory` de Reasonix ([C·C.1](./plan-c-reasonix-deepseek.md#c1)) mapeado a rungs
 - Al cerrar sesión → rung-resumen autogenerado con LLM barato (`deepseek-v4-flash`)
 - Export rollout JSONL compatible con formato de sesiones Codex
@@ -23,7 +23,7 @@
 
 <a id="d2"></a>
 ### D.2 — Capa 2: Workspace Knowledge + Human-Tweak Lock
-- Tabla `workspace_knowledge`: ADRs/convenciones/hechos del proyecto con búsqueda **FTS5** (ranking verificado en tests)
+- Tabla `workspace_knowledge`: ADRs/convenciones/hechos del proyecto con búsqueda **FTS5** (ranking verificado en tests) — knowledge SIEMPRE scoped al proyecto; lo compartido va en biblioteca global ([A·A.0](./plan-a-chat-codex.md#a0))
 - Tabla `human_invariants` (Human-Tweak Lock V3Code): coordenadas protegidas por el humano → se inyectan al contexto del agente con regla "no tocar" — costo 0 tokens de negociación
 - Embeddings vectoriales DETRÁS de un trait (`EmbeddingStore`) — implementación v1: no-op; spike sqlite-vec aislado documentado aparte (no bloquea)
 - **Pruebas:** Cargo test FTS ranking + invariants presentes en contexto capturado

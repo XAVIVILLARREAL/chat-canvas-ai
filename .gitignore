@@ -43,4 +43,7 @@ reference/
 # Evidencia de pruebas (generada, no versionar)
 evidence/
 test-results/
-src-tauri/gen/
+
+# Tauri gen: se versiona el proyecto Android nativo (SDD-005);
+# solo se ignoran los esquemas autogenerados
+src-tauri/gen/schemas/

@@ -9,6 +9,7 @@
 ### P.1 — Cliente MCP core (Rust)
 - Cliente MCP spec vigente: stdio + HTTP/SSE, lifecycle (initialize/tools/list/call), streaming
 - Registro de servers por proyecto/global en SQLite; estado (connected/error/disabled) persistente
+- **Herencia con decisión del usuario** ([A·A.0](./plan-a-chat-codex.md#a0)): server GLOBAL disponible en todos los proyectos (cada uno puede desactivarlo) o LOCAL solo-de-ese-proyecto — igual filosofía que skills ([G·G.1](./plan-g-skills-lab.md#g1))
 - Llamadas tool SIEMPRE pasan por el gating del skill/rol ([G·G.2](./plan-g-skills-lab.md#g2)) y quedan en rungs auditables ([D·D.1](./plan-d-memoria-v3code.md#d1))
 - **Pruebas:** Cargo test contra fixture-server MCP local (stdio): list/call/stream. Timeout + kill limpio
 

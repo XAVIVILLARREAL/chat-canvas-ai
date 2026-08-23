@@ -7,7 +7,7 @@
 
 <a id="n1"></a>
 ### N.1 — Modelo de empresa
-- Tablas `companies`, `company_members` (agente+rol+skill), `budgets` (límite $/día por empresa y por agente)
+- Tablas `companies`, `company_members` (agente+rol+skill), `budgets` (límite $/día por empresa y por agente) — cada empresa opera SOBRE proyecto(s) del tenant ([A·A.0](./plan-a-chat-codex.md#a0)); sus worktrees son del repo de ese proyecto
 - UI asistente "Nueva empresa": plantilla (web-app, api, script) → roles sugeridos → skills del Lab ([G](./plan-g-skills-lab.md)) asignados con su tool-gating ([G·G.2](./plan-g-skills-lab.md#g2))
 - **Avatar + personalidad generada por IA** por cada nuevo miembro (imagen, nombre coherente, mini-bio) — identidad inmediata sin configurar nada
 - **Pruebas:** Cargo test modelo + presupuesto enforcement (rechaza gasto over-budget). E2E humano: crear empresa completa desde cero

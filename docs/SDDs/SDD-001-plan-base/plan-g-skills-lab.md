@@ -12,6 +12,7 @@ Un skill = contrato estructurado: `{nombre, rol, triggers, instrucciones, herram
 <a id="g1"></a>
 ### G.1 — Modelo de datos + CRUD
 - Tabla `skills` en SQLite; store Zustand + React Query; UI lista/grid con búsqueda FTS5 ([D·D.2](./plan-d-memoria-v3code.md#d2))
+- **Alcance elegido por el usuario** ([A·A.0](./plan-a-chat-codex.md#a0)): skill GLOBAL (biblioteca compartida entre proyectos) o COPIA LOCAL editable sin afectar a otros — toggle visible y linaje "derivada de X" cuando es copia
 - **Pruebas:** Cargo test repos. E2E humano: crear/editar/duplicar/eliminar skill desde cero
 
 <a id="g2"></a>

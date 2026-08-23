@@ -176,3 +176,10 @@ eference/ (clones shallow, depth 1):
 - Fix UI real: botón "Crear primer agente" ahora conectado al store (addAgent) — era un botón muerto sin onClick
 - Script nuevo: pnpm test:e2e:human · Reglas del SDD-001 actualizadas: cada gate exige suite humana ampliada
 - Actualizado ESTADO.md e INDEX.md
+
+- **SDD-005 Cierre Multiplataforma**: multiplataforma pasa de diseño a verificado
+  - Entorno Android instalado en servidor (JDK 21, SDK 34 + build-tools + NDK r27 en /opt/android-sdk, 4 targets Rust android) — documentado en docs/MULTIPLATAFORMA.md
+  - Proyecto Android nativo generado y VERSIONADO: src-tauri/gen/android/ (gradle wrapper incluido); .gitignore ajustado (solo gen/schemas queda ignorado)
+  - CI nuevo job build-desktop: matriz ubuntu/windows/macos con cargo check + build frontend en cada push (DoD 2+ plataformas ahora continuo)
+  - Workflow manual "Android Build" (workflow_dispatch): genera APK debug como artefacto sin toolchain local
+  - docs/MULTIPLATAFORMA.md: comandos por plataforma; iOS documentado (requiere Mac para ios init)

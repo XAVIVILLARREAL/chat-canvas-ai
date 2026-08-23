@@ -15,6 +15,8 @@
 | SDD-002 | Sistema de pruebas spec-driven + suite Playwright humano | `./docs/SDDs/SDD-002-testing-spec-driven.md` |
 | SDD-003 | Torneo 500 ideas → 20 ganadoras (backlog vivo incluido) | `./docs/SDDs/SDD-003-torneo-500-ideas.md` |
 | SDD-004 | Análisis Grok Bot (xAI/Cursor): 12 ideas robadas mapeadas | `./docs/SDDs/SDD-004-analisis-grokbot.md` |
+| SDD-005 | Cierre Multiplataforma (Android versionado, CI 3 SO) | `./docs/SDDs/SDD-005-cierre-multiplataforma.md` |
+| MULTIPLATAFORMA.md | Comandos para compilar en Windows/macOS/Linux/Android/iOS | `./docs/MULTIPLATAFORMA.md` |
 | referencia de diseno.md | Catalogo de skills de diseno en `reference/` con links | `./docs/referencia de diseno.md` |
 | INDEX.md | Este archivo | `./docs/INDEX.md` |
 | RESPONSIVE.md | Guia de responsive design | `./docs/RESPONSIVE.md` |
@@ -24,7 +26,7 @@
 
 | Directorio | Contenido |
 |---|---|
-| `docs/SDDs/` | Software Design Documents (creados por AI) — SDD-001 Plan Base vigente |
+| `docs/SDDs/` | Software Design Documents (creados por AI) — SDD-001 Plan Base vigente · SDD-005 multiplataforma |
 | `docs/ADRs/` | Architecture Decision Records (creados por AI) |
 | `reference/` | Recursos de diseno y arquitectura de referencia (`v3code`, `apple-design-skill`, `ui-ux-pro-max`, etc.) |
 | `_reciclaje/` | Archivos obsoletos de versiones anteriores |

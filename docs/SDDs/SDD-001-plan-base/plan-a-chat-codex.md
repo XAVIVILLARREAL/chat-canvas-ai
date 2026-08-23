@@ -7,6 +7,22 @@
 
 ## Fases
 
+<a id="a0"></a>
+### A.0 — Proyectos como TENANTS: cards + tabs + historial aislado (FUNDACIÓN, va sobre todo lo demás)
+- **Modelo**: tabla `projects`; TODAS las demás tablas (sessions, messages, event_stream, knowledge, tasks, settings-overrides) llevan `project_id` — aislamiento total estilo multitenant, pero por proyecto de software
+- **Cards de selección**: al abrir la app, grid de tarjetas simples (avatar/color generado, nombre, última actividad, agentes activos) — seleccionar y entrar. Crear/renombrar/archivar proyecto desde ahí
+- **Tabs de proyectos**: barra superior con los proyectos ABIERTOS como tabs (estilo navegador) — cambiar entre ellos sin cerrar nada; cada tab conserva su chat/sesión activa; las tabs se restauran tras reiniciar
+- **Historial 100% aislado**: las conversaciones de un proyecto JAMÁS se mezclan con otro; buscar/fork/export opera dentro del proyecto actual
+- **Tareas en background entre tabs**: cambiar de tab NO detiene al agente del otro proyecto — sigue trabajando (badge de actividad en su tab)
+- **Configuraciones por proyecto persistidas**: modelo preferido, permisos default, apariencia del workspace — cada tenant recuerda lo suyo ([A·A.6](./plan-a-chat-codex.md#a6) herencia global→proyecto)
+- **Global vs Local decidido por el usuario** para MCP ([PLAN P](./plan-p-centro-mcp.md)), skills ([G](./plan-g-skills-lab.md)) y agentes: biblioteca GLOBAL compartida O "hacer copia local" editable sin afectar a otros proyectos — toggle explícito por elemento
+- **Pruebas:**
+  - Unit: repos filtran por project_id en TODAS las consultas; resolución de scopes global→local
+  - Integration: proyecto A no ve NADA de B (queries cross-tenant vacías); override local no muta el global; restauración de tabs tras reinicio
+  - E2E funcional: crear 2 proyectos → alternar tabs → historiales separados → skill global usada en ambos → copia local editada solo afecta a uno
+  - Suite HUMANA @core: entro por card, cambio de tab como usuario real, veo que nada se mezcló
+
+<a id="a1"></a>
 ### A.1 — AppShell + stores
 - Layout 3 paneles responsive según ADR-001: Sidebar proyectos / ChatPanel / WorkArea placeholder
 - Stores Zustand: `session-store` (sesión activa, mensajes), `ui-store` (paneles, perillas)
@@ -15,7 +31,7 @@
 
 <a id="a2"></a>
 ### A.2 — Persistencia SQLite
-- Tablas `sessions`, `messages` via sqlx (migraciones embebidas)
+- Tablas `sessions`, `messages` via sqlx (migraciones embebidas) — **ambas con `project_id` desde el día 1** ([A·A.0](./plan-a-chat-codex.md#a0)): el aislamiento multitenant NO se retrofittea después
 - Commands Tauri CRUD + bindings tauri-specta
 - **Pruebas:** Cargo test repositorios; integration roundtrip mensaje
 
@@ -42,7 +58,7 @@ trait AgentProvider {
 - Cards de tool-call: nombre + args colapsados + resultado + estado
 - Visor de diff unificado inline en el chat
 - Panel terminal colapsable (salida de comandos del agente)
-- **Slash commands**: `/resume`, `/fork`, `/status`, `/permissions` (parser propio; `/compact` llega con [D](./plan-d-memoria-v3code.md#d1))
+- **Slash commands**: `/resume` (dentro del proyecto actual), `/fork`, `/status`, `/permissions` (parser propio; `/compact` llega con [D](./plan-d-memoria-v3code.md#d1))
 - Aprobar/rechazar acción pendiente con scopes "una vez" vs "toda la sesión" (Codex)
 - **Pruebas:** E2E browser-mode con provider MOCK scriptado (sin key real): prompt→streaming→tool-call→aprobar→diff visible→slash fork duplica sesión
 

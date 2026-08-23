@@ -9,7 +9,9 @@
 
 <a id="b1"></a>
 ### B.1 — Workspace virtual + detección Codex
-- Proyecto activo en `~/EmpresaDev/projects/<id>/` (fs scoped por Rust)
+- Proyecto activo en `~/EmpresaDev/projects/<id>/` (fs scoped por Rust) — con [A·A.0](./plan-a-chat-codex.md#a0), cambiar de TAB cambia árbol+editor+preview completos: cada proyecto vive en su mundo
+- Artefactos versionados ([B·B.9](./plan-b-sidepanels-lovable.md#b9)) y diffs siempre dentro del proyecto activo
+
 - Detección inicial estilo Codex: carpeta con git → preset **Auto**; sin git → **Solo lectura** hasta que el usuario confíe
 - File tree lazy + commands fs seguros (anti path-traversal, cargo deny list)
 - **Pruebas:** Cargo test seguridad paths. E2E: árbol refleja archivos creados por el agente

@@ -42,7 +42,7 @@
   - Tarea con tool-calls → Reasonix `deepseek-v4-flash` (perfil economy/balanced)
   - Planificación/tarea dura → `deepseek-reasoner` (`--model`); auto-escale flash→reasoner en doble fallo
 - Perfiles economy/balanced/delivery expuestos en UI (mapea a `--profile`)
-- Widget costo sesión vía `--metrics` (costo acumulado + tokens + cache hits)
+- Widget costo sesión vía `--metrics` — **por proyecto y con rollup global** ([A·A.0](./plan-a-chat-codex.md#a0)): "¿cuánto me cuesta ESTE proyecto?" es una pregunta de primer nivel (costo acumulado + tokens + cache hits)
 - Indicador AGENTS.md cargado (Reasonix lo lee nativo — solo exponer qué archivos)
 - **Pruebas:** unit router + cálculo costos. E2E: badge costo sube durante sesión real barata
 
