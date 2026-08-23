@@ -39,6 +39,7 @@
 - A.6 jerarquía completa de 5 scopes: vista de VALOR EFECTIVO con origen (git --show-origin) · reset por capa · merge por tipo de campo · políticas enforced 🔒 · claves prohibidas por nivel — aplicado a TODO lo configurable
 - **C.6 OllamaProvider ready-to-plug**: tercer driver local OpenAI-compat localhost:11434 · knobs KV verificados docs v0.32 (f16/q8_0/q4_0 GLOBAL, fallback silencioso advertido por UI) · flash attention 3-estado · presets por hardware GPU/laptop/CPU · embeddings plug-and-play para D.5 — privacidad total/offline/costo cero
 - **C.7 Registro universal de proveedores API (patrón OpenCode/models.dev)**: registro declarativo openai-compat|anthropic|google · catálogo models.dev MIT autocompleta 75+ proveedores con precios reales · drivers genéricos cubren todo el mercado sin código nuevo · tarjetas 1-click pegando solo la key + JSON experto · telemetría con precios reales
+- **SDD-007 análisis exhaustivo OpenCode** (docs oficiales providers): 14 ideas robadas — /connect unificado con OAuth a SUSCRIPCIONES ya pagadas (ChatGPT Plus/Claude Pro/Copilot device-flow), blacklist/whitelist de modelos por scope, small_model para tareas internas baratas, gateways con headers custom, locales first-class (LM Studio/llama.cpp además de Ollama), lista curada verificada estilo Zen, auth.json separado del config, esquema del registro documentado
 - **ADR-005 integrado al roadmap como prerequisito Etapa 1** (workspace Cargo core/tauri-shell/server)
 ## 2026-08-21
 
