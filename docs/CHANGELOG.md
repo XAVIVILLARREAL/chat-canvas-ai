@@ -2,6 +2,17 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-23 (sesion 12)
+
+- **SDD-008 Análisis cliente-servidor autónomo + escalado** (3 investigaciones paralelas: K8s para agentes IA · sync multi-dispositivo · servidor Rust multi-tenant)
+- DECISIÓN CENTRAL elevada: el trabajo persiste en SERVIDOR central (Linux/docker/k8s); dispositivos = ventanas+controles delgados
+- Arquitectura servidor Rust adoptada (patrón Everruns open source): gateway axum stateless + workers SIN credenciales DB reclamando tareas FOR UPDATE SKIP LOCKED + heartbeat; Postgres+RLS fail-closed con crate tenaxum; fan-out broadcast POR SESIÓN multi-dispositivo; deltas efímeros/eventos terminales persistentes; reconexión ?since_id
+- Sync sin fricción (patrón Linear endosado CTO): delta-sync con cursor por dispositivo + outbox duradero idempotente para comandos offline + conflictos LWW por campo invisibles con keep-both
+- Auth: passkeys sincronizadas primarias + QR pairing TTL<2min + sesiones revocables por dispositivo + refresh rotativo con detección de reuso
+- L.4 NUEVA fase: push dispatcher cross-platform APNs/FCM/ntfy-VAPID (payload mínimo→delta-sync al abrir)
+- Camino de escalado por fases: HOY Docker Compose + driver sandbox abstracto → tracción: k3s + CRD agent-sandbox (SIG-Apps Google, warm pools, hibernación, scale-to-zero KEDA) + gVisor → serio: namespaces endurecidos + Kata/Firecracker + CloudNativePG + Karpenter + OpenCost chargeback por tenant
+- Anti-trampas documentadas: KEDA ScaledJob para trabajos largos · PVC individual+s3 (no RWX) · LISTEN/NOTIFY requiere conexión no-pooled · tenant_id jamás como label Prometheus
+
 ## 2026-08-23
 
 - **SDD-003 Torneo de ideas**: 500 ideas generadas de productos de mercado (25 categorías × 20) → eliminatoria por categoría → 10 debates cruzados documentados → **20 ganadoras** con rúbrica Valor/Viabilidad/Mantenibilidad/Encaje ≥17

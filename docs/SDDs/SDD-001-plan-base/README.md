@@ -113,7 +113,7 @@ ETAPA 13:          + GitService (gitoxide/Rust o CLI git)
 ETAPA 14:          + CompanyOrchestrator (jerarquía líder→operativos sobre subagentes reasonix)
 ```
 
-**Prerequisito de Etapa 1**: [ADR-005](../ADRs/ADR-005-modelo-despliegue-dual.md) — refactor a workspace Cargo (crates core/tauri-shell/server) ANTES de codificar, para que "local o nube" sea propiedad del build y no una promesa. Habilita Etapa 12 (sync) y agentes always-on del servidor. ✅ **Ejecutado 2026-08-23**: workspace con `crates/core` (dominio compartido) + `crates/server` (axum, prueba viva: sirve el mismo dominio por HTTP) + `src-tauri` (shell fino).
+**Prerequisito de Etapa 1**: [ADR-005](../ADRs/ADR-005-modelo-despliegue-dual.md) + [SDD-008 análisis cliente-servidor/K8s](../SDD-008-analisis-cliente-servidor-k8s.md) — refactor a workspace Cargo creando DESDE EL DÍA 1 tres binarios: `server` (gateway axum stateless), `worker` (ejecuta agentes, patrón Everruns FOR UPDATE SKIP LOCKED) y `tauri-shell`; Postgres+RLS server-side (`tenaxum` fail-closed); fan-out broadcast POR SESIÓN para multi-dispositivo; K8s explícitamente fuera de la base (camino Compose→k3s+agent-sandbox→K8s endurecido en SDD-008), para que "local o nube" sea propiedad del build y no una promesa. Habilita Etapa 12 (sync) y agentes always-on del servidor. ✅ **Ejecutado 2026-08-23**: workspace con `crates/core` (dominio compartido) + `crates/server` (axum, prueba viva: sirve el mismo dominio por HTTP) + `src-tauri` (shell fino).
 
 ## 🔄 Cómo funciona la plataforma: multiplataforma + sync sin fricción (la explicación simple)
 

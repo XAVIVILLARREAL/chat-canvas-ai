@@ -17,6 +17,8 @@
 - Login al hub una sola vez por dispositivo; selección de QUÉ sincronizar (sesiones/config/skills); estado de última sync visible
 - Resolución de conflictos con UI diff-and-choose; offline queue con flush automático al volver
 - Continuidad total combinada con lo que ya existe: tabs restauradas ([A·A.0](./plan-a-chat-codex.md#a0)), resume inteligente ([A·A.8](./plan-a-chat-codex.md#a8)), snapshots del entorno ([H·H.9](./plan-h-motor-pruebas.md#h9))
+- **Delta-sync con cursor** (patrón Linear): cada dispositivo guarda su último `sync_id`; al reconectar pide SOLO `/changes?since=` — nunca refetch completo
+- **Outbox duradero**: comandos offline persistidos localmente con UUID; servidor idempotente (dedupe); ACK al procesar
 - **Pruebas:** E2E humano: crear en laptop → aparece en móvil → editar ambos → resolver eligiendo
 
 <a id="l3"></a>
@@ -24,6 +26,13 @@
 - Yjs CRDT sobre el mismo WS: dispositivo B ve el chat/canva de A en solo-lectura con indicador 👁️; v2: edición compartida con permisos por panel
 - Latencia objetivo <100ms local
 - **Pruebas:** Integration CRDT: dos docs convergen tras ediciones concurrentes. E2E: B refleja acciones de A
+
+<a id="l4"></a>
+### L.4 — Push dispatcher cross-platform (despertar sin drenar batería)
+- Servicio propio que registra tokens por dispositivo/plataforma y enruta: **APNs** (iOS — única vía fiable) · FCM o ntfy-UnifiedPush (Android) · Web Push VAPID (web/PWA)
+- Payload mínimo ("evento del agente") → al abrir dispara delta-sync; los DATOS viajan por el canal de sync, no por el push
+- Respeta la política de interrupción [K·K.3](./plan-k-voz.md#k3)
+- **Pruebas:** Integration dispatcher con mocks APNs/FCM/VAPID. E2E humano: agente termina en servidor → push llega al móvil → abrir muestra el delta correcto
 
 ## 🚪 GATE L (demo verificable)
 

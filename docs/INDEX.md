@@ -18,6 +18,7 @@
 | SDD-005 | PLAN INTERMEDIO: 4 ventanas visuales (grafo docs, kanban resultados, canvas sesiones, 3D) | `./docs/SDDs/SDD-005-plan-intermedio.md` |
 | SDD-006 | Investigación SOTA: KV-cache/cuantización/compresión + jerarquías config + memorias multi-tipo | `./docs/SDDs/SDD-006-investigacion-cache-memoria.md` |
 | SDD-007 | Análisis OpenCode+models.dev: registro universal de proveedores (14 ideas) | `./docs/SDDs/SDD-007-analisis-opencode-modelsdev.md` |
+| SDD-008 | Análisis cliente-servidor autónomo + escalado Linux/Kubernetes (3 investigaciones) | `./docs/SDDs/SDD-008-analisis-cliente-servidor-k8s.md` |
 | SDD-005 | Cierre Multiplataforma (Android versionado, CI 3 SO) | `./docs/SDDs/SDD-005-cierre-multiplataforma.md` |
 | MULTIPLATAFORMA.md | Comandos para compilar en Windows/macOS/Linux/Android/iOS | `./docs/MULTIPLATAFORMA.md` |
 | referencia de diseno.md | Catalogo de skills de diseno en `reference/` con links | `./docs/referencia de diseno.md` |
