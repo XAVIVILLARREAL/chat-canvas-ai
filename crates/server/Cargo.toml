@@ -1,0 +1,11 @@
+[package]
+name = "empresa-dev-server"
+version = "0.1.0"
+description = "Servidor central de Empresa Dev (modo nube, ADR-005 D6)"
+edition = "2021"
+
+[dependencies]
+empresa-dev-core = { path = "../core" }
+axum = "0.8"
+tokio.workspace = true
+serde_json.workspace = true

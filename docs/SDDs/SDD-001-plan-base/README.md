@@ -29,7 +29,7 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 | 0 | Fundaciones | *(completada)* | — | Infra 100% verde + testing humano 12/12 ✅ |
 | 1 | Chat núcleo Codex + **tenants** | [plan-a](./plan-a-chat-codex.md) | **A.0**–A.9 | Streaming real, 2 perillas, slash cmds |
 | 2 | Sidepanels Lovable | [plan-b](./plan-b-sidepanels-lovable.md) | B.1–B.5 | Ves construirse en vivo |
-| 3 | Runtime Reasonix+DeepSeek+Ollama | [plan-c](./plan-c-reasonix-deepseek.md) | C.0–C.6 | 3 motores (local-ready), costos, cancelación |
+| 3 | Runtime Reasonix+DeepSeek+Ollama+**API universal** | [plan-c](./plan-c-reasonix-deepseek.md) | C.0–C.6 | 3 motores (local-ready), costos, cancelación |
 | 4 | Memoria V3Code | [plan-d](./plan-d-memoria-v3code.md) | D.0–D.6 | Recuerda entre sesiones + gobernanza + grafo dual |
 | 5 | Cierre Base | [plan-e](./plan-e-integracion-total.md) | E.1–E.3 | Tag `plan-base-v0.1` |
 | 6 | Canva ReactFlow + Oficina | [plan-f](./plan-f-canva-oficina.md) | F.1–F.6 | Nodos-agentes animados arrastrables |

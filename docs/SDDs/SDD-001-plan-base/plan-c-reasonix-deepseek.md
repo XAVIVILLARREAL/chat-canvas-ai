@@ -73,6 +73,15 @@
 - Venta diferencial: privacidad total y modo offline — agentes trabajando sin internet ni coste por token
 - **Pruebas:** Unit: detección/parsing de /api/tags y errores de conexión. Integration con Ollama real: chat streaming completo + embeddings generados; cambio de preset KV verificado por memoria consumida. E2E humano: conectar Ollama desde cero siguiendo la guía in-app
 
+<a id="c7"></a>
+### C.7 — Registro universal de proveedores API (patrón OpenCode/models.dev)
+- Para quien use APIs de CUALQUIER empresa, sin escribir código nuevo: **registro declarativo de proveedores** — cada uno = `{id, tipo_api: openai-compat|anthropic|google, baseURL, api_key cifrada, modelos: {id: {nombre, contexto, max_output, precio_in/out por M tokens, capacidades: tools/reasoning/vision}}}`
+- **Catálogo models.dev integrado** (open-source MIT, mismo equipo que OpenCode): consumimos su `api.json` público para autocompletar automáticamente precios/contexto/capacidades de 75+ proveedores y cientos de modelos; snapshot local cacheado → funciona offline; actualizable sin tocar la app
+- Dos drivers genéricos cubren el mercado entero: `OpenAICompatProvider` (ya existe como DeepSeekDirect, ahora parametrizado por baseURL/key) + `AnthropicProvider` (API de mensajes propia) — cualquier proveedor nuevo = una entrada del registro, NO código
+- **UI doble en [A·A.6](./plan-a-chat-codex.md#a6)→Proveedores**: tarjetas 1-click para no-programadores (pegas tu API key → los modelos se autodescubren del catálogo con precios reales) + modo experto JSON crudo validado; botón "probar conexión" con llamada mínima; estado por key (válida/cuota/error)
+- Integración total con lo existente: router de costo ([C·C.6](./plan-c-reasonix-deepseek.md#c5)) usa precios REALES del registro; knobs de caché ([C·C.5](./plan-c-reasonix-deepseek.md#c5)) respetan capacidades del modelo (soporta caching/reasoning/vision); keys cifradas por scope ([A·A.0](./plan-a-chat-codex.md#a0): global o por proyecto)
+- **Pruebas:** Unit: parser/validador del registro + merge catálogo-remoto vs local. Integration: 3 proveedores reales (deepseek + anthropic + uno openai-compat genérico) vía el MISMO trait; precios correctos en telemetría. E2E humano: no-programador agrega OpenRouter/OpenAI pegando solo su key y chatea <2 min
+
 ## 🚪 GATE C (demo verificable)
 
 Tres sesiones desde la MISMA UI: chat directo (barato), tarea flash con tools, planificación reasoner. Costo acumulado visible y correcto contra métricas reales. Cancelar una tarea a mitad funciona y deja estado consistente. Matar el proceso serve → la app se recupera sola.

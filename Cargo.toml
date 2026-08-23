@@ -1,0 +1,20 @@
+[workspace]
+resolver = "2"
+members = ["crates/core", "crates/server", "src-tauri"]
+
+# ADR-005 D1: un solo dominio Rust (crates/core) consumido por tres binarios:
+# el shell Tauri (desktop/mobile) y el servidor axum (modo nube).
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+specta = { version = "2.0.0-rc.25", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+
+[profile.dev]
+incremental = true
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

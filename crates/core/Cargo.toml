@@ -1,0 +1,9 @@
+[package]
+name = "empresa-dev-core"
+version = "0.1.0"
+description = "Dominio puro de Empresa Dev — sin Tauri ni HTTP (ADR-005 D1)"
+edition = "2021"
+
+[dependencies]
+serde.workspace = true
+specta.workspace = true

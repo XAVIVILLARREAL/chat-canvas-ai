@@ -1,23 +1,16 @@
-use serde::{Deserialize, Serialize};
-use specta::Type;
+use empresa_dev_core::domain::{Agent, Task};
 use specta_typescript::Typescript;
 use tauri::Manager;
 
-#[derive(Debug, Serialize, Deserialize, Clone, Type)]
-pub struct Agent {
-    pub id: String,
-    pub name: String,
-    pub role: String,
-    pub status: String,
-}
+// ADR-005 D1: los tipos de dominio viven en crates/core y son re-exportados
+// aquí; el shell solo define comandos IPC que envuelven lógica del core.
 
-#[derive(Debug, Serialize, Deserialize, Clone, Type)]
-pub struct Task {
-    pub id: String,
-    pub title: String,
-    pub description: String,
-    pub status: String,
-    pub assigned_agent_id: Option<String>,
+/// Ejemplo de comando que fabrica dominio via core: mismo contrato para
+/// Tauri (IPC) y servidor (HTTP /api/domain/agent-demo).
+#[tauri::command]
+#[specta::specta]
+fn draft_agent(id: String, name: String) -> Agent {
+    Agent::new(id, name)
 }
 
 #[tauri::command]
@@ -32,10 +25,19 @@ fn get_app_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
+// Los tipos Task/Agent se referencian en la firma de comandos/export specta
+// para mantenerlos vivos hasta que las fases A/B los consuman.
+#[allow(dead_code)]
+type DomainTypes = (Agent, Task);
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let builder = tauri_specta::Builder::<tauri::Wry>::new()
-        .commands(tauri_specta::collect_commands![greet, get_app_version]);
+        .commands(tauri_specta::collect_commands![
+            greet,
+            get_app_version,
+            draft_agent
+        ]);
 
     #[cfg(debug_assertions)]
     builder
