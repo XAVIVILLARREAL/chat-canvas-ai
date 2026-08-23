@@ -46,6 +46,27 @@ trait AgentProvider {
 - Aprobar/rechazar acción pendiente con scopes "una vez" vs "toda la sesión" (Codex)
 - **Pruebas:** E2E browser-mode con provider MOCK scriptado (sin key real): prompt→streaming→tool-call→aprobar→diff visible→slash fork duplica sesión
 
+<a id="a6"></a>
+### A.6 — Centro de Configuración (flexible para todos los públicos)
+- Hub unificado accesible desde sidebar, con **búsqueda de ajustes** y dos modos de presentación: **tarjetas en lenguaje claro** (no-programadores: toggles, descripciones humanas, presets) y **modo crudo** (programadores: JSON editable con validación)
+- Categorías: Cuenta · Apariencia · Modelos y proveedores · Permisos/Sandbox por defecto · Notificaciones · Voz · Sync · Presupuestos · Privacidad/Datos · Atajos · MCP ([PLAN P](./plan-p-centro-mcp.md)) · Avanzado
+- Alcance GLOBAL vs POR-PROYECTO con herencia y override visible ("este proyecto sobreescribe X")
+- Import/export de configuración portable · Modo seguro (arranca sin terceros) · Reset por categoría con confirmación · Todo cambio auditado en el Ledger
+- **Pruebas:** Unit store settings + herencia global/proyecto. E2E humano: no-programador cambia un ajuste solo con clicks; programador edita JSON crudo validado; override por proyecto visible
+
+<a id="a7"></a>
+### A.7 — Modo ENCARGO: dar trabajo, no prompts (patrón Grok Bot)
+- Alternativa al prompt libre: botón "Nuevo encargo" con campos en lenguaje humano — **qué resultado esperas** (criterios), **cuándo** (al terminar / fecha), **autonomía** (me consultas siempre / solo lo peligroso / todo tuyo)
+- El encargo se convierte internamente en tarea con criterios ([H·H.1](./plan-h-motor-pruebas.md#h1)) — el agente trabaja y "vuelve cuando está listo o necesita juicio"
+- Menos como promptear, más como delegar a un compañero
+- **Pruebas:** E2E humano: crear encargo sin escribir un prompt; agente mock lo completa; notificación de vuelta con evidencia
+
+<a id="a8"></a>
+### A.8 — Resume inteligente al abrir (patrón Grok Bot)
+- Al abrir la app: tarjeta contextual por sesión activa — "ayer quedaste en X, el agente dejó Y pendiente, ¿continúo?"
+- Reconstruye contexto desde rungs del Ledger ([D·D.1](./plan-d-memoria-v3code.md#d1)) y ofrece continuar/ignorar/descartar con un click
+- **Pruebas:** Integration: sesión interrumpida → resume card correcta. E2E humano: cerrar a mitad de tarea → reabrir → continuar fluido
+
 ## 🚪 GATE A (demo verificable)
 
 1. Conversación REAL con DeepSeek (key de prueba) con streaming carácter a carácter

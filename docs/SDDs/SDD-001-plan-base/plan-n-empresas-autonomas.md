@@ -26,6 +26,8 @@
 <a id="n4"></a>
 ### N.4 — Dashboard de empresa
 - Vista canva de toda la empresa (organigrama sobre [PLAN F](./plan-f-canva-oficina.md)): nodos jerárquicos, flujo de artefactos entre roles, KPIs vivos (tareas done/fallidas, costo, tiempo, escaladas [H·H.4](./plan-h-motor-pruebas.md#h4), revisiones [I·I.1](./plan-i-revision-superposiciones.md#i1)), timeline replay del Ledger
+- **Split-screen "pantalla de cada agente"**: ver EN VIVO qué está haciendo cada operativo (su terminal/archivos), estilo computadora-propia de Grok Bot
+- **Curva de mejora por agente**: KPI de aprendizaje ("Dev-A mejoró 30% su tasa primera-pass contigo") — los compañeros se afinan con el uso
 - **Pruebas:** E2E humano: navegar dashboard, filtrar por rol/agente, replay scrubber de un proyecto completo
 
 <a id="n5"></a>
@@ -39,6 +41,12 @@
 - **Rutinas programadas**: scheduler de trabajos recurrentes por empresa ("triage de bugs cada noche", "scoreboard lunes 9am") disparando skills/empresas sin humano presente
 - **Digest automático** diario/semanal: qué hizo cada agente, costos, bloqueos, próximos pasos — generado del Ledger y archivado
 - **Pruebas:** Integration: 3 agentes en group chat resuelven handoff sin humano (scripted). E2E humano: observo la conversación grupal en vivo; programo rutina nocturna y verifico ejecución + digest matutino
+
+<a id="n7"></a>
+### N.7 — Entorno compartido de empresa (adaptación del "computer compartido" de Grok Bot)
+- La empresa tiene UN entorno compartido controlado: credenciales/servicios/secretos de la empresa disponibles a sus agentes CON auditoría y scopes por rol ([G·G.2](./plan-g-skills-lab.md#g2)) — a diferencia de Grok Bot (todo compartido), aquí cada acceso es rung auditado
+- Los worktrees siguen aislando el CÓDIGO; el entorno compartido provee servicios comunes (registry, staging DB, deploy keys)
+- **Pruebas:** Cargo test: acceso sin scope rechazado+auditado; con scope permitido+registrado
 
 ## 🚪 GATE N (el gate histórico)
 

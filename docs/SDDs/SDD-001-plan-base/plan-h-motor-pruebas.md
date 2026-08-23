@@ -43,6 +43,16 @@
 - Auto-purga: logs verbosos de los ciclos se descartan; solo el rung resumen sobrevive (copia.md §auto-purgado)
 - **Pruebas:** Integration scripted: agente introduce error → 2 ciclos SELF_FIX invisibles → entrega limpia → Ledger muestra los rungs, el chat NO muestra ruido
 
+<a id="h9"></a>
+### H.9 — Computadora persistente del agente (patrón Grok Bot, local-first)
+- Abstracción `AgentComputer` con DOS drivers:
+  - **LocalDriver** (default v1): workspace + worktree + procesos sandbox ya existentes — cero requisitos extra
+  - **ContainerDriver**: contenedor **Ubuntu persistente por agente** (Docker local o en tu servidor): filesystem que sobrevive entre sesiones, terminal accesible desde la UI, navegador headless disponible, snapshots/restores del estado completo de la máquina
+- La máquina del agente es SU oficina: instala dependencias, deja servicios corriendo, retoma el entorno tal cual lo dejó (persistencia real estilo Grok Bot pero en TU infraestructura, no en la nube ajena)
+- Snapshots manuales + automáticos pre-tarea peligrosa; reset limpio con un click; límites CPU/RAM/disco configurables ([C6](./plan-a-chat-codex.md#a4) hereda permisos)
+- Terminal visible en panel ([A·A.4](./plan-a-chat-codex.md#a4)) conectada a LA máquina de ese agente
+- **Pruebas:** Cargo test drivers tras trait común. Integration: container crea archivo → reinicia sesión → archivo sigue ahí; snapshot→restore exacto. Chaos: matar container → recrear desde snapshot. E2E humano: abre terminal del agente, trabaja, cierra app, vuelve y su entorno sigue intacto
+
 ## 🚪 GATE H (demo verificable)
 
 Tarea real end-to-end: "agrega botón de exportar CSV al panel" con criterios (`existe test del export`, `comando vitest pasa`) → el agente implementa en su flujo → TestRunner ejecuta → canva muestra ✓✓ → reviso diff clicable → apruebo → done persistido. Todo demostrado en video con suite humana verde.

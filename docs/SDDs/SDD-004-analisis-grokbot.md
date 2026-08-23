@@ -64,3 +64,39 @@ Sistema de **"compañeros IA siempre encendidos"** (bots) que:
 - Etapa G: +fase G.6 (rutinas por demostración — diferenciador fuerte)
 - Etapa N: refuerzos N.2/N.4 + nuevas N.5b group-chat visible, N.6 rutinas programadas
 - Estimación global ajustada: +1 semana total (las fases nuevas son UI/orquestación sobre mecanismos ya previstos)
+
+
+## APÉNDICE — Extracción TOTAL de ideas Grok Bot (28, estado de integración)
+
+| # | Idea Grok Bot | Estado en nuestro roadmap |
+|---|---|---|
+| 1 | Computadora propia persistente por bot | ✅ [H·H.9](./SDD-001-plan-base/plan-h-motor-pruebas.md#h9) LocalDriver + ContainerDriver Ubuntu |
+| 2 | Group chat de bots que coordinan solos | ✅ N.6 |
+| 3 | Chief of staff gestiona especialistas | ✅ N.2 reforzado |
+| 4 | Rutinas por demostración (follow along) | ✅ G.6 |
+| 5 | Rutinas programadas / cron | ✅ N.6 |
+| 6 | Proactividad: retoma hilos, empuja handoffs | ✅ I.6 |
+| 7 | Pipeline bug→ticket→debugger | ✅ I.6 |
+| 8 | Sabe cuándo molestar vs seguir | ✅ K.3 política interrupción |
+| 9 | Aprende tu voz y estilo | ✅ D.2 preferencias aplicadas a commits/PRs |
+| 10 | Mismo hilo móvil/desktop | ✅ Etapa L (confirmación de modelo) |
+| 11 | Handoffs entre bots con resumen | ✅ N.2 visible en group chat |
+| 12 | Digests/scoreboards automáticos | ✅ N.6 digest + N.4 scoreboard |
+| 13 | Pantalla propia por bot (split view) | ✅ N.4 split-screen en vivo |
+| 14 | Curva "se afina contigo" medible | ✅ N.4 KPI aprendizaje por agente |
+| 15 | Computer compartido por cuenta | 🔄 Adaptado: N.7 entorno compartido CON auditoría por acceso |
+| 16 | Menos promptear, más delegar | ✅ A.7 Modo ENCARGO (resultado+plazo+autonomía) |
+| 17 | Trabajo aterriza en tools reales, no drafts | ✅ Ya es nuestro core (commits/PRs reales) — principio reforzado |
+| 18 | Conectores/MCP donde exista, computer-use el resto | 🔄 Escalera equivalente: MCP/tools primero ([PLAN P](./plan-p-centro-mcp.md)), terminal después |
+| 19 | Solo te llama para judgment calls | ✅ K.3 + cola unificada A.4/I.4 |
+| 20 | Zero-config onboarding: mensajéalo y ya | ✅ A.1 empty-states + wizard primer agente |
+| 21 | Retomar trabajo de conversaciones viejas | ✅ A.8 resume inteligente al abrir |
+| 22 | Negocia/en redacta EN TU VOZ | ✅ D.2 perfil de estilo → commits/PRs/comentarios |
+| 23 | Jobs nocturnos overnight (research mientras duermes) | ✅ N.6 programadas (corren aunque cierres) |
+| 24 | Asignación de ownership autónoma justificada | ✅ N.2 decisión de asignación replayable |
+| 25 | Página central de aprobaciones/seguridad | ✅ Hub de aprobaciones A.4/I.4 unificado + A.6 settings |
+| 26 | Apps desktop+iOS paridad | 📋 Backlog: Tauri mobile post-v1 (ADR-002) |
+| 27 | Gating por suscripción/tiers | 📋 Backlog negocio: O.3 pricing tiers |
+| 28 | Preocupación comunidad: control del usuario | ✅ Nuestro answer BY DESIGN: kill-switch + permisos granulares + local-first |
+
+**Cobertura final: 24/28 integradas o reforzadas · 4 backlog consciente · 0 ignoradas**
