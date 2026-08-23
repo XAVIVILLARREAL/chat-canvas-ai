@@ -61,6 +61,16 @@
 - **Checkpoints V3Code**: cada turno genera snapshot git-backed (rama interna shadow) — saltar a cualquier checkpoint restaura código Y contexto de conversación intactos
 - **Pruebas:** Unit aging policy. Integration router: prompt de auth carga SOLO shard auth (verificado en request capturado). E2E checkpoint: rebobinar a turno N restaura archivos exactos
 
+<a id="d8"></a>
+### D.8 — Motor de memorias multi-tipo configurable (SDD-006 §3)
+- **Taxonomía completa con knobs separados** (CoALA): `working` (presupuesto tokens) · `episódica` (rungs) · `semántica/largo-plazo` (hechos) · `relacional` (grafo bi-temporal: contradicción INVALIDA, nunca borra) · `indexada` (FTS5/vector) · `procedimental` (skills/reglas versionadas)
+- Configurables por SCOPE ([A·A.6](./plan-a-chat-codex.md#a6)): qué tipos activa cada agente/subagente según su rol
+- Operaciones completas: Consolidación (clustering archive-then-insert idempotente) · Indexing · Updating · **Forgetting** (decay Ebbinghaus λ POR TIPO; afecta ranking NUNCA borrado; GC solo <0.01 archivando originales; refuerzo por acceso) · Retrieval (híbrido multi-señal: relevance×3+importance×2+recency×0.5 pesos tuneables) · Compression
+- Escritura configurable: auto-extraída async / explícita remember() / cola pendiente con aprobación humana (patrón Cursor Memories)
+- Reflexión por UMBRAL de importancia acumulada (~150 tuneable) → insights escritos de vuelta como memorias scorable
+- Scoping namespaced SIEMPRE: global/proyecto/agente/subagente — cero leakage cross-tenant ([A·A.0](./plan-a-chat-codex.md#a0))
+- **Pruebas:** Unit decay/scoring con fixtures. Integration: contradicción invalida (bi-temporal) sin borrar; consolidación idempotente. E2E humano: ajustar λ de un tipo y ver el ranking cambiar; leakage test entre proyectos
+
 ## 🚪 GATE D (demo verificable)
 
 1. Sesión 1: "decidimos usar Tailwind, prohibido CSS global" → decisión queda en Ledger

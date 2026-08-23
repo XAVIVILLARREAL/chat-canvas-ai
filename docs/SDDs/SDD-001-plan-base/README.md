@@ -1,6 +1,6 @@
 # SDD-001 · Roadmap Maestro — Empresa Dev
 
-> Fecha: 2026-08-22 · Estado: Propuesto · v3.2 MEGA-PLAN (15 etapas + P, ~84 fases)
+> Fecha: 2026-08-22 · Estado: Propuesto · v3.2 MEGA-PLAN (15 etapas + P, ~88 fases)
 > Investigación profunda: OpenAI Codex (docs oficiales), Reasonix v1.23 (verificado EN VIVO en este servidor), V3Code (sitio oficial + spec copia.md), **Grok Bot xAI/Cursor** ([SDD-004](../SDD-004-analisis-grokbot.md): group chat de agentes, rutinas por demostración, proactividad, pipeline de bugs) + patrones de varve/codevira.
 > Pruebas: [SDD-002](../SDD-002-testing-spec-driven.md) — toda fase pasa las 4 capas; todo gate cierra con suite humana.
 
@@ -22,7 +22,7 @@
 
 Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable + motor barato DeepSeek + memoria V3Code + shadow workspace Cursor + fast apply Morph + gobernanza varve + revisión Reasonix + repo-map Aider + voz natural + sync CRDT + git nativo.
 
-## Mapa de las 15 ETAPAS (~84 fases)
+## Mapa de las 15 ETAPAS (~88 fases)
 
 | Etapa | Nombre | Archivo | Fases | Gate resumen |
 |---|---|---|---|---|
@@ -43,6 +43,7 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 | 14 | Empresas autónomas | [plan-n](./plan-n-empresas-autonomas.md) | N.1–N.5 | Empresa completa operada por agentes |
 | 15 | Marketplace + MCP público + v1.0 | [plan-o](./plan-o-marketplace-v1.md) | O.1–O.3 | Empresas empaquetables, release 1.0 |
 | P | **Centro MCP transversal** | [plan-p](./plan-p-centro-mcp.md) | P.1–P.4 | Conectar herramientas externas sin tocar JSON (o pegándolo) |
+| C.5+D.8+H.9+A.6 | **Motor Contexto/Memoria/Caché configurable** | [SDD-006 investigación](../SDD-006-investigacion-cache-memoria.md) → fases en plan-c/d/h/a | — | KV-caché, compresión, memorias multi-tipo y respaldos por rol en 5 scopes |
 
 ```
                     ┌──────────────────────────────────────┐

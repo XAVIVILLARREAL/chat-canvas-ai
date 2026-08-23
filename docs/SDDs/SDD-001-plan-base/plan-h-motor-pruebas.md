@@ -51,6 +51,7 @@
 - La máquina del agente es SU oficina: instala dependencias, deja servicios corriendo, retoma el entorno tal cual lo dejó (persistencia real estilo Grok Bot pero en TU infraestructura, no en la nube ajena)
 - Snapshots manuales + automáticos pre-tarea peligrosa; reset limpio con un click; límites CPU/RAM/disco configurables ([C6](./plan-a-chat-codex.md#a4) hereda permisos)
 - Terminal visible en panel ([A·A.4](./plan-a-chat-codex.md#a4)) conectada a LA máquina de ese agente
+- **Respaldos del estado del agente POR ROL** (SDD-006 §4): frecuencia y retención configurables por scope ([A·A.6](./plan-a-chat-codex.md#a6)) — default estilo Claude Code (automáticos, conserva últimos 5); snapshot = estado COMPLETO (archivos+memoria) pero restauración exige replay-or-fork explícito con registro de efectos externos ya ocurridos (anti semantic-rollback ACRFence); golden snapshot de empresa heredable ([N·N.7](./plan-n-empresas-autonomas.md#n7)) con aprobación humana para actualizarlo
 - **Pruebas:** Cargo test drivers tras trait común. Integration: container crea archivo → reinicia sesión → archivo sigue ahí; snapshot→restore exacto. Chaos: matar container → recrear desde snapshot. E2E humano: abre terminal del agente, trabaja, cierra app, vuelve y su entorno sigue intacto
 
 ## 🚪 GATE H (demo verificable)
