@@ -113,6 +113,8 @@ ETAPA 13:          + GitService (gitoxide/Rust o CLI git)
 ETAPA 14:          + CompanyOrchestrator (jerarquía líder→operativos sobre subagentes reasonix)
 ```
 
+**Prerequisito de Etapa 1**: [ADR-005](../ADRs/ADR-005-modelo-despliegue-dual.md) — refactor a workspace Cargo (crates core/tauri-shell/server) ANTES de codificar, para que "local o nube" sea propiedad del build y no una promesa. Habilita Etapa 12 (sync) y agentes always-on del servidor.
+
 Reglas transversales intocables: **CADA PROYECTO ES UN TENANT** — todo dato lleva `project_id` desde el día 1 ([A·A.0](./plan-a-chat-codex.md#a0): cards + tabs + historial aislado; skills/MCP/agentes GLOBAL o COPIA LOCAL a decisión del usuario) · secretos SOLO en Rust · un trait por capacidad (provider/store/embeddings/router) · SQLite append-only para auditoría · fail-open en extras, fail-safe en datos · cada capa expone su contraparte MCP (visión V3Code).
 
 ## Estimación global honesta (vibecoding dedicado)
