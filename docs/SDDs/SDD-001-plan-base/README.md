@@ -156,6 +156,15 @@ Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: so
 
 Dentro de rango sano para CI en cada push (core) + gates (full).
 
+## Espacios reservados → [Plan Intermedio](../SDD-005-plan-intermedio.md) (no bloquea nada)
+
+La base YA deja los ganchos que las 4 ventanas futuras necesitan — sin tablas nuevas ni deuda:
+- `event_stream` con `TEST_RESULT` → alimentará el **Kanban de resultados animados** (Etapa 17)
+- `documents/knowledge` ([D·D.2](./plan-d-memoria-v3code.md#d2)) + índice dual ([D·D.5](./plan-d-memoria-v3code.md#d5)) → alimentarán el **Grafo de documentos estilo Obsidian** (Etapa 16)
+- Sesiones/rungs navegables ([D·D.3](./plan-d-memoria-v3code.md#d3)) → alimentarán el **Canvas de sesiones** (Etapa 18)
+- Three.js + pagerank ([PLAN J](./plan-j-grafo3d-repomap.md)) + layouts persistidos desde F/VI → terreno listo para **3D/gafas** (Etapa 19)
+Regla: cada ventana futura es una VISTA sobre estos datos; prohibido duplicar.
+
 ## Optimización visual/UX aplicada
 
 | Patrón | Fuente | Fase |
