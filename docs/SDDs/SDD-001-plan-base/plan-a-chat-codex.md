@@ -67,6 +67,12 @@ trait AgentProvider {
 - Reconstruye contexto desde rungs del Ledger ([D·D.1](./plan-d-memoria-v3code.md#d1)) y ofrece continuar/ignorar/descartar con un click
 - **Pruebas:** Integration: sesión interrumpida → resume card correcta. E2E humano: cerrar a mitad de tarea → reabrir → continuar fluido
 
+<a id="a9"></a>
+### A.9 — Ramas visuales al editar mensajes (patrón ChatGPT)
+- Al editar un mensaje ([A·A.7](./plan-a-chat-codex.md#a7) fork): navegadores ‹2/3› sobre el mensaje para moverse entre ramas de la conversación
+- Indicador de rama activa en el header + acceso a "otras ramas" con su resultado final comparado
+- **Pruebas:** Unit tree-store. E2E humano: edito mensaje 2 veces → flechas ‹› navegan alternativas sin perder ninguna
+
 ## 🚪 GATE A (demo verificable)
 
 1. Conversación REAL con DeepSeek (key de prueba) con streaming carácter a carácter

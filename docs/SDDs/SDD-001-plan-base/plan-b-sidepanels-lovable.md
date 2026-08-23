@@ -39,6 +39,13 @@
 - Si un delta llega inválido → rollback del archivo a último estado bueno + aviso inline (fail-safe)
 - **Pruebas:** Cargo test aplicador: 500 deltas/sec sintéticos sin pérdida ni desorden. E2E humano: ver un archivo grande escribirse fluido en vivo
 
+<a id="b9"></a>
+### B.9 — Artefactos versionados (patrón Claude artifacts)
+- El preview/archivo principal de una tarea se trata como ARTEFACTO con historial de versiones navegable
+- Selector ‹v2/v5› + comparación side-by-side entre dos versiones + "restaurar esta versión" (con rung en Ledger)
+- Cada versión muestra quién/cuándo (agente o humano) y qué criterio la cambió
+- **Pruebas:** Integration versionado automático por escritura relevante. E2E humano: navegar 3 versiones, comparar side-by-side, restaurar antigua
+
 ## 🚪 GATE B (demo verificable)
 
 Prompt real: *"crea una landing para una cafetería"* → aparecen archivos en el árbol, Monaco los muestra al click, el preview renderiza la página terminada en vivo. El usuario no tocó código. Feedback en un diff se refleja en la corrección del agente.

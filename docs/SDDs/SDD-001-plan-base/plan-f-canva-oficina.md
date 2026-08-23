@@ -7,6 +7,15 @@
 
 ## Fases
 
+<a id="f0"></a>
+### F.0 — Design System core + capa de experiencia (prerrequisito de TODO lo visual)
+- **Tokens de diseño** (`oklch()` + cascade layers): color/espacio/tipografía/radio/sombra/motion en un solo archivo consumido por todas las etapas — modo oscuro/claro/alto-contraste desde el mismo token
+- **Primitivas base**: Button, Input, Card, Modal, **Toast + UNDO 5s** en acciones destructivas (patrón Linear), Skeleton loaders (nunca spinners), Avatar, StatusDot, Tabs, Tooltip, EmptyState ilustrado
+- **Status bar global inferior** (patrón Zed/Vim): modelo activo · contexto usado% · coste sesión · rama git · estado sync · agentes corriendo — información mirable de reojo, cero clicks
+- Motion spec único: duraciones/easing globales, respeta `prefers-reduced-motion`
+- La IA aplica los skills de `reference/` SOBRE estos tokens (nunca CSS improvisado)
+- **Pruebas:** Vitest tokens/primitivas. E2E humano: contraste AA automatizado, toast deshace acción destructiva, status bar refleja modelo/coste reales
+
 ### F.1 — Fundaciones ReactFlow
 - ReactFlow instalado y montado en WorkArea como pestaña "Oficina" (el chat/sidepanels NO se tocan)
 - Nodos estáticos arrastrables, edges, viewport con zoom/pan (rueda + pinch), minimap desktop
