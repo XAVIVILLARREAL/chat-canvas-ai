@@ -60,6 +60,19 @@
 - Dashboard cache_hit + semáforo coste POR SCOPE; persistido en settings
 - **Pruebas:** Unit hash/orden estable. Integration DeepSeek real: cache_hit>90% post warm-up; cambio de knob → aviso de caché fría. E2E humano: aplicar preset de rol en un click
 
+<a id="c6"></a>
+### C.6 — OllamaProvider local, ready-to-plug (SDD-006 §5)
+- **Tercer driver** del trait ([A·A.3](./plan-a-chat-codex.md#a3)): reutiliza el cliente OpenAI-compatible (`/v1/chat/completions`) apuntando a `http://localhost:11434` — mismo EventBus, misma UI
+- **Detección automática**: al abrir settings, ping a `/api/tags`; si está instalado muestra modelos disponibles y estados; si no, guía de instalación por OS (nativo o Docker `-e`) sin salir de la app
+- **Knobs de hardware conectados a [C·C.5](./plan-c-reasonix-deepseek.md#c5)** (verificados en docs oficiales v0.32):
+  - `OLLAMA_KV_CACHE_TYPE`: `f16 (default) / q8_0 (~½ memoria, pérdida imperceptible — recomendado) / q4_0 (~¼, trade-off mayor)` — ⚠️ es GLOBAL del servidor y hace fallback SILENCIOSO a f16 en arquitecturas no soportadas: la UI lo advierte y verifica por consumo real de memoria
+  - Flash attention: hoy 3-estado automático; `=1` solo como forzado para debug
+  - `OLLAMA_CONTEXT_LENGTH` global y `num_ctx` por request (API nativa); `keep_alive` para mantener modelo cargado entre tareas
+- **Presets por hardware** (detecta VRAM/RAM): GPU grande (f16 + ctx largo) · Laptop (q8_0 + ctx medio) · CPU-only (modelos cuantizados chicos) — editables como cualquier scope de [A·A.6](./plan-a-chat-codex.md#a6)
+- **Embeddings plug-and-play**: `/api/embeddings` alimenta automáticamente el índice semántico dual ([D·D.5](./plan-d-memoria-v3code.md#d5)) cuando Ollama está presente; sin él, FTS5 sigue funcionando igual
+- Venta diferencial: privacidad total y modo offline — agentes trabajando sin internet ni coste por token
+- **Pruebas:** Unit: detección/parsing de /api/tags y errores de conexión. Integration con Ollama real: chat streaming completo + embeddings generados; cambio de preset KV verificado por memoria consumida. E2E humano: conectar Ollama desde cero siguiendo la guía in-app
+
 ## 🚪 GATE C (demo verificable)
 
 Tres sesiones desde la MISMA UI: chat directo (barato), tarea flash con tools, planificación reasoner. Costo acumulado visible y correcto contra métricas reales. Cancelar una tarea a mitad funciona y deja estado consistente. Matar el proceso serve → la app se recupera sola.

@@ -183,3 +183,11 @@ eference/ (clones shallow, depth 1):
   - CI nuevo job build-desktop: matriz ubuntu/windows/macos con cargo check + build frontend en cada push (DoD 2+ plataformas ahora continuo)
   - Workflow manual "Android Build" (workflow_dispatch): genera APK debug como artefacto sin toolchain local
   - docs/MULTIPLATAFORMA.md: comandos por plataforma; iOS documentado (requiere Mac para ios init)
+- **ADR-005 Modelo de Despliegue Dual (ACEPTADO)**: visión "desarrollar desde cualquier dispositivo sin fricción" convertida en decisión arquitectónica
+  - D1: refactor a workspace Cargo (crates/core + tauri-shell + server) — el MISMO dominio Rust corre embebido en Tauri Y como binario axum; se ejecuta ANTES de Etapa 1 (~70 líneas hoy, barato ahora, caro después)
+  - D2: sqlx como abstracción SQLite(local) ↔ PostgreSQL+RLS(servidor), feature-flag sin forks
+  - D3: git de base propio ligero — repos bare vía gitoxide detrás del trait GitService (Plan M), puente GitHub con octocrab; Forgejo queda como opción posterior NO core
+  - D4: sesiones resumibles = doc Yrs CRDT + event log; agentes corren en sandboxes Docker server-side y siguen trabajando sin dispositivos conectados
+  - D5: stack 100% Rust MIT/Apache (tokio/axum/sqlx/yrs/gitoxide/octocrab/bollard) — comercializable SaaS sin AGPL embebido
+  - D6: tres modos de despliegue con un codebase: local-first / self-host docker / cloud multi-tenant futuro
+  - Fases mapeadas al roadmap vigente: L nace el servidor, M sirve ambos backends git, N orquesta local vs sandbox

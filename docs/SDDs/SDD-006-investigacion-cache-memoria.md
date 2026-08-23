@@ -48,3 +48,12 @@
 - Snapshot frequency/retention POR ROL (estilo Claude Code: conserva últimos 5 automáticos)
 - Checkpoint = estado COMPLETO (archivos+memoria), pero separar "estado ejecutable" de "memoria conversacional"
 - ⚠️ Anti-patrón documentado (ACRFence): restaurar checkpoint puede RE-EJECUTAR acciones externas irreversibles → todo restore exige replay-or-fork explícito con registro de efectos ya ocurridos
+
+## 5 · Ollama — knobs verificados (docs oficiales v0.32, ago 2026)
+
+- `OLLAMA_KV_CACHE_TYPE`: `f16` default · `q8_0` ~½ memoria pérdida imperceptible (recomendado) · `q4_0` ~¼ con trade-off notable en contextos largos
+- ⚠️ GLOBAL del servidor (no per-modelo; PR Modelfile nunca mergeado) · requiere flash attention activo · **fallback silencioso a f16** en arquitecturas no soportadas (verificar por memoria real/logs, no asumir)
+- Flash attention: 3-estado desde oct-2025 (auto donde hardware soporta; `=1` fuerza, `=0` excluye en debug). El log imprime `false` cuando unset aunque esté activo — reporta la variable, no el comportamiento
+- `OLLAMA_CONTEXT_LENGTH` global; `num_ctx` por request solo en API nativa (NO en endpoint OpenAI-compat)
+- Endpoints: `/api/tags` listar · `/api/chat` streaming NDJSON · `/v1/chat/completions` compat · `/api/embeddings` + `/v1/embeddings`
+- `keep_alive` mantiene modelo cargado entre llamadas; docker `-e` soporta todas las variables

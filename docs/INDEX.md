@@ -41,6 +41,7 @@
 | ADR-002 | Arquitectura Hibrida Monorepo | Aprobado |
 | ADR-003 | Voz y Sincronizacion | Pendiente |
 | ADR-004 | Integracion GitHub | Pendiente |
+| ADR-005 | Modelo de Despliegue Dual (local-first + servidor nube, crates Rust) | Aceptado |
 
 ## Documentos archivados (no vigentes)
 

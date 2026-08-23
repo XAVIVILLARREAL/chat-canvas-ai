@@ -50,7 +50,7 @@
   - Nivel BAJO: símbolos y fragmentos de código ([J·J.1](./plan-j-grafo3d-repomap.md#j1) alimenta los nodos)
   - Nivel ALTO: conceptos arquitectónicos, ADRs y decisiones del workspace
 - v1 práctica: FTS5 léxico con ranking BM25 para ambos niveles (ya probado en [D·D.2](./plan-d-memoria-v3code.md#d2))
-- v2 opcional (spike aislado): búsqueda semántica KNN con `sqlite-vec` embebido y embeddings generados LOCALMENTE por el provider configurado — si no hay motor disponible, el sistema queda en v1 sin degradarse (fail-open)
+- v2 opcional: búsqueda semántica KNN con `sqlite-vec` embebido y embeddings LOCALES vía **OllamaProvider** ([C·C.6](./plan-c-reasonix-deepseek.md#c6) `/api/embeddings`, ready-to-plug: si Ollama está presente se activa solo) — sin motor disponible queda en FTS5 puro sin degradarse (fail-open)
 - Búsqueda híbrida final: FTS5 ∪ KNN con fusión por ranking cuando la v2 exista
 - **Pruebas:** Integration: consulta ("cómo manejamos auth") retorna la decisión correcta aunque no comparta palabras. Indexado incremental <100ms/archivo
 
