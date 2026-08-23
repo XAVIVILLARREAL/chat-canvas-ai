@@ -1,7 +1,7 @@
 import { expect } from "../human-fixture";
 import { test } from "../human-fixture";
 
-test.describe("Crear agente — flujo humano completo", () => {
+test.describe("@core Crear agente — flujo humano completo", () => {
   test("creo mi primer agente y reviso su detalle", async ({ h }) => {
     await h.step("entro a la app", () => h.page.goto("/"));
 

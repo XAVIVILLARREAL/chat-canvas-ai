@@ -129,6 +129,32 @@ Valor usable continuo: chat desde semana 2, paneles semana 4, memoria semana 7, 
 
 Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: solo **20 ganadoras** entran al roadmap (fases C.5 caché Reasonix, A.5 medidor/debug contexto, B.6-B.8 menciones/hunks/consola→agente, D.7 blame-rung, F.7 ⌘K, G.4 golden skills, H.7 best-of-N + H.8 cuarentena flaky, N.2 merge-train, I.4 risk-score). Detalle completo: [SDD-003-torneo-500-ideas](../SDD-003-torneo-500-ideas.md). Las 480 restantes son backlog vivo re-visible al cerrar cada etapa.
 
+## Revisión de viabilidad y optimización (2026-08-23, post-commit d5be587)
+
+**Veredicto: VIABLE.** Fortalezas comprobadas en runtime: infra 100% verde, trait Provider que aísla el riesgo del contrato Reasonix, estrategia mock-first que mantiene el coste de pruebas ≈$0 (gates con key real estimados <$2 c/u usando flash).
+
+### Optimizaciones APLICADAS en esta revisión
+
+1. **CI tenía un job roto** (`empresa-autonoma` apuntaba a carpeta eliminada en el reset Flutter→Tauri — fallaba cada push) → eliminado
+2. **CI no ejecutaba ningún E2E** → job `e2e` nuevo: build + vite + chromium funcional + suite humana @core (21.8s medidas)
+3. **Tiering de la suite humana**: `@core` (smoke ~22s, en cada push) vs completa (solo gates) — evita explosión de minutos de CI al crecer la suite
+4. Knip añadido al CI (código muerto visible desde el principio)
+
+### Recomendaciones de orden APROBADAS (aplican al ejecutar)
+
+- Tras Etapa I: ejecutar **M (GitHub) antes que K/L** — los agentes necesitan committir para el Gate N, y PRs automáticos dan demo de valor antes que voz/sync
+- **L.3 Co-Work CRDT** queda detrás de feature-flag y puede moverse a post-v1 sin romper L.1–L.2 (Yjs es la dependencia más compleja de menor valor inmediato)
+- **B.5 Fast Apply** se activa tras feature-flag hasta pasar su chaos-test
+
+### Carga de pruebas proyectada (matemática de viabilidad)
+
+| Punto | Funcionales | Humanas core | Humanas full | Tiempo CI |
+|---|---|---|---|---|
+| Hoy | 4+12=16 | 6 (~22s) | 12 (~80s) | ~2 min |
+| Gate E | ~70 | ~10 (~35s) | ~45 (~6 min) | ~9 min |
+
+Dentro de rango sano para CI en cada push (core) + gates (full).
+
 ## Reglas de ejecución (no negociables)
 
 1. Mini-SDD técnico por ETAPA antes de codificarla (ampliar su archivo)

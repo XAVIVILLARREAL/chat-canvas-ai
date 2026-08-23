@@ -1,7 +1,7 @@
 import { expect } from "../human-fixture";
 import { test } from "../human-fixture";
 
-test.describe("Boot — primera impresión como humano", () => {
+test.describe("@core Boot — primera impresión como humano", () => {
   test("abro la app y entiendo qué es", async ({ h }) => {
     await h.step("abro la aplicación", () => h.page.goto("/"));
 
