@@ -12,10 +12,10 @@ async fn main() {
         .route("/api/version", get(version))
         .route("/api/domain/agent-demo", get(agent_demo));
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3010")
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3030")
         .await
-        .expect("puerto 3010 disponible");
-    println!("[empresa-dev-server] escuchando en http://0.0.0.0:3010");
+        .expect("puerto 3030 disponible");
+    println!("[empresa-dev-server] escuchando en http://0.0.0.0:3030");
     axum::serve(listener, app).await.expect("servidor axum");
 }
 
