@@ -498,7 +498,7 @@ La AI gestiona los documentos **sola**, sin intervencion humana. El humano solo 
 | ADR-004 | Integracion GitHub | Pendiente |
 
 
-## 🪟 LAS 4 VENTANAS DEL PROYECTO (lógica de negocio — ver SDD-005)
+## 🪟 LAS 5 VENTANAS DEL PROYECTO (lógica de negocio — ver SDD-005)
 
 Cada proyecto de desarrollo (tenant, [A.0]) tiene SU PROPIO conjunto de ventanas visuales. Son vistas sobre los mismos datos (Ledger/knowledge/sesiones), no silos:
 
@@ -506,7 +506,8 @@ Cada proyecto de desarrollo (tenant, [A.0]) tiene SU PROPIO conjunto de ventanas
 2. **🕸️ GRAFO DE DOCUMENTOS** (Plan Intermedio, Etapa 16) — estilo Obsidian/Graphify: grafo de los .md del proyecto organizado por IA pero TOTALMENTE editable por el humano; síntesis y resúmenes humano+IA sencillos y prácticos. Debe verse increíble (cerebros de Obsidian).
 3. **📋 KANBAN DE RESULTADOS** (Plan Intermedio, Etapa 17) — tipo Jira pero optimizado para agentes: cards y bloques ANIMADOS mostrando evidencia (tests Playwright pasando/fallando, resultados por etapa); orientado a dejar a la IA trabajando horas autónomamente y ver qué se consiguió.
 4. **💬 CANVAS DE SESIONES** (Plan Intermedio, Etapa 18) — cards de cada sesión con agente: acceso directo a hablar (TTS/STT), ver sus resultados y retomar el hilo.
+5. **🎛️ CONTROL ROOM** (Plan Intermedio, Etapa 20) — mapa maestro GLOBAL de todos los proyectos y agentes en acción: métricas vivas, órdenes por voz/texto enrutadas al destino correcto, modo vigilancia de excepciones. Mission control del sistema entero.
 
 **Regla transversal**: toda la capa visual se construye con tokens/primitivas del Design System ([F.0]) y con estructuras de datos ESPACIALMENTE listas (posiciones, clusters, profundidades) para proyección futura en 3D/gafas (Etapa 10 Three.js es la primera; las demás ventanas heredan la preparación).
 
-Detalle completo y fases: `docs/SDDs/SDD-005-plan-intermedio.md`
+Detalle completo y fases: `docs/SDDs/SDD-005-plan-intermedio.md` · El Canvas Planeación (V2) alimenta Kanban/motor; la Control Room (V5) unifica todos los proyectos.

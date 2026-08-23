@@ -9,10 +9,11 @@ Cada proyecto-tenant ([A.0](./SDD-001-plan-base/plan-a-chat-codex.md#a0)) obtien
 
 | # | Ventana | Qué es | Inspiración |
 |---|---|---|---|
-| V1 | 🏢 Canva Multiagentes | Organigrama editable: equipos, flujos de skills, bots complejos | **YA EXISTE**: [Etapa 6 / plan-f](./SDD-001-plan-base/plan-f-canva-oficina.md) |
-| V2 | 🕸️ Grafo de Documentos | Grafo vivo de los .md del proyecto, ordenado por IA, 100% editable humano+IA | Obsidian graph / Graphify |
+| V1 | 🏢 Canva Oficina/Multiagentes | Crear y organizar agentes/equipos; organigrama editable con estados vivos | **YA EXISTE**: [Etapa 6 / plan-f](./SDD-001-plan-base/plan-f-canva-oficina.md) |
+| V2 | 🕸️ **CANVAS PLANEACIÓN** | El "segundo cerebro": grafo vivo de los .md del proyecto ordenado por IA, 100% editable humano+IA — **pantalla de planeación y orden**: crear etapas/fases/planes interactuando con los nodos; la IA crea/modifica/resume .md y hace relaciones directamente | Obsidian graph / Graphify / segundo cerebro de Karpaty |
 | V3 | 📋 Kanban de Resultados | Tablero evidencia-first con animaciones de tests/resultados, para autonomía de horas | Jira optimizado para agentes |
 | V4 | 💬 Canvas de Sesiones | Cards de sesiones por agente: hablar (TTS/STT), ver resultados, retomar | Grok Bot threads + chat apps |
+| V5 | 🎛️ **CONTROL ROOM** | Mapa maestro GLOBAL: todos los proyectos + todas las sesiones de agentes en acción; dar órdenes por voz (STT/TTS) desde un solo lugar | Centro de misión / mission control |
 
 **Regla de terreno 3D/gafas**: toda posición/clúster/profundidad que calculemos se guarda en el modelo de datos (no solo en memoria de UI) — Etapa 10 ya proyecta Three.js; las demás ventanas heredan la preparación.
 
@@ -26,9 +27,9 @@ Cada proyecto-tenant ([A.0](./SDD-001-plan-base/plan-a-chat-codex.md#a0)) obtien
 
 ---
 
-# PLAN VI — Etapa 16: Grafo de Documentos (Obsidian/Graphify propio)
+# PLAN VI — Etapa 16: CANVAS PLANEACIÓN (grafo de documentos estilo Obsidian/Graphify)
 
-**Entregable:** el cerebro visible del proyecto: sus .md como grafo hermoso, curado por IA, editable por humanos — con síntesis y resúmenes al click.
+**Entregable:** la pantalla de PLANEACIÓN Y ORDEN del proyecto — el segundo cerebro: sus .md como grafo hermoso curado por IA y totalmente editable por el humano, donde se crean etapas, fases y planes interactuando con los nodos.
 
 | Fase | Contenido | Pruebas |
 |---|---|---|
@@ -51,6 +52,8 @@ Render estilo Obsidian: nodos-tarjeta (título+tags+resumen-corto), edges curvos
 <a id="vi4"></a>
 ### VI.4 — Edición humano+IA sobre el grafo
 Seleccionar N nodos → "sintetizar" genera doc-resumen enlazado (agente barato); "resumir" rellena resumen de un nodo; editar título/tags inline; TODO cambio humano marca el nodo como `human_touched` (lock suave: la IA no lo reorganiza sin permiso — coherente con [D·D.2](./SDD-001-plan-base/plan-d-memoria-v3code.md#d2)); deshacer global
+- **PLANEACIÓN ASISTIDA**: crear nodos-tipo ETAPA/FASE/PLAN desde el grafo (con criterios); invocar a la IA sobre una selección para que cree/modifique/resuma .md directamente ("ordena estos docs", "resume y propón fases"); los nodos-PLAN creados aquí alimentan automáticamente el Kanban ([KR·KR.1](#kr1)) y las tareas del motor ([H·H.1](./SDD-001-plan-base/plan-h-motor-pruebas.md#h1))
+- Órdenes rápidas sobre selección: "relaciona estos", "reordena bajo este criterio", "propón estructura" — siempre con diff previo aceptable por el humano
 - **Pruebas:** Integration síntesis crea doc+edges. E2E humano: selecciona 3 notas→sintetiza→edita resultado→deshacer→re-hacer
 
 **🚪 GATE VI:** abro el grafo de ESTE mismo proyecto: veo clusters reales (docs/, SDDs/, ADRs/), busco "kanban" y solo ese subgrafo brilla, sintetizo 3 ADRs en una nota nueva enlazada, muevo nodos y mi layout sobrevive reinicios. Video + suites verdes.
@@ -119,6 +122,39 @@ Agrupación opcional por agente/proyecto-tema usando el índice dual ([D·D.5](.
 
 ---
 
+# PLAN CR — Etapa 20: CONTROL ROOM (mapa maestro global)
+
+> Depende de: A.0 tenants + todas las ventanas anteriores. Es la vista que UNIFICA todo.
+
+**Entregable:** un solo lugar donde ves TODO — todos los proyectos, todas las sesiones de agentes trabajando en este momento, su salud y costos — y das órdenes por voz o texto a cualquiera de ellos.
+
+<a id="cr1"></a>
+### CR.1 — Mapa global en vivo
+- Vista agregada cross-proyecto: cada proyecto como tarjeta-zona con sus agentes activos dentro (estados en tiempo real vía EventBus existente [C·C.1](./SDD-001-plan-base/plan-c-reasonix-deepseek.md#c1))
+- Métricas globales arriba: agentes corriendo · tareas activas · gasto hoy · alertas abiertas ([I·I.2](./SDD-001-plan-base/plan-i-revision-superposiciones.md#i2))
+- Drill-down: click zona → proyecto; click agente → su sesión/canva/evidencia sin perder el contexto global
+- **Pruebas:** E2E humano: 3 proyectos con actividad simulada → mapa refleja estados <1s tras cada evento
+
+<a id="cr2"></a>
+### CR.2 — Órdenes maestras por voz/texto
+- Composer global con STT/TTS ([K](./plan-k-voz.md)): "pausa el dev del proyecto café", "dale prioridad al fix de login", "resume qué hizo QA hoy" — el comando enruta al proyecto/agente correcto con confirmación de destino antes de ejecutar
+- Órdenes grupales: "pausa TODOS los agentes", "modo economía en todo"
+- Cada orden queda como rung DECISION auditado en el Ledger del proyecto afectado
+- **Pruebas:** Integration routing comando→destino correcto. E2E humano: 5 órdenes habladas consecutivas, todas enrutadas y confirmadas
+
+<a id="cr3"></a>
+### CR.3 — Alertas y modo vigilancia
+- Modo "vigilancia": pantalla dedicada que solo muestra excepciones (bloqueados, presupuestos al 80%+, tests rotos en main) usando la política de interrupción [K·K.3](./plan-k-voz.md#k3)
+- Sonido/visual diferenciado por severidad; acuse recibo desde la misma pantalla
+- **Pruebas:** E2E: inyectar eventos de severidad mixta → solo los que superan umbral aparecen; acuse limpia alerta
+
+## 🚪 GATE CR (demo verificable)
+
+Demo de misión control: 4 proyectos vivos en pantalla, agentes trabajando en 3 de ellos; por voz pido "resumen del proyecto cafetería" → TTS responde; detecto un agente bloqueado en el mapa → le hablo directo desde su card → se desbloquea; pauso toda una empresa por voz. Video + suites verdes.
+
+---
+[← Maestro](./README.md) · [← PLAN SS](./plan-ss-canvas-sesiones.md)
+
 # PLAN 3D — Etapa 19: Preparación espacial (gafas/futuro)
 
 | Fase | Contenido | Pruebas |
@@ -143,8 +179,9 @@ Reutiliza el motor de [PLAN J](./plan-j-grafo3d-repomap.md#j3) para navegar graf
 | VI Grafo documentos | 2–2.5 |
 | KR Kanban resultados | 2–2.5 |
 | SS Canvas sesiones | 1.5–2 |
+| CR Control Room | 1.5–2 |
 | 3D preparación | 1–1.5 |
-| **Total intermedio** | **~6.5–8.5 semanas** (tras Gate F/N según dependencias: VI y KR pueden ir en paralelo tras F+H; SS tras K) |
+| **Total intermedio** | **~8–10.5 semanas** (VI/KR paralelos tras F+H; SS tras K; CR al final — es la vista que unifica) |
 
 ## Reglas
 
