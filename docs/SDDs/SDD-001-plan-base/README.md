@@ -252,6 +252,30 @@ La base YA deja los ganchos que las 4 ventanas futuras necesitan — sin tablas 
 - Three.js + pagerank ([PLAN J](./plan-j-grafo3d-repomap.md)) + layouts persistidos desde F/VI → terreno listo para **3D/gafas** (Etapa 19)
 Regla: cada ventana futura es una VISTA sobre estos datos; prohibido duplicar.
 
+## ORDEN DE EJECUCIÓN MAESTRO (los números de fase son IDs estables; esta es la secuencia de construcción)
+
+```
+ETAPA 1  A.0→A.1→A.2(+settings cifrada)→A.3→A.4→A.5→A.6→A.7→A.8→A.9 ── Gate A
+PARALELO TRAS GATE A:
+  Track BETA   B.1→B.2→B.3→B.4→B.5→B.6→B.7→B.8→B.9 ── Gate B
+  Track GAMMA  C.0→C.1→C.2→C.3→C.5→C.6→C.7 ─────────── Gate C
+ETAPA 4  D.0→D.1→D.2→D.3→D.4→D.5→D.6→D.7→D.8 ── Gate D
+ETAPA 5  E.1→E.2→E.3 ── 🏷️ plan-base-v0.1
+POST-BASE:
+  F.0→F.1→F.2→F.3→F.4→F.7→F.5→F.6 (Gate F)   ∥  P.1→P.2→P.3→P.4 (Gate P)
+  G.1→G.2→G.3→G.4→G.6→G.5 (Gate G)
+  H.1→H.2→H.5→H.6→H.3→H.4→H.7→H.8→H.9 (Gate H)  ← desviación: Shadow primero
+  I.1→I.6→I.2→I.3→I.4→I.5 (Gate I)
+  J.1→J.2→J.3 · K.1→K.2→K.3 (Gates J/K)
+  M.1→M.2→M.3 (Gate M) ← recomendado ANTES que K/L
+  L.1→L.2→L.4→L.3-flag (Gate L)
+  N.1→N.2→N.3→N.4→N.5→N.6→N.7 (Gate N) · O.1→O.2→O.3 (v1.0)
+TRANSVERSALES: U.1 con F.0 · subconjunto flow-protection/inbox de U.5 desde A.4 ·
+  resto U tras cada ventana · S continuo · T.SEC/T.QA desde Etapa 1 · T.BIZ antes v1.0
+```
+
+**Matriz completa de TODAS las fases con sus pruebas**: [MATRIZ-FASES-PRUEBAS.md](./MATRIZ-FASES-PRUEBAS.md) — generada automáticamente, regenerar al cambiar fases.
+
 ## Optimización visual/UX aplicada
 
 | Patrón | Fuente | Fase |

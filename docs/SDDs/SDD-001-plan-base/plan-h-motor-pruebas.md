@@ -3,7 +3,7 @@
 > [← Maestro](./README.md) · [← PLAN G](./plan-g-skills-lab.md) · [PLAN I →](./plan-i-revision-superposiciones.md)
 > Depende de: Etapas 6 (canva para mostrar resultados), 7 (skills definen el cómo). Inspiración: readiness checks de Reasonix (vistos en --metrics), SOP MetaGPT/ChatDev, "pruebas y evidencia" del AGENTS.md original.
 
-**Entregable:** los agentes trabajan por RESULTADOS verificables — cada tarea tiene criterios de aceptación que se prueban automáticamente y se muestran en el canva.
+**Entregable:** los agentes trabajan por RESULTADOS verificables — **Orden de construcción: H.1→H.2→H.5→H.6→H.3→H.4→H.7→H.8→H.9** (Shadow Workspace H.5/H.6 INMEDIATAMENTE tras el runner). Números = IDs estables. — cada tarea tiene criterios de aceptación que se prueban automáticamente y se muestran en el canva.
 
 <a id="h1"></a>
 ### H.1 — Tareas con criterios

@@ -31,7 +31,8 @@
 
 <a id="a2"></a>
 ### A.2 — Persistencia SQLite
-- Tablas `sessions`, `messages` via sqlx (migraciones embebidas) — **ambas con `project_id` desde el día 1** ([A·A.0](./plan-a-chat-codex.md#a0)): el aislamiento multitenant NO se retrofittea después
+- Tablas `sessions`, `messages` via sqlx (migraciones embebidas) — **ambas con `project_id` desde el día 1**
+- **Tabla `settings` CIFRADA (AES-GCM) aquí**: primitiva que consumen [A·A.3](./plan-a-chat-codex.md#a3) (API keys) y [A·A.6](./plan-a-chat-codex.md#a6) (hub) ([A·A.0](./plan-a-chat-codex.md#a0)): el aislamiento multitenant NO se retrofittea después
 - Commands Tauri CRUD + bindings tauri-specta
 - **Pruebas:** Cargo test repositorios; integration roundtrip mensaje
 

@@ -41,6 +41,23 @@
 - Si un delta llega inválido → rollback del archivo a último estado bueno + aviso inline (fail-safe)
 - **Pruebas:** Cargo test aplicador: 500 deltas/sec sintéticos sin pérdida ni desorden. E2E humano: ver un archivo grande escribirse fluido en vivo
 
+<a id="b6"></a>
+### B.6 — @menciones de archivos/símbolos (ganadora torneo #002)
+- En el composer: escribir `@` abre dropdown fuzzy con archivos del proyecto (del árbol [B·B.1](./plan-b-sidepanels-lovable.md#b1)); al existir índice AST ([J·J.1](./plan-j-grafo3d-repomap.md#j1)) también símbolos
+- La mención inserta un chip visual que el provider convierte en contexto anclado
+- **Pruebas GUI:** E2E humano: teclear `@app` filtra <100ms, flechas navegan, Enter inserta chip; el chip llega al agente como ruta anclada
+
+<a id="b7"></a>
+### B.7 — Revisión por HUNKS (ganadora torneo #124)
+- El visor diff permite aceptar/rechazar CADA hunk independiente (no todo-o-nada); estado parcial persiste por archivo
+- Hunks rechazados se devuelven al agente como feedback estructurado con el motivo
+- **Pruebas GUI:** E2E humano: diff de 3 hunks → aprueba 2, rechaza 1 con nota → solo los aprobados se aplican; el rechazo aparece citado en el siguiente turno del agente
+
+<a id="b8"></a>
+### B.8 — Consola preview → "enviar error al agente" (ganadora torneo #143)
+- Errores runtime del iframe capturados (window.onerror dentro del sandbox); botón formatea `[archivo:línea + stack + screenshot]` y lo envía como turno al agente
+- **Pruebas GUI:** E2E: mock lanza TypeError en preview → badge clicable → click envía contexto completo → respuesta corrige y error desaparece
+
 <a id="b9"></a>
 ### B.9 — Artefactos versionados (patrón Claude artifacts)
 - El preview/archivo principal de una tarea se trata como ARTEFACTO con historial de versiones navegable
