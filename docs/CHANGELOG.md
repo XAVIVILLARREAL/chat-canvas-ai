@@ -48,6 +48,11 @@
 - DEBATE RUNTIME: Reasonix verificado MIT bundlable + cache-hit 99.82% medido ($12 vs $61 por 435M tokens) → MVP Reasonix-core CON 4 condiciones no negociables (contenedor efímero por sesión SymJack/pin+CI/transcripts JSONL día-1/disparadores OwnLoop) → crecimiento híbrido → escala OwnLoopProvider principal con base OSS mini-swe-agent/OpenHands SDK
 - Lección transversal: "harness ES el producto" (todos los competidores verticalizaron); industria estandarizó bordes ACP/App-Server para que la salida sea barata
 
+## 2026-08-23 (sesion 18)
+
+- **G.7 Identidad viva de Skills y Agentes (estilo Gems)**: avatar IA + emoji-firma único + mini-bio de personalidad + voz TTS por skill/agente; ceremonia de NACIMIENTO al crear (overlay "Nace X — bienvenido al equipo"); preview en vivo en el editor; biblioteca de linajes visuales; presencia animada en las 4 ventanas; fallback procedural si IA cae
+- AGENTS.md: nuevo principio de EQUIPO VIVO — personajes con identidad IA, manipulación total del equipo como piezas vivas (armar/clonar/promover/pausar/despedir), regla Octocat (jamás hablan por hablar), organización neuro-psicológica por departamento/color
+
 ## 2026-08-23
 
 - **SDD-003 Torneo de ideas**: 500 ideas generadas de productos de mercado (25 categorías × 20) → eliminatoria por categoría → 10 debates cruzados documentados → **20 ganadoras** con rúbrica Valor/Viabilidad/Mantenibilidad/Encaje ≥17

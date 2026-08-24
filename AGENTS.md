@@ -524,6 +524,17 @@ El sistema DEBE ser neuro-gratificante por diseño: cada proceso de desarrollo s
 
 Detalle completo y fases v2 (juice calibrado, flow-protection, inbox de resultados, widget glanceable): [PLAN U](./docs/SDDs/SDD-001-plan-base/plan-u-motivacion.md).
 
+**Principio de EQUIPO VIVO (estilo Gems — aplica a skills y agentes):**
+
+Cada skill y cada agente NO es una configuración — es un PERSONAJE con vida propia que puedes armar, observar, dirigir y ver crecer. Objetivo emocional: *sentir que realmente tienes un equipo*.
+
+- **Identidad generada por IA**: avatar único consistente, emoji-firma, mini-bio de personalidad con carácter, voz TTS propia ([PLAN G·G.7](./docs/SDDs/SDD-001-plan-base/plan-g-skills-lab.md#g7))
+- **Ceremonia de nacimiento**: crear un miembro dispara la presentación festiva del nuevo compañero — contratar se siente
+- **Presencia continua**: su avatar vive en la Oficina, el Kanban, las Sesiones y la Control Room; su emoji firma cada rung que genera; su voz responde cuando le hablas
+- **Organización neuro-psicológica**: departamentos con color coherente, el equipo se lee de un vistazo, jerarquía clara PM→operativos
+- **Manipulación total**: armar, clonar, promover, pausar, despedir — el dueño manipula su empresa entera como piezas vivas, nunca como YAML
+- Regla Octocat aplicada: el personaje JAMÁS habla por hablar (sus reportes llegan por canales serios); evoluciona por logros y jamás se deteriora
+
 **Regla transversal**: toda la capa visual se construye con tokens/primitivas del Design System ([F.0]) y con estructuras de datos ESPACIALMENTE listas (posiciones, clusters, profundidades) para proyección futura en 3D/gafas (Etapa 10 Three.js es la primera; las demás ventanas heredan la preparación).
 
 Detalle completo y fases: `docs/SDDs/SDD-005-plan-intermedio.md` · El Canvas Planeación (V2) alimenta Kanban/motor; la Control Room (V5) unifica todos los proyectos.

@@ -45,6 +45,16 @@ Un skill = contrato estructurado: `{nombre, rol, triggers, instrucciones, herram
 - La rutina aceptada se re-ejecuta on-demand o programada, y mejora con cada corrección
 - **Pruebas:** Integration: sesión grabada de N pasos → skill propuesto con N pasos correctos; corrección humana se persiste. E2E humano: grabo "preparar release" → skill creado → lo ejecuto programado
 
+<a id="g7"></a>
+### G.7 — Identidad viva de Skills y Agentes (estilo Gems de Gemini)
+- **Al crear/editar un skill o agente se le da VIDA**: generador de AVATAR por IA (imagen consistente derivada de nombre+rol, con variantes hasta elegir; fallback procedural por hash si la IA no responde) + **EMOJI-FIRMA** único sugerido + **mini-bio de personalidad** escrita por la IA (1-2 frases con carácter) + voz TTS asignada ([K·K.1](./plan-k-voz.md#k1))
+- **Ceremonia de NACIMIENTO**: al guardar, overlay festivo "Nace [nombre] — bienvenido al equipo" presentando al nuevo miembro con su avatar animado (reutiliza CelebrationOverlay de [U·U.3](./plan-u-motivacion.md#u3)) — la contratación se SIENTE
+- El personaje ES la identidad en todo el sistema: presente y animado según estado real en Canva Oficina ([F·F.2](./plan-f-canva-oficina.md#f2)), Kanban, Canvas Sesiones y Control Room; habla con su voz; su emoji aparece en cada rung que genera
+- Pestaña "Identidad" dentro del SkillEditor con preview EN VIVO del personaje mientras editas
+- Biblioteca de identidades reutilizable: mismo rol → misma familia visual; skill clonado hereda linaje
+- Neuro-psicológicamente organizado: agrupación por departamento con color coherente ([F·F.0](./plan-f-canva-oficina.md#f0) tokens) — el equipo SE LEE de un vistazo
+- **Pruebas GUI:** E2E humano completo: crear skill → eliges entre 3 avatares generados → ceremonia de nacimiento → el personaje aparece en Oficina/Sesiones con su emoji · probar en laboratorio responde CON su avatar y voz · editar bio actualiza en todas las ventanas · caída de IA genera avatar procedural sin romper flujo
+
 ## 🚪 GATE G (demo verificable)
 
 Desde cero y sin YAML: creo skill "QA-Tester" (rol qa, triggers "revisar/tests", tools read+test, modelo flash) → lo compilo → lo pruebo en el laboratorio contra un mini-proyecto → veo respuesta y costo → lo exporto como subagent-profile de Reasonix y funciona en CLI. Suite humana ampliada verde.
