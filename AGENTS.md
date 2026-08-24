@@ -126,7 +126,7 @@ Skills y guias de diseno clonadas localmente para dar identidad grafica al proye
 
 | Recurso | Ruta | Uso |
 |---|---|---|
-| **apple-design-skill** (dickwu) | `reference/apple-design-skill/SKILL.md` | Auditor UI/UX basado en Apple HIG, multiplataforma (Tauri + Flutter). 53 guias en `references/hig/` (color, tipografia, accesibilidad, dark mode, glassmorphism) |
+| **apple-design-skill** (dickwu) | `reference/apple-design-skill/SKILL.md` | Auditor UI/UX basado en Apple HIG, multiplataforma (Tauri + web). 53 guias en `references/hig/` (color, tipografia, accesibilidad, dark mode, glassmorphism) |
 | **ui-ux-pro-max** | `reference/ui-ux-pro-max/` | Catalogo de estilos: 84 estilos (glassmorphism, claymorphism, brutalismo...), 192 paletas, 74 pares tipograficos, 98 reglas UX. Skills en `cli/assets/skills/` |
 | **impeccable** (pbakaus) | `reference/impeccable/plugin/skills/impeccable/SKILL.md` | Lenguaje anti-"estetica IA generica": tipografia, color, motion, spatial. Comandos: polish, audit, critique, animate |
 | **liquid-glass-web** (Zettersten) | `reference/liquid-glass-web/skills/liquid-glass/SKILL.md` | Liquid Glass real en web: CSS `backdrop-filter` + SVG `feDisplacementMap`, plantillas React para el canva |
@@ -396,7 +396,7 @@ La AI gestiona los documentos **sola**, sin intervencion humana. El humano solo 
 |---|---|---|
 | Disenar una feature | `docs/SDDs/SDD-XXX-nombre.md` | Crear SDD con numeracion secuencial |
 | Decidir algo de arquitectura | `docs/ADRs/ADR-XXX-nombre.md` | Crear ADR |
-| Completar un gate | `docs/SUPER_PLAN.md` | Marcar `[x]` en el gate |
+| Completar un gate | `docs/SDDs/SDD-001-plan-base/MATRIZ-FASES-PRUEBAS.md` + `docs/ESTADO.md` | Marcar fase/gate cumplido y actualizar estado |
 | Cualquier accion significativa | `docs/CHANGELOG.md` | Append al dia actual |
 | Cambiar la arquitectura | `docs/ARQUITECTURA.md` | Actualizar seccion afectada |
 

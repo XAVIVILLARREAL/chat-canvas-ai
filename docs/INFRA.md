@@ -213,31 +213,16 @@ Skills personalizados en `.opencode/skills/` para guiar el desarrollo y testing.
 
 ### dev
 - **Trigger:** "dev", "super plan", "plan", "siguiente fase", "implementar", "gate", "probar", "progreso"
-- **Funcion:** Guia de desarrollo por fases con pruebas de comprobacion (gates)
-- **Flujo:** SDD primero → TDD → CI local → cerrar fase con gate
-- **Fases:** 7 etapas desde fundacion visual hasta vibecoding + Playwright E2E
-
-### dev-4b
-- **Trigger:** "4b", "etapa 4b", "skills"
-- **Funcion:** Resumen de estado de la Etapa 4b (gestor visual de skills + laboratorio)
-- **Contenido:** SDD-113, slices completados, CI, gate pendiente
+- **Funcion:** Guia de desarrollo por fases del Plan Base SDD-001 (15 etapas, 112 fases) con pruebas de comprobacion (gates)
+- **Flujo:** SPEC (SDD-001) → TESTS 4 capas primero → IMPL → CI local (check:all + cargo + e2e) → cerrar fase con gate
+- **Gates:** suite humana + video evidencia + responsive móvil 375/desktop 1440
 
 ### commit-es
 - **Trigger:** "commit", "mensaje de commit"
 - **Funcion:** Redacta commits cortos en espanol con contexto
 - **Restricciones:** Prefijos feat/fix/docs/chore, maximo 72 caracteres
 
-### patrol-iteracion
-- **Trigger:** "patrol", "probar la app", "test e2e", "depurar la ui", "screenshot de la app"
-- **Funcion:** Iteracion de pruebas Flutter via Patrol E2E
-- **Flujo:** Test → screenshot → debug widget tree → fix → re-ejecutar → evidencia
-- **Plataformas:** Android emulador, iOS simulador, Windows desktop
-- **Nota:** Windows tiene workaround para VS 2026 (cmake generator)
-
-### terminal-sos
-- **Trigger:** "terminal", "ssh", "sftp"
-- **Funcion:** Diagnostico rapido de problemas SSH/SFTP
-- **Contexto:** dartssh2, conectividad, errores comunes
+(eliminado 2026-08-24: skills Flutter residuales patrol-iteracion/terminal-sos/dev-4b y command dev Flutter — el proyecto ya no es Flutter; ver git history para restaurar)
 
 ## Stack completo verificado
 
