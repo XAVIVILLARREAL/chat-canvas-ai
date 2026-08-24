@@ -1,6 +1,6 @@
 # SDD-001 · Roadmap Maestro — Empresa Dev
 
-> Fecha: 2026-08-22 · Estado: Propuesto · v3.2 MEGA-PLAN (15 etapas + P, ~88 fases)
+> Fecha: 2026-08-24 · Estado: Activo · v3.4 MEGA-PLAN (15 etapas + P, ~112 fases)
 > Investigación profunda: OpenAI Codex (docs oficiales), Reasonix v1.23 (verificado EN VIVO en este servidor), V3Code (sitio oficial + spec copia.md), **Grok Bot xAI/Cursor** ([SDD-004](../SDD-004-analisis-grokbot.md): group chat de agentes, rutinas por demostración, proactividad, pipeline de bugs) + patrones de varve/codevira.
 > Pruebas: [SDD-002](../SDD-002-testing-spec-driven.md) — toda fase pasa las 4 capas; todo gate cierra con suite humana.
 
@@ -28,19 +28,19 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 |---|---|---|---|---|
 | 0 | Fundaciones | *(completada)* | — | Infra 100% verde + testing humano 12/12 ✅ |
 | 1 | Chat núcleo Codex + **tenants** | [plan-a](./plan-a-chat-codex.md) | **A.0**–A.9 | Streaming real, 2 perillas, slash cmds |
-| 2 | Sidepanels Lovable | [plan-b](./plan-b-sidepanels-lovable.md) | B.1–B.5 | Ves construirse en vivo |
-| 3 | Runtime Reasonix+DeepSeek+Ollama+**API universal** | [plan-c](./plan-c-reasonix-deepseek.md) | C.0–C.6 | 3 motores (local-ready), costos, cancelación |
-| 4 | Memoria V3Code | [plan-d](./plan-d-memoria-v3code.md) | D.0–D.6 | Recuerda entre sesiones + gobernanza + grafo dual |
+| 2 | Sidepanels Lovable | [plan-b](./plan-b-sidepanels-lovable.md) | B.1–B.9 | Ves construirse en vivo |
+| 3 | Runtime Reasonix+DeepSeek+Ollama+**API universal** | [plan-c](./plan-c-reasonix-deepseek.md) | C.0–C.7 | 3 motores (local-ready), costos, cancelación |
+| 4 | Memoria V3Code | [plan-d](./plan-d-memoria-v3code.md) | D.0–D.8 | Recuerda entre sesiones + gobernanza + grafo dual |
 | 5 | Cierre Base | [plan-e](./plan-e-integracion-total.md) | E.1–E.3 | Tag `plan-base-v0.1` |
-| 6 | Canva ReactFlow + Oficina | [plan-f](./plan-f-canva-oficina.md) | F.1–F.6 | Nodos-agentes animados arrastrables |
-| 7 | Skills Lab | [plan-g](./plan-g-skills-lab.md) | G.1–G.4 | Crear/probar/exportar skills sin YAML |
-| 8 | Motor de pruebas y resultados | [plan-h](./plan-h-motor-pruebas.md) | H.1–H.6 | Agentes demuestran con tests, no promesas |
+| 6 | Canva ReactFlow + Oficina | [plan-f](./plan-f-canva-oficina.md) | F.0–F.7 | Nodos-agentes animados arrastrables |
+| 7 | Skills Lab | [plan-g](./plan-g-skills-lab.md) | G.1–G.7 | Crear/probar/exportar skills sin YAML |
+| 8 | Motor de pruebas y resultados | [plan-h](./plan-h-motor-pruebas.md) | H.1–H.9 | Agentes demuestran con tests, no promesas |
 | 9 | Revisión auto + Superposiciones | [plan-i](./plan-i-revision-superposiciones.md) | I.1–I.6 | El sistema detecta y corrige solo |
 | 10 | Grafo 3D Repo-Map | [plan-j](./plan-j-grafo3d-repomap.md) | J.1–J.3 | Repo entero en <1000 tokens + visual 3D |
 | 11 | Voz | [plan-k](./plan-k-voz.md) | K.1–K.3 | Hablas, los agentes responden |
-| 12 | Sync multi-device + Co-Work | [plan-l](./plan-l-sync-cowork.md) | L.1–L.3 | Continúas donde dejaste, en cualquier dispositivo |
+| 12 | Sync multi-device + Co-Work | [plan-l](./plan-l-sync-cowork.md) | L.1–L.4 | Continúas donde dejaste, en cualquier dispositivo |
 | 13 | GitHub nativo | [plan-m](./plan-m-github.md) | M.1–M.3 | Push/pull/PRs sin terminal |
-| 14 | Empresas autónomas | [plan-n](./plan-n-empresas-autonomas.md) | N.1–N.5 | Empresa completa operada por agentes |
+| 14 | Empresas autónomas | [plan-n](./plan-n-empresas-autonomas.md) | N.1–N.7 | Empresa completa operada por agentes |
 | 15 | Marketplace + MCP público + v1.0 | [plan-o](./plan-o-marketplace-v1.md) | O.1–O.3 | Empresas empaquetables, release 1.0 |
 | P | **Centro MCP transversal** | [plan-p](./plan-p-centro-mcp.md) | P.1–P.4 | Conectar herramientas externas sin tocar JSON (o pegándolo) |
 | S | **Despliegue/Costos/Stack eficiente** | [plan-s](./plan-s-despliegue-costos.md) | S.1–S.4 | Hosting 3 etapas ($16→$600/mes), stack Rust fijado, patrones Tauri — datos ago-2026 |
@@ -141,12 +141,12 @@ Todo el "cerebro" del sistema (tipos de dominio, reglas de negocio, agentes, tar
         ┌────────────────────────┼────────────────────────┐
         ▼                        ▼                        ▼
 ┌────────────────┐    ┌─────────────────────┐    ┌──────────────────┐
-│ APP DESKTOP    │    │ APP CELULAR         │    │ SERVIDOR (nube)  │
-│ (Tauri Win/Mac │    │ (Tauri iOS/Android) │    │ binario axum     │
-│  /Linux)       │    │                     │    │                  │
+│ NAVEGADOR (v1) │    │ CELULAR / tablet    │    │ SERVIDOR (nube)  │
+│ (web servida   │    │ (UI adaptada del    │    │ binario axum     │
+│  por el gateway│    │  mismo web)         │    │ 24/7 · agentes   │
 └───────┬────────┘    └──────────┬──────────┘    └────────┬─────────┘
-        │ IPC local              │ IPC local              │ HTTP/WebSocket
-        │ (rápido, offline)      │ (rápido, offline)      │ (24/7, siempre)
+        │ HTTP/WS               │ HTTP/WS                │ local
+        │ (siempre)             │ (siempre)              │ (siempre)
         └────────────────────────┼────────────────────────┘
                                  ▼
                     ┌──────────────────────────┐
@@ -157,9 +157,10 @@ Todo el "cerebro" del sistema (tipos de dominio, reglas de negocio, agentes, tar
                     └──────────────────────────┘
 ```
 
-- **Desktop/laptop:** cuerpo completo — puede trabajar SOLO (offline) porque lleva el cerebro adentro.
-- **Celular:** mismo cerebro, cuerpo más pequeño (UI adaptada, ADR-001) — también puede trabajar solo.
+- **Navegador (v1 — WEB-FIRST):** el cerebro lo sirve el gateway axum — cero instalación, abre y trabajas; los agentes corren en el servidor (o en modo local).
+- **Celular/tablet:** misma web con UI adaptada (ADR-001) — participa, aprueba, chatea; el trabajo pesado delega al servidor.
 - **Servidor:** el cerebro corriendo 24/7 sin pantalla — aquí trabajan los agentes cuando TÚ no estás conectado.
+- **Tauri shell (DIFERIDO):** envuelve la misma web con superpoderes nativos (IPC local, offline real) — se construye SOLO si hay demanda demostrada ([ADR-005](../ADRs/ADR-005-modelo-despliegue-dual.md)). "local o nube" es propiedad del build, no una promesa.
 
 ### Pieza 2 — Tu sesión es un documento vivo, no una máquina
 
@@ -190,10 +191,10 @@ El servidor guarda cada proyecto como un **repositorio git bare** (tu "GitHub pr
 
 | Dispositivo | UI | Ejecuta agentes | Guarda repos | Funciona offline |
 |---|---|---|---|---|
-| Laptop/desktop | ✅ completa | ✅ (modo local) | ✅ (modo local) | ✅ |
+| **Navegador (v1 — WEB-FIRST)** | ✅ completa | ✅ (modo servidor) | ✅ (repos bare del servidor) | parcial (cola cambios) |
 | Celular/tablet | ✅ adaptada | ❌ delega | ❌ lee/escribe via hub | ✅ (cola cambios) |
 | Servidor | ❌ headless | ✅ **siempre (24/7)** | ✅ fuente canónica | n/a |
-| Browser (v2) | ✅ ligera | ❌ delega | ❌ via hub | parcial |
+| Tauri shell (diferido, solo con demanda) | ✅ completa | ✅ (modo local) | ✅ (modo local) | ✅ |
 
 **Regla de oro:** el dispositivo más pobre del mundo debe poder PARTICIPAR (ver, aprobar, chatear); el trabajo pesado nunca depende de que un dispositivo esté encendido.
 
@@ -209,7 +210,7 @@ Reglas transversales intocables: **CADA PROYECTO ES UN TENANT** — todo dato ll
 | Visual + Skills + Pruebas | 6–8 | 5–7 sem |
 | Inteligencia (revisión, 3D, voz, sync, git) | 9–13 | 5–7 sem |
 | Empresas autónomas + marketplace | 14–15 | 4–6 sem |
-| **Total** | 15 etapas | **~20–27 semanas** (+GrokBot fases G.6/I.6/N.6)
+| **Total** | 15 etapas | **~24–32 semanas** (+GrokBot fases G.6/I.6/N.6)
 
 Valor usable continuo: chat desde semana 2, paneles semana 4, memoria semana 7, canva semana 10…
 
@@ -228,11 +229,25 @@ Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: so
 3. **Tiering de la suite humana**: `@core` (smoke ~22s, en cada push) vs completa (solo gates) — evita explosión de minutos de CI al crecer la suite
 4. Knip añadido al CI (código muerto visible desde el principio)
 
+### Revisión profunda v3.4 (2026-08-24) — decisiones del usuario aplicadas
+
+- **A.5 (medidor/debug contexto) y D.7 (blame-rung) reintegradas** como fases reales con pruebas — estaban prometidas en ORDEN/torneo pero no existían
+- **H.9 partida**: H.9a (aislamiento contenedor mínimo) se ejecuta tras C.3 y cumple la condición NO negociable de seguridad de PLAN C; H.9b (computadora persistente) al final de H
+- **P (Centro MCP)** pasa a ejecutarse tras el Gate B, en paralelo con C/D (antes en paralelo con F)
+- **M (GitHub) antes que K/L** ahora está DENTRO del ORDEN (antes era una recomendación que contradecía el propio bloque); voz (K) al final del bloque
+- **Multiplataforma alineada a WEB-FIRST**: navegador = v1 servido por el gateway; Tauri diferido hasta demanda (sección "cómo funciona la plataforma" corregida)
+- **A.7/A.8**: v1 mínima en Etapa 1 (tarea simple / resume sin rungs) que H.1/D.1 formalizan después
+- **C.7 y D.8**: alcance v1 acotado en la base; lo pesado (OAuth/small_model · memoria relacional/reflexión) marcado post-base (C.7b / D.8b)
+- **Matriz regenerada**: 112 fases (95 A–P + 17 S/T/U), orden = ejecución, regla "fase GUI ⇒ [E]+[H]", presupuesto **máx $20/gate** con APIs reales
+
 ### Recomendaciones de orden APROBADAS (aplican al ejecutar)
 
-- Tras Etapa I: ejecutar **M (GitHub) antes que K/L** — los agentes necesitan committir para el Gate N, y PRs automáticos dan demo de valor antes que voz/sync
+- ✅ **M (GitHub) antes que K/L** ya está EN el ORDEN (bloque de ejecución arriba) — los agentes necesitan committir para el Gate N, y PRs automáticos dan demo de valor antes que voz/sync
 - **L.3 Co-Work CRDT** queda detrás de feature-flag y puede moverse a post-v1 sin romper L.1–L.2 (Yjs es la dependencia más compleja de menor valor inmediato)
 - **B.5 Fast Apply** se activa tras feature-flag hasta pasar su chaos-test
+- ✅ **P (Centro MCP)** se ejecuta tras el Gate B, en paralelo con C/D (antes esperaba a F)
+- ✅ **H.9 partida**: H.9a (contenedor mínimo) tras C.3; H.9b (computadora persistente) al final de H
+- ✅ **Voz (K)** al final del bloque de inteligencia (J → M → L → K)
 
 ### Carga de pruebas proyectada (matemática de viabilidad)
 
@@ -240,6 +255,7 @@ Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: so
 |---|---|---|---|---|
 | Hoy | 4+12=16 | 6 (~22s) | 12 (~80s) | ~2 min |
 | Gate E | ~70 | ~10 (~35s) | ~45 (~6 min) | ~9 min |
+| Gate N | ~300 | ~20 (~70s) | ~140 (~22 min) | ~28 min |
 
 Dentro de rango sano para CI en cada push (core) + gates (full).
 
@@ -258,20 +274,24 @@ Regla: cada ventana futura es una VISTA sobre estos datos; prohibido duplicar.
 ETAPA 1  A.0→A.1→A.2(+settings cifrada)→A.3→A.4→A.5→A.6→A.7→A.8→A.9 ── Gate A
 PARALELO TRAS GATE A:
   Track BETA   B.1→B.2→B.3→B.4→B.5→B.6→B.7→B.8→B.9 ── Gate B
-  Track GAMMA  C.0→C.1→C.2→C.3→C.5→C.6→C.7 ─────────── Gate C
+  Track GAMMA  C.0→C.1→C.2→C.3→H.9a→C.5→C.6→C.7 ─────── Gate C  ← H.9a (contenedor mínimo) tras C.3: condición NO negociable de seguridad
+PARALELO TRAS GATE B (con C/D):
+  P.1→P.2→P.3→P.4 ── Gate P (Centro MCP — alimenta G y N)
 ETAPA 4  D.0→D.1→D.2→D.3→D.4→D.5→D.6→D.7→D.8 ── Gate D
 ETAPA 5  E.1→E.2→E.3 ── 🏷️ plan-base-v0.1
 POST-BASE:
-  F.0→F.1→F.2→F.3→F.4→F.7→F.5→F.6 (Gate F)   ∥  P.1→P.2→P.3→P.4 (Gate P)
-  G.1→G.2→G.3→G.4→G.6→G.5 (Gate G)
-  H.1→H.2→H.5→H.6→H.3→H.4→H.7→H.8→H.9 (Gate H)  ← desviación: Shadow primero
+  F.0→F.1→F.2→F.3→F.4→F.7→F.5→F.6 (Gate F)
+  G.1→G.2→G.3→G.4→G.6→G.7→G.5 (Gate G)  ← G.7 identidad viva; su voz se completa en K.1
+  H.1→H.2→H.5→H.6→H.3→H.4→H.7→H.8→H.9b (Gate H)  ← desviación: Shadow primero; H.9a ya corrió en Etapa 3
   I.1→I.6→I.2→I.3→I.4→I.5 (Gate I)
-  J.1→J.2→J.3 · K.1→K.2→K.3 (Gates J/K)
-  M.1→M.2→M.3 (Gate M) ← recomendado ANTES que K/L
+  J.1→J.2→J.3 (Gate J)
+  M.1→M.2→M.3 (Gate M) ← ANTES que K/L: los agentes necesitan git para el Gate N y los PRs dan valor visible temprano
   L.1→L.2→L.4→L.3-flag (Gate L)
+  K.1→K.2→K.3 (Gate K) ← voz al final del bloque (nice-to-have)
   N.1→N.2→N.3→N.4→N.5→N.6→N.7 (Gate N) · O.1→O.2→O.3 (v1.0)
 TRANSVERSALES: U.1 con F.0 · subconjunto flow-protection/inbox de U.5 desde A.4 ·
-  resto U tras cada ventana · S continuo · T.SEC/T.QA desde Etapa 1 · T.BIZ antes v1.0
+  resto U tras cada ventana · S.1+S.2 prerequisito de Etapa 1 · S.3 solo con demanda Tauri · S.4 continuo ·
+  T.SEC/T.QA desde Etapa 1 · T.BIZ antes v1.0
 ```
 
 **Matriz completa de TODAS las fases con sus pruebas**: [MATRIZ-FASES-PRUEBAS.md](./MATRIZ-FASES-PRUEBAS.md) — generada automáticamente, regenerar al cambiar fases.
@@ -296,3 +316,6 @@ copia.md queda COMPLETAMENTE minado. Backlog del torneo conserva lo no-promovido
 5. Docs auto-gestionadas cada sesión (ESTADO/CHANGELOG/INDEX)
 6. Fase >50% sobre estimación ⇒ recortar alcance documentado
 7. Anti-scope-creep: features nuevas ⇒ nuevo mini-SDD antes de tocar código
+8. **Toda fase GUI tiene [E]2E humano explícito** ([H] obligatoria) — "compila" no es gate; "lo operé como persona" sí
+9. Presupuesto de pruebas con APIs reales (DeepSeek/GitHub/Ollama): **máx $20/gate**; el resto de la suite corre mock-first (~$0)
+10. **La matriz se regenera en CADA cambio de fases**; una fase sin fila en la matriz no se construye

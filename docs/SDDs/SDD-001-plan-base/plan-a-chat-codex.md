@@ -57,13 +57,24 @@ trait AgentProvider {
   - Presets con nombre: **Auto** (workspace+al-salir), **Lectura**, **Plan**
   - Traducción a modos Reasonix (`ask/auto/plan/acceptEdits/dontAsk`) documentada para [PLAN C](./plan-c-reasonix-deepseek.md#c1)
 - Cards de tool-call: nombre + args colapsados + resultado + estado
-- **Streaming vía abstracción de transporte**: en WEB-FIRST los tokens llegan por WebSocket/SSE del gateway directo al navegador; bajo el futuro instalable Tauri el MISMO contrato viaja por Channel IPC — la UI nunca cambia ([PLAN S·S3](./plan-s-despliegue-costos.md#s--3--cliente-tauri-eficiente-patrones-obligatorios))
+- **Streaming vía abstracción de transporte**: en WEB-FIRST los tokens llegan por WebSocket/SSE del gateway directo al navegador; bajo el futuro instalable Tauri el MISMO contrato viaja por Channel IPC — la UI nunca cambia ([PLAN S·S3](./plan-s-despliegue-costos.md#s3))
   - Regla día-1: URL del API configurable en runtime + notificaciones/archivos SIEMPRE por capas de abstracción → agregar shells nativos mañana costará cero reescritura
 - Visor de diff unificado inline en el chat
 - Panel terminal colapsable (salida de comandos del agente)
 - **Slash commands**: `/resume` (dentro del proyecto actual), `/fork`, `/status`, `/permissions` (parser propio; `/compact` llega con [D](./plan-d-memoria-v3code.md#d1))
 - Aprobar/rechazar acción pendiente con scopes "una vez" vs "toda la sesión" (Codex)
 - **Pruebas:** E2E browser-mode con provider MOCK scriptado (sin key real): prompt→streaming→tool-call→aprobar→diff visible→slash fork duplica sesión
+
+<a id="a5"></a>
+### A.5 — Medidor y debug de contexto (ganadora torneo)
+- Widget en vivo de QUÉ ve el agente: desglose de tokens por fuente (system · AGENTS.md · rungs · knowledge · tool-results · historial) y % de ventana de contexto usada
+- Semáforo anticipado: qué se comprimirá/expulsará en el próximo turno ([C·C.5](./plan-c-reasonix-deepseek.md#c5)) antes de que ocurra — sin sorpresas de caché fría
+- Modo debug: inspeccionar el request EXACTO enviado (capturado en el trait [A·A.3](./plan-a-chat-codex.md#a3)) y reproducirlo
+- Knobs por scope ([A·A.6](./plan-a-chat-codex.md#a6)): límites de contexto por fuente, presupuesto por proyecto
+- **Pruebas:**
+  - Unit: desglose de tokens por fuente correcto con fixtures sintéticos
+  - Integration: request capturado por mock coincide 1:1 con lo que el medidor muestra
+  - E2E humano: abrir el medidor durante una sesión real → el desglose coincide con el costo mostrado; ajusto un límite → la siguiente request refleja el cambio
 
 <a id="a6"></a>
 ### A.6 — Centro de Configuración (flexible para todos los públicos)
@@ -79,6 +90,7 @@ trait AgentProvider {
 ### A.7 — Modo ENCARGO: dar trabajo, no prompts (patrón Grok Bot)
 - Alternativa al prompt libre: botón "Nuevo encargo" con campos en lenguaje humano — **qué resultado esperas** (criterios), **cuándo** (al terminar / fecha), **autonomía** (me consultas siempre / solo lo peligroso / todo tuyo)
 - El encargo se convierte internamente en tarea con criterios ([H·H.1](./plan-h-motor-pruebas.md#h1)) — el agente trabaja y "vuelve cuando está listo o necesita juicio"
+- **v1 (Etapa 1)**: modelo de tarea MÍNIMO (título + criterios de texto + autonomía); [H·H.1] (Etapa 8) lo formaliza con criterios tipados y ciclo SOP sin cambiar la UI (mismo store, misma pantalla)
 - Menos como promptear, más como delegar a un compañero
 - **Pruebas:** E2E humano: crear encargo sin escribir un prompt; agente mock lo completa; notificación de vuelta con evidencia
 
@@ -86,11 +98,12 @@ trait AgentProvider {
 ### A.8 — Resume inteligente al abrir (patrón Grok Bot)
 - Al abrir la app: tarjeta contextual por sesión activa — "ayer quedaste en X, el agente dejó Y pendiente, ¿continúo?"
 - Reconstruye contexto desde rungs del Ledger ([D·D.1](./plan-d-memoria-v3code.md#d1)) y ofrece continuar/ignorar/descartar con un click
+- **v1 (Etapa 1)**: resume desde el estado persistido de la sesión (última tarea, mensajes pendientes); [D·D.1] (Etapa 4) lo enriquece reconstruyendo contexto desde el Ledger
 - **Pruebas:** Integration: sesión interrumpida → resume card correcta. E2E humano: cerrar a mitad de tarea → reabrir → continuar fluido
 
 <a id="a9"></a>
 ### A.9 — Ramas visuales al editar mensajes (patrón ChatGPT)
-- Al editar un mensaje ([A·A.7](./plan-a-chat-codex.md#a7) fork): navegadores ‹2/3› sobre el mensaje para moverse entre ramas de la conversación
+- Al editar un mensaje ([A·A.4](./plan-a-chat-codex.md#a4) `/fork`): navegadores ‹2/3› sobre el mensaje para moverse entre ramas de la conversación
 - Indicador de rama activa en el header + acceso a "otras ramas" con su resultado final comparado
 - **Pruebas:** Unit tree-store. E2E humano: edito mensaje 2 veces → flechas ‹› navegan alternativas sin perder ninguna
 

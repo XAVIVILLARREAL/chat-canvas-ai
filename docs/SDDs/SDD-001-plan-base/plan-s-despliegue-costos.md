@@ -1,7 +1,9 @@
 # PLAN S — Despliegue, Costos y Stack Eficiente (transversal, datos verificados ago-2026)
 
 > [← Maestro](./README.md) · Investiga y fija CÓMO desplegar barato hoy sin bloquear el escalado mañana. Fuentes: investigación con sub-agentes sobre Hetzner/ARM/PaaS/LLM-pricing, stack Rust 2026 y cliente Tauri 2.x.
+> **Prerequisito de Etapa 1**: S.1 (hosting) y S.2 (stack servidor) se ejecutan ANTES de arrancar Etapa 1 — el gateway axum sirve la web desde el día 1 y el stack ya está ~70% ejecutado (crates/core + crates/server). S.3 (Tauri) SOLO cuando haya demanda demostrada (WEB-FIRST, [ADR-005](../ADRs/ADR-005-modelo-despliegue-dual.md)); S.4 continuo.
 
+<a id="s1"></a>
 ## S · 1 — Hosting por etapas con COSTOS REALES
 
 | Etapa | Cuándo | Infra | Costo/mes |
@@ -19,6 +21,7 @@ Referencia dura: el equivalente gestionado (Fly/Railway/Render con app+DB+egress
 4. Todo reproducible con IaC: el mercado EU subió 30–170% en 10 semanas (DRAM shock) — cero lock-in
 5. Contabo/Netcup-shared SOLO para staging/workers tolerantes; jamás el nodo central sin HA
 
+<a id="s2"></a>
 ## S · 2 — Stack servidor Rust eficiente (versiones fijadas ago-2026)
 
 | Capa | Elección | Nota |
@@ -37,6 +40,7 @@ Referencia dura: el equivalente gestionado (Fly/Railway/Render con app+DB+egress
 
 WebSocket 10k conexiones: KBs por conexión (no MBs) — sobrado en un contenedor pequeño; broadcast acotado + dashmap + Message::Binary + heartbeat.
 
+<a id="s3"></a>
 ## S · 3 — Cliente Tauri eficiente (patrones obligatorios)
 
 1. **Streaming del agente = Command async + `Channel<TokenEvent>`** (tagged enum, batch coalescido ~30ms en Rust): NO `emit` ni fetch-SSE dentro del webview (iOS pausa todo en background; el stream vive en reqwest/Rust y sobrevive)
@@ -48,6 +52,7 @@ WebSocket 10k conexiones: KBs por conexión (no MBs) — sobrado en un contenedo
 7. Móvil fase 2: push vía plugin comunitario (no oficial, issue #11651); deep-link requiere single-instance PRIMERO + parseo argv (bug getCurrent null Win/Linux)
 8. Preview iframe: WKWebView ITP rompe cookies cross-origin → contexto por postMessage, no cookies/localStorage
 
+<a id="s4"></a>
 ## S · 4 — Presupuesto de costos proyectado (visión completa funcionando)
 
 | Concepto | MVP | Escala media |
@@ -62,7 +67,7 @@ vs equivalente managed: $400–700/mes. El costo escala LINEAL con uso (tokens) 
 
 ## Pruebas del plan S
 
-- Unit: cálculo costos por scope ([C·C.6](./plan-c-reasonix-deepseek.md#c6)) contra tabla de precios del registro ([C·C.7](./plan-c-reasonix-deepseek.md#c7))
+- Unit: cálculo costos por scope ([C·C.2](./plan-c-reasonix-deepseek.md#c2)) contra tabla de precios del registro ([C·C.7](./plan-c-reasonix-deepseek.md#c7))
 - Integration: restore completo desde backup B2 en máquina limpia ≤30min (drill trimestral automatizado)
 - E2E: despliegue Compose desde cero con IaC en VPS limpio ≤15 min
 - Humana: operador cambia preset KV/hardware en un click y ve el efecto en memoria real

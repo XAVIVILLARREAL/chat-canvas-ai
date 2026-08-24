@@ -53,6 +53,8 @@
 - **Pruebas:** chaos integration kill -9 → recuperación automática; estado consistente post-cancel
 
 <a id="c5"></a>
+> **C.4 (reservada)**: el hueco es intencional — el "contexto/caché" que ocuparía se integró en C.5 (SDD-006 §1) y el registro de proveedores en C.7 (SDD-007). Los IDs de fase son estables y no se reutilizan.
+
 ### C.5 — Motor de Contexto y Caché configurable (SDD-006 §1)
 - **Configurable en 5 scopes** ([A·A.6](./plan-a-chat-codex.md#a6)): Global → Proyecto → Equipo → Agente → Subagente, con vista de valor efectivo y origen ("definido en: Global")
 - Knobs: `prefijo_estable` + warm-up al abrir proyecto · perfil cuantización KV (`fp16/fp8/int4/int2` + ventana residual 128) · eviction (`query-aware / sinks+recientes / H2O%`) · compresión tramo medio (`ninguna / ligera 2× / agresiva 5×`, reservar dígitos, umbral mínimo 2K tokens) · compacción (`aviso 70% / flush 100% / expulsar 50%`) · alerta si hash del system prompt cambia (caché inválida)
@@ -78,6 +80,8 @@
 
 Para quien use APIs de cualquier empresa: **75+ proveedores sin escribir código**, copiando el sistema verificado de OpenCode.
 
+- **Alcance por etapas (anti sobre-complicación)**: **v1 en Etapa 3** = a) registro declarativo + drivers genéricos `OpenAICompatProvider`/`AnthropicProvider` + catálogo models.dev con precios + blacklist/whitelist + picker con datos visibles (cubre DeepSeek/OpenRouter/Anthropic/Azure). **Post-base (C.7b)** = b) OAuth a suscripciones + d) `small_model` + lista verificada curada + actualización de catálogo sin tocar la app.
+
 **a) Registro declarativo + catálogo models.dev**
 - Esquema del registro por proveedor: `{id, tipo_api: openai-compat|anthropic|google, nombre, options{baseURL, headers}, auth{modo}, modelos{id:{nombre, contexto, max_output, precio_in/out, capacidades}}, blacklist/whitelist}`
 - Catálogo **models.dev** (MIT, mismo equipo OpenCode) autocompleta precios/contexto/capacidades; snapshot cacheado offline + actualización sin tocar la app
@@ -92,7 +96,7 @@ Para quien use APIs de cualquier empresa: **75+ proveedores sin escribir código
 - blacklist/whitelist por proveedor como scope [A·A.6](./plan-a-chat-codex.md#a6); estado por key (válida/cuota/error) con botón probar-conexión
 
 **d) small_model + lista verificada**
-- `small_model` separado para tareas internas baratas (títulos de sesión, resúmenes chicos, rung-resúmenes) — conecta al router [C·C.6](./plan-c-reasonix-deepseek.md#c6)
+- `small_model` separado para tareas internas baratas (títulos de sesión, resúmenes chicos, rung-resúmenes) — conecta al router [C·C.2](./plan-c-reasonix-deepseek.md#c2)
 - Lista "Modelos verificados Empresa Dev" curada por nosotros (patrón Zen) + guía proveedor-por-proveedor de obtención de key (alimenta plantillas [P·P.4](./plan-p-centro-mcp.md#p4))
 
 - **Pruebas (matriz completa):**
@@ -101,7 +105,7 @@ Para quien use APIs de cualquier empresa: **75+ proveedores sin escribir código
   - E2E funcional: agregar proveedor desde JSON experto; selector muestra precio/contexto; small_model usado en tarea interna (verificado en request capturado)
   - Suite HUMANA @core-ampliada: no-programador conecta OpenRouter pegando solo su key y chatea <2 min · elige modelo viendo el precio · esconde modelos con whitelist
 **⚠️ Condiciones NO negociables del runtime Reasonix (debate SDD-009):**
-1. Cada sesión de agente corre dentro de **contenedor efímero** ([H·H.9](./plan-h-motor-pruebas.md#h9) ContainerDriver) — el sandbox de Reasonix NO es kernel-level y toda la categoría (SymJack 2026) ha sido comprometida
+1. Cada sesión de agente corre dentro de **contenedor efímero** ([H·H.9a](./plan-h-motor-pruebas.md#h9a) — aislamiento mínimo que se ejecuta INMEDIATAMENTE tras esta fase C.3, antes de ninguna otra etapa) — el sandbox de Reasonix NO es kernel-level y toda la categoría (SymJack 2026) ha sido comprometida
 2. Versión PINNEADA + job de CI que pruebe upgrades antes de adoptarlos (reescritura TS→Go en vuelo upstream)
 3. Transcripts JSONL persistidos desde el día 1 ([D·D.1](./plan-d-memoria-v3code.md#d1)) — dataset de migración + auditoría
 4. **Disparadores de migración a OwnLoopProvider** (base OSS mini-swe-agent/OpenHands SDK): volumen tokens justifique 1 FTE en loop · UX que sidecars no cubran · primer incidente no contenido · señal de churn (breaking/paid-tier)

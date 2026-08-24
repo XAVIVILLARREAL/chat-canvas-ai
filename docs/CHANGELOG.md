@@ -4,6 +4,18 @@
 
 ## 2026-08-24
 
+## 2026-08-24
+
+- **REVISIÓN PROFUNDA Plan Base v3.4** (SDD-001): análisis completo de los 20 planes + matriz + README maestro
+- Fases reintegradas: **A.5** (medidor/debug de contexto) y **D.7** (blame-rung) — estaban prometidas en ORDEN/torneo pero no existían; C.4 documentada como reservada (absorbida en C.5/C.7)
+- **H.9 partida**: H.9a (aislamiento contenedor mínimo) se ejecuta tras C.3 y cumple la condición NO negociable de seguridad de PLAN C; H.9b (computadora persistente) al final de H
+- **P (Centro MCP)** pasa a tras el Gate B en paralelo con C/D; **M (GitHub) antes que K/L** ahora DENTRO del ORDEN; voz (K) al final del bloque (J→M→L→K)
+- **Multiplataforma corregida a WEB-FIRST** en el README (tabla qué-corre-dónde + diagrama cerebro-tres-cuerpos): navegador = v1 servido por el gateway; Tauri diferido hasta demanda
+- **A.7/A.8** con v1 mínima en Etapa 1 (tarea simple / resume sin rungs) que H.1/D.1 formalizan; **C.7 y D.8** con alcance v1 acotado (C.7b/D.8b post-base)
+- **MATRIZ regenerada: 112 fases** (95 A–P + 17 S/T/U) en orden de ejecución, regla dura "fase GUI ⇒ [E]+[H]", presupuesto **máx $20/gate** con APIs reales (resto mock-first)
+- Cross-refs rotos reparados: A.9→A.4 fork · C.7→router C.2 · plan-s→C.2 · H.9 enlace inválido · plan-u link a plan-kr inexistente → referencia a Etapa 17
+- Rangos de fases de la tabla maestra corregidos (B.1–B.9, F.0–F.7, G.1–G.7, H.1–H.9, L.1–L.4, N.1–N.7); estimación recalibrada a ~24–32 semanas
+
 - **SDD-010 Modelo de Negocio** (3 investigaciones paralelas: outcome-pricing · growth devtools · costos hosting):
 - 3 ESCENARIOS soportados por el mismo codebase ADR-005: A todo-local (Ollama en tu máquina→Tauri su hogar natural, SKU posterior) · B servidor propio (web-first ideal) · C nube gestionada (el negocio recurrente)
 - MONETIZACIÓN con datos: Motor principal = open-core + managed hosting ($16-110 costo real → cobrar $29-149/mes margen 60-80%, modelo n8n $5.2B val); Pay-per-results = arma de diferenciación SOLO tras >70% success-rate medido y entregas binariamente verificables POR NUESTROS TESTS (ventaja única del mercado; Fin $100M ARR $0.99/resolución pero Devin abandonó outcome puro — 42% PRs mergeados = revenue erraticísimo; Agentforce $2/conversación fracasó $900/día); Enterprise on-prem ilimitado anual después (Harvey $1,200+/seat sin outcomes; Adecco-Agentforce acuerdo ilimitado)

@@ -3,7 +3,7 @@
 > [← Maestro](./README.md) · [← PLAN G](./plan-g-skills-lab.md) · [PLAN I →](./plan-i-revision-superposiciones.md)
 > Depende de: Etapas 6 (canva para mostrar resultados), 7 (skills definen el cómo). Inspiración: readiness checks de Reasonix (vistos en --metrics), SOP MetaGPT/ChatDev, "pruebas y evidencia" del AGENTS.md original.
 
-**Entregable:** los agentes trabajan por RESULTADOS verificables — **Orden de construcción: H.1→H.2→H.5→H.6→H.3→H.4→H.7→H.8→H.9** (Shadow Workspace H.5/H.6 INMEDIATAMENTE tras el runner). Números = IDs estables. — cada tarea tiene criterios de aceptación que se prueban automáticamente y se muestran en el canva.
+**Entregable:** los agentes trabajan por RESULTADOS verificables — **Orden de construcción: H.1→H.2→H.5→H.6→H.3→H.4→H.7→H.8→H.9b** · **H.9a (contenedor mínimo) se ejecuta tras C.3 en Etapa 3** — condición no negociable de seguridad ([PLAN C §condiciones](./plan-c-reasonix-deepseek.md)). Shadow Workspace H.5/H.6 INMEDIATAMENTE tras el runner. Números = IDs estables. — cada tarea tiene criterios de aceptación que se prueban automáticamente y se muestran en el canva.
 
 <a id="h1"></a>
 ### H.1 — Tareas con criterios
@@ -43,13 +43,20 @@
 - Auto-purga: logs verbosos de los ciclos se descartan; solo el rung resumen sobrevive (copia.md §auto-purgado)
 - **Pruebas:** Integration scripted: agente introduce error → 2 ciclos SELF_FIX invisibles → entrega limpia → Ledger muestra los rungs, el chat NO muestra ruido
 
+<a id="h9a"></a>
+### H.9a — Aislamiento contenedor mínimo (SE EJECUTA TRAS C.3, Etapa 3)
+- **Por qué aquí**: [PLAN C](./plan-c-reasonix-deepseek.md) declara NO NEGOCIABLE que cada sesión de agente corra en contenedor efímero — el sandbox de Reasonix no es kernel-level. NINGÚN agente de etapas posteriores corre sin esto.
+- Contenedor Ubuntu **efímero por agente/sesión** (Docker local o del servidor): spawn con límites CPU/RAM/disco, kill limpio, red denegada por defecto, cwd scoped al workspace
+- Sin persistencia avanzada (llega en H.9b): el contenedor muere con la sesión; solo sobrevive el diff en el workspace
+- **Pruebas:** Cargo test: spawn/kill/timeout con fixture; chaos: matar contenedor a mitad → el agente se recupera en uno nuevo con estado consistente; allowlist de red verificada (sin salida por defecto)
+
 <a id="h9"></a>
-### H.9 — Computadora persistente del agente (patrón Grok Bot, local-first)
+### H.9b — Computadora persistente del agente (patrón Grok Bot, local-first) — al final de H
 - Abstracción `AgentComputer` con DOS drivers:
   - **LocalDriver** (default v1): workspace + worktree + procesos sandbox ya existentes — cero requisitos extra
   - **ContainerDriver**: contenedor **Ubuntu persistente por agente** (Docker local o en tu servidor): filesystem que sobrevive entre sesiones, terminal accesible desde la UI, navegador headless disponible, snapshots/restores del estado completo de la máquina
 - La máquina del agente es SU oficina: instala dependencias, deja servicios corriendo, retoma el entorno tal cual lo dejó (persistencia real estilo Grok Bot pero en TU infraestructura, no en la nube ajena)
-- Snapshots manuales + automáticos pre-tarea peligrosa; reset limpio con un click; límites CPU/RAM/disco configurables ([C6](./plan-a-chat-codex.md#a4) hereda permisos)
+- Snapshots manuales + automáticos pre-tarea peligrosa; reset limpio con un click; límites CPU/RAM/disco configurables (hereda permisos de [A·A.4](./plan-a-chat-codex.md#a4))
 - Terminal visible en panel ([A·A.4](./plan-a-chat-codex.md#a4)) conectada a LA máquina de ese agente
 - **Respaldos del estado del agente POR ROL** (SDD-006 §4): frecuencia y retención configurables por scope ([A·A.6](./plan-a-chat-codex.md#a6)) — default estilo Claude Code (automáticos, conserva últimos 5); snapshot = estado COMPLETO (archivos+memoria) pero restauración exige replay-or-fork explícito con registro de efectos externos ya ocurridos (anti semantic-rollback ACRFence); golden snapshot de empresa heredable ([N·N.7](./plan-n-empresas-autonomas.md#n7)) con aprobación humana para actualizarlo
 - **Pruebas:** Cargo test drivers tras trait común. Integration: container crea archivo → reinicia sesión → archivo sigue ahí; snapshot→restore exacto. Chaos: matar container → recrear desde snapshot. E2E humano: abre terminal del agente, trabaja, cierra app, vuelve y su entorno sigue intacto

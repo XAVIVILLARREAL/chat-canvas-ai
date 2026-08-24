@@ -4,7 +4,7 @@
 
 ## Donde estamos
 
-Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **ADR-005 aceptado Y D1 EJECUTADO:** workspace Cargo vivo (crates/core + crates/server axum:3030 + src-tauri shell fino) — el mismo dominio Rust corre por IPC y por HTTP; Plan Base README define el modelo mental multiplataforma+sync. **Multiplataforma cerrado (SDD-005):** proyecto Android nativo versionado en `src-tauri/gen/android/` (toolchain instalada en servidor: JDK 21 + SDK 34 + NDK r27), CI con matriz desktop ubuntu/windows/macos en cada push, workflow manual "Android Build" para APK debug, y `docs/MULTIPLATAFORMA.md` con comandos por plataforma (iOS requiere Mac para `ios init`). Siguiente paso: mini-SDD técnico PLAN A y Fase A.1.
+Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan Base revisado a fondo (v3.4, 2026-08-24): 112 fases ordenadas en la matriz, contradicciones resueltas (H.9a contenedor tras C.3, P tras Gate B, M antes de K/L, WEB-FIRST consistente), fases A.5/D.7 reintegradas.** **ADR-005 aceptado Y D1 EJECUTADO:** workspace Cargo vivo (crates/core + crates/server axum:3030 + src-tauri shell fino) — el mismo dominio Rust corre por IPC y por HTTP; Plan Base README define el modelo mental multiplataforma+sync. **Multiplataforma cerrado (SDD-005):** proyecto Android nativo versionado en `src-tauri/gen/android/` (toolchain instalada en servidor: JDK 21 + SDK 34 + NDK r27), CI con matriz desktop ubuntu/windows/macos en cada push, workflow manual "Android Build" para APK debug, y `docs/MULTIPLATAFORMA.md` con comandos por plataforma (iOS requiere Mac para `ios init`). Siguiente paso: mini-SDD técnico PLAN A y Fase A.1.
 
 ## Gates pendientes
 
@@ -31,6 +31,7 @@ Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **ADR-0
 
 ## Ultimos cambios
 
+- 2026-08-24: **Revisión profunda Plan Base v3.4** — A.5/D.7 reintegradas, H.9 partida (H.9a tras C.3), P tras Gate B, M antes de K/L, WEB-FIRST consistente en README, matriz regenerada 112 fases, política $20/gate APIs reales
 - 2026-08-24: SDD-012 Multi-Agent GrokBot Patterns — Group Chat, Chief of Staff, Routine Learning, A2A protocol
 - 2026-08-24: SDD-011 Integracion Hermes Agent — analisis completo hermes-agent (10k archivos, 1.8M LOC) + 7 subsystems
 - 2026-08-24: SDD-010 Modelo Negocio — 3 escenarios monetizacion, datos como activo, growth loops

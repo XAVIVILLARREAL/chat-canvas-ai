@@ -27,7 +27,7 @@
 
 <a id="u2"></a>
 ### U.2 — Micro-feedback en ejecución (cada segundo cuenta)
-- Test pasa → tick verde animado en su bloque ([KR·KR.2](./plan-kr-kanban-resultados.md#kr2)); criterio cumplido → MilestonePop; tool-call exitoso → pulso sutil del nodo-agente
+- Test pasa → tick verde animado en su bloque (Kanban de resultados — Etapa 17, [espacio reservado](./README.md#espacios-reservados)); criterio cumplido → MilestonePop; tool-call exitoso → pulso sutil del nodo-agente
 - **Worklog que colapsa al éxito** (patrón clack taskLog): durante ejecución muestra pasos verbosos; al terminar bien colapsa a "✔ 14 pasos completados"; expandible SOLO si falló o bajo demanda — el log sucio permanente mata la satisfacción
 - **La barra AVANZA aunque la tarea falle** (Duolingo): progreso parcial real (pasos completados, tokens invertidos) nunca se estanca — el reintento se siente continuación, no reinicio
 - **% de contexto/coste consumido visible junto a cada tarea** (Cursor): confianza en tiempo real

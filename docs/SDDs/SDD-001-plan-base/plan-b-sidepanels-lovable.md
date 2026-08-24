@@ -45,6 +45,7 @@
 ### B.6 — @menciones de archivos/símbolos (ganadora torneo #002)
 - En el composer: escribir `@` abre dropdown fuzzy con archivos del proyecto (del árbol [B·B.1](./plan-b-sidepanels-lovable.md#b1)); al existir índice AST ([J·J.1](./plan-j-grafo3d-repomap.md#j1)) también símbolos
 - La mención inserta un chip visual que el provider convierte en contexto anclado
+- **Dependencia blanda de [J·J.1](./plan-j-grafo3d-repomap.md#j1)**: sin índice AST (hasta Etapa 10) las menciones son de ARCHIVOS; cuando J.1 exista se añaden símbolos automáticamente — enhancement progresivo, B.6 NO espera ni bloquea a J
 - **Pruebas GUI:** E2E humano: teclear `@app` filtra <100ms, flechas navegan, Enter inserta chip; el chip llega al agente como ruta anclada
 
 <a id="b7"></a>

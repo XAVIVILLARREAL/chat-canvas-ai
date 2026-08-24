@@ -1,6 +1,6 @@
 # PLAN P — Etapa transversal: Centro MCP (visual, para programadores Y no-programadores)
 
-> [← Maestro](./README.md) · Se ejecuta tras Etapa 2 (necesita AppShell+stores); alimenta a G (gating), I y N (tools de agentes)
+> [← Maestro](./README.md) · **Se ejecuta tras el Gate B** (necesita AppShell+stores), en paralelo con C/D; alimenta a G (gating), I y N (tools de agentes)
 > Promueve a fase activa los ítems 484–500 del [torneo SDD-003](../SDD-003-torneo-500-ideas.md). Complementa O.2 (nuestro cerebro EXPUESTO vía MCP): este plan es el lado CLIENTE — conectar herramientas externas.
 
 **Entregable:** cualquier persona conecta servidores MCP a sus agentes en minutos: el programador pega su JSON/TOML, el no-programador instala tarjetas 1-click. Los agentes ganan superpoderes externos con permisos y auditoría.

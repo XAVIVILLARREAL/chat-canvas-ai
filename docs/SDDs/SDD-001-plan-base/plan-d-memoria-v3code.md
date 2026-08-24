@@ -62,7 +62,14 @@
 - **Pruebas:** Unit aging policy. Integration router: prompt de auth carga SOLO shard auth (verificado en request capturado). E2E checkpoint: rebobinar a turno N restaura archivos exactos
 
 <a id="d8"></a>
+### D.7 — Blame-rung: "por qué existe esto" (ganadora torneo)
+- Cada rung de cambio queda VINCULADO a la decisión/requisito que lo motivó: diff → decisión → sesión → criterio ([H·H.1](./plan-h-motor-pruebas.md#h1))
+- Desde cualquier línea/diff del workspace: clic → panel "por qué existe esto" con la cadena completa (quién · cuándo · qué decisión · qué evidencia)
+- Se alimenta del Ledger ([D·D.1](./plan-d-memoria-v3code.md#d1)) y de la gobernanza ([D·D.4](./plan-d-memoria-v3code.md#d4)) — sin tablas nuevas
+- **Pruebas:** Unit: mapping diff→decisión correcto con fixture sintético. Integration: commit de agente → blame muestra la decisión aceptada correcta. E2E humano: clic en línea de código → cadena completa navegable
+
 ### D.8 — Motor de memorias multi-tipo configurable (SDD-006 §3)
+- **v1 (Etapa 4)**: tipos `working` (presupuesto tokens) · `episódica` (rungs) · `semántica` (hechos) con decay Ebbinghaus λ POR TIPO + scoping namespaced + escritura auto/explícita. **Post-base (D.8b)**: `relacional` (grafo bi-temporal), `indexada` KNN, `procedimental` versionada, consolidación/reflexión por umbral y retrieval multi-señal con pesos — no bloquean la base.
 - **Taxonomía completa con knobs separados** (CoALA): `working` (presupuesto tokens) · `episódica` (rungs) · `semántica/largo-plazo` (hechos) · `relacional` (grafo bi-temporal: contradicción INVALIDA, nunca borra) · `indexada` (FTS5/vector) · `procedimental` (skills/reglas versionadas)
 - Configurables por SCOPE ([A·A.6](./plan-a-chat-codex.md#a6)): qué tipos activa cada agente/subagente según su rol
 - Operaciones completas: Consolidación (clustering archive-then-insert idempotente) · Indexing · Updating · **Forgetting** (decay Ebbinghaus λ POR TIPO; afecta ranking NUNCA borrado; GC solo <0.01 archivando originales; refuerzo por acceso) · Retrieval (híbrido multi-señal: relevance×3+importance×2+recency×0.5 pesos tuneables) · Compression

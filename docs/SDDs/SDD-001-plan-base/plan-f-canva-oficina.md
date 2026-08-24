@@ -22,6 +22,7 @@
 - Config adaptativa de ADR-001 (mobile: sin minimap, controls flotantes)
 - **Pruebas:** E2E humano: arrastrar nodo, conectar dos nodos, zoom con rueda y pinch
 
+<a id="f2"></a>
 ### F.2 — Nodos-agente vivos (datos reales)
 - Nodo custom por agente del store real ([A·A.2](./plan-a-chat-codex.md#a2)): avatar, nombre, rol, badge de estado (`idle/working/blocked/error`)
 - Estado sincronizado con eventos del provider ([C·C.1](./plan-c-reasonix-deepseek.md#c1)): cuando el agente ejecuta tool-call → estado "working" en vivo
