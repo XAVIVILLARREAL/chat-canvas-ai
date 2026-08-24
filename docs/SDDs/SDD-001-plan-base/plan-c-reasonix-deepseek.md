@@ -62,7 +62,7 @@
 
 <a id="c6"></a>
 ### C.6 — OllamaProvider local, ready-to-plug (SDD-006 §5)
-- **Tercer driver** del trait ([A·A.3](./plan-a-chat-codex.md#a3)): reutiliza el cliente OpenAI-compatible (`/v1/chat/completions`) apuntando a `http://localhost:11434` — mismo EventBus, misma UI
+- **Tercer driver** del trait ([A·A.3](./plan-a-chat-codex.md#a3)): reutiliza el cliente OpenAI-compatible (`/v1/chat/completions`) apuntando a `http://localhost:11434` en el SERVIDOR donde corre el sistema (self-host) o en la máquina del usuario en modo todo-local — mismo EventBus, misma UI
 - **Detección automática**: al abrir settings, ping a `/api/tags`; si está instalado muestra modelos disponibles y estados; si no, guía de instalación por OS (nativo o Docker `-e`) sin salir de la app
 - **Knobs de hardware conectados a [C·C.5](./plan-c-reasonix-deepseek.md#c5)** (verificados en docs oficiales v0.32):
   - `OLLAMA_KV_CACHE_TYPE`: `f16 (default) / q8_0 (~½ memoria, pérdida imperceptible — recomendado) / q4_0 (~¼, trade-off mayor)` — ⚠️ es GLOBAL del servidor y hace fallback SILENCIOSO a f16 en arquitecturas no soportadas: la UI lo advierte y verifica por consumo real de memoria
