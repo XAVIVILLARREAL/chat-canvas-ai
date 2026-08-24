@@ -54,6 +54,18 @@
 - **Respaldos del estado del agente POR ROL** (SDD-006 §4): frecuencia y retención configurables por scope ([A·A.6](./plan-a-chat-codex.md#a6)) — default estilo Claude Code (automáticos, conserva últimos 5); snapshot = estado COMPLETO (archivos+memoria) pero restauración exige replay-or-fork explícito con registro de efectos externos ya ocurridos (anti semantic-rollback ACRFence); golden snapshot de empresa heredable ([N·N.7](./plan-n-empresas-autonomas.md#n7)) con aprobación humana para actualizarlo
 - **Pruebas:** Cargo test drivers tras trait común. Integration: container crea archivo → reinicia sesión → archivo sigue ahí; snapshot→restore exacto. Chaos: matar container → recrear desde snapshot. E2E humano: abre terminal del agente, trabaja, cierra app, vuelve y su entorno sigue intacto
 
+<a id="h7"></a>
+### H.7 — Best-of-N: votación entre soluciones (ganadora torneo #213, patrón Devin)
+- Para tareas críticas: el orquestador lanza N ejecuciones (2-3) con semillas/enfoques distintos → cada una produce su solución + evidencia → scoring automático por criterios ([H·H.1](./plan-h-motor-pruebas.md#h1)) + review ([I·I.1](./plan-i-revision-superposiciones.md#i1))
+- El humano elige entre candidatas presentadas lado-a-lado con sus scores; la no-elegida archiva como alternativa consultable
+- **Pruebas:** Integration scripted: 3 candidatas mock → scores correctos → elegida la mejor. E2E humano: vista comparativa lado-a-lado funcional
+
+<a id="h8"></a>
+### H.8 — Cuarentena de tests flaky (ganadora torneo #253)
+- Detector estadístico: test que falla intermitentemente sin cambio de código (N pasadas/fallos alternados) → marcado flaky → movido a cuarentena automáticamente (no bloquea gates)
+- Re-verificación programática periódica: si pasa M veces seguidas sale de cuarentena; si confirma inestabilidad, ticket para el agente QA con repro mínimo
+- **Pruebas:** Unit detector con historial sintético. Integration: test inestable simulado entra/sale de cuarentena correctamente; gate ignora cuarentenados
+
 ## 🚪 GATE H (demo verificable)
 
 Tarea real end-to-end: "agrega botón de exportar CSV al panel" con criterios (`existe test del export`, `comando vitest pasa`) → el agente implementa en su flujo → TestRunner ejecuta → canva muestra ✓✓ → reviso diff clicable → apruebo → done persistido. Todo demostrado en video con suite humana verde.

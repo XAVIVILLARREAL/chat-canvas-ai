@@ -47,6 +47,11 @@
 - Auditoría final documentada en docs (qué skill eligió qué y por qué)
 - **Pruebas:** suite humana completa re-corrida + checklist RESPONSIVE.md + contraste automatizado básico
 
+<a id="f7"></a>
+### F.7 — Command Palette global ⌘K (ganadora torneo #173, patrón Zed/Raycast)
+- Paleta accesible desde cualquier ventana: buscar/ejecutar acciones, saltar a proyecto/archivo/agente/sesión, despachar encargos rápidos ([A·A.7](./plan-a-chat-codex.md#a7))
+- Respuesta <50ms percibida; fuzzy-match con ranking por uso reciente; hotkeys para las 5 acciones top configurables
+- **Pruebas GUI:** E2E humano: ⌘K→escribir 3 letras→Enter ejecuta acción correcta; paleta lista proyectos/agentes/comandos; hotkey personalizada persiste
 ### F.6 — Performance del canva
 - Virtualización de nodos (>50), solo transform/opacity en animaciones, will-change selectivo, prefers-reduced-motion
 - Benchmark: 100 nodos + 150 edges a 60fps en desktop dev
