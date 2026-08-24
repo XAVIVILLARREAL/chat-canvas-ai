@@ -16,6 +16,7 @@
 - Cross-refs rotos reparados: A.9→A.4 fork · C.7→router C.2 · plan-s→C.2 · H.9 enlace inválido · plan-u link a plan-kr inexistente → referencia a Etapa 17
 - Rangos de fases de la tabla maestra corregidos (B.1–B.9, F.0–F.7, G.1–G.7, H.1–H.9, L.1–L.4, N.1–N.7); estimación recalibrada a ~24–32 semanas
 - **RESPONSIVE TOTAL endurecido**: regla transversal dura en AGENTS.md + SDD-002 + plan-t (T.A11Y/T.QA) + README (regla 11) + matriz — TODAS las pantallas/secciones/ventanas mobile-first, verificadas en móvil 375 + desktop 1440 en cada gate (suite humana responsive); no existe pantalla "solo desktop"
+- **REVISIÓN DE ARQUITECTURA v3.5 + stack validado por investigación**: CÓMPUTO CLIENT-FIRST como regla transversal #12 (D.5 wa-sqlite/OPFS + sqlite-vec WASM · J.1 web-tree-sitter WASM · F.6 Three.js WebGPU · C.6 Ollama local en el cliente) — el servidor escala con datos, no con CPU de usuarios; ARQUITECTURA.md reescrita (backend Python fantasma eliminado, web-first+Rust confirmado); INFRA.md corregido; ADR-002 marcado superado en parte por ADR-005/SDD-008; stack validado: axum 0.8.9 + tokio 1.53 + sqlx 0.9 + rustls 0.23 (3.475 sesiones WS/vCPU), sin BFF Node, Go como plan B
 
 - **SDD-010 Modelo de Negocio** (3 investigaciones paralelas: outcome-pricing · growth devtools · costos hosting):
 - 3 ESCENARIOS soportados por el mismo codebase ADR-005: A todo-local (Ollama en tu máquina→Tauri su hogar natural, SKU posterior) · B servidor propio (web-first ideal) · C nube gestionada (el negocio recurrente)

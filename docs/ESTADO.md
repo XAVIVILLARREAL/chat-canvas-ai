@@ -31,6 +31,7 @@ Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan 
 
 ## Ultimos cambios
 
+- 2026-08-24: **Arquitectura v3.5 + CÓMPUTO CLIENT-FIRST** — regla transversal #12 (búsqueda/indexación/canva/LLM local al cliente); ARQUITECTURA.md reescrita (sin backend Python; web-first Rust); INFRA.md corregido; ADR-002 superado en parte; stack validado por investigación (axum 0.8.9/tokio 1.53/sqlx 0.9/rustls 0.23, sin BFF Node, Go plan B)
 - 2026-08-24: **RESPONSIVE TOTAL** — regla dura en AGENTS.md/SDD-002/plan-t/README/matriz: toda pantalla mobile-first verificada en 375/768/1440 en cada gate
 - 2026-08-24: **Revisión profunda Plan Base v3.4** — A.5/D.7 reintegradas, H.9 partida (H.9a tras C.3), P tras Gate B, M antes de K/L, WEB-FIRST consistente en README, matriz regenerada 112 fases, política $20/gate APIs reales
 - 2026-08-24: SDD-012 Multi-Agent GrokBot Patterns — Group Chat, Chief of Staff, Routine Learning, A2A protocol

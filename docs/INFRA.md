@@ -60,38 +60,40 @@
 
 ### TanStack React Query (estado server)
 - **Paquete:** `@tanstack/react-query` v5.101.4
-- **Beneficio:** Caching, reintentos, loading states automaticos para datos del Python service
+- **Beneficio:** Caching, reintentos, loading states automaticos para datos del gateway Rust
 
 ## Arquitectura hibrida
 
-### Un solo codebase (Tauri)
-- **Desktop:** Windows, macOS, Linux (Tauri 2.0)
-- **Mobile:** Android, iOS (Tauri mobile)
+### Un solo codebase (web-first)
+- **Navegador v1 (WEB-FIRST):** la SPA React la sirve el gateway axum (`crates/server`) — cero instalación
+- **Tauri (DIFERIDO):** envoltorio de la misma web + superpoderes nativos, solo con demanda demostrada
 - **Frontend:** React compartido en `src/`
-- **Backend local:** Rust en `src-tauri/`
+- **Dominio Rust:** `crates/core` (compartido por server y tauri-shell)
 
 ### Estructura de carpetas
 ```
-src/                    # React (compartido)
-src-tauri/              # Rust (Tauri)
+src/                    # React (compartido, web-first)
+crates/core             # Dominio Rust (agentes, tareas, skills, sesiones)
+crates/server           # Gateway axum (sirve SPA + REST + SSE/WS)
+src-tauri/              # Rust (Tauri — shell diferido)
 packages/shared-types/  # Tipos TypeScript compartidos
-services/python/        # Python (CrewAI)
 e2e/                    # Playwright tests
 docs/                   # Documentacion
 ```
+> ⚠️ NO existe `services/python/`: el backend server es **Rust** (ADR-005 + SDD-008 + Plan Base v3.4). Corregido 2026-08-24.
 
 ### Capas
 | Capa | Carpeta | Tecnologia |
 |---|---|---|
 | Frontend | `src/` | React + TypeScript |
-| Backend Local | `src-tauri/` | Rust |
-| Backend Server | `services/python/` | Python + FastAPI |
+| Gateway Server | `crates/server` | Rust (axum) — sirve la SPA + API + SSE/WS |
+| Dominio | `crates/core` | Rust — agentes, tareas, skills, sesiones |
 | Shared Types | `packages/shared-types/` | TypeScript |
 
 ### Comunicacion
-- Frontend <-> Backend Local: IPC (Tauri commands)
-- Frontend <-> Backend Server: WebSocket/HTTP
-- Backend Local <-> Backend Server: WebSocket
+- Frontend <-> Gateway axum: HTTP/WS/SSE (web-first)
+- Gateway <-> Workers: cola Postgres `FOR UPDATE SKIP LOCKED` + eventos
+- Workers <-> Postgres+RLS: datos multi-tenant (proyectos como tenants)
 
 ### Documentacion
 - **ADR-002:** `docs/ADRs/ADR-002-arquitectura-hibrida.md`

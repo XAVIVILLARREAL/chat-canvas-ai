@@ -26,7 +26,7 @@ Referencia dura: el equivalente gestionado (Fly/Railway/Render con app+DB+egress
 
 | Capa | Elección | Nota |
 |---|---|---|
-| Runtime | tokio 1.52 (LTS 1.51) | dial9 flight-recorder para diagnosticar stalls |
+| Runtime | **tokio 1.53.x** (validado 2026-08: 1.52 queda en línea de parche) | dial9 flight-recorder para diagnosticar stalls; MSRV ≥1.94 por sqlx 0.9 (servidor tiene 1.98 ✓) |
 | HTTP | axum 0.8.9 + tower-http | WS sobre HTTP/2, graceful shutdown cubre WS; SSE con CancellationToken |
 | DB driver | sqlx 0.9 (macros, offline mode) | compile-time checks sin DB viva en CI |
 | KV embebido | redb 4.1 (transaccional) / fjall 3.0 (write-heavy) | sled descartado (estancado) |

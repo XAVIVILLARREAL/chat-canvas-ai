@@ -9,6 +9,7 @@
 ### J.1 — Indexador AST
 - Tree-sitter (crate Rust) parsea el workspace → `repo_symbols` (file, symbol, kind, líneas) + edges import/call
 - PageRank en Rust sobre el grafo; indexado incremental por watcher (solo archivos cambiados)
+- **Client-first**: el indexador también compila a **WASM (web-tree-sitter)** y corre en el NAVEGADOR del usuario cuando el repo es suyo (edición/consulta instantánea sin servidor); el servidor solo indexa cuando un agente 24/7 lo necesita — el repo-map resultante viaja como tokens, no como CPU
 - **Pruebas:** Cargo test con fixture multi-archivo TS/Rust: símbolos+edges correctos, pagerank orden esperado
 
 <a id="j2"></a>

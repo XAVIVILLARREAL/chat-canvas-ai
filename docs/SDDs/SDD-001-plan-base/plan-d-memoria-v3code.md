@@ -51,6 +51,7 @@
   - Nivel ALTO: conceptos arquitectónicos, ADRs y decisiones del workspace
 - v1 práctica: FTS5 léxico con ranking BM25 para ambos niveles (ya probado en [D·D.2](./plan-d-memoria-v3code.md#d2))
 - v2 opcional: búsqueda semántica KNN con `sqlite-vec` embebido y embeddings LOCALES vía **OllamaProvider** ([C·C.6](./plan-c-reasonix-deepseek.md#c6) `/api/embeddings`, ready-to-plug: si Ollama está presente se activa solo) — sin motor disponible queda en FTS5 puro sin degradarse (fail-open)
+- **Client-first**: cuando los datos del proyecto son del dispositivo (modo local o caché del navegador), la búsqueda corre en el CLIENTE con **wa-sqlite + OPFS** (FTS5) y **sqlite-vec WASM** (KNN) — el servidor solo indexa lo compartido entre dispositivos (escalabilidad: cero CPU de servidor por búsqueda local)
 - Búsqueda híbrida final: FTS5 ∪ KNN con fusión por ranking cuando la v2 exista
 - **Pruebas:** Integration: consulta ("cómo manejamos auth") retorna la decisión correcta aunque no comparta palabras. Indexado incremental <100ms/archivo
 

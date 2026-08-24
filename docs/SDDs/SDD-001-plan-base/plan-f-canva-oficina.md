@@ -55,6 +55,7 @@
 - **Pruebas GUI:** E2E humano: ⌘K→escribir 3 letras→Enter ejecuta acción correcta; paleta lista proyectos/agentes/comandos; hotkey personalizada persiste
 ### F.6 — Performance del canva
 - Virtualización de nodos (>50), solo transform/opacity en animaciones, will-change selectivo, prefers-reduced-motion
+- **Renderer Three.js WebGPU** (2026: estándar; WebGL queda como fallback) — el canva 3D corre 100% en el CLIENTE, cero carga de servidor
 - Benchmark: 100 nodos + 150 edges a 60fps en desktop dev
 - **Pruebas:** test de rendimiento programático + suite humana sin jank percibido
 

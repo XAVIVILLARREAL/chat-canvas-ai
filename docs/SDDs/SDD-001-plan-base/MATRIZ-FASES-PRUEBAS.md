@@ -3,7 +3,7 @@
 > Generada de los planes (fuente de verdad). **Regenerar en CADA cambio de fases** (regla de ejecución #10 del [README](./README.md)).
 > Orden = ORDEN DE EJECUCIÓN maestro (no alfabético): así la matriz es también el checklist de construcción.
 > Capas por fase: **[U]**nit vitest · **[I]**ntegración cargo/mock · **[E]**2E Playwright · **[H]**umana suite modo persona.
-> **Reglas duras**: fase GUI ⇒ **[E]+[H] obligatorias** · **toda fase GUI se prueba en móvil 375px + desktop 1440px** (suite humana `responsive-human.spec.ts` en cada gate — no hay pantalla "solo desktop") · fase sin fila aquí NO se construye · presupuesto APIs reales **máx $20/gate** (el resto mock-first ~$0) · evidencia de gate = video + `evidence/`.
+> **Reglas duras**: fase GUI ⇒ **[E]+[H] obligatorias** · **toda fase GUI se prueba en móvil 375px + desktop 1440px** (suite humana `responsive-human.spec.ts` en cada gate — no hay pantalla "solo desktop") · **cómputo client-first**: todo lo que pueda correr en el cliente va al cliente (server = datos, no CPU de usuarios) · fase sin fila aquí NO se construye · presupuesto APIs reales **máx $20/gate** (el resto mock-first ~$0) · evidencia de gate = video + `evidence/`.
 
 ## Etapa 1 · Chat núcleo Codex + tenants — `plan-a-chat-codex.md`
 | Fase | Nombre | Pruebas |
@@ -60,7 +60,7 @@
 | D.2 | Capa 2: Workspace Knowledge + Lock | Cargo test FTS ranking + invariantes presentes en contexto capturado |
 | D.3 | Capa 3: Memory Rail UI + inyección | E2E componentes rail/scrubber. Integration: request capturado por mock contiene contexto esperado |
 | D.4 | Gobernanza de decisiones (varve) | Cargo test ciclo estados + enforcement de scope. E2E HUMANA: agente propone → acepto con evidencia → otra tarea toca archivo gobernado → aviso de decisión activa |
-| D.5 | Índice semántico dual local | Integration: consulta ("cómo manejamos auth") retorna la decisión correcta sin palabras compartidas; indexado incremental <100ms/archivo. (v1 FTS5; KNN cuando existan Ollama/J.1 — fail-open) |
+| D.5 | Índice semántico dual local (**client-first: wa-sqlite OPFS + sqlite-vec WASM**) | Integration: consulta ("cómo manejamos auth") retorna la decisión correcta sin palabras compartidas; indexado incremental <100ms/archivo. E2E: búsqueda local en el navegador sin servidor. (v1 FTS5; KNN cuando existan Ollama/J.1 — fail-open) |
 | D.6 | Memory Router + shards + checkpoints | Unit aging policy. Integration: prompt de auth carga SOLO shard auth (request capturado). E2E checkpoint: rebobinar a turno N restaura archivos exactos |
 | D.7 | Blame-rung: "por qué existe esto" (torneo) | Unit: mapping diff→decisión con fixture. Integration: commit de agente → blame muestra decisión aceptada correcta. E2E HUMANA: clic en línea de código → cadena completa navegable |
 | D.8 | Memorias multi-tipo (v1: working/episódica/semántica; relacional+reflexión → D.8b) | Unit decay/scoring con fixtures. Integration: contradicción invalida sin borrar; consolidación idempotente. E2E HUMANA: ajustar λ de un tipo → ranking cambia; leakage test entre proyectos |
@@ -82,7 +82,7 @@
 | F.4 | Tareas y Kanban sobre el canva | E2E HUMANA: drag tarea todo→doing→done; persistencia verificada tras reinicio |
 | F.7 | Command Palette global ⌘K (torneo) | E2E HUMANA: ⌘K→3 letras→Enter ejecuta acción correcta; paleta lista proyectos/agentes/comandos; hotkey personalizada persiste |
 | F.5 | Identidad visual dirigida por IA | Suite humana completa re-corrida + checklist RESPONSIVE.md + contraste automatizado básico |
-| F.6 | Performance del canva | Benchmark programático: 100 nodos + 150 edges @60fps; suite humana sin jank percibido |
+| F.6 | Performance del canva (**WebGPU renderer, 100% cliente**) | Benchmark programático: 100 nodos + 150 edges @60fps (WebGPU; WebGL fallback); suite humana sin jank percibido |
 
 ## Etapa 7 · Skills Lab — `plan-g-skills-lab.md`
 | Fase | Nombre | Pruebas |
@@ -121,7 +121,7 @@
 ## Etapa 10 · Grafo 3D Repo-Map — `plan-j-grafo3d-repomap.md`
 | Fase | Nombre | Pruebas |
 |---|---|---|
-| J.1 | Indexador AST | Cargo test con fixture multi-archivo TS/Rust: símbolos+edges correctos, pagerank orden esperado |
+| J.1 | Indexador AST (**client-first: también WASM/web-tree-sitter**) | Cargo test con fixture multi-archivo TS/Rust: símbolos+edges correctos, pagerank orden esperado. E2E: indexado en el navegador del usuario sin servidor |
 | J.2 | Repo-map compacto | Unit presupuesto tokens (hard cap ≤1000). Integration: prompt capturado contiene mapa |
 | J.3 | Visor 3D | E2E HUMANA: rotar/zoom, click nodo abre archivo correcto; perf 60fps con 500 archivos |
 

@@ -73,6 +73,7 @@
 - **Presets por hardware** (detecta VRAM/RAM): GPU grande (f16 + ctx largo) · Laptop (q8_0 + ctx medio) · CPU-only (modelos cuantizados chicos) — editables como cualquier scope de [A·A.6](./plan-a-chat-codex.md#a6)
 - **Embeddings plug-and-play**: `/api/embeddings` alimenta automáticamente el índice semántico dual ([D·D.5](./plan-d-memoria-v3code.md#d5)) cuando Ollama está presente; sin él, FTS5 sigue funcionando igual
 - Venta diferencial: privacidad total y modo offline — agentes trabajando sin internet ni coste por token
+- **Client-first**: en modo todo-local el modelo corre en la MÁQUINA DEL USUARIO (no en el servidor) — el servidor no paga CPU ni tokens por esos usuarios, solo sirve datos; escala con usuarios locales sin coste marginal
 - **Pruebas:** Unit: detección/parsing de /api/tags y errores de conexión. Integration con Ollama real: chat streaming completo + embeddings generados; cambio de preset KV verificado por memoria consumida. E2E humano: conectar Ollama desde cero siguiendo la guía in-app
 
 <a id="c7"></a>

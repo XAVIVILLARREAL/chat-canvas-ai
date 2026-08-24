@@ -1,6 +1,6 @@
 # SDD-001 · Roadmap Maestro — Empresa Dev
 
-> Fecha: 2026-08-24 · Estado: Activo · v3.4 MEGA-PLAN (15 etapas + P, ~112 fases)
+> Fecha: 2026-08-24 · Estado: Activo · v3.5 MEGA-PLAN (15 etapas + P, ~112 fases)
 > Investigación profunda: OpenAI Codex (docs oficiales), Reasonix v1.23 (verificado EN VIVO en este servidor), V3Code (sitio oficial + spec copia.md), **Grok Bot xAI/Cursor** ([SDD-004](../SDD-004-analisis-grokbot.md): group chat de agentes, rutinas por demostración, proactividad, pipeline de bugs) + patrones de varve/codevira.
 > Pruebas: [SDD-002](../SDD-002-testing-spec-driven.md) — toda fase pasa las 4 capas; todo gate cierra con suite humana.
 
@@ -200,7 +200,7 @@ El servidor guarda cada proyecto como un **repositorio git bare** (tu "GitHub pr
 
 
 
-Reglas transversales intocables: **CADA PROYECTO ES UN TENANT** — todo dato lleva `project_id` desde el día 1 ([A·A.0](./plan-a-chat-codex.md#a0): cards + tabs + historial aislado; skills/MCP/agentes GLOBAL o COPIA LOCAL a decisión del usuario) · secretos SOLO en Rust · un trait por capacidad (provider/store/embeddings/router) · SQLite append-only para auditoría · fail-open en extras, fail-safe en datos · cada capa expone su contraparte MCP (visión V3Code).
+Reglas transversales intocables: **CÓMPUTO CLIENT-FIRST** (todo lo que pueda correr en el cliente va al cliente — ver ARQUITECTURA.md) · **CADA PROYECTO ES UN TENANT** — todo dato lleva `project_id` desde el día 1 ([A·A.0](./plan-a-chat-codex.md#a0): cards + tabs + historial aislado; skills/MCP/agentes GLOBAL o COPIA LOCAL a decisión del usuario) · secretos SOLO en Rust · un trait por capacidad (provider/store/embeddings/router) · SQLite append-only para auditoría · fail-open en extras, fail-safe en datos · cada capa expone su contraparte MCP (visión V3Code).
 
 ## Estimación global honesta (vibecoding dedicado)
 
@@ -239,6 +239,13 @@ Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: so
 - **A.7/A.8**: v1 mínima en Etapa 1 (tarea simple / resume sin rungs) que H.1/D.1 formalizan después
 - **C.7 y D.8**: alcance v1 acotado en la base; lo pesado (OAuth/small_model · memoria relacional/reflexión) marcado post-base (C.7b / D.8b)
 - **Matriz regenerada**: 112 fases (95 A–P + 17 S/T/U), orden = ejecución, regla "fase GUI ⇒ [E]+[H]", presupuesto **máx $20/gate** con APIs reales
+
+### Revisión de arquitectura v3.5 (2026-08-24) — escalabilidad + stack validado por investigación
+
+- **CÓMPUTO CLIENT-FIRST elevado a regla transversal #12**: todo cómputo que pueda correr en el cliente va al cliente (búsqueda local wa-sqlite/OPFS + sqlite-vec WASM en D.5, indexación AST web-tree-sitter en J.1, canva Three.js WebGPU en F.6, LLM local Ollama en C.6) — el servidor escala con los DATOS, no con la CPU de cada usuario; solo queda server-only lo central (agentes 24/7, sync, repos, secretos, RLS)
+- **ARQUITECTURA.md reescrita (v3.5)**: eliminado el backend Python fantasma (FastAPI/CrewAI — no existía `services/python/`) y el modelo Tauri-first; alineada a ADR-005 (web-first) + SDD-008 (workers Everruns, Postgres SKIP LOCKED) + Plan Base v3.4; **INFRA.md corregido** y ADR-002 marcado como superado en parte
+- **Stack validado por investigación (2026-08-24)**: Rust axum 0.8.9 + tokio 1.53 + sqlx 0.9 + rustls 0.23 es la combinación vigente (3.475 sesiones WS/vCPU, benchmark streaming — el más barato por conexión; patrón Everruns); **sin BFF Node/Hono** (un solo stack para un dev); Go (chi/pgx) como plan B pragmático (70% rendimiento, ~1/4 fricción); Hono solo si mañana se necesita ecosistema npm/edge (nunca Express)
+- Pendiente menor: skills Flutter residuales en `.opencode/skills/` (patrol-iteracion, terminal-sos) — candidatos a limpiar
 
 ### Recomendaciones de orden APROBADAS (aplican al ejecutar)
 
@@ -320,3 +327,4 @@ copia.md queda COMPLETAMENTE minado. Backlog del torneo conserva lo no-promovido
 9. Presupuesto de pruebas con APIs reales (DeepSeek/GitHub/Ollama): **máx $20/gate**; el resto de la suite corre mock-first (~$0)
 10. **La matriz se regenera en CADA cambio de fases**; una fase sin fila en la matriz no se construye
 11. **RESPONSIVE TOTAL (transversal dura)**: TODAS las pantallas/secciones/ventanas son mobile-first y operables en celular — toda fase GUI se verifica en móvil 375 + desktop 1440 (suite humana `responsive-human.spec.ts` en cada gate); no existe pantalla "solo desktop"; un gate con mobile rojo NO cierra
+12. **CÓMPUTO CLIENT-FIRST (transversal dura, escalabilidad)**: todo cómputo que PUEDA correr en el cliente corre en el cliente (render, búsqueda local FTS/vectorial, indexación AST WASM, canva WebGPU, LLM local Ollama) — el servidor solo ejecuta lo central (agentes 24/7, estado autoritativo, sync, repos, secretos); el servidor escala con los DATOS, no con la CPU de cada usuario (tabla en ARQUITECTURA.md)
