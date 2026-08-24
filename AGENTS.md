@@ -507,7 +507,22 @@ Cada proyecto de desarrollo (tenant, [A.0]) tiene SU PROPIO conjunto de ventanas
 3. **📋 KANBAN DE RESULTADOS** (Plan Intermedio, Etapa 17) — tipo Jira pero optimizado para agentes: cards y bloques ANIMADOS mostrando evidencia (tests Playwright pasando/fallando, resultados por etapa); orientado a dejar a la IA trabajando horas autónomamente y ver qué se consiguió.
 4. **🎛️ CONTROL ROOM** (Plan Intermedio, Etapa 18 — fusiona sesiones+mapa global) — TODAS las sesiones de agentes como cards vivas (hablar TTS/STT, ver resultados, retomar) sobre el mapa maestro GLOBAL de todos los proyectos en acción: métricas vivas, órdenes por voz/texto enrutadas al destino correcto, modo vigilancia de excepciones. Mission control del sistema entero.
 
-**Principio de MOTIVACIÓN (PLAN U)**: la interfaz convierte cada proceso en una escalera de micro-victorias VERIFICABLES (test ✓ → criterio → tarea → gate → nivel) — dopamina por progreso real del Ledger, nunca actividad vacía; intensidad configurable Apagado/Festivo y anti-dark-patterns prohibidos por plan.
+**Principio de NEURO-GRATIFICACIÓN (PLAN U — aplica a TODO el producto):**
+
+El sistema DEBE ser neuro-gratificante por diseño: cada proceso de desarrollo se convierte en una escalera de sensaciones y emociones positivas ancladas a PROGRESO REAL. No es decoración — es el motor emocional del producto.
+
+*La dopamina como mecánica central:* el cerebro libera dopamina en la ANTICIPACIÓN y el LOGRO de metas visibles. Por eso cada acción del usuario/agentes debe tener un eco visual-sonoro-propio proporcional: token que fluye (anticipación), test ✓ (micro-logro sonoro), criterio cumplido (pop), tarjeta que vuela a DONE (recompensa visible), GATE cerrado (celebración festiva), nivel de agente que sube (progresión), recap semanal (orgullo consolidado).
+
+*Las sensaciones objetivo por momento:*
+- **Anticipación** mientras el agente trabaja: energía visible, "está ocurriendo algo"
+- **Satisfacción** al ver completarse cada pieza: tick/pop/cierre con peso físico
+- **Orgullo** ante evidencia acumulada: antes/después, stats, rachas honestas
+- **Pertenencia** hacia los agentes: identidad, voz, evolución — son colegas, no herramientas
+- **Calma controlada** en modo vigilancia: todo bajo control, excepciones visibles
+
+*Guardarraíles éticos innegociables:* la dopamina SOLO de progreso VERIFICABLE del Ledger (jamás logros falsos, culpa de rachas, urgencia artificial ni comparación pública sin consentimiento); intensidad configurable Apagado/Festivo; `prefers-reduced-motion` y silencio respetados siempre; métrica norte = sesiones que terminan en ENTREGA, no tiempo-en-app.
+
+Detalle completo y fases: [PLAN U](./docs/SDDs/SDD-001-plan-base/plan-u-motivacion.md).
 
 **Regla transversal**: toda la capa visual se construye con tokens/primitivas del Design System ([F.0]) y con estructuras de datos ESPACIALMENTE listas (posiciones, clusters, profundidades) para proyección futura en 3D/gafas (Etapa 10 Three.js es la primera; las demás ventanas heredan la preparación).
 
