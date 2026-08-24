@@ -522,7 +522,7 @@ El sistema DEBE ser neuro-gratificante por diseño: cada proceso de desarrollo s
 
 *Guardarraíles éticos innegociables:* la dopamina SOLO de progreso VERIFICABLE del Ledger (jamás logros falsos, culpa de rachas, urgencia artificial ni comparación pública sin consentimiento); intensidad configurable Apagado/Festivo; `prefers-reduced-motion` y silencio respetados siempre; métrica norte = sesiones que terminan en ENTREGA, no tiempo-en-app.
 
-Detalle completo y fases: [PLAN U](./docs/SDDs/SDD-001-plan-base/plan-u-motivacion.md).
+Detalle completo y fases v2 (juice calibrado, flow-protection, inbox de resultados, widget glanceable): [PLAN U](./docs/SDDs/SDD-001-plan-base/plan-u-motivacion.md).
 
 **Regla transversal**: toda la capa visual se construye con tokens/primitivas del Design System ([F.0]) y con estructuras de datos ESPACIALMENTE listas (posiciones, clusters, profundidades) para proyección futura en 3D/gafas (Etapa 10 Three.js es la primera; las demás ventanas heredan la preparación).
 

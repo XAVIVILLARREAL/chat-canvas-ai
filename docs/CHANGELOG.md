@@ -34,6 +34,12 @@
 - U.5 Tuning responsable: A/B interno sobre retención propia, anti-patrones PROHIBIDOS explícitos (logros falsos, culpa de racha, urgencia artificial), métrica norte = sesiones que terminan en ENTREGA no tiempo-en-app
 - AGENTS.md: principio de MOTIVACIÓN añadido a la sección visual
 
+## 2026-08-23 (sesion 16)
+
+- **PLAN U v2 reescrito tras investigación profunda** (Duolingo/game-design/juice/flow + gamificación devtools — 2 sub-agentes): de 5 a 8 fases con hallazgos medidos
+- Añadidos: JUICE checklist por acción core (hit-stop 100ms/squash/partículas-comunican/shake-solo-fallo) · física Linear en cards (-28% fricción NASA-TLX) · celebraciones 1.2s con VARIANTES aleatorias (error de predicción Schultz) · sonido teoría musical tuta (arpegio Do éxito/tritono error) + chime por tipo evento + mute-focused + cooldown · milestones GATED a rareza real (+1.7% retención D7 Duolingo) con COFRES FUNCIONALES (core loop con inversión) · screenshot/demo adjunta por agente (aprobar viendo resultado no diff) · worklog colapsa al éxito (patrón clack) · barra avanza aunque falle · racha con ESCUDO-perdón ganable · heatmap anual relativo al propio máximo (perdona reinicio) · ligas internas pools ~30 · **inbox de resultados anti-spinner** (spinner mata retención @12s; lenguaje "lanzó un run y fue a revisar resultados") · flow-protection agrupa interrupciones · aprobaciones agrupadas en lote (Copilot 7 prompts frustan) · checkpoints nombrados revertibles en hover · session insights timeline verde-roja (Devin) · widget tray 2 DATOS (¿operó hoy?+racha, patrón Duolingo) · onboarding unboxing Arc/Raycast (demo 90s=producción real, tarjeta fundador)
+- Anti-patrones reforzados con test ético de incertidumbre y regla SDT triple-presencia
+
 ## 2026-08-23
 
 - **SDD-003 Torneo de ideas**: 500 ideas generadas de productos de mercado (25 categorías × 20) → eliminatoria por categoría → 10 debates cruzados documentados → **20 ganadoras** con rúbrica Valor/Viabilidad/Mantenibilidad/Encaje ≥17
