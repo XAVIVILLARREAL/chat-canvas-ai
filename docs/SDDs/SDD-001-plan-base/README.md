@@ -356,6 +356,20 @@ TRANSVERSALES: U.1 con F.0 · subconjunto flow-protection/inbox de U.5 desde A.4
 
 copia.md queda COMPLETAMENTE minado. Backlog del torneo conserva lo no-promovido.
 
+## 🔧 PRE-ARRANQUE — checklist antes de tocar Etapa 1 (v3.8, ratificado 2026-08-24)
+
+Decisiones que cuestan caro cambiarlas después — fijadas ANTES de codificar:
+
+1. **Refactor Cargo con `crates/worker` (patrón Everruns)** — ✅ EJECUTADO (2026-08-24): worker stateless SIN credenciales de DB, heartbeat 30s; el claim `FOR UPDATE SKIP LOCKED` y el sandbox Docker llegan con C.3/H.9a
+2. **Auth MVP en A.0 (modo servidor)**: el gateway es público (web-first) → A.0 incluye sesión/token simple + **RLS fail-closed desde el día 1**; passkeys/QR-pairing ([SDD-008](../SDD-008-analisis-cliente-servidor-k8s.md)) quedan post-base
+3. **Postgres en Compose desde el día 1** (dev web-first = servidor): RLS se prueba REAL desde Etapa 1; SQLite solo para el shell Tauri offline futuro ([ADR-005 D2](../ADRs/ADR-005-modelo-despliegue-dual.md))
+4. **Schema maestro unificado (mini-SDD ANTES de A.2)**: TODAS las tablas con `tenant_id` + **contrato de `event_stream`/rung** (event_type canónico + payload) definidos UNA vez, implementados por fases — evita migraciones dolorosas entre D.1/F.4/H.3/KR/CR/VI
+5. **Tipos compartidos web-first**: fuente de verdad `crates/core` (specta) → JSON schema → cliente TS generado de la **OpenAPI del gateway axum** (openapi-typescript/orval); `shared-types` deja de ser manual
+6. **KEK de settings cifradas (A.2)**: env var / keyring con fallback cifrado (patrón [T.SEC](./plan-t-excelencia.md#tsec)) — decidido, no improvisado en A.2
+7. **Sandbox dev**: docker socket del host montado en el worker (C.3/H.9a); red denegada por defecto
+8. **Recursos**: cuenta DeepSeek + Ollama (servidor 32GB) listas antes de Etapa 1 · cuenta GitHub de prueba (Gates M/N) · presupuesto dev LLM ~$50–100/mes (gates reales: E.1/N.5/C.6/I.1/M.1)
+9. **Proceso**: UNA sesión a la vez sobre docs/plan (las sesiones concurrentes ya causaron roces de commits); los commits de docs se pushean al cerrar cada decisión
+
 ## Reglas de ejecución (no negociables)
 
 1. Mini-SDD técnico por ETAPA antes de codificarla (ampliar su archivo)

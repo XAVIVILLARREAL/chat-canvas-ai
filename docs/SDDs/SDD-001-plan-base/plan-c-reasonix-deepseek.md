@@ -50,6 +50,7 @@
 ### C.3 — Robustez
 - Reconexión si muere serve; cancelación en curso (`task stop`); timeouts por fase
 - Fail-open: Reasonix no arranca → aviso claro + opción modo directo DeepSeekDirect
+- **Sandbox dev (v3.8)**: docker socket del host montado SOLO en el worker (`crates/worker`), jamás en el gateway; red denegada por defecto ([H·H.9a](./plan-h-motor-pruebas.md#h9a))
 - **Pruebas:** chaos integration kill -9 → recuperación automática; estado consistente post-cancel
 
 <a id="c5"></a>

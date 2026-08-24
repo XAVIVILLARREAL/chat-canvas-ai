@@ -19,11 +19,12 @@ Plataforma **WEB-FIRST** de orquestación de agentes: el gateway Rust (axum) **s
 |  Agentes · Tareas · Skills · Sesiones · Memoria      |
 +-----------------------------------------------------+
 |          WORKERS de agentes (Rust, sin DB creds)     |
-|  cola Postgres SKIP LOCKED · sandboxes · heartbeat   |
+|  crates/worker — cola SKIP LOCKED · sandboxes · hb   |
 +-----------------------------------------------------+
 |        DATOS (Postgres+RLS · MinIO · Valkey)         |
 +-----------------------------------------------------+
 ```
+> ✅ `crates/worker` creado (2026-08-24, patrón Everruns): stateless sin credenciales de DB, heartbeat 30s — el claim SKIP LOCKED y el sandbox Docker llegan con C.3/H.9a.
 
 ## Principio de cómputo CLIENT-FIRST (escalabilidad — regla transversal dura)
 
@@ -49,6 +50,7 @@ Plataforma **WEB-FIRST** de orquestación de agentes: el gateway Rust (axum) **s
 | Gateway | **Rust axum 0.8.9 + tokio 1.53 + sqlx 0.9 + rustls 0.23** | 3.475 sesiones WS/vCPU (benchmark streaming por vCPU) — el más barato por conexión; mismo patrón que Everruns (plataforma de agentes OSS más cercana) |
 | Workers | **Rust** — cola Postgres `FOR UPDATE SKIP LOCKED`, **sin credenciales de DB** (patrón Everruns) | stateless + heartbeat (reclaim 30s); el lenguaje no es el cuello de botella (esperan LLM/sandbox) |
 | BFF Node/Hono | **NO** | un solo stack para un solo dev = impuesto doble evitado; Hono solo si mañana se necesita ecosistema npm/edge (y entonces Hono, jamás Express) |
+| Tipos compartidos | **OpenAPI del gateway** (crates/core specta → JSON schema → openapi-typescript/orval) | fuente de verdad única; `shared-types` deja de ser manual (v3.8) |
 | Plan B pragmático | **Go** (chi/pgx) | 70% del rendimiento con ~1/4 de fricción — solo si el vibecoding Rust se atasca |
 | Frontend | React 19 + Vite 8 (Rolldown) + tsgo + Biome/oxlint | toolchain moderna (10-100× vs tsc/Babel/ESLint) |
 
@@ -87,6 +89,8 @@ Plataforma **WEB-FIRST** de orquestación de agentes: el gateway Rust (axum) **s
 4. **Workers stateless** — sin credenciales de DB; reclaman tareas con `FOR UPDATE SKIP LOCKED` + heartbeat.
 5. **Multi-tenant con Postgres + RLS fail-closed** (patrón tenaxum/Everruns); `tenant_id`/`project_id` en TODO dato desde el día 1 ([A·A.0]).
 6. **Secretos SOLO en el servidor/Rust** — jamás al webview ni al bundle.
+7. **Auth MVP desde el día 1** (modo servidor): sesión/token + RLS fail-closed; passkeys/QR post-base ([SDD-008]).
+8. **Postgres en Compose desde el día 1** (dev web-first): RLS se prueba real; SQLite solo Tauri offline.
 7. **Eventos**: efímeros por bus (broadcast por sesión) · durables en Postgres append-only (Ledger).
 8. **Cada capa expone su contraparte MCP** (visión V3Code).
 9. **Responsive TOTAL** — todas las pantallas operables en móvil 375 (ver AGENTS.md §Diseno responsive).

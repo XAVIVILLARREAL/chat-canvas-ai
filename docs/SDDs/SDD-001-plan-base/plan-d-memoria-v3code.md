@@ -15,7 +15,7 @@
 
 <a id="d1"></a>
 ### D.1 — Capa 1: Decision Ledger
-- Tabla `event_stream` **append-only** con `project_id` (el Ledger de cada tenant-proyecto es independiente): `session_id, event_type(PROMPT/DIFF/DECISION/TEST_RESULT), summary, payload JSON, lines_added/deleted`
+- Tabla `event_stream` **append-only** con `project_id` (el Ledger de cada tenant-proyecto es independiente): `session_id, event_type(PROMPT/DIFF/DECISION/TEST_RESULT), summary, payload JSON, lines_added/deleted` · **contrato canónico fijado en el schema maestro (prerequisito v3.8)** — F.4 (SpatialMeta), H.3 (TEST_RESULT), KR y CR leen este mismo contrato, sin variantes por fase
 - Fuente primaria: `--trajectory` de Reasonix ([C·C.1](./plan-c-reasonix-deepseek.md#c1)) mapeado a rungs
 - Al cerrar sesión → rung-resumen autogenerado con LLM barato (`deepseek-v4-flash`)
 - Export rollout JSONL compatible con formato de sesiones Codex

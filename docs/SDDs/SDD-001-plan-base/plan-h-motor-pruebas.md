@@ -46,7 +46,7 @@
 <a id="h9a"></a>
 ### H.9a — Aislamiento contenedor mínimo (SE EJECUTA TRAS C.3, Etapa 3)
 - **Por qué aquí**: [PLAN C](./plan-c-reasonix-deepseek.md) declara NO NEGOCIABLE que cada sesión de agente corra en contenedor efímero — el sandbox de Reasonix no es kernel-level. NINGÚN agente de etapas posteriores corre sin esto.
-- Contenedor Ubuntu **efímero por agente/sesión** (Docker local o del servidor): spawn con límites CPU/RAM/disco, kill limpio, red denegada por defecto, cwd scoped al workspace
+- Contenedor Ubuntu **efímero por agente/sesión** (Docker local o del servidor): spawn con límites CPU/RAM/disco, kill limpio, red denegada por defecto, cwd scoped al workspace · **dev (v3.8)**: docker socket del host montado en el worker `crates/worker`, jamás en el gateway axum
 - Sin persistencia avanzada (llega en H.9b): el contenedor muere con la sesión; solo sobrevive el diff en el workspace
 - **Pruebas:** Cargo test: spawn/kill/timeout con fixture; chaos: matar contenedor a mitad → el agente se recupera en uno nuevo con estado consistente; allowlist de red verificada (sin salida por defecto)
 

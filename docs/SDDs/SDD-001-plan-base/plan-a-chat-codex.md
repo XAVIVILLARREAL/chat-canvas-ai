@@ -11,6 +11,7 @@
 ### A.0 — Proyectos como TENANTS: cards + tabs + historial aislado (FUNDACIÓN, va sobre todo lo demás)
 - **Modelo**: tabla `projects`; TODAS las demás tablas (sessions, messages, event_stream, knowledge, tasks, settings-overrides) llevan `project_id` — aislamiento total estilo multitenant, pero por proyecto de software
 - **Cards de selección**: al abrir la app, grid de tarjetas simples (avatar/color generado, nombre, última actividad, agentes activos) — seleccionar y entrar. Crear/renombrar/archivar proyecto desde ahí
+- **Auth MVP (prerequisito v3.8)**: en modo servidor (web-first) A.0 incluye sesión/token simple con **RLS fail-closed desde el día 1**; passkeys/QR-pairing ([SDD-008](../SDD-008-analisis-cliente-servidor-k8s.md)) quedan post-base — sin esto el gateway público no arranca
 - **Tabs de proyectos**: barra superior con los proyectos ABIERTOS como tabs (estilo navegador) — cambiar entre ellos sin cerrar nada; cada tab conserva su chat/sesión activa; las tabs se restauran tras reiniciar
 - **Historial 100% aislado**: las conversaciones de un proyecto JAMÁS se mezclan con otro; buscar/fork/export opera dentro del proyecto actual
 - **Tareas en background entre tabs**: cambiar de tab NO detiene al agente del otro proyecto — sigue trabajando (badge de actividad en su tab)
@@ -32,7 +33,8 @@
 <a id="a2"></a>
 ### A.2 — Persistencia SQLite
 - Tablas `sessions`, `messages` via sqlx (migraciones embebidas) — **ambas con `project_id` desde el día 1**
-- **Tabla `settings` CIFRADA (AES-GCM) aquí**: primitiva que consumen [A·A.3](./plan-a-chat-codex.md#a3) (API keys) y [A·A.6](./plan-a-chat-codex.md#a6) (hub) ([A·A.0](./plan-a-chat-codex.md#a0)): el aislamiento multitenant NO se retrofittea después
+- **Schema maestro (prerequisito v3.8)**: ANTES de crear tablas, mini-SDD con TODAS las tablas del roadmap (`sessions, messages, event_stream, tasks, skills, documents, workspace_knowledge, human_invariants, decisions, companies, budgets, repos, mcp_servers…`) + `tenant_id` en cada una + **contrato canónico de `event_stream`/rung** (event_type + payload) — se implementa por fases, pero los IDs/columnas quedan fijados una vez
+- **Tabla `settings` CIFRADA (AES-GCM) aquí**: primitiva que consumen [A·A.3](./plan-a-chat-codex.md#a3) (API keys) y [A·A.6](./plan-a-chat-codex.md#a6) (hub) ([A·A.0](./plan-a-chat-codex.md#a0)): el aislamiento multitenant NO se retrofittea después · **KEK decidida (v3.8)**: env var / keyring con fallback cifrado (patrón [T.SEC](./plan-t-excelencia.md#tsec))
 - Commands Tauri CRUD + bindings tauri-specta
 - **Pruebas:** Cargo test repositorios; integration roundtrip mensaje
 

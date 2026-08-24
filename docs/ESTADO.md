@@ -31,6 +31,7 @@ Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan 
 
 ## Ultimos cambios
 
+- 2026-08-24: **PRE-ARRANQUE aplicado** — `crates/worker` creado (Everruns, compila) + checklist en README (auth MVP, Postgres dev, schema maestro, OpenAPI types, KEK, sandbox socket, recursos)
 - 2026-08-24: **ORDEN v3.8 — Intermedio INTERCALADO**: plan intermedio entre fases base (no después); J.3 y K.1/K.2 movidos a intermedio; K.3 se queda; Consejo de Expertos adelantado (dogfood gates base); matriz 136 fases (114 base + 22 intermedio)
 - 2026-08-24: **SÍNTESIS v3.7** — PLAN V (Visual GrokBot) + Consejo de Expertos (VI.5–VI.7) unificados: primitiva única de "preguntas con opciones", avatares geométricos para auditores también; README 16 etapas ~124 fases; regla 13 renderer agnóstico (SpatialMeta); pendiente push de la sesión concurrente integrado
 - 2026-08-24: **PLAN V (v3.6) — Visual GrokBot**: la capa social visual de Grok Bot añadida al plan base — chat-first desks, identidad por avatar geométrico, estados 2 capas, actividad inline con aprobaciones numeradas, group chat con handoffs; matriz ahora 117 fases
