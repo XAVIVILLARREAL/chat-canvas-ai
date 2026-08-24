@@ -40,6 +40,14 @@
 - Añadidos: JUICE checklist por acción core (hit-stop 100ms/squash/partículas-comunican/shake-solo-fallo) · física Linear en cards (-28% fricción NASA-TLX) · celebraciones 1.2s con VARIANTES aleatorias (error de predicción Schultz) · sonido teoría musical tuta (arpegio Do éxito/tritono error) + chime por tipo evento + mute-focused + cooldown · milestones GATED a rareza real (+1.7% retención D7 Duolingo) con COFRES FUNCIONALES (core loop con inversión) · screenshot/demo adjunta por agente (aprobar viendo resultado no diff) · worklog colapsa al éxito (patrón clack) · barra avanza aunque falle · racha con ESCUDO-perdón ganable · heatmap anual relativo al propio máximo (perdona reinicio) · ligas internas pools ~30 · **inbox de resultados anti-spinner** (spinner mata retención @12s; lenguaje "lanzó un run y fue a revisar resultados") · flow-protection agrupa interrupciones · aprobaciones agrupadas en lote (Copilot 7 prompts frustan) · checkpoints nombrados revertibles en hover · session insights timeline verde-roja (Devin) · widget tray 2 DATOS (¿operó hoy?+racha, patrón Duolingo) · onboarding unboxing Arc/Raycast (demo 90s=producción real, tarjeta fundador)
 - Anti-patrones reforzados con test ético de incertidumbre y regla SDT triple-presencia
 
+## 2026-08-23 (sesion 17)
+
+- **SDD-009 Debate adversarial de decisiones** (sub-agentes abogados del diablo con investigación 2026):
+- DEBATE CLIENTE: caso demoledor contra desktop-first para agentes-centralizados (Lovable $400-500M ARR solo-web; SmartScreen sin reputación=62% completación instalación; WebKitGTK mantenedor "no futuro"; local-first≠desktop-client — privacidad se vende como on-prem del SERVIDOR) → VEREDICTO WEB-FIRST: gateway sirve la React app directamente; tauri-shell diferido a demanda; CLI ligero para repos locales ⚠️ pendiente ratificación usuario
+- DEBATE SYNC: mantener delta-sync propio para v0.x (patrón simple genuino) + trigger definido para adoptar PowerSync Open Edition $0 self-hosted si crecen conflictos multi-editor
+- DEBATE RUNTIME: Reasonix verificado MIT bundlable + cache-hit 99.82% medido ($12 vs $61 por 435M tokens) → MVP Reasonix-core CON 4 condiciones no negociables (contenedor efímero por sesión SymJack/pin+CI/transcripts JSONL día-1/disparadores OwnLoop) → crecimiento híbrido → escala OwnLoopProvider principal con base OSS mini-swe-agent/OpenHands SDK
+- Lección transversal: "harness ES el producto" (todos los competidores verticalizaron); industria estandarizó bordes ACP/App-Server para que la salida sea barata
+
 ## 2026-08-23
 
 - **SDD-003 Torneo de ideas**: 500 ideas generadas de productos de mercado (25 categorías × 20) → eliminatoria por categoría → 10 debates cruzados documentados → **20 ganadoras** con rúbrica Valor/Viabilidad/Mantenibilidad/Encaje ≥17

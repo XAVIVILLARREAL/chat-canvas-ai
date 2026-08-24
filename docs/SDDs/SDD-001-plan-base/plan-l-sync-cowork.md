@@ -16,6 +16,7 @@
 ### L.2 — Cliente sync sin fricción
 - Login al hub una sola vez por dispositivo; selección de QUÉ sincronizar (sesiones/config/skills); estado de última sync visible
 - Resolución de conflictos con UI diff-and-choose; offline queue con flush automático al volver
+- **Trigger de adopción PowerSync Open Edition ($0 self-hosted)**: si >10% sesiones con edición concurrente de misma entidad o >2 dispositivos escribiendo activamente — los bugs sutiles del sync propio ya están depurados ahí (debate SDD-009)
 - Continuidad total combinada con lo que ya existe: tabs restauradas ([A·A.0](./plan-a-chat-codex.md#a0)), resume inteligente ([A·A.8](./plan-a-chat-codex.md#a8)), snapshots del entorno ([H·H.9](./plan-h-motor-pruebas.md#h9))
 - **Delta-sync con cursor** (patrón Linear): cada dispositivo guarda su último `sync_id`; al reconectar pide SOLO `/changes?since=` — nunca refetch completo
 - **Outbox duradero**: comandos offline persistidos localmente con UUID; servidor idempotente (dedupe); ACK al procesar

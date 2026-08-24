@@ -100,6 +100,12 @@ Para quien use APIs de cualquier empresa: **75+ proveedores sin escribir código
   - Integration: 3 proveedores REALES vía el mismo trait (deepseek API-key + uno openai-compat genérico baseURL custom + anthropic si hay key) con streaming y precios correctos en telemetría · OAuth device-flow mockeado
   - E2E funcional: agregar proveedor desde JSON experto; selector muestra precio/contexto; small_model usado en tarea interna (verificado en request capturado)
   - Suite HUMANA @core-ampliada: no-programador conecta OpenRouter pegando solo su key y chatea <2 min · elige modelo viendo el precio · esconde modelos con whitelist
+**⚠️ Condiciones NO negociables del runtime Reasonix (debate SDD-009):**
+1. Cada sesión de agente corre dentro de **contenedor efímero** ([H·H.9](./plan-h-motor-pruebas.md#h9) ContainerDriver) — el sandbox de Reasonix NO es kernel-level y toda la categoría (SymJack 2026) ha sido comprometida
+2. Versión PINNEADA + job de CI que pruebe upgrades antes de adoptarlos (reescritura TS→Go en vuelo upstream)
+3. Transcripts JSONL persistidos desde el día 1 ([D·D.1](./plan-d-memoria-v3code.md#d1)) — dataset de migración + auditoría
+4. **Disparadores de migración a OwnLoopProvider** (base OSS mini-swe-agent/OpenHands SDK): volumen tokens justifique 1 FTE en loop · UX que sidecars no cubran · primer incidente no contenido · señal de churn (breaking/paid-tier)
+
 ## 🚪 GATE C (demo verificable)
 
 Tres sesiones desde la MISMA UI: chat directo (barato), tarea flash con tools, planificación reasoner. Costo acumulado visible y correcto contra métricas reales. Cancelar una tarea a mitad funciona y deja estado consistente. Matar el proceso serve → la app se recupera sola.
