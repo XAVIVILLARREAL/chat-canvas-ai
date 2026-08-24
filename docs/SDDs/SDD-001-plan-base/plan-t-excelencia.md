@@ -20,7 +20,7 @@
 - **i18n central es/en** desde el primer componente (strings NUNCA hardcodeadas); español default
 - Contraste AA verificado automatizado + foco visible siempre + targets ≥44px móvil + `prefers-reduced-motion` global + aria-live polite en streaming del chat
 - axe-core en los E2E funcionales (falla CI si hay violación seria) · navegación 100% teclado ya exigida por suite humana
-- **Pruebas:** axe-core gate en CI. E2E humano dual idioma. Auditoría contraste en cada tema ([F·F.0](./plan-f-canva-oficina.md#f0)). **Suite humana responsive re-corrida en CADA gate**: todas las pantallas nuevas operadas en móvil 375 y desktop 1440 (sin scroll horizontal, touch targets ≥44px, sin dependencia de hover)
+- **Pruebas:** axe-core gate en CI. E2E humano dual idioma. Auditoría contraste en cada tema contra la paleta de [SDD-013 §1.1](../SDD-013-gui-visual-spec.md) + **checklist de calidad visual [SDD-013 §7](../SDD-013-gui-visual-spec.md)** (contraste AA, reduced-motion, empty states, touch targets) auditado en el gate F.5. **Suite humana responsive re-corrida en CADA gate**: todas las pantallas nuevas operadas en móvil 375 y desktop 1440 (sin scroll horizontal, touch targets ≥44px, sin dependencia de hover)
 
 <a id="tonb"></a>
 ### T.ONB — Onboarding que convierte

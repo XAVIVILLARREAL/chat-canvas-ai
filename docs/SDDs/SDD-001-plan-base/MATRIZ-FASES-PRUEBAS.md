@@ -3,7 +3,7 @@
 > Generada de los planes (fuente de verdad). **Regenerar en CADA cambio de fases** (regla de ejecución #10 del [README](./README.md)).
 > Orden = ORDEN DE EJECUCIÓN maestro (no alfabético): así la matriz es también el checklist de construcción.
 > Capas por fase: **[U]**nit vitest · **[I]**ntegración cargo/mock · **[E]**2E Playwright · **[H]**umana suite modo persona.
-> **Reglas duras**: fase GUI ⇒ **[E]+[H] obligatorias** · **toda fase GUI se prueba en móvil 375px + desktop 1440px** (suite humana `responsive-human.spec.ts` en cada gate — no hay pantalla "solo desktop") · **cómputo client-first**: todo lo que pueda correr en el cliente va al cliente (server = datos, no CPU de usuarios) · fase sin fila aquí NO se construye · presupuesto APIs reales **máx $20/gate** (el resto mock-first ~$0) · evidencia de gate = video + `evidence/`.
+> **Reglas duras**: fase GUI ⇒ **[E]+[H] obligatorias** · **toda fase GUI se prueba en móvil 375px + desktop 1440px** (suite humana `responsive-human.spec.ts` en cada gate — no hay pantalla "solo desktop") · **cómputo client-first**: todo lo que pueda correr en el cliente va al cliente (server = datos, no CPU de usuarios) · **toda UI usa los tokens de [SDD-013](../SDD-013-gui-visual-spec.md) (Obsidian Glass)** — CSS improvisado prohibido, checklist §7 auditado en F.5 · fase sin fila aquí NO se construye · presupuesto APIs reales **máx $20/gate** (el resto mock-first ~$0) · evidencia de gate = video + `evidence/`.
 
 ## Etapa 1 · Chat núcleo Codex + tenants — `plan-a-chat-codex.md`
 | Fase | Nombre | Pruebas |
@@ -75,7 +75,7 @@
 ## Etapa 6 · Canva Oficina — `plan-f-canva-oficina.md`
 | Fase | Nombre | Pruebas |
 |---|---|---|
-| F.0 | Design System core + capa de experiencia (prerequisito visual) | Vitest tokens/primitivas. E2E HUMANA: contraste AA automatizado; toast deshace acción destructiva; status bar refleja modelo/coste reales |
+| F.0 | Design System core "Obsidian Glass" + capa de experiencia ([SDD-013](../SDD-013-gui-visual-spec.md) canónico) | Vitest tokens/primitivas (oklch de SDD-013 §1). E2E HUMANA: contraste AA automatizado contra la paleta §1.1; toast deshace acción destructiva; status bar refleja modelo/coste reales; checklist SDD-013 §7 |
 | F.1 | Fundaciones ReactFlow | E2E HUMANA: arrastrar nodo, conectar dos nodos, zoom con rueda y pinch |
 | F.2 | Nodos-agente vivos (datos reales) | E2E: crear agente en chat → nodo aparece; mock provider working → badge cambia |
 | F.3 | Edges semánticos + Animated Beams | Unit mapping evento→edge. Visual gate con screenshots/video |

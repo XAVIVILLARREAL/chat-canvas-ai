@@ -20,7 +20,7 @@
 
 <a id="k3"></a>
 ### K.3 — Sonidos de estado + política de interrupción ("sabe cuándo molestar")
-- Notificaciones sonoras por evento del EventBus ([C·C.1](./plan-c-reasonix-deepseek.md#c1)): agente bloqueado, esperando aprobación ([A·A.4](./plan-a-chat-codex.md#a4)), tarea lista para revisión ([H·H.4](./plan-h-motor-pruebas.md#h4))
+- Notificaciones sonoras por evento del EventBus ([C·C.1](./plan-c-reasonix-deepseek.md#c1)): agente bloqueado, esperando aprobación ([A·A.4](./plan-a-chat-codex.md#a4)), tarea lista para revisión ([H·H.4](./plan-h-motor-pruebas.md#h4)) · **la tabla de sonidos por teoría musical es canónica en [SDD-013 §5.3](../SDD-013-gui-visual-spec.md)** (chime distinto por evento: commit≠test≠deploy; arpegio/tritono)
 - **Política de interrupción por severidad** (patrón Grok Bot): bloqueos/aprobaciones/peligro → interrumpen AHORA; progreso normal → se agrupa en digest silencioso consultable
 - Volumen/on-off POR TIPO en settings ([A·A.6](./plan-a-chat-codex.md#a6)); respeta prefers-reduced-motion análogo (modo silencio)
 - **Pruebas:** E2E: mock eventos → sonido correcto por tipo (spy Audio); evento menor NO suena pero aparece en digest; toggles persisten

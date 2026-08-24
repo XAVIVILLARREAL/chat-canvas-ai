@@ -262,6 +262,12 @@ Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: so
 - **Rutinas visibles + notificaciones persistentes**: follow-along con indicador, badge no-leído que persiste, digests como mensajes del PM (V.4 con G.6/K.3/U.5)
 - **Complementa, no quita**: Codex sigue siendo la referencia de paneles/diffs; GrokBot es la referencia de la capa social. Matriz ahora con **117 fases**
 
+### Revisión v3.9 (2026-08-24) — Spec visual "Obsidian Glass" integrada
+
+- **[SDD-013](../SDD-013-gui-visual-spec.md) es la FUENTE CANÓNICA VISUAL** de todo el plan (no solo F): tokens oklch (fondos void→overlay, vidrio translúcido, acentos neón sofisticados), tipografía/espaciado/radios, motion neuro-psicológico (física de resortes, solo transform+opacity, catálogo de 10 animaciones), Liquid Glass 4 capas con fallback, componentes (GlassCard/AgentNode/AnimatedBeam/Toast/⌘K), tabla de sonidos por teoría musical y checklist de calidad auditado en F.5
+- **Fusión con el plan**: F.0 (implementación del §1–§4) · PLAN U (mapeo token/animación/sonido por primitiva) · PLAN V (avatares/estados usan la paleta de identidad §1.1) · K.3 (sonidos §5.3 canónicos) · T.A11Y (contraste §1.1 + checklist §7) · A.4 (superficie chat con GlassCard) · matriz: regla "toda UI usa tokens SDD-013; CSS improvisado prohibido"
+- Tokens ya implementados en `src/styles.css` (Obsidian Glass) — la IA lee SDD-013 antes de tocar cualquier UI
+
 ### Revisión v3.8 (2026-08-24) — Plan Intermedio INTERCALADO (ratificado por el usuario)
 
 - **El intermedio deja de ser "el plan después de la base"**: pasa a ser un **carril de vistas** intercalado — cada ventana se construye justo tras su fase base habilitadora (VI tras F/G, KR tras H, 3D tras J, CR al final paralelo a N/O)

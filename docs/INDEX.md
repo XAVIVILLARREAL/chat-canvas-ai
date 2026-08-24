@@ -21,7 +21,9 @@
 | SDD-008 | Análisis cliente-servidor autónomo + escalado Linux/Kubernetes (3 investigaciones) | `./docs/SDDs/SDD-008-analisis-cliente-servidor-k8s.md` |
 | SDD-009 | Debate adversarial de decisiones clave (web-first, sync build-vs-buy, runtime híbrido) | `./docs/SDDs/SDD-009-debate-decisiones.md` |
 | SDD-010 | Modelo de negocio: 3 escenarios, monetización con datos reales, growth por fases, exit paths | `./docs/SDDs/SDD-010-modelo-negocio.md` |
-| SDD-010 | Modelo de negocio: 3 escenarios, monetización con datos reales, growth por fases, exit paths | `./docs/SDDs/SDD-010-modelo-negocio.md` |
+| SDD-011 | Integración Hermes Agent: A2A protocol, SKILL.md format, 7 subsystems | `./docs/SDDs/SDD-011-integracion-hermes-agent.md` |
+| SDD-012 | Multi-Agent GrokBot Patterns: Group Chat, Chief of Staff, Routine Learning | `./docs/SDDs/SDD-012-multi-agent-grokbot-patterns.md` |
+| SDD-013 | GUI Visual Spec: Obsidian Glass design system, oklch tokens, motion, Liquid Glass, neuro-gratification | `./docs/SDDs/SDD-013-gui-visual-spec.md` |
 | SDD-005 | Cierre Multiplataforma (Android versionado, CI 3 SO) | `./docs/SDDs/SDD-005-cierre-multiplataforma.md` |
 | MULTIPLATAFORMA.md | Comandos para compilar en Windows/macOS/Linux/Android/iOS | `./docs/MULTIPLATAFORMA.md` |
 | referencia de diseno.md | Catalogo de skills de diseno en `reference/` con links | `./docs/referencia de diseno.md` |

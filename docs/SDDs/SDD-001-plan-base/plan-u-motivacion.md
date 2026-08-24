@@ -11,6 +11,22 @@
 - **Flow de Csikszentmihalyi**: reto calibrado + metas claras + feedback inmediato; las interrupciones triviales son el anti-patrón #1
 - **Test ético de incertidumbre**: "¿el usuario mantendría el mecanismo activo si entendiera exactamente cómo opera?" — drops cosméticos transparentes sí; loot-boxes ocultos jamás
 
+## Integración visual con [`SDD-013`](../SDD-013-gui-visual-spec.md)
+
+PLAN U vive SOBRE el Design System de SDD-013. Cada componente dopaminérgico usa los tokens oklch de "Obsidian Glass" — nunca CSS improvisado:
+
+| Primitiva U | Token SDD-013 | Animación SDD-013 §2 | Sonido SDD-013 §5.3 |
+|-------------|---------------|----------------------|----------------------|
+| `ProgressRing` | `--accent-primary` glow + `--bg-elevated` track | micro-tick 100ms `ease-out-back` | tick percusivo corto |
+| `MilestonePop` | `--state-success` + `--glass-bg` overlay | squash&stretch 200ms `spring` | pop grave satisfecho |
+| `CelebrationOverlay` | `--gradient-brand` confetti particles | burst 1200ms `ease-out` gated | cascata ascendente + reverb |
+| `StreakFlame` | `--state-warning` flame icon | glow pulse 2s loop `ease-in-out` | — |
+| `Toast success` | `--glass-bg` + `--state-success` border | fade-up 250ms `ease-out-expo` | arpegio ascendente Do mayor |
+| `Toast error` | `--glass-bg` + `--state-error` border | shake sutil 200ms | tritono descendente |
+| `Worklog collapse` | `--text-secondary` → `--state-success` | collapse 300ms `ease-in-out-quart` | — |
+
+**Regla:** si SDD-013 cambia un token o timing, PLAN U se actualiza para mantener coherencia. La fuente de verdad visual es SDD-013; PLAN U es la fuente de verdad dopaminérgica.
+
 ## Configuración global: intensidad `Apagado / Sutil / Normal / Festivo` por scope ([A·A.6](./plan-a-chat-codex.md#a6)) · respeta `prefers-reduced-motion` y silencio ([K·K.3](./plan-k-voz.md#k3))
 
 ---

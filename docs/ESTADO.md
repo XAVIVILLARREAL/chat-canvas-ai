@@ -1,6 +1,6 @@
 # ESTADO ACTUAL
 
-> Sesion: 2026-08-24 . Fase: Mega-Roadmap SDD-001 v3 aprobado (15 etapas) — arranca PLAN A . SDDs recientes: SDD-012, SDD-011, SDD-010
+> Sesion: 2026-08-24 . Fase: Mega-Roadmap SDD-001 v3 aprobado (15 etapas) — arranca PLAN A . SDDs recientes: SDD-013, SDD-012, SDD-011, SDD-010
 
 ## Donde estamos
 
@@ -23,6 +23,7 @@ Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan 
 
 ## SDDs recientes
 
+- SDD-013: GUI Visual Spec — Obsidian Glass design system, oklch tokens, motion spec, Liquid Glass, neuro-gratification integration (2026-08-24) · docs/SDDs/SDD-013-gui-visual-spec.md
 - SDD-012: Multi-Agent GrokBot Patterns — Group Chat, Chief of Staff, Routine Learning (2026-08-24) · docs/SDDs/SDD-012-multi-agent-grokbot-patterns.md
 - SDD-011: Integracion Hermes Agent — A2A protocol, SKILL.md format, 7 subsystems (2026-08-24) · docs/SDDs/SDD-011-integracion-hermes-agent.md
 - SDD-010: Modelo Negocio — 3 escenarios, monetizacion con datos, growth y exit paths (2026-08-24) · docs/SDDs/SDD-010-modelo-negocio.md
@@ -31,6 +32,8 @@ Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan 
 
 ## Ultimos cambios
 
+- 2026-08-24: **SDD-013 GUI Visual Spec creado** — paleta "Obsidian Glass" (oklch), motion spec con física real, Liquid Glass 4 capas, componentes (GlassCard/AgentNode/AnimatedBeam/Toast/CommandPalette), checklist de calidad F.5. Integrado en F.0, PLAN U, y styles.css reescrito con tokens.
+- 2026-08-24: **GUI v3.9 — SDD-013 "Obsidian Glass" integrado y fundido**: fuente canónica visual en README/matriz/F.0/V/U/K.3/T.A11Y/A.4; tokens en src/styles.css; checklist §7 auditado en F.5
 - 2026-08-24: **PRE-ARRANQUE aplicado** — `crates/worker` creado (Everruns, compila) + checklist en README (auth MVP, Postgres dev, schema maestro, OpenAPI types, KEK, sandbox socket, recursos)
 - 2026-08-24: **ORDEN v3.8 — Intermedio INTERCALADO**: plan intermedio entre fases base (no después); J.3 y K.1/K.2 movidos a intermedio; K.3 se queda; Consejo de Expertos adelantado (dogfood gates base); matriz 136 fases (114 base + 22 intermedio)
 - 2026-08-24: **SÍNTESIS v3.7** — PLAN V (Visual GrokBot) + Consejo de Expertos (VI.5–VI.7) unificados: primitiva única de "preguntas con opciones", avatares geométricos para auditores también; README 16 etapas ~124 fases; regla 13 renderer agnóstico (SpatialMeta); pendiente push de la sesión concurrente integrado

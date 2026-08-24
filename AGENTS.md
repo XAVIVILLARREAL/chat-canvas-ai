@@ -65,6 +65,7 @@ Los agentes no solo escriben codigo — **prueban y demuestran resultados**:
 | Editor | **Monaco Editor** | VS Code editor, LSP nativo, 100+ lenguajes |
 | Canva 2D | **ReactFlow** | Nodos, edges, zoom, drag-and-drop, minimap |
 | Canva 3D | **Three.js** | Grafo del proyecto, visualizacion de relaciones |
+| VR/Gafas | **WebXR** (futuro, Etapa 19) | Inmersivo en gafas Meta Quest/Apple Vision Pro — preparado desde F.0 con SpatialMeta |
 | Backend | **Rust (Tauri)** | Hub server, DB, filesystem, seguridad |
 | DB local | **SQLite (sqlx)** | Persistencia rapida y segura |
 | Persistencia UI | **tauri-plugin-store** | Store nativo JSON, persiste estado del canva/config |
@@ -122,17 +123,17 @@ Los agentes no solo escriben codigo — **prueban y demuestran resultados**:
 
 ## Recursos de diseno visual (reference/)
 
-Skills y guias de diseno clonadas localmente para dar identidad grafica al proyecto. Consultar antes de tocar UI.
+Skills y guias de diseno clonadas localmente para dar identidad grafica al proyecto. **Fuente canónica visual: [`SDD-013-gui-visual-spec.md`](./docs/SDDs/SDD-013-gui-visual-spec.md) — la IA lee SDD-013 ANTES de tocar cualquier UI.** Consultar antes de tocar UI.
 
-| Recurso | Ruta | Uso |
-|---|---|---|
-| **apple-design-skill** (dickwu) | `reference/apple-design-skill/SKILL.md` | Auditor UI/UX basado en Apple HIG, multiplataforma (Tauri + web). 53 guias en `references/hig/` (color, tipografia, accesibilidad, dark mode, glassmorphism) |
-| **ui-ux-pro-max** | `reference/ui-ux-pro-max/` | Catalogo de estilos: 84 estilos (glassmorphism, claymorphism, brutalismo...), 192 paletas, 74 pares tipograficos, 98 reglas UX. Skills en `cli/assets/skills/` |
-| **impeccable** (pbakaus) | `reference/impeccable/plugin/skills/impeccable/SKILL.md` | Lenguaje anti-"estetica IA generica": tipografia, color, motion, spatial. Comandos: polish, audit, critique, animate |
-| **liquid-glass-web** (Zettersten) | `reference/liquid-glass-web/skills/liquid-glass/SKILL.md` | Liquid Glass real en web: CSS `backdrop-filter` + SVG `feDisplacementMap`, plantillas React para el canva |
-| **magic-ui** | `reference/magic-ui/skills/magic-ui/SKILL.md` | 150+ componentes animados React+Tailwind+Motion: Border Beam / Shine Border (bordes iluminados), Animated Beam (aristas de luz entre nodos del canva), meteors, particles, aurora text, shimmer button |
-| **react-bits** | `reference/react-bits/AGENTS/SKILLS/` | Componentes interactivos de alto impacto: Spotlight Cards, Click Spark, fondos Silk/Aurora, Blur Text. Skills propios para encontrar/mejorar animaciones |
-| **v3code** | `reference/v3code/README.md` | Arquitectura de 3 capas de memoria, Memory Rail (centipede), gutter de atribucion, auto model router y Human-Tweak Lock |
+| Recurso | Ruta | Estado | Uso |
+|---|---|---|---|
+| **apple-design-skill** (dickwu) | `reference/apple-design-skill/` | ✅ Instalado | Auditor UI/UX basado en Apple HIG, multiplataforma (Tauri + web). 53 guias en `references/hig/` (color, tipografia, accesibilidad, dark mode, glassmorphism, liquid-glass) |
+| **impeccable** (pbakaus) | `reference/impeccable/` | ✅ Instalado | Lenguaje anti-"estetica IA generica": tipografia, color, motion, **spatial** (profundidad 3D). Comandos: polish, audit, critique, animate. Critico para 3D/gafas |
+| **react-bits** (DavidHDev) | `reference/react-bits/` | ✅ Instalado | Componentes interactivos de alto impacto: Spotlight Cards, Click Spark, fondos Silk/Aurora, Blur Text, Glare Hover. Skills: find-animation-opportunities, improve-animations, apple-design |
+| **ui-ux-pro-max** | `reference/ui-ux-pro-max/` | ❌ No clone (GitHub auth) | Catalogo de estilos: 84 estilos (glassmorphism, claymorphism, brutalismo...), 192 paletas, 74 pares tipograficos, 98 reglas UX. Clonar manualmente |
+| **liquid-glass-web** (Zettersten) | `reference/liquid-glass-web/` | ❌ No clone (GitHub auth) | Liquid Glass real en web: CSS `backdrop-filter` + SVG `feDisplacementMap` (refraccion real, no solo blur), plantillas React. Clonar manualmente |
+| **magic-ui** | `reference/magic-ui/` | ❌ No clone (GitHub auth) | 150+ componentes animados React+Tailwind+Motion: Border Beam, Animated Beam (aristas de luz), meteors, particles, Globe 3D. Clonar manualmente |
+| **v3code** | `reference/v3code/` | ❌ No encontrado | Arquitectura de 3 capas de memoria, Memory Rail, gutter de atribucion. Clonar si se necesita |
 
 ### Como elegir (decide la IA)
 
@@ -539,6 +540,78 @@ Cada skill y cada agente NO es una configuración — es un PERSONAJE con vida p
 - **Manipulación total**: armar, clonar, promover, pausar, despedir — el dueño manipula su empresa entera como piezas vivas, nunca como YAML
 - Regla Octocat aplicada: el personaje JAMÁS habla por hablar (sus reportes llegan por canales serios); evoluciona por logros y jamás se deteriora
 
-**Regla transversal**: toda la capa visual se construye con tokens/primitivas del Design System ([F.0]) y con estructuras de datos ESPACIALMENTE listas (posiciones, clusters, profundidades) para proyección futura en 3D/gafas (Etapa 10 Three.js es la primera; las demás ventanas heredan la preparación).
+**Regla transversal**: toda la capa visual se construye con tokens/primitivas del Design System ([F.0]) y con `SpatialMeta` (x, y, z?, cluster, camera) como tipo espacial obligatorio — estructuras de datos ESPACIALMENTE listas para proyeccion futura en 3D/gafas. Renderer agnostico: ReactFlow (2D) → Three.js (3D) → WebXR (gafas) es solo cambiar el "executor", no los componentes ni los datos. Cadena: `SpatialMeta(F.0) → ReactFlow(F.1) → persistencia(F.4) → Three.js(J.3) → gafas(3D.1-3D.2)`. Ver seccion Roadmap VR/Gafas arriba.
 
 Detalle completo y fases: `docs/SDDs/SDD-005-plan-intermedio.md` · El Canvas Planeación (V2) alimenta Kanban/motor; la Control Room (V5) unifica todos los proyectos.
+
+## 🥽 ROADMAP VR / GAFAS — Preparacion desde el dia 1
+
+> **Filosofia:** el producto EMPIEZA en 2D (pantallas), pero toda arquitectura esta preparada para escalar a gafas VR/AR sin refactor. La clave: `SpatialMeta` (F.0) + renderer agnostico (regla #13) + Three.js como puente.
+
+### Cadena de renderizado (ya definida en Plan Base)
+
+```
+SpatialMeta(F.0) → ReactFlow 2D(F.1) → persistencia(F.4) → Three.js 3D(J.3) → WebXR gafas(3D.1-3D.2)
+```
+
+### Que significa "preparado para gafas" AHORA (sin hacer nada extra)
+
+| Capa | En 2D (ahora) | En 3D/gafas (futuro) | Que cambia |
+|------|---------------|----------------------|------------|
+| **Datos** | `SpatialMeta {x, y, z:null, cluster, camera}` en cada nodo | Mismo tipo, `z` populated por force-directed | Solo el valor de `z` |
+| **Renderer** | ReactFlow (nodos DOM) | Three.js (WebGPU) → WebXR | Solo el "executor", no los componentes |
+| **Persistencia** | `event_stream` guarda x,y | Mismo `event_stream` guarda x,y,z | Agrega `z` al guardar |
+| **Controles** | Mouse drag + wheel zoom | Orbit + touch + hand tracking | Capa de input diferente |
+| **UI** | CSS + Tailwind | Three.js scene + HTML overlay | Mismo Design System, diferente rendering |
+
+### Hardware objetivo (cuando llegue el momento)
+
+| Gafas | Procesador | GPU | WebXR | Viabilidad |
+|-------|-----------|-----|-------|------------|
+| **Meta Quest 3/3S** | Snapdragon XR2 Gen 2 | Adreno 740 | ✅ nativo | **Ideal** — standalone, $299-499, 80% mercado |
+| **Apple Vision Pro** | M2 + R1 | Apple GPU | ✅ WebXR via Safari | Premium, ecosistema Apple |
+| **Pico 4** | Snapdragon XR2 Gen 2 | Adreno 740 | ✅ WebXR | Alternativa Android |
+| **HoloLens 2** | Qualcomm 850 | Adreno 630 | ⚠️ limitado | Enterprise, no consumer |
+
+### Arquitectura tecnica para gafas (cuando se implemente)
+
+```
+┌─────────────┐     WiFi/WebRTC      ┌──────────────────┐
+│  Gafas 3D   │ ◄──────────────────► │  Celular/PC      │
+│  (decodifica │   video H.264/AV1    │  (renderiza       │
+│   píxeles)  │   + input tracking   │   Three.js/WebXR) │
+└─────────────┘                      └────────┬─────────┘
+                                              │ Internet
+                                     ┌────────▼─────────┐
+                                     │  Servidor Linux   │
+                                     │  (agentes, DB,    │
+                                     │   lógica negocio) │
+                                     └──────────────────┘
+```
+
+**Reglas de diseño para gafas (ya aplicadas desde F.0):**
+1. **SpatialMeta** en cada nodo — `z` es null en 2D, populated en 3D
+2. **Renderer agnóstico** — componentes del Design System, no de ReactFlow
+3. **Persistencia espacial** — posiciones en `event_stream`, no solo en store
+4. **Performance client-side** — Three.js WebGPU corre en el cliente (F.6 benchmark: 100 nodos @ 60fps)
+5. **LOD (Level of Detail)** — distances grandes = nodos simplificados (J.3)
+
+### Skills de diseno relevantes para 3D/gafas
+
+| Skill | Que aporta para 3D | Prioridad |
+|-------|-------------------|-----------|
+| **impeccable** | Dominio `spatial` — profundidad, jerarquía espacial, anti-generico en 3D | Alta |
+| **liquid-glass-web** | Efectos de vidrio translúcido en paneles 3D (backdrop-filter + feDisplacementMap) | Alta |
+| **apple-design-skill** | Guías HIG para interfaces espaciales, dark mode, contraste en 3D | Media |
+| **magic-ui** | Globe 3D, Animated Beam (conexiones 3D), partículas atmosféricas | Media |
+| **react-bits** | Silk/Aurora backgrounds para entornos 3D inmersivos | Baja |
+
+### Criterio de transición 2D → 3D
+
+El cambio de 2D a 3D NO es un "proyecto grande" — es **cambiar el renderer**:
+1. Las posiciones ya están en `event_stream` (desde F.4)
+2. Los tipos ya tienen `SpatialMeta` con `z` (desde F.0)
+3. Three.js ya está como dependencia (desde Etapa 10/J.3)
+4. Solo falta: instanciar Three.js en vez de ReactFlow, calcular `z`, y conectar WebXR
+
+**Estimación de esfuerzo cuando se decida hacer el salto:** ~2-3 semanas (vs meses si no hubiera preparación).

@@ -9,11 +9,18 @@
 
 <a id="f0"></a>
 ### F.0 — Design System core + capa de experiencia (prerrequisito de TODO lo visual)
-- **Tokens de diseño** (`oklch()` + cascade layers): color/espacio/tipografía/radio/sombra/motion en un solo archivo consumido por todas las etapas — modo oscuro/claro/alto-contraste desde el mismo token
-- **Primitivas base**: Button, Input, Card, Modal, **Toast + UNDO 5s** en acciones destructivas (patrón Linear), Skeleton loaders (nunca spinners), Avatar, StatusDot, Tabs, Tooltip, EmptyState ilustrado
-- **Status bar global inferior** (patrón Zed/Vim): modelo activo · contexto usado% · coste sesión · rama git · estado sync · agentes corriendo — información mirable de reojo, cero clicks
-- Motion spec único: duraciones/easing globales, respeta `prefers-reduced-motion`
-- La IA aplica los skills de `reference/` SOBRE estos tokens (nunca CSS improvisado)
+- **Fuente canónica visual:** [`SDD-013-gui-visual-spec.md`](../SDD-013-gui-visual-spec.md) — paleta oklch "Obsidian Glass", tipografía, espaciado, motion, Liquid Glass, componentes, checklist de calidad. La IA lee SDD-013 ANTES de tocar cualquier UI.
+- **Tokens de diseño** (`oklch()` + cascade layers): paleta completa "Obsidian Glass" (fondos void→deep→surface→elevated→overlay, vidrio translucido con refracción, acentos neón sofisticados, texto con jerarquía 3 niveles, estados semánticos, degradados solo en elementos activos) — ver SDD-013 §1.1-1.3
+- **Primitivas base** (expandidas con SDD-013):
+  - `GlassCard` — vidrio con `backdrop-filter: blur(20px) saturate(1.5)`, borde translúcido, highlight interior
+  - `AgentNode` — avatar con glow ring pulsante, badge de estado, barra de progreso sutil
+  - `AnimatedBeam` — partícula viajante con `offset-path` + glow trail
+  - `Toast` neuro-gratificante — never spinner, progreso real, mini-confetti local
+  - `ProgressRing`, `MilestonePop`, `CelebrationOverlay` (pulse/burst/festivo), `StreakFlame`, `LevelBadge`, `HeatmapAnual`
+  - `Button`, `Input`, `Modal`, `Skeleton` (nunca spinners), `Avatar`, `StatusDot`, `Tabs`, `Tooltip`, `EmptyState`
+- **Command Palette global ⌘K** (patrón Zed/Raycast): glass profundo con `backdrop-filter: blur(30px)`, fuzzy-match <50ms, hotkeys configurables
+- **Motion spec** (SDD-013 §2): duraciones 50ms→1200ms, easings físicos (expo, back, spring, quart), reglas no negociables (solo transform+opacity, stagger máx 20, `prefers-reduced-motion`), catálogo de 10 animaciones con timing y sensación exactos
+- **Sonido** (SDD-013 §5.3): teoría musical aplicada — cada evento tiene chime DISTINTO (commit≠test≠deploy), mute por defecto, `prefers-reduced-motion` = silencio
 - **SpatialMeta (primitiva transversal 3D/gafas):** toda componente visual que se renderice en el canvas lleva un campo `spatial?: SpatialMeta` en su tipo:
 ```typescript
 interface SpatialMeta {
@@ -28,7 +35,8 @@ interface SpatialMeta {
 }
 ```
 En 2D: `z` es `null`, ReactFlow ignora `cluster` y `camera`. En 3D: se calcula `z` con force-directed y `camera` se define. **Sin refactor al cambiar de renderer.** Todas las ventanas (Oficina, Planeación, Kanban, Control Room) heredan esta primitiva — el tipo se define en F.0 y se reutiliza en Etapas 6-19.
-- **Pruebas:** Vitest tokens/primitivas. E2E humano: contraste AA automatizado, toast deshace acción destructiva, status bar refleja modelo/coste reales
+- **Liquid Glass** (SDD-013 §4): composición de 4 capas (CSS blur + SVG feDisplacementMap + gradiente de borde + sombra interior). Prioridad: paneles laterales → modales → command palette → cards → status bar. Fallback Firefox/Safari.
+- **Pruebas:** Vitest tokens/primitivas. E2E humano: contraste AA automatizado, toast deshace acción destructiva, status bar refleja modelo/coste reales. **Gate visual F.5** audita contra checklist SDD-013 §7.
 
 ### F.1 — Fundaciones ReactFlow
 - ReactFlow instalado y montado en WorkArea como pestaña "Oficina" (el chat/sidepanels NO se tocan)

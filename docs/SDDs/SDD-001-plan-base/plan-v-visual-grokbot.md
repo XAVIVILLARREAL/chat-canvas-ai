@@ -23,7 +23,7 @@
 
 <a id="v1"></a>
 ### V.1 — Identidad por avatar geométrico + estados en 2 capas (con [F·F.0]/[G·G.7])
-- **Avatar geométrico único por agente**: forma (triángulo/hexágono/círculo/rectángulo/nube/puntos) + color de identidad por defecto — el color NO es estado, es QUIÉN; los avatares IA generados de [G·G.7] conviven (el geométrico es el fallback determinista) — aplica también a los expertos del [Consejo](../SDD-005-plan-intermedio.md#vi5) (cada auditor se VE como especialista con su color de departamento)
+- **Avatar geométrico único por agente**: forma (triángulo/hexágono/círculo/rectángulo/nube/puntos) + color de identidad por defecto — el color NO es estado, es QUIÉN; los avatares IA generados de [G·G.7] conviven (el geométrico es el fallback determinista) — aplica también a los expertos del [Consejo](../SDD-005-plan-intermedio.md#vi5) (cada auditor se VE como especialista con su color de departamento) · **los colores de identidad salen de la paleta de [SDD-013 §1.1](../SDD-013-gui-visual-spec.md) (nunca de los estados semánticos)** y el nodo usa el componente `AgentNode` (glow ring por estado) de F.0
 - **Capa de estado separada y explícita**: puntos animados rebotando = trabajando · icono "needs attention" (pregunta/aprobación/handoff) · badge azul = no leído · marca en la fila = desk activo
 - Edición de identidad desde el chat (header → agent settings): name, title, description, avatar, notifications — complementa [G·G.7] y [F·F.2] (nodos)
 - **Pruebas:** E2E HUMANA: identificar de un vistazo cuál agente trabaja, cuál espera aprobación y cuál tiene no-leído (sin leer texto); editar el perfil desde el chat y ver el cambio reflejado en sidebar + canva + group chat; caída de IA → avatar geométrico determinista

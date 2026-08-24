@@ -60,6 +60,7 @@ trait AgentProvider {
   - Traducción a modos Reasonix (`ask/auto/plan/acceptEdits/dontAsk`) documentada para [PLAN C](./plan-c-reasonix-deepseek.md#c1)
 - Cards de tool-call: nombre + args colapsados + resultado + estado — **viven INLINE en el hilo** (superficie chat-first estilo GrokBot, [PLAN V·V.2](./plan-v-visual-grokbot.md#v2)); el panel WorkArea es el zoom, no el flujo
 - **Streaming vía abstracción de transporte**: en WEB-FIRST los tokens llegan por WebSocket/SSE del gateway directo al navegador; bajo el futuro instalable Tauri el MISMO contrato viaja por Channel IPC — la UI nunca cambia ([PLAN S·S3](./plan-s-despliegue-costos.md#s3))
+- **Superficie visual**: la conversación (burbujas, desks, cards de tool-call, aprobaciones numeradas) se construye con los tokens de [SDD-013](../SDD-013-gui-visual-spec.md) (GlassCard + texto §1) — chat-first GrokBot ([PLAN V](./plan-v-visual-grokbot.md#v0)) sobre el Design System, nunca CSS improvisado
   - Regla día-1: URL del API configurable en runtime + notificaciones/archivos SIEMPRE por capas de abstracción → agregar shells nativos mañana costará cero reescritura
 - Visor de diff unificado inline en el chat
 - Panel terminal colapsable (salida de comandos del agente)
