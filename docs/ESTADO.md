@@ -4,7 +4,7 @@
 
 ## Donde estamos
 
-Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan Base v3.10: 137 fases (114 base + 23 intermedio) en matriz de ejecución**, ORDEN intercalado (intermedio entre fases base), GUI "Obsidian Glass" (SDD-013) fundida, prerequisitos de arranque fijados (worker crate ✅ creado). **ADR-005 D1 EJECUTADO:** workspace Cargo vivo (crates/core + crates/server axum + crates/worker Everruns + src-tauri shell fino) — el mismo dominio Rust corre por IPC y por HTTP. **Multiplataforma:** proyecto Android versionado + CI 3 SO + APK por demanda (SDD-005-cierre). **Siguiente paso (en orden):** ① mini-SDD schema maestro (todas las tablas + contrato event_stream, antes de A.2) → ② mini-SDD técnico PLAN A → ③ Fase A.1.
+Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan Base v3.10: 137 fases (114 base + 23 intermedio) en matriz de ejecución**, ORDEN intercalado (intermedio entre fases base), GUI "Obsidian Glass" (SDD-013) fundida, prerequisitos de arranque fijados (worker crate ✅ creado). **ADR-005 D1 EJECUTADO:** workspace Cargo vivo (crates/core + crates/server axum + crates/worker Everruns + src-tauri shell fino) — el mismo dominio Rust corre por IPC y por HTTP. **Multiplataforma:** proyecto Android versionado + CI 3 SO + APK por demanda (SDD-005-cierre). **Siguiente paso (en orden):** ① mini-SDD schema maestro (todas las tablas + contrato event_stream, antes de A.2) → ② mini-SDD técnico PLAN A → ③ Fase A.1. **Blindaje de pruebas v3.10 activo**: contrato de pruebas 1:1, fases por prompt (slices), E2E transversal por etapa, gate de deuda por fase (SDD-002 + reglas 14–16).
 
 ## Gates pendientes
 
