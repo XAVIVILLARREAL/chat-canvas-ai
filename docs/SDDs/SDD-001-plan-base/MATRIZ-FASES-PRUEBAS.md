@@ -173,12 +173,13 @@
 | VI.3 | Canvas interactivo Obsidian-style | E2E HUMANA: grafo >200 docs sin jank; buscar→subgrafo resaltado; abrir doc desde nodo; móvil 375 operativo |
 | VI.4 | Edición humano+IA sobre el grafo (ETAPA/FASE/PLAN) | Integration síntesis crea doc+edges. E2E HUMANA: selecciona 3 notas→sintetiza→edita→deshacer→re-hacer |
 
-### Consejo de Expertos — VI.5–VI.7 (ADELANTADO tras Gate G — DOGFOOD: audita los gates de la base)
+### Consejo de Expertos + Discovery Hub — VI.5–VI.8 (ADELANTADO tras Gate G — DOGFOOD: audita los gates de la base)
 | Fase | Nombre | Pruebas |
 |---|---|---|
 | VI.5 | CONSEJO DE EXPERTOS: skills auditores visuales | Unit: skill experto compila y gating READ-ONLY bloquea escritura ([G·G.2]). E2E: convoco 2 expertos sobre nodo-PLAN → personajes conectados al subgrafo; escritura directa → bloqueada |
 | VI.6 | Auditoría EN PARALELO + preguntas-opciones | Integration: 3 expertos mock en paralelo agrupados sin cruzarse; respuesta aplica rung DECISION + diff correcto ([D·D.4]). Chaos: experto falla a mitad → marcado, resto sigue. E2E HUMANA: 5 preguntas de 3 expertos → diffs aceptados visibles en el plan |
 | VI.7 | Juice del Consejo (dopaminérgico) | Snapshot por estado de experto × intensidad. E2E: responder 3× → variantes distintas + arpegio audible (audio spy); reduced-motion → flujo completo sin partículas |
+| VI.8 | Discovery Hub: explorador GitHub + Repo Scout (IA proactiva) | Unit: skill scout compila y gating READ-ONLY bloquea escritura. Integration: buscar "react table" → results con preview. E2E HUMANA: busco repo → agrego como referencia → nodo aparece en grafo; scout sugiere repos → selecciono 1 → se agrega; preview README; filter funciona; historial persiste |
 
 ### Etapa 17 · Kanban de Resultados — KR.1–KR.5 (tras Gate H; KR.3 tras N.3/N.6)
 | Fase | Nombre | Pruebas |
@@ -250,4 +251,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 136 fases** — **base 114** (A–P 92 incl. H.9a/H.9b, sin J.3/K.1/K.2 + V 5 + S/T/U 17) + **intermedio 22** (VI 7 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases.
+**Total: 137 fases** — **base 114** (A–P 92 incl. H.9a/H.9b, sin J.3/K.1/K.2 + V 5 + S/T/U 17) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases.

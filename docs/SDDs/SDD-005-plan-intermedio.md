@@ -89,7 +89,65 @@ La sesión de planeación debe SENTIRSE como ser asesorado por un equipo élite 
 - Intensidad Apagado/Sutil/Normal/Festivo por scope ([A·A.6](./SDD-001-plan-base/plan-a-chat-codex.md#a6)) · **cero dark patterns**: todas las preguntas son reales del dominio, nunca artificiales para retener
 - **Pruebas GUI:** snapshot visual por estado de experto × intensidad · E2E: responder 3 veces seguidas → variantes distintas + arpegio audible (audio spy) · reduced-motion → sin partículas pero flujo completo funcional
 
-**🚪 GATE VI:** abro el grafo de ESTE mismo proyecto: veo clusters reales (docs/, SDDs/, ADRs/), busco "kanban" y solo ese subgrafo brilla, sintetizo 3 ADRs en una nota nueva enlazada, muevo nodos y mi layout sobrevive reinicios. **Convoco al consejo completo sobre este plan: los 5 expertos auditan en paralelo, me llegan preguntas con opciones al panel derecho, respondo con clicks, veo los diffs aplicados y recibo el acta final — todo fluido y celebratorio.** Video + suites verdes.
+<a id="vi8"></a>
+### VI.8 — Discovery Hub: explorador de repos + Repo Scout (IA proactiva)
+**Panel inferior derecho del Canvas Planeación** — la tercera zona junto al grafo y el Consejo de Expertos. Combina un navegador de GitHub con un skill de IA que sugiere repos relevantes según el contexto del proyecto.
+
+**Layout del Canvas Planeación (actualizado):**
+```
+┌─────────────────────────────────┬──────────────────────┐
+│                                 │  🧠 Consejo Expertos  │
+│       GRAFO DE DOCUMENTOS       │  (panel derecho)     │
+│       (nodos .md, edges,        │  VI.5-VI.7           │
+│        clusters, zoom/pan)      │                      │
+│                                 │  ┌──────────────────┐│
+│                                 │  │ 🔍 Discovery Hub ││
+│                                 │  │ (abajo-derecha)  ││
+│                                 │  │ VI.8             ││
+├─────────────────────────────────┤  └──────────────────┘│
+```
+
+#### VI.8a — Explorador GitHub (navegador integrado)
+- **Barra de búsqueda** con fuzzy-match: buscar repos por nombre, descripción, topic, lenguaje
+- **Resultados en cards**: avatar del repo, nombre, descripción corta, stars, lenguaje, última actualización, badge "trending" si aplica
+- **Preview inline**: click en card → mini-preview con README renderizado, estructura de archivos (tree), dependencias principales
+- **Acciones sobre el repo encontrado**:
+  - 📌 **Agregar como referencia** → crea nodo `reference` en el grafo con edges a los nodos relacionados
+  - 📋 **Clonar al workspace** → shallow clone vía [PLAN M](./SDD-001-plan-base/plan-m-github.md) (Etapa 13) — requiere GitHub auth
+  - 🔗 **Copiar URL** → clipboard
+- **Filtros**: lenguaje, rango de stars, última actualización, licencia, topic
+- **Historial de búsquedas** recientes (persistido por proyecto)
+- **Fuente**: GitHub API v3 (REST) con paginación; rate limit 30 req/min sin auth, 5000 con token
+
+#### VI.8b — Repo Scout (skill de IA proactivo)
+- **Skill estándar** en Skills Lab ([G·G.1](./SDD-001-plan-base/plan-g-skills-lab.md#g1)) con tool-gating READ-ONLY sobre la API de GitHub y sobre el grafo de documentos
+- **Modo proactivo**: cuando el usuario crea/modifica nodos de tipo ETAPA/FASE/PLAN que mencionan conceptos conocidos (auth, CRUD, real-time, deploy, testing, etc.), el scout sugiere repos relevantes automáticamente — aparece como notificación sutil en el Discovery Hub ("💡 3 repos encontrados para 'real-time sync'")
+- **Modo manual**: el usuario puede invocar al scout desde ⌘K o desde un botón "Sugerir repos" sobre una selección de nodos del grafo
+- **Output del scout**:
+  - Lista de repos con **explicación de por qué sirven** para el contexto actual
+  - Mapeo automático: qué parte del plan se beneficia de qué repo (edge sugerido)
+  - Métricas de relevancia: stars, actividad reciente, calidad de docs, licencia compatible
+  - **"Este patrón ya se resolvió en X"** — cita el repo y el archivo relevante
+- **Identidad viva** ([G·G.7](./SDD-001-plan-base/plan-g-skills-lab.md#g7)): avatar de explorador, emoji 🔍, mini-bio "Busco soluciones que ya funcionan para que no reinventes la rueda"
+- **Integración con el grafo**: repos sugeridos se agregan como nodos `reference` con edges semánticos a los nodos del plan que describen el mismo problema
+- **Integración con el Consejo**: los expertos pueden LEER los repos referenciados al auditar ("este enfoque tiene vulnerabilidades conocidas en X issue")
+
+#### VI.8c — Panel de repos guardados
+- Lista de repos marcados como referencia para este proyecto
+- Cada repo guardado muestra: nombre, por qué se guardó (reasoning del scout o nota manual), edges en el grafo
+- **"Refresco"**: el scout re-evalúa repos guardados periódicamente (¿siguen activos? ¿hay alternativas mejores?)
+- Exportable: lista de referencias como .md enlazado en el grafo
+
+#### Layout responsive
+- **Desktop (>1024px)**: panel inferior derecho, 320px ancho, colapsable
+- **Tablet (640-1024px)**: panel flotante que se abre con botón
+- **Mobile (<640px)**: pantalla completa al abrir, se cierra con swipe down
+
+- **Pruebas:** Unit: skill Repo Scout compila y su gating bloquea escritura. Integration: buscar "react table" → results con preview; scout sobre nodo "necesito auth" → sugiere repos de auth. E2E humano: abro Discovery Hub, busco un repo, lo agrego como referencia → aparece nodo en el grafo con edge; scout sugiere 3 repos → selecciono 1 → se agrega; preview de README renderizado; filter por stars funciona; historial persiste tras reinicio
+
+---
+
+**🚪 GATE VI (ampliado):** abro el grafo de ESTE mismo proyecto: veo clusters reales (docs/, SDDs/, ADRs/), busco "kanban" y solo ese subgrafo brilla, sintetizo 3 ADRs en una nota nueva enlazada, muevo nodos y mi layout sobrevive reinicios. **Convoco al consejo completo sobre este plan: los 5 expertos auditan en paralelo, me llegan preguntas con opciones al panel derecho, respondo con clicks, veo los diffs aplicados y recibo el acta final — todo fluido y celebratorio.** Abro el Discovery Hub: busco "react data table" → preview de 3 repos → agrego 1 como referencia → aparece nodo en el grafo; el Repo Scout sugiere "para auth usa NextAuth" → lo acepto → nodo reference conectado. **Video + suites verdes.**
 
 ---
 
@@ -219,6 +277,7 @@ Reutiliza el motor de [PLAN J](./plan-j-grafo3d-repomap.md#j3) para navegar graf
 |---|---|---|
 | VI.1–VI.4 Canvas Planeación | 2.5–3 | tras Gate F |
 | VI.5–VI.7 **Consejo de Expertos** | 1.5–2 | tras Gate G — DOGFOOD: audita los gates de la base |
+| VI.8 **Discovery Hub** (explorador GitHub + Repo Scout) | 1–1.5 | tras Gate G — exploración de repos + nodos-referencia |
 | KR Kanban resultados | 2–2.5 | tras Gate H (KR.3 tras N.3/N.6) |
 | 3D (3D.1 + **J.3** + 3D.2) | 1.5–2 | tras Gate J |
 | Voz (**K.1/K.2**) | 1 | junto a CR |

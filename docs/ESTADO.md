@@ -4,7 +4,7 @@
 
 ## Donde estamos
 
-Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan Base revisado a fondo (v3.4, 2026-08-24): 112 fases ordenadas en la matriz, contradicciones resueltas (H.9a contenedor tras C.3, P tras Gate B, M antes de K/L, WEB-FIRST consistente), fases A.5/D.7 reintegradas.** **ADR-005 aceptado Y D1 EJECUTADO:** workspace Cargo vivo (crates/core + crates/server axum:3030 + src-tauri shell fino) — el mismo dominio Rust corre por IPC y por HTTP; Plan Base README define el modelo mental multiplataforma+sync. **Multiplataforma cerrado (SDD-005):** proyecto Android nativo versionado en `src-tauri/gen/android/` (toolchain instalada en servidor: JDK 21 + SDK 34 + NDK r27), CI con matriz desktop ubuntu/windows/macos en cada push, workflow manual "Android Build" para APK debug, y `docs/MULTIPLATAFORMA.md` con comandos por plataforma (iOS requiere Mac para `ios init`). Siguiente paso: mini-SDD técnico PLAN A y Fase A.1.
+Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan Base v3.10: 137 fases (114 base + 23 intermedio) en matriz de ejecución**, ORDEN intercalado (intermedio entre fases base), GUI "Obsidian Glass" (SDD-013) fundida, prerequisitos de arranque fijados (worker crate ✅ creado). **ADR-005 D1 EJECUTADO:** workspace Cargo vivo (crates/core + crates/server axum + crates/worker Everruns + src-tauri shell fino) — el mismo dominio Rust corre por IPC y por HTTP. **Multiplataforma:** proyecto Android versionado + CI 3 SO + APK por demanda (SDD-005-cierre). **Siguiente paso (en orden):** ① mini-SDD schema maestro (todas las tablas + contrato event_stream, antes de A.2) → ② mini-SDD técnico PLAN A → ③ Fase A.1.
 
 ## Gates pendientes
 
@@ -32,6 +32,7 @@ Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan 
 
 ## Ultimos cambios
 
+- 2026-08-24: **VI.8 Discovery Hub agregado a SDD-005** — explorador GitHub (búsqueda, preview README, clonar, agregar como referencia nodal) + Repo Scout IA proactiva (sugiere repos según contexto del proyecto, mapea edges al grafo) + panel de repos guardados. Panel inferior derecho del Canvas Planeación.
 - 2026-08-24: **SDD-013 GUI Visual Spec creado** — paleta "Obsidian Glass" (oklch), motion spec con física real, Liquid Glass 4 capas, componentes (GlassCard/AgentNode/AnimatedBeam/Toast/CommandPalette), checklist de calidad F.5. Integrado en F.0, PLAN U, y styles.css reescrito con tokens.
 - 2026-08-24: **GUI v3.9 — SDD-013 "Obsidian Glass" integrado y fundido**: fuente canónica visual en README/matriz/F.0/V/U/K.3/T.A11Y/A.4; tokens en src/styles.css; checklist §7 auditado en F.5
 - 2026-08-24: **PRE-ARRANQUE aplicado** — `crates/worker` creado (Everruns, compila) + checklist en README (auth MVP, Postgres dev, schema maestro, OpenAPI types, KEK, sandbox socket, recursos)

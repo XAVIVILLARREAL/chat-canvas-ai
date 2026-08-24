@@ -1,6 +1,6 @@
 # SDD-001 · Roadmap Maestro — Empresa Dev
 
-> Fecha: 2026-08-24 · Estado: Activo · v3.8 MEGA-PLAN (16 etapas + P, ~136 fases: 114 base + 22 intermedio intercalado)
+> Fecha: 2026-08-24 · Estado: Activo · v3.10 MEGA-PLAN (16 etapas base + P + 4 intermedio, ~137 fases: 114 base + 23 intermedio intercalado)
 > Investigación profunda: OpenAI Codex (docs oficiales), Reasonix v1.23 (verificado EN VIVO en este servidor), V3Code (sitio oficial + spec copia.md), **Grok Bot xAI/Cursor** ([SDD-004](../SDD-004-analisis-grokbot.md): group chat de agentes, rutinas por demostración, proactividad, pipeline de bugs) + patrones de varve/codevira.
 > Pruebas: [SDD-002](../SDD-002-testing-spec-driven.md) — toda fase pasa las 4 capas; todo gate cierra con suite humana.
 
@@ -42,7 +42,10 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 | 13 | GitHub nativo | [plan-m](./plan-m-github.md) | M.1–M.3 | Push/pull/PRs sin terminal |
 | 14 | Empresas autónomas | [plan-n](./plan-n-empresas-autonomas.md) | N.1–N.7 | Empresa completa operada por agentes |
 | 15 | Marketplace + MCP público + v1.0 | [plan-o](./plan-o-marketplace-v1.md) | O.1–O.3 | Empresas empaquetables, release 1.0 |
-| 16 | Canvas Planeación + **Consejo de Expertos** | [plan-intermedio](../SDD-005-plan-intermedio.md) | VI.1–VI.7 | **INTERCALADO**: VI.1–VI.4 tras Gate F · VI.5–VI.7 (Consejo) tras Gate G — DOGFOOD: audita los gates de la base |
+| 16 | Canvas Planeación + **Consejo de Expertos** + **Discovery Hub** | [plan-intermedio](../SDD-005-plan-intermedio.md) | VI.1–VI.8 | **INTERCALADO**: VI.1–VI.4 tras Gate F · VI.5–VI.8 (Consejo + Discovery) tras Gate G — DOGFOOD + exploración repos |
+| 17 | Kanban de Resultados | [plan-intermedio](../SDD-005-plan-intermedio.md) | KR.1–KR.5 | **INTERCALADO tras Gate H** (KR.3 tras N.3/N.6): tablero evidencia-first con bloques animados de tests |
+| 18 | Control Room | [plan-intermedio](../SDD-005-plan-intermedio.md) | CR.1–CR.5 | **AL FINAL** (paralelo a N/O): mapa global + cards de sesión vivas + órdenes por voz |
+| 19 | Preparación espacial + Visor 3D | [plan-intermedio](../SDD-005-plan-intermedio.md) | 3D.1 + J.3 + 3D.2 | **tras Gate J**: SpatialMeta → visores 3D unificados (puente a gafas/WebXR) |
 | P | **Centro MCP transversal** | [plan-p](./plan-p-centro-mcp.md) | P.1–P.4 | Conectar herramientas externas sin tocar JSON (o pegándolo) |
 | S | **Despliegue/Costos/Stack eficiente** | [plan-s](./plan-s-despliegue-costos.md) | S.1–S.4 | Hosting 3 etapas ($16→$600/mes), stack Rust fijado, patrones Tauri — datos ago-2026 |
 | T | **Excelencia transversal** | [plan-t](./plan-t-excelencia.md) | T.SEC/T.A11Y/T.ONB/T.QA/T.BIZ | Seguridad profesional, i18n, onboarding <5min, calidad continua, comercial/legal |
@@ -241,26 +244,12 @@ Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: so
 3. **Tiering de la suite humana**: `@core` (smoke ~22s, en cada push) vs completa (solo gates) — evita explosión de minutos de CI al crecer la suite
 4. Knip añadido al CI (código muerto visible desde el principio)
 
-### Revisión profunda v3.4 (2026-08-24) — decisiones del usuario aplicadas
+### Revisión v3.10 (2026-08-24) — análisis profundo final: unificación y orden
 
-- **A.5 (medidor/debug contexto) y D.7 (blame-rung) reintegradas** como fases reales con pruebas — estaban prometidas en ORDEN/torneo pero no existían
-- **H.9 partida**: H.9a (aislamiento contenedor mínimo) se ejecuta tras C.3 y cumple la condición NO negociable de seguridad de PLAN C; H.9b (computadora persistente) al final de H
-- **P (Centro MCP)** pasa a ejecutarse tras el Gate B, en paralelo con C/D (antes en paralelo con F)
-- **M (GitHub) antes que K/L** ahora está DENTRO del ORDEN (antes era una recomendación que contradecía el propio bloque); voz (K) al final del bloque
-- **Multiplataforma alineada a WEB-FIRST**: navegador = v1 servido por el gateway; Tauri diferido hasta demanda (sección "cómo funciona la plataforma" corregida)
-- **A.7/A.8**: v1 mínima en Etapa 1 (tarea simple / resume sin rungs) que H.1/D.1 formalizan después
-- **C.7 y D.8**: alcance v1 acotado en la base; lo pesado (OAuth/small_model · memoria relacional/reflexión) marcado post-base (C.7b / D.8b)
-- **Matriz regenerada**: 112 fases (95 A–P + 17 S/T/U), orden = ejecución, regla "fase GUI ⇒ [E]+[H]", presupuesto **máx $20/gate** con APIs reales
-
-### Revisión v3.6 (2026-08-24) — Visual GrokBot como referencia de la capa social
-
-- **Nuevo [PLAN V](./plan-v-visual-grokbot.md) (transversal, 5 fases)**: lo visual de Grok Bot (xAI/Cursor, verificado con docs oficiales + reviews) — la app se SIENTE mensajería, no dashboard
-- **Chat-first "desks"**: sidebar = una fila por bot/proyecto con su última actividad (V.0 con A.1/A.4)
-- **Identidad por avatar geométrico**: el color del avatar es QUIÉN, no estado — estados en 2 capas separadas: puntos animados = trabajando, needs-attention, badge no-leído, desk activo (V.1 con F.0/G.7)
-- **Actividad inline en el hilo**: tools/archivos/diffs y **aprobaciones como opciones numeradas** (▸ 1. X · 2. Y) con un tap (V.2 con A.4/B.4)
-- **Group chat de bots visual**: 2–6 bots, @menciones/@everyone, handoffs visibles en la conversación (V.3 con N.6)
-- **Rutinas visibles + notificaciones persistentes**: follow-along con indicador, badge no-leído que persiste, digests como mensajes del PM (V.4 con G.6/K.3/U.5)
-- **Complementa, no quita**: Codex sigue siendo la referencia de paneles/diffs; GrokBot es la referencia de la capa social. Matriz ahora con **117 fases**
+- **VI.8 (Discovery Hub) absorbida** (sesión concurrente): explorador GitHub + Repo Scout tras Gate G; matriz y totales unificados — **137 fases (114 base + 23 intermedio: VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2)**
+- **Header/tabla/ORDEN alineados**: v3.10, filas de Etapas 16–19 en la tabla maestra (KR tras H, CR al final, 3D tras J), ORDEN con VI.8, secciones de revisión reordenadas cronológicamente (v3.10→v3.9→v3.8→v3.6→v3.5→v3.4)
+- **A.4 ↔ V.2 aclarado**: las cards inline + aprobaciones de opciones numeradas se implementan NATIVAMENTE en A.4 (Etapa 1, es el corazón UX Codex); V.2 (con F.0) unifica la primitiva con el Consejo (VI.6) y aplica el pulido SDD-013 — sin dependencia hacia adelante falsa
+- **ESTADO.md actualizado**: "Donde estamos" a v3.10/137; el siguiente paso concreto es **schema maestro (mini-SDD) → mini-SDD PLAN A → A.1** (los prerequisitos de arranque del §PRE-ARRANQUE ya están fijados y el crate `worker` ya existe)
 
 ### Revisión v3.9 (2026-08-24) — Spec visual "Obsidian Glass" integrada
 
@@ -273,15 +262,35 @@ Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: so
 - **El intermedio deja de ser "el plan después de la base"**: pasa a ser un **carril de vistas** intercalado — cada ventana se construye justo tras su fase base habilitadora (VI tras F/G, KR tras H, 3D tras J, CR al final paralelo a N/O)
 - **J.3 (visor 3D) se movió de la base al intermedio** (J.1/J.2 quedan: el repo-map alimenta el contexto del agente)
 - **K.1/K.2 (voz TTS/STT) se movieron al intermedio** (las consume CR); **K.3 (política de interrupción) se queda en base** por ser transversal (U.5/V.4/I)
-- **Consejo de Expertos ADELANTADO como DOGFOOD**: en cuanto existan G.1/G.2 (Etapa 7), VI.5–VI.7 se construyen y se usan para **auditar los gates de la propia base**
-- Base: **114 fases** · Intermedio: **22** (VI 7 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2) · **Total 136**
+- **Consejo de Expertos ADELANTADO como DOGFOOD**: en cuanto existan G.1/G.2 (Etapa 7), VI.5–VI.8 se construyen y se usan para **auditar los gates de la propia base** (Consejo + Discovery Hub)
+- Base: **114 fases** · Intermedio: **23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2) · **Total 137**
+
+### Revisión v3.6 (2026-08-24) — Visual GrokBot como referencia de la capa social
+
+- **Nuevo [PLAN V](./plan-v-visual-grokbot.md) (transversal, 5 fases)**: lo visual de Grok Bot (xAI/Cursor, verificado con docs oficiales + reviews) — la app se SIENTE mensajería, no dashboard
+- **Chat-first "desks"**: sidebar = una fila por bot/proyecto con su última actividad (V.0 con A.1/A.4)
+- **Identidad por avatar geométrico**: el color del avatar es QUIÉN, no estado — estados en 2 capas separadas: puntos animados = trabajando, needs-attention, badge no-leído, desk activo (V.1 con F.0/G.7)
+- **Actividad inline en el hilo**: tools/archivos/diffs y **aprobaciones como opciones numeradas** (▸ 1. X · 2. Y) con un tap (V.2 con A.4/B.4)
+- **Group chat de bots visual**: 2–6 bots, @menciones/@everyone, handoffs visibles en la conversación (V.3 con N.6)
+- **Rutinas visibles + notificaciones persistentes**: follow-along con indicador, badge no-leído que persiste, digests como mensajes del PM (V.4 con G.6/K.3/U.5)
+- **Complementa, no quita**: Codex sigue siendo la referencia de paneles/diffs; GrokBot es la referencia de la capa social
 
 ### Revisión de arquitectura v3.5 (2026-08-24) — escalabilidad + stack validado por investigación
 
 - **CÓMPUTO CLIENT-FIRST elevado a regla transversal #12**: todo cómputo que pueda correr en el cliente va al cliente (búsqueda local wa-sqlite/OPFS + sqlite-vec WASM en D.5, indexación AST web-tree-sitter en J.1, canva Three.js WebGPU en F.6, LLM local Ollama en C.6) — el servidor escala con los DATOS, no con la CPU de cada usuario; solo queda server-only lo central (agentes 24/7, sync, repos, secretos, RLS)
 - **ARQUITECTURA.md reescrita (v3.5)**: eliminado el backend Python fantasma (FastAPI/CrewAI — no existía `services/python/`) y el modelo Tauri-first; alineada a ADR-005 (web-first) + SDD-008 (workers Everruns, Postgres SKIP LOCKED) + Plan Base v3.4; **INFRA.md corregido** y ADR-002 marcado como superado en parte
 - **Stack validado por investigación (2026-08-24)**: Rust axum 0.8.9 + tokio 1.53 + sqlx 0.9 + rustls 0.23 es la combinación vigente (3.475 sesiones WS/vCPU, benchmark streaming — el más barato por conexión; patrón Everruns); **sin BFF Node/Hono** (un solo stack para un dev); Go (chi/pgx) como plan B pragmático (70% rendimiento, ~1/4 fricción); Hono solo si mañana se necesita ecosistema npm/edge (nunca Express)
-- Pendiente menor: skills Flutter residuales en `.opencode/skills/` (patrol-iteracion, terminal-sos) — candidatos a limpiar
+
+### Revisión profunda v3.4 (2026-08-24) — decisiones del usuario aplicadas
+
+- **A.5 (medidor/debug contexto) y D.7 (blame-rung) reintegradas** como fases reales con pruebas — estaban prometidas en ORDEN/torneo pero no existían
+- **H.9 partida**: H.9a (aislamiento contenedor mínimo) se ejecuta tras C.3 y cumple la condición NO negociable de seguridad de PLAN C; H.9b (computadora persistente) al final de H
+- **P (Centro MCP)** pasa a ejecutarse tras el Gate B, en paralelo con C/D (antes en paralelo con F)
+- **M (GitHub) antes que K/L** ahora está DENTRO del ORDEN (antes era una recomendación que contradecía el propio bloque); voz (K) al final del bloque
+- **Multiplataforma alineada a WEB-FIRST**: navegador = v1 servido por el gateway; Tauri diferido hasta demanda (sección "cómo funciona la plataforma" corregida)
+- **A.7/A.8**: v1 mínima en Etapa 1 (tarea simple / resume sin rungs) que H.1/D.1 formalizan después
+- **C.7 y D.8**: alcance v1 acotado en la base; lo pesado (OAuth/small_model · memoria relacional/reflexión) marcado post-base (C.7b / D.8b)
+- **Matriz regenerada**: 112 fases, orden = ejecución, regla "fase GUI ⇒ [E]+[H]", presupuesto **máx $20/gate** con APIs reales
 
 ### Recomendaciones de orden APROBADAS (aplican al ejecutar)
 
@@ -306,7 +315,7 @@ Dentro de rango sano para CI en cada push (core) + gates (full).
 
 **Modelo v3.8 (ratificado 2026-08-24)**: el intermedio NO va después de la base — es un **carril de vistas** que se construye justo tras su fase base habilitadora, en paralelo con el resto de la base:
 - **VI.1–VI.4** (Canvas Planeación) ⟶ tras Gate F (necesita D.2 + F.1)
-- **VI.5–VI.7** (Consejo de Expertos) ⟶ tras Gate G — **ADELANTADO como DOGFOOD**: audita los gates de la propia base
+- **VI.5–VI.8** (Consejo de Expertos + Discovery Hub) ⟶ tras Gate G — **ADELANTADO como DOGFOOD**: audita los gates de la propia base + exploración de repos
 - **KR.1–KR.5** (Kanban Resultados) ⟶ tras Gate H (KR.3 tras N.3/N.6)
 - **3D** (3D.1 + J.3 + 3D.2) ⟶ tras Gate J (motor Three.js); **J.3 se movió de la base al intermedio**
 - **K.1/K.2** (voz TTS/STT) ⟶ intermedio (las consume CR); **K.3** (política de interrupción) SE QUEDA en base (transversal: U.5/V.4/I)
@@ -329,7 +338,7 @@ POST-BASE (base funcional) ⟷ INTERMEDIO (carril de vistas — INTERCALADO, no 
   F.0→F.1→F.2→F.3→F.4→F.7→F.5→F.6 (Gate F)
     ⟶ INTERMEDIO VI.1→VI.4 (Canvas Planeación — tras F, necesita D.2+F.1)
   G.1→G.2→G.3→G.4→G.6→G.7→G.5 (Gate G)  ← G.7 identidad viva; su voz se completa en el intermedio (K.1)
-    ⟶ INTERMEDIO VI.5→VI.7 (Consejo de Expertos — ADELANTADO: DOGFOOD, audita los gates de la base)
+    ⟶ INTERMEDIO VI.5→VI.8 (Consejo de Expertos + Discovery Hub — ADELANTADO: DOGFOOD, audita los gates de la base)
   H.1→H.2→H.5→H.6→H.3→H.4→H.7→H.8→H.9b (Gate H)  ← desviación: Shadow primero; H.9a ya corrió en Etapa 3
     ⟶ INTERMEDIO KR.1→KR.2→KR.4→KR.5 (Kanban Resultados — tras H; KR.3 tras N.3/N.6)
   I.1→I.6→I.2→I.3→I.4→I.5 (Gate I)
