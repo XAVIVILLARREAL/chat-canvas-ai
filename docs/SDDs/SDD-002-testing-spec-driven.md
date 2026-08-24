@@ -64,6 +64,13 @@ Una feature SIN spec escrita no se codea. Un gate sin suite humana no se cierra.
 
 Cada gate (A/B/C/D/E) añade a su checklist: **suite humana ampliada** cubriendo las features nuevas del plan. La suite crece con el producto: al llegar a Gate E debe existir un walkthrough humano completo de punta a punta.
 
+### Regla RESPONSIVE (transversal, en TODOS los gates)
+
+- **TODAS las pantallas, secciones y ventanas son responsive y se operan en celular**: toda fase GUI se prueba en **mobile 375px (viewport + touch) Y desktop 1440px** — no hay excepción ni pantalla "solo desktop"
+- La suite humana `responsive-human.spec.ts` (375/768/1440) se re-corre en **CADA gate** y antes de cada tag
+- En móvil se verifica: sin scroll horizontal, touch targets ≥44px, sin dependencia de hover, modales/BottomSheet usables, texto legible, navegación BottomNav
+- Un gate cuya suite humana mobile falla NO cierra, aunque desktop esté verde
+
 ## Anti-patrones prohibidos
 
 | Prohibido | Por qué |

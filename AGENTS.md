@@ -256,6 +256,8 @@ src/
 
 ## Diseno responsive (siempre se sigue)
 
+> **REGLA TRANSVERSAL DURA: TODAS las pantallas, secciones, ventanas, modales, paneles y flows del proyecto son RESPONSIVE y usables en celular.** No existe pantalla "solo desktop", ni seccion "solo web", ni "provisionalmente no movil". Si una pantalla no se puede operar completa en un celular (375px), la feature NO existe. Mobile-first SIEMPRE; desktop es un caso especial, no al reves.
+
 **Todo componente UI se disena para mobile primero.** Desktop es un caso especial, no al reves.
 
 ### Reglas clave
@@ -268,7 +270,9 @@ src/
 6. **Navegacion** — BottomNav en mobile, Sidebar en desktop
 7. **Paneles** — BottomSheet en mobile, RightPanel en desktop
 8. **Animaciones** — respetar `prefers-reduced-motion`
-9. **Testing** — Playwright testea ambas vistas (mobile 375px + desktop 1440px)
+9. **Testing** — Playwright testea TODA pantalla/seccion en ambas vistas (mobile 375px + desktop 1440px); un gate GUI sin verificacion mobile NO cierra
+10. **Cobertura total** — el checklist por pantalla incluye: layout sin scroll horizontal, touch targets ≥44px, BottomSheet/BottomNav en mobile, contenido completo accesible sin hover (nada depende de hover en movil), texto legible sin zoom, modales a pantalla completa en movil
+11. **Regresion** — la suite humana responsive (`responsive-human.spec.ts`) se re-corre en CADA gate y antes de cada tag; cualquier cambio visual nuevo exige su paso mobile
 
 ### Hook `useResponsive`
 
@@ -302,7 +306,7 @@ Uso en componentes:
 
 ### Prefases de pruebas E2E (Playwright CLI)
 
-Cuando la feature involucra **interfaz grafica (GUI)**, se crean pruebas E2E con Playwright:
+Cuando la feature involucra **interfaz grafica (GUI)**, se crean pruebas E2E con Playwright — **SIEMPRE en las dos vistas: mobile 375px (viewport celular + touch) y desktop 1440px**. Una feature GUI sin su corrida mobile no se cierra:
 
 **Simulacion humana:**
 - `page.click('selector')` — clickear botones, links, elementos

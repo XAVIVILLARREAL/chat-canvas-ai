@@ -319,3 +319,4 @@ copia.md queda COMPLETAMENTE minado. Backlog del torneo conserva lo no-promovido
 8. **Toda fase GUI tiene [E]2E humano explícito** ([H] obligatoria) — "compila" no es gate; "lo operé como persona" sí
 9. Presupuesto de pruebas con APIs reales (DeepSeek/GitHub/Ollama): **máx $20/gate**; el resto de la suite corre mock-first (~$0)
 10. **La matriz se regenera en CADA cambio de fases**; una fase sin fila en la matriz no se construye
+11. **RESPONSIVE TOTAL (transversal dura)**: TODAS las pantallas/secciones/ventanas son mobile-first y operables en celular — toda fase GUI se verifica en móvil 375 + desktop 1440 (suite humana `responsive-human.spec.ts` en cada gate); no existe pantalla "solo desktop"; un gate con mobile rojo NO cierra

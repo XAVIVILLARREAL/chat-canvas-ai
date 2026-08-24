@@ -16,10 +16,11 @@
 
 <a id="ta11y"></a>
 ### T.A11Y + i18n — usable por cualquiera, en su idioma
+- **REGLA RESPONSIVE TOTAL (transversal dura)**: TODAS las pantallas, secciones y ventanas del proyecto son responsive y operables en celular — mobile-first, verificadas en **375px móvil + 768px tablet + 1440px desktop** en cada gate (suite humana `responsive-human.spec.ts`); ninguna pantalla puede ser "solo desktop"
 - **i18n central es/en** desde el primer componente (strings NUNCA hardcodeadas); español default
 - Contraste AA verificado automatizado + foco visible siempre + targets ≥44px móvil + `prefers-reduced-motion` global + aria-live polite en streaming del chat
 - axe-core en los E2E funcionales (falla CI si hay violación seria) · navegación 100% teclado ya exigida por suite humana
-- **Pruebas:** axe-core gate en CI. E2E humano dual idioma. Auditoría contraste en cada tema ([F·F.0](./plan-f-canva-oficina.md#f0))
+- **Pruebas:** axe-core gate en CI. E2E humano dual idioma. Auditoría contraste en cada tema ([F·F.0](./plan-f-canva-oficina.md#f0)). **Suite humana responsive re-corrida en CADA gate**: todas las pantallas nuevas operadas en móvil 375 y desktop 1440 (sin scroll horizontal, touch targets ≥44px, sin dependencia de hover)
 
 <a id="tonb"></a>
 ### T.ONB — Onboarding que convierte
@@ -31,7 +32,7 @@
 
 <a id="tqa"></a>
 ### T.QA — Calidad continua (anti-deuda-técnica activa)
-- **Budgets de rendimiento en CI**: tamaño de bundles, tiempo de arranque medido, canva 60fps check — regresión = build rojo
+- **Budgets de rendimiento en CI**: tamaño de bundles, tiempo de arranque medido, canva 60fps check, **regresión responsive (scroll horizontal en móvil, touch targets, layout roto a 375px) — regresión = build rojo**
 - Cobertura mínima por crate/módulo como gate configurable
 - Flaky-quarantine automática ([H·H.8](./plan-h-motor-pruebas.md#h8)) aplicada también a suites humanas
 - Revisión trimestral de deuda: knip + clippy pedantic + auditoría de TODOs (deben ser cero o documentados)

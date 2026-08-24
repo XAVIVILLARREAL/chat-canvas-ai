@@ -15,6 +15,7 @@
 - **MATRIZ regenerada: 112 fases** (95 A–P + 17 S/T/U) en orden de ejecución, regla dura "fase GUI ⇒ [E]+[H]", presupuesto **máx $20/gate** con APIs reales (resto mock-first)
 - Cross-refs rotos reparados: A.9→A.4 fork · C.7→router C.2 · plan-s→C.2 · H.9 enlace inválido · plan-u link a plan-kr inexistente → referencia a Etapa 17
 - Rangos de fases de la tabla maestra corregidos (B.1–B.9, F.0–F.7, G.1–G.7, H.1–H.9, L.1–L.4, N.1–N.7); estimación recalibrada a ~24–32 semanas
+- **RESPONSIVE TOTAL endurecido**: regla transversal dura en AGENTS.md + SDD-002 + plan-t (T.A11Y/T.QA) + README (regla 11) + matriz — TODAS las pantallas/secciones/ventanas mobile-first, verificadas en móvil 375 + desktop 1440 en cada gate (suite humana responsive); no existe pantalla "solo desktop"
 
 - **SDD-010 Modelo de Negocio** (3 investigaciones paralelas: outcome-pricing · growth devtools · costos hosting):
 - 3 ESCENARIOS soportados por el mismo codebase ADR-005: A todo-local (Ollama en tu máquina→Tauri su hogar natural, SKU posterior) · B servidor propio (web-first ideal) · C nube gestionada (el negocio recurrente)

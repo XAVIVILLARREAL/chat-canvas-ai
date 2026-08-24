@@ -3,7 +3,7 @@
 > Generada de los planes (fuente de verdad). **Regenerar en CADA cambio de fases** (regla de ejecución #10 del [README](./README.md)).
 > Orden = ORDEN DE EJECUCIÓN maestro (no alfabético): así la matriz es también el checklist de construcción.
 > Capas por fase: **[U]**nit vitest · **[I]**ntegración cargo/mock · **[E]**2E Playwright · **[H]**umana suite modo persona.
-> **Reglas duras**: fase GUI ⇒ **[E]+[H] obligatorias** · fase sin fila aquí NO se construye · presupuesto APIs reales **máx $20/gate** (el resto mock-first ~$0) · evidencia de gate = video + `evidence/`.
+> **Reglas duras**: fase GUI ⇒ **[E]+[H] obligatorias** · **toda fase GUI se prueba en móvil 375px + desktop 1440px** (suite humana `responsive-human.spec.ts` en cada gate — no hay pantalla "solo desktop") · fase sin fila aquí NO se construye · presupuesto APIs reales **máx $20/gate** (el resto mock-first ~$0) · evidencia de gate = video + `evidence/`.
 
 ## Etapa 1 · Chat núcleo Codex + tenants — `plan-a-chat-codex.md`
 | Fase | Nombre | Pruebas |
@@ -177,9 +177,9 @@
 | Fase | Nombre | Pruebas |
 |---|---|---|
 | T.SEC | Seguridad profesional | CI falla si cargo-audit encuentra CVE crítico. Integration: intento de XSS vía respuesta del agente → neutralizado. Suite path-traversal completa verde |
-| T.A11Y | A11Y + i18n (es/en) | axe-core gate en CI (violación seria = rojo). E2E HUMANA dual idioma. Auditoría contraste en cada tema |
+| T.A11Y | A11Y + i18n (es/en) + **RESPONSIVE TOTAL** | axe-core gate en CI (violación seria = rojo). E2E HUMANA dual idioma. Auditoría contraste en cada tema. **Suite humana responsive (375/768/1440) re-corrida en CADA gate — todas las pantallas operables en móvil** |
 | T.ONB | Onboarding que convierte | E2E HUMANA: usuario nuevo → primer agente trabajando <5 min sin documentación externa |
-| T.QA | Calidad continua (anti-deuda) | Pipelines con gates activos (budgets perf, cobertura mínima, flaky-quarantine). Dashboard de tendencia |
+| T.QA | Calidad continua (anti-deuda) | Pipelines con gates activos (budgets perf + **regresión responsive en CI**: scroll horizontal en móvil, touch targets, layout a 375px = build rojo). Dashboard de tendencia |
 | T.BIZ | Comercial y legal (antes de v1.0) | Flags verificados; bundle Free NO incluye código Pro compilado; docs legales revisadas |
 
 ## Transversal U · Dopaminérgico — `plan-u-motivacion.md` (U.1 con F.0; resto tras cada ventana)
