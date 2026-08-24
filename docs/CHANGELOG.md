@@ -4,6 +4,7 @@
 
 ## 2026-08-24 (sesion 20)
 
+- **SÍNTESIS (sesión unificada)**: integrados PLAN V (Visual GrokBot) + Consejo de Expertos (VI.5–VI.7) — la "pregunta con opciones" es UNA primitiva visual compartida (aprobaciones del agente V.2 = radio-cards del Consejo VI.6, con cross-links en plan-v y SDD-005); los avatares geométricos deterministas de V.1 aplican también a los expertos auditores; README v3.7 (16 etapas, ~124 fases) con fila Etapa 16 + regla 13 RENDERER AGNÓSTICO (SpatialMeta en F.0/F.4, cadena 2D→3D→gafas sin refactor)
 - **SDD-005 PLAN VI ampliado — CONSEJO DE EXPERTOS (VI.5–VI.7)** en Canvas Planeación: 5 skills auditores visuales (🔐 ciberseguridad · 🎨 frontend · 🏗️ infraestructura · 📈 escalabilidad · 🧭 arquitectura, + creables por usuario) con tool-gating READ-ONLY [G·G.2] e identidad viva [G·G.7]; auditoría EN PARALELO con panel derecho de preguntas-opciones en cards animadas; responder aplica rung DECISION [D·D.4] + diff aceptable al .md; cards-debate ante conflictos entre expertos; juice dopaminérgico [U·U.1/U.3] (micro-vida, cascada por respuesta, variantes aleatorias, score de madurez, Acta del Consejo) con cero dark patterns. GATE VI ampliado; estimación intermedio ~10–12 sem (VI: 4–5). README maestro sincronizado (espacios reservados)
 
 ## 2026-08-24

@@ -1,6 +1,6 @@
 # SDD-001 · Roadmap Maestro — Empresa Dev
 
-> Fecha: 2026-08-24 · Estado: Activo · v3.6 MEGA-PLAN (15 etapas + P, ~117 fases)
+> Fecha: 2026-08-24 · Estado: Activo · v3.7 MEGA-PLAN (16 etapas + P, ~124 fases)
 > Investigación profunda: OpenAI Codex (docs oficiales), Reasonix v1.23 (verificado EN VIVO en este servidor), V3Code (sitio oficial + spec copia.md), **Grok Bot xAI/Cursor** ([SDD-004](../SDD-004-analisis-grokbot.md): group chat de agentes, rutinas por demostración, proactividad, pipeline de bugs) + patrones de varve/codevira.
 > Pruebas: [SDD-002](../SDD-002-testing-spec-driven.md) — toda fase pasa las 4 capas; todo gate cierra con suite humana.
 
@@ -42,6 +42,7 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 | 13 | GitHub nativo | [plan-m](./plan-m-github.md) | M.1–M.3 | Push/pull/PRs sin terminal |
 | 14 | Empresas autónomas | [plan-n](./plan-n-empresas-autonomas.md) | N.1–N.7 | Empresa completa operada por agentes |
 | 15 | Marketplace + MCP público + v1.0 | [plan-o](./plan-o-marketplace-v1.md) | O.1–O.3 | Empresas empaquetables, release 1.0 |
+| 16 | Canvas Planeación + **Consejo de Expertos** | [plan-intermedio](../SDD-005-plan-intermedio.md) | VI.1–VI.7 | Grafo vivo de los .md (segundo cerebro) + 5 skills auditores visuales (ciberseguridad/frontend/infra/escalabilidad/arquitectura) que auditan el plan EN PARALELO con preguntas-opciones |
 | P | **Centro MCP transversal** | [plan-p](./plan-p-centro-mcp.md) | P.1–P.4 | Conectar herramientas externas sin tocar JSON (o pegándolo) |
 | S | **Despliegue/Costos/Stack eficiente** | [plan-s](./plan-s-despliegue-costos.md) | S.1–S.4 | Hosting 3 etapas ($16→$600/mes), stack Rust fijado, patrones Tauri — datos ago-2026 |
 | T | **Excelencia transversal** | [plan-t](./plan-t-excelencia.md) | T.SEC/T.A11Y/T.ONB/T.QA/T.BIZ | Seguridad profesional, i18n, onboarding <5min, calidad continua, comercial/legal |
@@ -293,7 +294,7 @@ La base YA deja los ganchos que las ventanas futuras necesitan — sin tablas nu
 - `event_stream` con `TEST_RESULT` → alimentará el **Kanban de resultados animados** (Etapa 17)
 - `documents/knowledge` ([D·D.2](./plan-d-memoria-v3code.md#d2)) + índice dual ([D·D.5](./plan-d-memoria-v3code.md#d5)) → alimentarán el **Grafo de documentos estilo Obsidian** (Etapa 16) + **Consejo de Expertos** (VI.5–VI.7: skills auditores — ciberseguridad/frontend/infra/escalabilidad/arquitectura — que auditan el plan en paralelo con preguntas-opciones dopaminérgicas)
 - Sesiones/rungs navegables ([D·D.3](./plan-d-memoria-v3code.md#d3)) → alimentarán la **Control Room** (Etapa 18)
-- Three.js + pagerank ([PLAN J](./plan-j-grafo3d-repomap.md)) + layouts persistidos desde F/VI → terreno listo para **3D/gafas** (Etapa 19)
+- **`SpatialMeta` en Design System (F.0)** + posiciones persistidas en `event_stream` (F.4) → terreno espacial listo desde Etapa 6. Three.js + pagerank ([PLAN J](./plan-j-grafo3d-repomap.md)) reutiliza estas posiciones → **3D/gafas** (Etapa 19) sin refactor. La cadena completa: `SpatialMeta(F.0) → ReactFlow 2D(F.1) → persistencia(F.4) → Three.js 3D(J.3) → gafas(3D.1-3D.2)`
 Regla: cada ventana futura es una VISTA sobre estos datos; prohibido duplicar.
 
 ## ORDEN DE EJECUCIÓN MAESTRO (los números de fase son IDs estables; esta es la secuencia de construcción)
@@ -353,3 +354,4 @@ copia.md queda COMPLETAMENTE minado. Backlog del torneo conserva lo no-promovido
 10. **La matriz se regenera en CADA cambio de fases**; una fase sin fila en la matriz no se construye
 11. **RESPONSIVE TOTAL (transversal dura)**: TODAS las pantallas/secciones/ventanas son mobile-first y operables en celular — toda fase GUI se verifica en móvil 375 + desktop 1440 (suite humana `responsive-human.spec.ts` en cada gate); no existe pantalla "solo desktop"; un gate con mobile rojo NO cierra
 12. **CÓMPUTO CLIENT-FIRST (transversal dura, escalabilidad)**: todo cómputo que PUEDA correr en el cliente corre en el cliente (render, búsqueda local FTS/vectorial, indexación AST WASM, canva WebGPU, LLM local Ollama) — el servidor solo ejecuta lo central (agentes 24/7, estado autoritativo, sync, repos, secretos); el servidor escala con los DATOS, no con la CPU de cada usuario (tabla en ARQUITECTURA.md)
+13. **RENDERER AGNÓSTICO (transversal dura, preparación 3D/gafas)**: toda UI visual se construye con **primitivas del Design System** (F.0) y **tipos de dominio con `SpatialMeta`**, NO con componentes específicos de un renderer. El renderer (ReactFlow 2D → Three.js 3D → WebXR gafas) es un "executor" intercambiable — los componentes y datos NO cambian al cambiar de renderer. Cadena: `Design System primitives → ReactFlow (2D) → Three.js (3D) → WebXR (gafas)`

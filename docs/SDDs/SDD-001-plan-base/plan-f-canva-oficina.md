@@ -14,6 +14,20 @@
 - **Status bar global inferior** (patrón Zed/Vim): modelo activo · contexto usado% · coste sesión · rama git · estado sync · agentes corriendo — información mirable de reojo, cero clicks
 - Motion spec único: duraciones/easing globales, respeta `prefers-reduced-motion`
 - La IA aplica los skills de `reference/` SOBRE estos tokens (nunca CSS improvisado)
+- **SpatialMeta (primitiva transversal 3D/gafas):** toda componente visual que se renderice en el canvas lleva un campo `spatial?: SpatialMeta` en su tipo:
+```typescript
+interface SpatialMeta {
+  x: number;          // posición horizontal (ReactFlow la maneja en 2D)
+  y: number;          // posición vertical
+  z?: number | null;  // profundidad — null en 2D, populated en 3D (force-directed o manual)
+  cluster?: string;   // agrupación semántica (ej: "agents", "docs", "tasks")
+  camera?: {          // vista al enfocar este nodo
+    position: [number, number, number];
+    target: [number, number, number];
+  };
+}
+```
+En 2D: `z` es `null`, ReactFlow ignora `cluster` y `camera`. En 3D: se calcula `z` con force-directed y `camera` se define. **Sin refactor al cambiar de renderer.** Todas las ventanas (Oficina, Planeación, Kanban, Control Room) heredan esta primitiva — el tipo se define en F.0 y se reutiliza en Etapas 6-19.
 - **Pruebas:** Vitest tokens/primitivas. E2E humano: contraste AA automatizado, toast deshace acción destructiva, status bar refleja modelo/coste reales
 
 ### F.1 — Fundaciones ReactFlow
@@ -40,7 +54,8 @@
 - Nodos-tarea vinculados al event_stream ([D·D.1](./plan-d-memoria-v3code.md#d1))
 - Vista tablero Kanban (todo/doing/review/done) sincronizada bidireccionalmente con el canva (mismo store, dos vistas)
 - Drag de tarea entre columnas actualiza estado real
-- **Pruebas:** E2E humano: drag tarea todo→doing→done; verificar persistencia tras reinicio
+- **Persistencia espacial (regla terreno 3D/gafas):** al arrastrar un nodo, su `SpatialMeta` (x, y, cluster) se guarda en `event_stream` o tabla `spatial_layout` — NO solo en el store de ReactFlow. Las posiciones SOBREVIVEN reinicios y están disponibles para el visor 3D (Etapa 10/19). El gate F.4 no cierra sin esto.
+- **Pruebas:** E2E humano: drag tarea todo→doing→done; **arrastrar nodo → recargar app → posición conservada**; verificar que `event_stream` tiene el registro de la posición
 
 ### F.5 — Identidad visual dirigida por IA
 - La IA (usando skills de `reference/`) elige estilo por pantalla: paleta ui-ux-pro-max + pulido impeccable + vidrio liquid-glass donde aporte

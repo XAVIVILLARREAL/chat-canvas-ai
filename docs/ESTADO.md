@@ -31,6 +31,7 @@ Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan 
 
 ## Ultimos cambios
 
+- 2026-08-24: **SÍNTESIS v3.7** — PLAN V (Visual GrokBot) + Consejo de Expertos (VI.5–VI.7) unificados: primitiva única de "preguntas con opciones", avatares geométricos para auditores también; README 16 etapas ~124 fases; regla 13 renderer agnóstico (SpatialMeta); pendiente push de la sesión concurrente integrado
 - 2026-08-24: **PLAN V (v3.6) — Visual GrokBot**: la capa social visual de Grok Bot añadida al plan base — chat-first desks, identidad por avatar geométrico, estados 2 capas, actividad inline con aprobaciones numeradas, group chat con handoffs; matriz ahora 117 fases
 - 2026-08-24: **Arquitectura v3.5 + CÓMPUTO CLIENT-FIRST** — regla transversal #12 (búsqueda/indexación/canva/LLM local al cliente); ARQUITECTURA.md reescrita (sin backend Python; web-first Rust); INFRA.md corregido; ADR-002 superado en parte; stack validado por investigación (axum 0.8.9/tokio 1.53/sqlx 0.9/rustls 0.23, sin BFF Node, Go plan B)
 - 2026-08-24: **RESPONSIVE TOTAL** — regla dura en AGENTS.md/SDD-002/plan-t/README/matriz: toda pantalla mobile-first verificada en 375/768/1440 en cada gate

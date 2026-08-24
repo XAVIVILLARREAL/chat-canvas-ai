@@ -70,7 +70,7 @@ Seleccionar N nodos → "sintetizar" genera doc-resumen enlazado (agente barato)
 <a id="vi6"></a>
 ### VI.6 — Panel del Consejo: auditoría EN PARALELO + preguntas con opciones
 - **Los N expertos trabajan EN PARALELO** (una sesión por experto vía provider [C·C.1](./SDD-001-plan-base/plan-c-reasonix-deepseek.md#c1); subagentes reasonix `review`/`security-review` como motor barato donde aplique): mientras piensan, su personaje pulsa "ocupado" y sus hallazgos caen en vivo al panel
-- **Panel derecho "Consejo"**: inbox de cards/bloques ANIMADOS — cada card = 1 pregunta con contexto citado, **OPCIONES clicables** (2–4 radio-cards + "otra…" texto libre + "posponer"); agrupadas por experto con ProgressRing de avance ([U·U.1](./SDD-001-plan-base/plan-u-motivacion.md#u1)); eliges con clicks, sin teclear si no quieres
+- **Panel derecho "Consejo"**: inbox de cards/bloques ANIMADOS — cada card = 1 pregunta con contexto citado, **OPCIONES clicables** (2–4 radio-cards + "otra…" texto libre + "posponer"); agrupadas por experto con ProgressRing de avance ([U·U.1](./SDD-001-plan-base/plan-u-motivacion.md#u1)); eliges con clicks, sin teclear si no quieres · **usa la MISMA primitiva visual de opciones numeradas que [PLAN V·V.2](./SDD-001-plan-base/plan-v-visual-grokbot.md#v2)** (aprobaciones del agente y preguntas del Consejo comparten componente)
 - **Responder REFINA EL PLAN**: cada respuesta queda como rung DECISION gobernada ([D·D.4](./SDD-001-plan-base/plan-d-memoria-v3code.md#d4)) y dispara al experto a ACTUALIZAR el .md correspondiente — SIEMPRE con diff previo aceptable por el humano (mismo contrato que [VI.4](#vi4)); nodos-fase/etapa nuevos sugeridos se crean como propuesta enlazada
 - **Cards-debate ante conflictos entre expertos** (p.ej. 🔐 seguridad vs 🎨 velocidad de entrega): ambos exponen punto + trade-off y proponen síntesis; tú eliges opción A/B/síntesis/custom — la discrepancia queda documentada como decisión, no se pierde
 - Barra de progreso global del consejo · responder en cualquier orden · cerrar el panel NO mata sesiones (siguen en background con badge de pendientes)
@@ -178,8 +178,31 @@ Demo de misión control: 4 proyectos vivos, agentes trabajando en 3; el mapa mue
 
 <a id="3d1"></a>
 ### 3D.1 — Modelo espacial transversal
-Todas las ventanas guardan `{x,y,z?,cluster,camera}` en el modelo de datos; exportador a formato escena (JSON espacial) común para las 4 ventanas
-- **Pruebas:** Unit schema escena. Roundtrip export/import
+Todas las ventanas usan el tipo `SpatialMeta` definido en [F.0](./SDD-001-plan-base/plan-f-canva-oficina.md#f0) y lo persisten desde [F.4](./SDD-001-plan-base/plan-f-canva-oficina.md#f4). El schema formal:
+
+```typescript
+// Tipo definido en F.0, reutilizado por todas las ventanas
+interface SpatialMeta {
+  x: number;          // posición horizontal
+  y: number;          // posición vertical
+  z?: number | null;  // profundidad (null en 2D, calculada en 3D)
+  cluster?: string;   // agrupación semántica
+  camera?: { position: [number, number, number]; target: [number, number, number] };
+}
+
+// Persistencia: cada ventana guarda SpatialMeta en su tabla/evento correspondiente
+// - Oficina (F.4): event_stream con tipo SPATIAL_POSITION
+// - Planeación (VI.2): tabla documents con columna spatial JSONB
+// - Kanban (KR.1): event_stream con tipo SPATIAL_POSITION
+// - Control Room (CR.2): event_stream con tipo SPATIAL_POSITION
+```
+
+**Reglas de persistencia:**
+1. `z` es `null` en 2D — ReactFlow ignora; Three.js lo calcula con force-directed
+2. Al hacer drag → `SpatialMeta` se guarda inmediatamente (no al cerrar sesión)
+3. Force-directed al abrir respeta posiciones humanas (si hay `z` guardado, úsalo; si no, calcular)
+4. Exportador a JSON espacial común (escena) para las 4 ventanas — roundtrip export/import
+- **Pruebas:** Unit schema SpatialMeta + persistencia. Integration: drag nodo → recargar → posición conservada. Roundtrip export/import de escena completa
 
 <a id="3d2"></a>
 ### 3D.2 — Visor 3D unificado (prototipo)

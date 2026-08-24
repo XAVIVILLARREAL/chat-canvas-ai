@@ -23,7 +23,7 @@
 
 <a id="v1"></a>
 ### V.1 — Identidad por avatar geométrico + estados en 2 capas (con [F·F.0]/[G·G.7])
-- **Avatar geométrico único por agente**: forma (triángulo/hexágono/círculo/rectángulo/nube/puntos) + color de identidad por defecto — el color NO es estado, es QUIÉN; los avatares IA generados de [G·G.7] conviven (el geométrico es el fallback determinista)
+- **Avatar geométrico único por agente**: forma (triángulo/hexágono/círculo/rectángulo/nube/puntos) + color de identidad por defecto — el color NO es estado, es QUIÉN; los avatares IA generados de [G·G.7] conviven (el geométrico es el fallback determinista) — aplica también a los expertos del [Consejo](../SDD-005-plan-intermedio.md#vi5) (cada auditor se VE como especialista con su color de departamento)
 - **Capa de estado separada y explícita**: puntos animados rebotando = trabajando · icono "needs attention" (pregunta/aprobación/handoff) · badge azul = no leído · marca en la fila = desk activo
 - Edición de identidad desde el chat (header → agent settings): name, title, description, avatar, notifications — complementa [G·G.7] y [F·F.2] (nodos)
 - **Pruebas:** E2E HUMANA: identificar de un vistazo cuál agente trabaja, cuál espera aprobación y cuál tiene no-leído (sin leer texto); editar el perfil desde el chat y ver el cambio reflejado en sidebar + canva + group chat; caída de IA → avatar geométrico determinista
@@ -31,7 +31,7 @@
 <a id="v2"></a>
 ### V.2 — Actividad INLINE en el hilo (complementa [A·A.4]/[B·B.4])
 - Tools ejecutadas, archivos creados, diffs y resultados aparecen **dentro del hilo** junto a los mensajes (no solo en paneles); el panel es el zoom, el hilo es el flujo
-- **Aprobaciones como opciones numeradas inline**: "¿Dónde guardo el rate-limiter? ▸ 1. Redis · 2. En memoria · 3. Valkey" — un tap responde; complementa las cards de tool-call de [A·A.4]
+- **Aprobaciones como opciones numeradas inline**: "¿Dónde guardo el rate-limiter? ▸ 1. Redis · 2. En memoria · 3. Valkey" — un tap responde; complementa las cards de tool-call de [A·A.4] · **el mismo patrón lo usa el Consejo de Expertos** ([SDD-005 VI.6](../SDD-005-plan-intermedio.md#vi6): radio-cards de opciones con contexto citado) — UNA primitiva de opciones para aprobaciones Y auditorías
 - Glifos de estado compactos en el hilo: `⋅` trabajando · `◇` idle · `◆` esperando aprobación
 - **Pruebas:** E2E HUMANA: responder una aprobación de opciones numeradas con UN tap; el archivo creado por el bot se ve inline y se abre con un click ([B·B.4]); el hilo muestra el flujo completo sin depender de abrir paneles
 
