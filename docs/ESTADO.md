@@ -32,6 +32,8 @@ Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **Plan 
 
 ## Ultimos cambios
 
+- 2026-08-24: **FIX móvil (regla #11)** — el panel ya NO se oculta en ≤640px (`display:none` introducido por la reescritura Obsidian Glass): se apila bajo la Oficina con scroll natural (`src/styles.css` bloque RESPONSIVE). Suite humana vuelve a **12/12** (boot + create-agent fallaban en mobile). 3 avisos biome `noImportantStyles` pre-existentes en reduced-motion quedan documentados como deuda menor (patrón a11y canónico).
+
 - 2026-08-24: **VI.8 Discovery Hub agregado a SDD-005** — explorador GitHub (búsqueda, preview README, clonar, agregar como referencia nodal) + Repo Scout IA proactiva (sugiere repos según contexto del proyecto, mapea edges al grafo) + panel de repos guardados. Panel inferior derecho del Canvas Planeación.
 - 2026-08-24: **SDD-013 GUI Visual Spec creado** — paleta "Obsidian Glass" (oklch), motion spec con física real, Liquid Glass 4 capas, componentes (GlassCard/AgentNode/AnimatedBeam/Toast/CommandPalette), checklist de calidad F.5. Integrado en F.0, PLAN U, y styles.css reescrito con tokens.
 - 2026-08-24: **GUI v3.9 — SDD-013 "Obsidian Glass" integrado y fundido**: fuente canónica visual en README/matriz/F.0/V/U/K.3/T.A11Y/A.4; tokens en src/styles.css; checklist §7 auditado en F.5

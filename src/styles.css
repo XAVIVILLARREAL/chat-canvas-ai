@@ -753,10 +753,20 @@ body {
 @media (max-width: 640px) {
   .app-main {
     grid-template-columns: 1fr;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
+  /* Regla #11 (responsive total): el panel NUNCA se oculta en móvil —
+     se apila bajo la Oficina y se alcanza con scroll natural (SDD-013). */
   .panel {
-    display: none;
+    border-left: none;
+    border-top: 1px solid var(--glass-border);
+    padding: var(--space-4);
+  }
+
+  .canvas-section {
+    min-height: 55vh;
   }
 
   .agents-grid {
