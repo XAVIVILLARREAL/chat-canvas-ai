@@ -27,6 +27,13 @@
 - **PLAN T Excelencia transversal creado**: T.SEC seguridad profesional (keyring OS, CSP, cargo-audit+deny+SBOM en CI, modelo de amenazas) · T.A11Y+i18n (axe-core gate CI, es/en central desde el primer componente) · T.ONB (primera corrida guiada, proyecto ejemplo, primer agente <5min) · T.QA calidad continua (budgets de perf en CI = build rojo si regresa, flaky-quarantine también humana, revisión trimestral deuda) · T.BIZ comercial/legal (open-core MIT/Apache + Pro flaggeado, ToS/privacy, telemetría opt-in)
 - Totales finales: 18 planes · ~95 fases · 77 anclajes · 0 rotos
 
+## 2026-08-23 (sesion 15)
+
+- **PLAN U Sistema de Progreso Dopaminérgico creado**: micro-feedback en ejecución (tick por test pasado, pop por criterio cumplido, pulso por tool-call), celebraciones escalonadas (tarea→tarjeta vuela / GATE→confetti+resumen / empresa entrega→overlay completo con stats), progresión XP solo por resultados VERIFICADOS + niveles de agente + rachas honestas + recap semanal estilo Wrapped generado del Ledger
+- Intensidad configurable (Apagado/Sutil/Normal/Festivo) respeta reduced-motion y silencio
+- U.5 Tuning responsable: A/B interno sobre retención propia, anti-patrones PROHIBIDOS explícitos (logros falsos, culpa de racha, urgencia artificial), métrica norte = sesiones que terminan en ENTREGA no tiempo-en-app
+- AGENTS.md: principio de MOTIVACIÓN añadido a la sección visual
+
 ## 2026-08-23
 
 - **SDD-003 Torneo de ideas**: 500 ideas generadas de productos de mercado (25 categorías × 20) → eliminatoria por categoría → 10 debates cruzados documentados → **20 ganadoras** con rúbrica Valor/Viabilidad/Mantenibilidad/Encaje ≥17
