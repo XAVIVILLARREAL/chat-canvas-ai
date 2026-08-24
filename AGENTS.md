@@ -507,6 +507,8 @@ Cada proyecto de desarrollo (tenant, [A.0]) tiene SU PROPIO conjunto de ventanas
 3. **📋 KANBAN DE RESULTADOS** (Plan Intermedio, Etapa 17) — tipo Jira pero optimizado para agentes: cards y bloques ANIMADOS mostrando evidencia (tests Playwright pasando/fallando, resultados por etapa); orientado a dejar a la IA trabajando horas autónomamente y ver qué se consiguió.
 4. **🎛️ CONTROL ROOM** (Plan Intermedio, Etapa 18 — fusiona sesiones+mapa global) — TODAS las sesiones de agentes como cards vivas (hablar TTS/STT, ver resultados, retomar) sobre el mapa maestro GLOBAL de todos los proyectos en acción: métricas vivas, órdenes por voz/texto enrutadas al destino correcto, modo vigilancia de excepciones. Mission control del sistema entero.
 
+**Principio de MOTIVACIÓN (PLAN U)**: la interfaz convierte cada proceso en una escalera de micro-victorias VERIFICABLES (test ✓ → criterio → tarea → gate → nivel) — dopamina por progreso real del Ledger, nunca actividad vacía; intensidad configurable Apagado/Festivo y anti-dark-patterns prohibidos por plan.
+
 **Regla transversal**: toda la capa visual se construye con tokens/primitivas del Design System ([F.0]) y con estructuras de datos ESPACIALMENTE listas (posiciones, clusters, profundidades) para proyección futura en 3D/gafas (Etapa 10 Three.js es la primera; las demás ventanas heredan la preparación).
 
 Detalle completo y fases: `docs/SDDs/SDD-005-plan-intermedio.md` · El Canvas Planeación (V2) alimenta Kanban/motor; la Control Room (V5) unifica todos los proyectos.

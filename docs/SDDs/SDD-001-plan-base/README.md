@@ -45,6 +45,7 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 | P | **Centro MCP transversal** | [plan-p](./plan-p-centro-mcp.md) | P.1–P.4 | Conectar herramientas externas sin tocar JSON (o pegándolo) |
 | S | **Despliegue/Costos/Stack eficiente** | [plan-s](./plan-s-despliegue-costos.md) | S.1–S.4 | Hosting 3 etapas ($16→$600/mes), stack Rust fijado, patrones Tauri — datos ago-2026 |
 | T | **Excelencia transversal** | [plan-t](./plan-t-excelencia.md) | T.SEC/T.A11Y/T.ONB/T.QA/T.BIZ | Seguridad profesional, i18n, onboarding <5min, calidad continua, comercial/legal |
+| U | **Progreso Dopaminérgico** | [plan-u](./plan-u-motivacion.md) | U.1–U.5 | Micro-victorias verificables, celebraciones escalonadas, niveles/rachas/recap — intensidad configurable, cero dark patterns |
 | C.5+D.8+H.9+A.6 | **Motor Contexto/Memoria/Caché configurable** | [SDD-006 investigación](../SDD-006-investigacion-cache-memoria.md) → fases en plan-c/d/h/a | — | KV-caché, compresión, memorias multi-tipo y respaldos por rol en 5 scopes |
 
 ```
