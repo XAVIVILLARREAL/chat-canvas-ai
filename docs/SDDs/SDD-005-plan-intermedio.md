@@ -1,6 +1,7 @@
 # SDD-005 · PLAN INTERMEDIO — Las 4 Ventanas visuales del proyecto
 
-> Fecha: 2026-08-23 · Estado: Propuesto · **Es el plan que SIGUE a la [base](./SDD-001-plan-base/README.md)** — se ejecuta tras cerrar Gate F (canva base) y alimenta a N (empresas lo usan todo)
+> Fecha: 2026-08-23 · Estado: Propuesto → **v3.8 (2026-08-24): INTERCALADO** — NO es "el plan que sigue a la base": es un **carril de vistas** que se construye ENTRE fases base (VI tras F/G, KR tras H, 3D tras J, CR al final paralelo a N/O). Ratificado por el usuario 2026-08-24.
+> **Absorbe del base (v3.8)**: **J.3** (visor 3D → sección 3D) y **K.1/K.2** (voz TTS/STT → las consume CR). **K.3** (política de interrupción) SE QUEDA en la base.
 > Lógica de negocio documentada en AGENTS.md §"Las 4 Ventanas". Pruebas según [SDD-002](./SDD-002-testing-spec-driven.md).
 
 ## Objetivo
@@ -61,6 +62,7 @@ Seleccionar N nodos → "sintetizar" genera doc-resumen enlazado (agente barato)
 **El sistema de skills visual dentro del Canvas Planeación:** un consejo de expertos invocables que AUDITAN tu plan, detectan lo que no viste y te hacen preguntas para definir lo indefinido — refinando el plan cada vez más.
 
 - **Roster inicial de 5 expertos** (skills precargados en biblioteca GLOBAL [G·G.1](./SDD-001-plan-base/plan-g-skills-lab.md#g1), copiables a local [A·A.0](./SDD-001-plan-base/plan-a-chat-codex.md#a0)): 🔐 **Ciberseguridad** · 🎨 **Frontend** · 🏗️ **Infraestructura** · 📈 **Escalabilidad** · 🧭 **Arquitectura** — cada uno con conocimiento profundo de dominio (system-prompt curado + checklist propio de auditoría) y creables/editables en Skills Lab como cualquier skill; el usuario puede sumar sus propios expertos (legal, finanzas, UX…)
+- **ADELANTADO como DOGFOOD (v3.8)**: VI.5–VI.7 se construyen en cuanto existan G.1/G.2 (Gate G de la base) y se usan para **AUDITAR los gates de la propia base** — el Consejo revisa el plan maestro mientras se construye (comer nuestro propio dogfood); el primer gate auditado es el propio Gate G
 - Cada experto es un skill estándar con **tool-gating estricto READ-ONLY** sobre `documents`/knowledge ([G·G.2](./SDD-001-plan-base/plan-g-skills-lab.md#g2)) — audita y pregunta, JAMÁS escribe sin aprobación humana
 - **Identidad viva total** ([G·G.7](./SDD-001-plan-base/plan-g-skills-lab.md#g7)): avatar IA, emoji-firma, mini-bio con personalidad, color de departamento ([F·F.0](./SDD-001-plan-base/plan-f-canva-oficina.md#f0) tokens) — el experto SE VE como especialista real, no como un menú
 - **Invocación desde el grafo**: seleccionas nodo(s) ETAPA/FASE/PLAN → "Auditar con…" (elige 1 experto) o "Convocar al consejo" (todos); los expertos aparecen como personajes-nodo alrededor del subgrafo auditado (posiciones persistidas [VI.2](#vi2)); también invocables desde ⌘K ([F·F.7](./SDD-001-plan-base/plan-f-canva-oficina.md#f7))
@@ -211,15 +213,17 @@ Reutiliza el motor de [PLAN J](./plan-j-grafo3d-repomap.md#j3) para navegar graf
 
 **🚪 GATE 3D:** prototipo navegable del "mundo Empresa Dev" en 3D con los documentos, el tablero y las sesiones flotando por clusters — prueba de concepto para gafas. Video.
 
-## Estimación del Plan Intermedio
+## Estimación del Plan Intermedio (intercalado v3.8)
 
-| Plan | Semanas |
-|---|---|
-| VI Grafo documentos + **Consejo de Expertos (VI.5–VI.7)** | 4–5 |
-| KR Kanban resultados | 2–2.5 |
-| CR Control Room (sesiones+mapa+órdenes fusionadas) | 2.5–3 |
-| 3D preparación | 1–1.5 |
-| **Total intermedio** | **~10–12 semanas** (VI/KR paralelos tras F+H; CR al final — es la vista que unifica) |
+| Plan | Semanas | Cuándo (intercalado en la base) |
+|---|---|---|
+| VI.1–VI.4 Canvas Planeación | 2.5–3 | tras Gate F |
+| VI.5–VI.7 **Consejo de Expertos** | 1.5–2 | tras Gate G — DOGFOOD: audita los gates de la base |
+| KR Kanban resultados | 2–2.5 | tras Gate H (KR.3 tras N.3/N.6) |
+| 3D (3D.1 + **J.3** + 3D.2) | 1.5–2 | tras Gate J |
+| Voz (**K.1/K.2**) | 1 | junto a CR |
+| CR Control Room | 2.5–3 | al final (paralelo a N/O) — la vista que unifica |
+| **Total intermedio** | **~11–13 semanas** | intercaladas en la línea de la base (no suman a su camino crítico completo) |
 
 ## Reglas
 

@@ -118,12 +118,11 @@
 | I.5 | Reflect (aprender de sesiones pasadas) | Integration corpus sintético: 3 correcciones plantadas → propuesta generada una sola vez (dedup). E2E: propuesta visible → acepto → aparece como knowledge activo |
 | I.6 | Proactividad + pipeline de bugs | Integration: bug plantado en fixture → tarea creada con repro correcta y asignada. E2E HUMANA: sugerencia proactiva visible → acepto → pipeline ejecuta completo |
 
-## Etapa 10 · Grafo 3D Repo-Map — `plan-j-grafo3d-repomap.md`
+## Etapa 10 · Grafo 3D Repo-Map — `plan-j-grafo3d-repomap.md` (J.1–J.2 en base · **J.3 → INTERMEDIO 3D**, v3.8)
 | Fase | Nombre | Pruebas |
 |---|---|---|
 | J.1 | Indexador AST (**client-first: también WASM/web-tree-sitter**) | Cargo test con fixture multi-archivo TS/Rust: símbolos+edges correctos, pagerank orden esperado. E2E: indexado en el navegador del usuario sin servidor |
 | J.2 | Repo-map compacto | Unit presupuesto tokens (hard cap ≤1000). Integration: prompt capturado contiene mapa |
-| J.3 | Visor 3D | E2E HUMANA: rotar/zoom, click nodo abre archivo correcto; perf 60fps con 500 archivos |
 
 ## Etapa 13 · GitHub nativo — `plan-m-github.md` (ANTES que K/L)
 | Fase | Nombre | Pruebas |
@@ -140,12 +139,10 @@
 | L.4 | Push dispatcher cross-platform | Integration dispatcher con mocks APNs/FCM/VAPID. E2E HUMANA: agente termina en servidor → push llega al móvil → abrir muestra el delta correcto |
 | L.3 | Co-Work en vivo (feature-flag, post-v1) | Integration CRDT: dos docs convergen tras ediciones concurrentes. E2E: B refleja acciones de A |
 
-## Etapa 11 · Voz — `plan-k-voz.md` (al final del bloque: nice-to-have)
+## Etapa 11 · Voz — `plan-k-voz.md` (**K.3 en base** · **K.1/K.2 → INTERMEDIO CR**, v3.8)
 | Fase | Nombre | Pruebas |
 |---|---|---|
-| K.1 | TTS de respuestas | Unit cliente WS + caché de audio por hash(texto+voz). E2E con mock WS: botón aparece, cola ordena |
-| K.2 | STT dictado | E2E con mock del API: "dictado" inserta texto, editar y enviar funciona |
-| K.3 | Sonidos + política de interrupción | E2E: mock eventos → sonido correcto por tipo (spy Audio); evento menor NO suena pero aparece en digest; toggles persisten |
+| K.3 | Sonidos + política de interrupción (transversal: U.5/V.4/I) | E2E: mock eventos → sonido correcto por tipo (spy Audio); evento menor NO suena pero aparece en digest; toggles persisten |
 
 ## Etapa 14 · Empresas autónomas — `plan-n-empresas-autonomas.md`
 | Fase | Nombre | Pruebas |
@@ -165,16 +162,54 @@
 | O.2 | MCP público del cerebro | Integration real: Claude Code conectado al MCP responde preguntas del workspace usando nuestro grafo. Snapshot tests de tools |
 | O.3 | Release v1.0 | Checklist DoD gigante: todas las suites humanas históricas re-corridas en las 3 vistas; builds CI verdes; demo documental final |
 
-## INTERMEDIO · Etapa 16 · Canvas Planeación + Consejo de Expertos — `../SDD-005-plan-intermedio.md` (tras Gate F+H)
+## INTERMEDIO (INTERCALADO v3.8 — cada ventana tras su fase base habilitadora; NO después de la base) — `../SDD-005-plan-intermedio.md`
+> VI tras F/G · KR tras H · 3D tras J · K.1/K.2 con CR · CR al final (paralelo a N/O). Consejo de Expertos ADELANTADO: audita los gates de la propia base (dogfood).
+
+### Etapa 16 · Canvas Planeación — VI.1–VI.4 (tras Gate F: necesita D.2 + F.1)
 | Fase | Nombre | Pruebas |
 |---|---|---|
 | VI.1 | Modelo de documentos | Cargo test parser enlaces/headings con fixture .md real. Integration: crear/editar/borrar doc actualiza grafo |
 | VI.2 | Layout IA del grafo | Unit clustering determinista con seeds. E2E: arrastrar nodo, recargar → posición conservada |
 | VI.3 | Canvas interactivo Obsidian-style | E2E HUMANA: grafo >200 docs sin jank; buscar→subgrafo resaltado; abrir doc desde nodo; móvil 375 operativo |
 | VI.4 | Edición humano+IA sobre el grafo (ETAPA/FASE/PLAN) | Integration síntesis crea doc+edges. E2E HUMANA: selecciona 3 notas→sintetiza→edita→deshacer→re-hacer |
+
+### Consejo de Expertos — VI.5–VI.7 (ADELANTADO tras Gate G — DOGFOOD: audita los gates de la base)
+| Fase | Nombre | Pruebas |
+|---|---|---|
 | VI.5 | CONSEJO DE EXPERTOS: skills auditores visuales | Unit: skill experto compila y gating READ-ONLY bloquea escritura ([G·G.2]). E2E: convoco 2 expertos sobre nodo-PLAN → personajes conectados al subgrafo; escritura directa → bloqueada |
 | VI.6 | Auditoría EN PARALELO + preguntas-opciones | Integration: 3 expertos mock en paralelo agrupados sin cruzarse; respuesta aplica rung DECISION + diff correcto ([D·D.4]). Chaos: experto falla a mitad → marcado, resto sigue. E2E HUMANA: 5 preguntas de 3 expertos → diffs aceptados visibles en el plan |
 | VI.7 | Juice del Consejo (dopaminérgico) | Snapshot por estado de experto × intensidad. E2E: responder 3× → variantes distintas + arpegio audible (audio spy); reduced-motion → flujo completo sin partículas |
+
+### Etapa 17 · Kanban de Resultados — KR.1–KR.5 (tras Gate H; KR.3 tras N.3/N.6)
+| Fase | Nombre | Pruebas |
+|---|---|---|
+| KR.1 | Tablero de resultados (evidencia-first) | Unit estados. E2E: tarea avanza columnas automáticamente con eventos reales |
+| KR.2 | Bloques animados de pruebas | Parser resultados Playwright/vitest→eventos UI. E2E con mock runner: secuencia animada correcta |
+| KR.3 | Modo autonomía prolongada (tras N.3/N.6) | Integration: cola mock 20 tareas → consumo ordenado + corte por presupuesto. Chaos: provider cae → pausa limpia |
+| KR.4 | Vista evidencia por etapa | E2E HUMANA: recorrer evidencia completa de una tarea sin salir del kanban |
+| KR.5 | Filtros y salud del board | E2E: filtros combinados; card estancada muestra badge |
+
+### Etapa 19 · Preparación espacial + Visor 3D — 3D.1 + J.3 + 3D.2 (tras Gate J)
+| Fase | Nombre | Pruebas |
+|---|---|---|
+| 3D.1 | Modelo espacial transversal (SpatialMeta F.0/F.4) | Unit schema SpatialMeta + persistencia. Integration: drag → recargar → posición conservada. Roundtrip export/import escena |
+| J.3 | Visor 3D (movido de la base, v3.8) | E2E HUMANA: rotar/zoom, click nodo abre archivo correcto; perf 60fps con 500 archivos |
+| 3D.2 | Visor 3D unificado (grafo+kanban+sesiones en capas) | Demo navegación 3 capas; perf 60fps con datos reales |
+
+### Voz (intermedio) — K.1–K.2 (movidas de la base, v3.8; las consume CR)
+| Fase | Nombre | Pruebas |
+|---|---|---|
+| K.1 | TTS de respuestas | Unit cliente WS + caché de audio por hash(texto+voz). E2E con mock WS: botón aparece, cola ordena |
+| K.2 | STT dictado | E2E con mock del API: "dictado" inserta texto, editar y enviar |
+
+### Etapa 18 · CONTROL ROOM — CR.1–CR.5 (AL FINAL: paralelo a N/O; consume K.1/K.2 + todo)
+| Fase | Nombre | Pruebas |
+|---|---|---|
+| CR.1 | Mapa global en vivo | E2E HUMANA: 3 proyectos con actividad simulada → mapa refleja estados <1s tras cada evento |
+| CR.2 | Cards de sesión vivas | E2E HUMANA: cards aparecen/desaparecen con sesiones reales; hablar por voz desde la card y recibir TTS sin abrir el chat |
+| CR.3 | Órdenes maestras por voz/texto | Integration routing comando→destino correcto. E2E HUMANA: 5 órdenes habladas, todas enrutadas y confirmadas |
+| CR.4 | Organización espacial semántica | Unit similitud→layout sugerido. E2E: buscar agrupa/ilumina correctamente |
+| CR.5 | Alertas y modo vigilancia | E2E: inyectar severidad mixta → solo los que superan umbral aparecen; acuse limpia alerta |
 
 ## Transversal V · Visual GrokBot — `plan-v-visual-grokbot.md` (V.0 desde A.1/A.4; V.1–V.2 con F.0/G.7; V.3 con N.6; V.4 con G.6/K.3/U.5 — complementa, no quita nada)
 | Fase | Nombre | Pruebas |
@@ -215,4 +250,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 124 fases** (95 de A–P incl. H.9a/H.9b + 5 de V + 17 de S/T/U + 7 del Intermedio VI). Regenerar tras CADA cambio de fases.
+**Total: 136 fases** — **base 114** (A–P 92 incl. H.9a/H.9b, sin J.3/K.1/K.2 + V 5 + S/T/U 17) + **intermedio 22** (VI 7 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases.

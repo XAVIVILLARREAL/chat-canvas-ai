@@ -1,6 +1,6 @@
 # SDD-001 · Roadmap Maestro — Empresa Dev
 
-> Fecha: 2026-08-24 · Estado: Activo · v3.7 MEGA-PLAN (16 etapas + P, ~124 fases)
+> Fecha: 2026-08-24 · Estado: Activo · v3.8 MEGA-PLAN (16 etapas + P, ~136 fases: 114 base + 22 intermedio intercalado)
 > Investigación profunda: OpenAI Codex (docs oficiales), Reasonix v1.23 (verificado EN VIVO en este servidor), V3Code (sitio oficial + spec copia.md), **Grok Bot xAI/Cursor** ([SDD-004](../SDD-004-analisis-grokbot.md): group chat de agentes, rutinas por demostración, proactividad, pipeline de bugs) + patrones de varve/codevira.
 > Pruebas: [SDD-002](../SDD-002-testing-spec-driven.md) — toda fase pasa las 4 capas; todo gate cierra con suite humana.
 
@@ -36,13 +36,13 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 | 7 | Skills Lab | [plan-g](./plan-g-skills-lab.md) | G.1–G.7 | Crear/probar/exportar skills sin YAML |
 | 8 | Motor de pruebas y resultados | [plan-h](./plan-h-motor-pruebas.md) | H.1–H.9 | Agentes demuestran con tests, no promesas |
 | 9 | Revisión auto + Superposiciones | [plan-i](./plan-i-revision-superposiciones.md) | I.1–I.6 | El sistema detecta y corrige solo |
-| 10 | Grafo 3D Repo-Map | [plan-j](./plan-j-grafo3d-repomap.md) | J.1–J.3 | Repo entero en <1000 tokens + visual 3D |
-| 11 | Voz | [plan-k](./plan-k-voz.md) | K.1–K.3 | Hablas, los agentes responden |
+| 10 | Grafo 3D Repo-Map | [plan-j](./plan-j-grafo3d-repomap.md) | J.1–J.2 | Repo entero en <1000 tokens para el contexto (J.3 visor 3D → intermedio 3D) |
+| 11 | Voz | [plan-k](./plan-k-voz.md) | K.3 | Política de interrupción (transversal; K.1/K.2 TTS/STT → intermedio CR) |
 | 12 | Sync multi-device + Co-Work | [plan-l](./plan-l-sync-cowork.md) | L.1–L.4 | Continúas donde dejaste, en cualquier dispositivo |
 | 13 | GitHub nativo | [plan-m](./plan-m-github.md) | M.1–M.3 | Push/pull/PRs sin terminal |
 | 14 | Empresas autónomas | [plan-n](./plan-n-empresas-autonomas.md) | N.1–N.7 | Empresa completa operada por agentes |
 | 15 | Marketplace + MCP público + v1.0 | [plan-o](./plan-o-marketplace-v1.md) | O.1–O.3 | Empresas empaquetables, release 1.0 |
-| 16 | Canvas Planeación + **Consejo de Expertos** | [plan-intermedio](../SDD-005-plan-intermedio.md) | VI.1–VI.7 | Grafo vivo de los .md (segundo cerebro) + 5 skills auditores visuales (ciberseguridad/frontend/infra/escalabilidad/arquitectura) que auditan el plan EN PARALELO con preguntas-opciones |
+| 16 | Canvas Planeación + **Consejo de Expertos** | [plan-intermedio](../SDD-005-plan-intermedio.md) | VI.1–VI.7 | **INTERCALADO**: VI.1–VI.4 tras Gate F · VI.5–VI.7 (Consejo) tras Gate G — DOGFOOD: audita los gates de la base |
 | P | **Centro MCP transversal** | [plan-p](./plan-p-centro-mcp.md) | P.1–P.4 | Conectar herramientas externas sin tocar JSON (o pegándolo) |
 | S | **Despliegue/Costos/Stack eficiente** | [plan-s](./plan-s-despliegue-costos.md) | S.1–S.4 | Hosting 3 etapas ($16→$600/mes), stack Rust fijado, patrones Tauri — datos ago-2026 |
 | T | **Excelencia transversal** | [plan-t](./plan-t-excelencia.md) | T.SEC/T.A11Y/T.ONB/T.QA/T.BIZ | Seguridad profesional, i18n, onboarding <5min, calidad continua, comercial/legal |
@@ -262,6 +262,14 @@ Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: so
 - **Rutinas visibles + notificaciones persistentes**: follow-along con indicador, badge no-leído que persiste, digests como mensajes del PM (V.4 con G.6/K.3/U.5)
 - **Complementa, no quita**: Codex sigue siendo la referencia de paneles/diffs; GrokBot es la referencia de la capa social. Matriz ahora con **117 fases**
 
+### Revisión v3.8 (2026-08-24) — Plan Intermedio INTERCALADO (ratificado por el usuario)
+
+- **El intermedio deja de ser "el plan después de la base"**: pasa a ser un **carril de vistas** intercalado — cada ventana se construye justo tras su fase base habilitadora (VI tras F/G, KR tras H, 3D tras J, CR al final paralelo a N/O)
+- **J.3 (visor 3D) se movió de la base al intermedio** (J.1/J.2 quedan: el repo-map alimenta el contexto del agente)
+- **K.1/K.2 (voz TTS/STT) se movieron al intermedio** (las consume CR); **K.3 (política de interrupción) se queda en base** por ser transversal (U.5/V.4/I)
+- **Consejo de Expertos ADELANTADO como DOGFOOD**: en cuanto existan G.1/G.2 (Etapa 7), VI.5–VI.7 se construyen y se usan para **auditar los gates de la propia base**
+- Base: **114 fases** · Intermedio: **22** (VI 7 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2) · **Total 136**
+
 ### Revisión de arquitectura v3.5 (2026-08-24) — escalabilidad + stack validado por investigación
 
 - **CÓMPUTO CLIENT-FIRST elevado a regla transversal #12**: todo cómputo que pueda correr en el cliente va al cliente (búsqueda local wa-sqlite/OPFS + sqlite-vec WASM en D.5, indexación AST web-tree-sitter en J.1, canva Three.js WebGPU en F.6, LLM local Ollama en C.6) — el servidor escala con los DATOS, no con la CPU de cada usuario; solo queda server-only lo central (agentes 24/7, sync, repos, secretos, RLS)
@@ -288,14 +296,17 @@ Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: so
 
 Dentro de rango sano para CI en cada push (core) + gates (full).
 
-## Espacios reservados → [Plan Intermedio](../SDD-005-plan-intermedio.md) (no bloquea nada)
+## Plan Intermedio — INTERCALADO (no "después de la base") — [SDD-005](../SDD-005-plan-intermedio.md)
 
-La base YA deja los ganchos que las ventanas futuras necesitan — sin tablas nuevas ni deuda:
-- `event_stream` con `TEST_RESULT` → alimentará el **Kanban de resultados animados** (Etapa 17)
-- `documents/knowledge` ([D·D.2](./plan-d-memoria-v3code.md#d2)) + índice dual ([D·D.5](./plan-d-memoria-v3code.md#d5)) → alimentarán el **Grafo de documentos estilo Obsidian** (Etapa 16) + **Consejo de Expertos** (VI.5–VI.7: skills auditores — ciberseguridad/frontend/infra/escalabilidad/arquitectura — que auditan el plan en paralelo con preguntas-opciones dopaminérgicas)
-- Sesiones/rungs navegables ([D·D.3](./plan-d-memoria-v3code.md#d3)) → alimentarán la **Control Room** (Etapa 18)
-- **`SpatialMeta` en Design System (F.0)** + posiciones persistidas en `event_stream` (F.4) → terreno espacial listo desde Etapa 6. Three.js + pagerank ([PLAN J](./plan-j-grafo3d-repomap.md)) reutiliza estas posiciones → **3D/gafas** (Etapa 19) sin refactor. La cadena completa: `SpatialMeta(F.0) → ReactFlow 2D(F.1) → persistencia(F.4) → Three.js 3D(J.3) → gafas(3D.1-3D.2)`
-Regla: cada ventana futura es una VISTA sobre estos datos; prohibido duplicar.
+**Modelo v3.8 (ratificado 2026-08-24)**: el intermedio NO va después de la base — es un **carril de vistas** que se construye justo tras su fase base habilitadora, en paralelo con el resto de la base:
+- **VI.1–VI.4** (Canvas Planeación) ⟶ tras Gate F (necesita D.2 + F.1)
+- **VI.5–VI.7** (Consejo de Expertos) ⟶ tras Gate G — **ADELANTADO como DOGFOOD**: audita los gates de la propia base
+- **KR.1–KR.5** (Kanban Resultados) ⟶ tras Gate H (KR.3 tras N.3/N.6)
+- **3D** (3D.1 + J.3 + 3D.2) ⟶ tras Gate J (motor Three.js); **J.3 se movió de la base al intermedio**
+- **K.1/K.2** (voz TTS/STT) ⟶ intermedio (las consume CR); **K.3** (política de interrupción) SE QUEDA en base (transversal: U.5/V.4/I)
+- **CR.1–CR.5** (Control Room) ⟶ al final (paralelo a N/O; consume K.1/K.2 + todo)
+
+Ganchos que la base ya deja (sin tablas nuevas): `event_stream` TEST_RESULT → KR · `documents/knowledge` + índice dual → VI · sesiones/rungs → CR · `SpatialMeta` (F.0/F.4) → terreno 3D. Regla: cada ventana es una VISTA sobre estos datos; prohibido duplicar.
 
 ## ORDEN DE EJECUCIÓN MAESTRO (los números de fase son IDs estables; esta es la secuencia de construcción)
 
@@ -308,16 +319,21 @@ PARALELO TRAS GATE B (con C/D):
   P.1→P.2→P.3→P.4 ── Gate P (Centro MCP — alimenta G y N)
 ETAPA 4  D.0→D.1→D.2→D.3→D.4→D.5→D.6→D.7→D.8 ── Gate D
 ETAPA 5  E.1→E.2→E.3 ── 🏷️ plan-base-v0.1
-POST-BASE:
+POST-BASE (base funcional) ⟷ INTERMEDIO (carril de vistas — INTERCALADO, no después):
   F.0→F.1→F.2→F.3→F.4→F.7→F.5→F.6 (Gate F)
-  G.1→G.2→G.3→G.4→G.6→G.7→G.5 (Gate G)  ← G.7 identidad viva; su voz se completa en K.1
+    ⟶ INTERMEDIO VI.1→VI.4 (Canvas Planeación — tras F, necesita D.2+F.1)
+  G.1→G.2→G.3→G.4→G.6→G.7→G.5 (Gate G)  ← G.7 identidad viva; su voz se completa en el intermedio (K.1)
+    ⟶ INTERMEDIO VI.5→VI.7 (Consejo de Expertos — ADELANTADO: DOGFOOD, audita los gates de la base)
   H.1→H.2→H.5→H.6→H.3→H.4→H.7→H.8→H.9b (Gate H)  ← desviación: Shadow primero; H.9a ya corrió en Etapa 3
+    ⟶ INTERMEDIO KR.1→KR.2→KR.4→KR.5 (Kanban Resultados — tras H; KR.3 tras N.3/N.6)
   I.1→I.6→I.2→I.3→I.4→I.5 (Gate I)
-  J.1→J.2→J.3 (Gate J)
-  M.1→M.2→M.3 (Gate M) ← ANTES que K/L: los agentes necesitan git para el Gate N y los PRs dan valor visible temprano
+  J.1→J.2 (Gate J) ← J.3 (visor 3D) MOVIDO al intermedio (3D)
+  M.1→M.2→M.3 (Gate M) ← ANTES que L: los agentes necesitan git para el Gate N y los PRs dan valor visible temprano
   L.1→L.2→L.4→L.3-flag (Gate L)
-  K.1→K.2→K.3 (Gate K) ← voz al final del bloque (nice-to-have)
+  K.3 (Gate K parcial) ← política de interrupción transversal (la usan U.5/V.4/I); K.1/K.2 voz → intermedio (CR)
   N.1→N.2→N.3→N.4→N.5→N.6→N.7 (Gate N) · O.1→O.2→O.3 (v1.0)
+INTERMEDIO AL FINAL (paralelo a N/O):
+  3D: 3D.1→J.3→3D.2 (visores 3D unificados — tras J) · Voz: K.1→K.2 (las consume CR) · CR.1→CR.5 (Control Room — la vista que unifica todo)
 TRANSVERSALES: U.1 con F.0 · subconjunto flow-protection/inbox de U.5 desde A.4 ·
   resto U tras cada ventana · S.1+S.2 prerequisito de Etapa 1 · S.3 solo con demanda Tauri · S.4 continuo ·
   T.SEC/T.QA desde Etapa 1 · T.BIZ antes v1.0 ·
