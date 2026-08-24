@@ -2,6 +2,16 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-24
+
+- **SDD-010 Modelo de Negocio** (3 investigaciones paralelas: outcome-pricing · growth devtools · costos hosting):
+- 3 ESCENARIOS soportados por el mismo codebase ADR-005: A todo-local (Ollama en tu máquina→Tauri su hogar natural, SKU posterior) · B servidor propio (web-first ideal) · C nube gestionada (el negocio recurrente)
+- MONETIZACIÓN con datos: Motor principal = open-core + managed hosting ($16-110 costo real → cobrar $29-149/mes margen 60-80%, modelo n8n $5.2B val); Pay-per-results = arma de diferenciación SOLO tras >70% success-rate medido y entregas binariamente verificables POR NUESTROS TESTS (ventaja única del mercado; Fin $100M ARR $0.99/resolución pero Devin abandonó outcome puro — 42% PRs mergeados = revenue erraticísimo; Agentforce $2/conversación fracasó $900/día); Enterprise on-prem ilimitado anual después (Harvey $1,200+/seat sin outcomes; Adecco-Agentforce acuerdo ilimitado)
+- GROWTH secuencia medida: KPI norte = % usuarios que COMPARTEN artefacto en sesión 1 (output filmable = activo #1, Lovable 25M proyectos/año=25K signups orgánicos/mes) · Show HN sábado título-numérico sin "AI" (-33% portada si la incluyes; HN supera PH 20x tráfico) · MCP registries 30min superficie permanente (caso: cliente pago en 2min vía agente descubriendo MCP) · errores fatales documentados (construir antes que distribuir, influencers antes de activation 94% fallo)
+- EXIT paths verificados: ARR creciente × usuarios × talento (Cursor rechazó OpenAI → reportado $60B; Google pagó $2.4B Windsurf tech+equipo; Salesforce compró Intercom validando outcome)
+- T.BIZ del plan-t ahora referencia SDD-010 como estrategia adoptada
+
+
 ## 2026-08-23 (sesion 12)
 
 - **SDD-008 Análisis cliente-servidor autónomo + escalado** (3 investigaciones paralelas: K8s para agentes IA · sync multi-dispositivo · servidor Rust multi-tenant)
