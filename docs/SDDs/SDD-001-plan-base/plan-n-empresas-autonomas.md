@@ -39,7 +39,7 @@
 <a id="n6"></a>
 ### N.6 — Group chat de la empresa + rutinas programadas (patrón Grok Bot)
 - **Group chat visible**: PM, devs y QA conversan en un hilo compartido — pasan ownership, piden contexto, resuelven dudas entre ellos; el humano LEE el trabajo social en vivo e interviene solo en judgment calls (ellos se coordinan solos)
-- **Identidad viva estilo mensajería**: avatar único POR AGENTE generado por IA, presencia (🟢 trabaja · 💤 idle), "Dev-A está escribiendo…", mensajes agrupados como persona hablando — el equipo SE SIENTE equipo (promueve idea 210 del torneo)
+- **Identidad viva estilo mensajería**: avatar único POR AGENTE generado por IA, presencia (🟢 trabaja · 💤 idle), "Dev-A está escribiendo…", mensajes agrupados como persona hablando — el equipo SE SIENTE equipo (promueve idea 210 del torneo) · **look según [PLAN V·V.3](./plan-v-visual-grokbot.md#v3)**: avatares geométricos deterministas como fallback, handoffs visibles en la conversación, @menciones y @everyone
 - **Rutinas programadas**: scheduler de trabajos recurrentes por empresa ("triage de bugs cada noche", "scoreboard lunes 9am") disparando skills/empresas sin humano presente
 - **Digest automático** diario/semanal: qué hizo cada agente, costos, bloqueos, próximos pasos — generado del Ledger y archivado
 - **Pruebas:** Integration: 3 agentes en group chat resuelven handoff sin humano (scripted). E2E humano: observo la conversación grupal en vivo; programo rutina nocturna y verifico ejecución + digest matutino

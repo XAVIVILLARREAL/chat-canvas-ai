@@ -165,6 +165,15 @@
 | O.2 | MCP público del cerebro | Integration real: Claude Code conectado al MCP responde preguntas del workspace usando nuestro grafo. Snapshot tests de tools |
 | O.3 | Release v1.0 | Checklist DoD gigante: todas las suites humanas históricas re-corridas en las 3 vistas; builds CI verdes; demo documental final |
 
+## Transversal V · Visual GrokBot — `plan-v-visual-grokbot.md` (V.0 desde A.1/A.4; V.1–V.2 con F.0/G.7; V.3 con N.6; V.4 con G.6/K.3/U.5 — complementa, no quita nada)
+| Fase | Nombre | Pruebas |
+|---|---|---|
+| V.0 | Chat-first AppShell: la app es mensajería (desks) | E2E HUMANA: usuario nuevo entiende "es un chat con mi equipo" en <30s; navegar conversación→panel→volver sin perder el hilo; mobile 375 sin roturas |
+| V.1 | Identidad por avatar geométrico + estados en 2 capas | E2E HUMANA: identificar de un vistazo quién trabaja / espera aprobación / tiene no-leído (sin leer texto); editar perfil desde el chat y ver el cambio en sidebar+canva+grupo; caída de IA → avatar geométrico determinista |
+| V.2 | Actividad INLINE en el hilo + aprobaciones numeradas | E2E HUMANA: responder aprobación de opciones numeradas con UN tap; archivo creado visible inline y abrible con un click; flujo completo del hilo sin abrir paneles |
+| V.3 | Group chat de bots visual (handoffs visibles) | E2E HUMANA: crear grupo de 3 agentes y verlos coordinar con handoffs en vivo e identidades claras; @mencionar a uno y que solo ese responda; intervenir en un judgment call |
+| V.4 | Rutinas visibles + notificaciones persistentes | E2E HUMANA: grabar "preparar release" con indicador de seguimiento; badge de no-leído persiste hasta abrir el hilo (app enfocada); digest del lunes llega como mensaje del PM |
+
 ## Transversal S · Despliegue/Costos/Stack — `plan-s-despliegue-costos.md` (S.1+S.2 prerequisito de Etapa 1)
 | Fase | Nombre | Pruebas |
 |---|---|---|
@@ -195,4 +204,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 112 fases** (95 de A–P incl. H.9a/H.9b + 17 de S/T/U). Regenerar tras CADA cambio de fases.
+**Total: 117 fases** (95 de A–P incl. H.9a/H.9b + 5 de V + 17 de S/T/U). Regenerar tras CADA cambio de fases.

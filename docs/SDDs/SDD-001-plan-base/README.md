@@ -1,6 +1,6 @@
 # SDD-001 · Roadmap Maestro — Empresa Dev
 
-> Fecha: 2026-08-24 · Estado: Activo · v3.5 MEGA-PLAN (15 etapas + P, ~112 fases)
+> Fecha: 2026-08-24 · Estado: Activo · v3.6 MEGA-PLAN (15 etapas + P, ~117 fases)
 > Investigación profunda: OpenAI Codex (docs oficiales), Reasonix v1.23 (verificado EN VIVO en este servidor), V3Code (sitio oficial + spec copia.md), **Grok Bot xAI/Cursor** ([SDD-004](../SDD-004-analisis-grokbot.md): group chat de agentes, rutinas por demostración, proactividad, pipeline de bugs) + patrones de varve/codevira.
 > Pruebas: [SDD-002](../SDD-002-testing-spec-driven.md) — toda fase pasa las 4 capas; todo gate cierra con suite humana.
 
@@ -46,6 +46,7 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 | S | **Despliegue/Costos/Stack eficiente** | [plan-s](./plan-s-despliegue-costos.md) | S.1–S.4 | Hosting 3 etapas ($16→$600/mes), stack Rust fijado, patrones Tauri — datos ago-2026 |
 | T | **Excelencia transversal** | [plan-t](./plan-t-excelencia.md) | T.SEC/T.A11Y/T.ONB/T.QA/T.BIZ | Seguridad profesional, i18n, onboarding <5min, calidad continua, comercial/legal |
 | U | **Dopaminérgico v2 (juice+flow)** | [plan-u](./plan-u-motivacion.md) | U.1–U.8 | JUICE calibrado, hitos gated con cofres funcionales, rachas-perdonables, heatmap, inbox de resultados anti-spinner, flow-protection, widget 2-datos, unboxing emocional — cero dark patterns |
+| V | **Visual GrokBot (transversal social)** | [plan-v](./plan-v-visual-grokbot.md) | V.0–V.4 | Chat-first estilo mensajería: desks, identidad por avatar geométrico (el color es QUIÉN, no estado), estados en 2 capas, actividad/aprobaciones inline en el hilo, group chat con handoffs visibles |
 | C.5+D.8+H.9+A.6 | **Motor Contexto/Memoria/Caché configurable** | [SDD-006 investigación](../SDD-006-investigacion-cache-memoria.md) → fases en plan-c/d/h/a | — | KV-caché, compresión, memorias multi-tipo y respaldos por rol en 5 scopes |
 
 ```
@@ -93,6 +94,16 @@ Features ganadoras combinadas en un solo producto: chat Codex + paneles Lovable 
 | Reflect: aprender lecciones de transcripciones pasadas (sin LLM para detectar) | codevira | [I·I.5](./plan-i-revision-superposiciones.md#i5) |
 | Worktrees paralelos por agente | Codex/Cursor | [N·N.2](./plan-n-empresas-autonomas.md#n2) |
 | MCP público del cerebro hacia otros agentes | Zed/V3Code | [O·O.2](./plan-o-marketplace-v1.md#o2) |
+
+### De Grok Bot (VISUAL — la capa social, referencia de UI de mensajería)
+
+| Patrón visual Grok Bot (verificado) | Adaptación | Fase |
+|---|---|---|
+| La app es mensajería, no dashboard: cada bot es un "desk" en la sidebar | AppShell chat-first: fila por bot/proyecto con última actividad; el chat es la superficie primaria | [V·V.0](./plan-v-visual-grokbot.md#v0) |
+| Avatar geométrico de color = IDENTIDAD (triángulo/hexágono/círculo…); el estado es capa aparte | Avatares geométricos deterministas + estados 2 capas (puntos=working, needs-attention, badge no-leído) | [V·V.1](./plan-v-visual-grokbot.md#v1) |
+| Actividad del bot INLINE en el hilo; aprobaciones como opciones numeradas (▸ 1. X · 2. Y) | Tools/archivos/diffs y aprobaciones viven en el hilo con un tap de respuesta | [V·V.2](./plan-v-visual-grokbot.md#v2) |
+| Group chat 2–6 bots, @menciones, handoffs visibles en la conversación | Group chat de la empresa con identidad por mensaje y ownership visible | [V·V.3](./plan-v-visual-grokbot.md#v3) |
+| Follow-along con indicador; notificaciones por bot que persisten como no-leído; digests como mensajes | Rutinas visibles + badges persistentes + digest del PM en el hilo | [V·V.4](./plan-v-visual-grokbot.md#v4) |
 
 ### De OpenAI Codex
 2 perillas sandbox×aprobación ortogonales con presets · detección git→Auto · AGENTS.md en capas · diff clicable con feedback al turno · slash commands (/resume /fork /compact /status /permissions) · sesiones rollout JSONL · **skills como SKILL.md empaquetables** (Etapa 7) · **profiles en config** · granular approval policy · **approvals_reviewer auto_review** (un agente revisa aprobaciones — inspiración Etapa 9) · reglas allow/prompt/forbid por prefijo de comando.
@@ -240,6 +251,16 @@ Se generaron **500 ideas** de productos de mercado y se debatieron en torneo: so
 - **C.7 y D.8**: alcance v1 acotado en la base; lo pesado (OAuth/small_model · memoria relacional/reflexión) marcado post-base (C.7b / D.8b)
 - **Matriz regenerada**: 112 fases (95 A–P + 17 S/T/U), orden = ejecución, regla "fase GUI ⇒ [E]+[H]", presupuesto **máx $20/gate** con APIs reales
 
+### Revisión v3.6 (2026-08-24) — Visual GrokBot como referencia de la capa social
+
+- **Nuevo [PLAN V](./plan-v-visual-grokbot.md) (transversal, 5 fases)**: lo visual de Grok Bot (xAI/Cursor, verificado con docs oficiales + reviews) — la app se SIENTE mensajería, no dashboard
+- **Chat-first "desks"**: sidebar = una fila por bot/proyecto con su última actividad (V.0 con A.1/A.4)
+- **Identidad por avatar geométrico**: el color del avatar es QUIÉN, no estado — estados en 2 capas separadas: puntos animados = trabajando, needs-attention, badge no-leído, desk activo (V.1 con F.0/G.7)
+- **Actividad inline en el hilo**: tools/archivos/diffs y **aprobaciones como opciones numeradas** (▸ 1. X · 2. Y) con un tap (V.2 con A.4/B.4)
+- **Group chat de bots visual**: 2–6 bots, @menciones/@everyone, handoffs visibles en la conversación (V.3 con N.6)
+- **Rutinas visibles + notificaciones persistentes**: follow-along con indicador, badge no-leído que persiste, digests como mensajes del PM (V.4 con G.6/K.3/U.5)
+- **Complementa, no quita**: Codex sigue siendo la referencia de paneles/diffs; GrokBot es la referencia de la capa social. Matriz ahora con **117 fases**
+
 ### Revisión de arquitectura v3.5 (2026-08-24) — escalabilidad + stack validado por investigación
 
 - **CÓMPUTO CLIENT-FIRST elevado a regla transversal #12**: todo cómputo que pueda correr en el cliente va al cliente (búsqueda local wa-sqlite/OPFS + sqlite-vec WASM en D.5, indexación AST web-tree-sitter en J.1, canva Three.js WebGPU en F.6, LLM local Ollama en C.6) — el servidor escala con los DATOS, no con la CPU de cada usuario; solo queda server-only lo central (agentes 24/7, sync, repos, secretos, RLS)
@@ -268,10 +289,10 @@ Dentro de rango sano para CI en cada push (core) + gates (full).
 
 ## Espacios reservados → [Plan Intermedio](../SDD-005-plan-intermedio.md) (no bloquea nada)
 
-La base YA deja los ganchos que las 4 ventanas futuras necesitan — sin tablas nuevas ni deuda:
+La base YA deja los ganchos que las ventanas futuras necesitan — sin tablas nuevas ni deuda:
 - `event_stream` con `TEST_RESULT` → alimentará el **Kanban de resultados animados** (Etapa 17)
-- `documents/knowledge` ([D·D.2](./plan-d-memoria-v3code.md#d2)) + índice dual ([D·D.5](./plan-d-memoria-v3code.md#d5)) → alimentarán el **Grafo de documentos estilo Obsidian** (Etapa 16)
-- Sesiones/rungs navegables ([D·D.3](./plan-d-memoria-v3code.md#d3)) → alimentarán el **Canvas de sesiones** (Etapa 18)
+- `documents/knowledge` ([D·D.2](./plan-d-memoria-v3code.md#d2)) + índice dual ([D·D.5](./plan-d-memoria-v3code.md#d5)) → alimentarán el **Grafo de documentos estilo Obsidian** (Etapa 16) + **Consejo de Expertos** (VI.5–VI.7: skills auditores — ciberseguridad/frontend/infra/escalabilidad/arquitectura — que auditan el plan en paralelo con preguntas-opciones dopaminérgicas)
+- Sesiones/rungs navegables ([D·D.3](./plan-d-memoria-v3code.md#d3)) → alimentarán la **Control Room** (Etapa 18)
 - Three.js + pagerank ([PLAN J](./plan-j-grafo3d-repomap.md)) + layouts persistidos desde F/VI → terreno listo para **3D/gafas** (Etapa 19)
 Regla: cada ventana futura es una VISTA sobre estos datos; prohibido duplicar.
 
@@ -298,7 +319,8 @@ POST-BASE:
   N.1→N.2→N.3→N.4→N.5→N.6→N.7 (Gate N) · O.1→O.2→O.3 (v1.0)
 TRANSVERSALES: U.1 con F.0 · subconjunto flow-protection/inbox de U.5 desde A.4 ·
   resto U tras cada ventana · S.1+S.2 prerequisito de Etapa 1 · S.3 solo con demanda Tauri · S.4 continuo ·
-  T.SEC/T.QA desde Etapa 1 · T.BIZ antes v1.0
+  T.SEC/T.QA desde Etapa 1 · T.BIZ antes v1.0 ·
+  V.0 con A.1/A.4 (chat-first) · V.1–V.2 con F.0/G.7 (identidad + actividad inline) · V.3 con N.6 (group chat) · V.4 con G.6/K.3/U.5 (rutinas + notif)
 ```
 
 **Matriz completa de TODAS las fases con sus pruebas**: [MATRIZ-FASES-PRUEBAS.md](./MATRIZ-FASES-PRUEBAS.md) — generada automáticamente, regenerar al cambiar fases.
@@ -311,6 +333,9 @@ TRANSVERSALES: U.1 con F.0 · subconjunto flow-protection/inbox de U.5 desde A.4
 | Artefactos versionados side-by-side | Claude artifacts | [B·B.9](./plan-b-sidepanels-lovable.md#b9) |
 | Ramas visuales ‹2/3› al editar mensajes | ChatGPT | [A·A.9](./plan-a-chat-codex.md#a9) |
 | Identidad viva: avatar IA por agente, presencia, "está escribiendo…" | Grok Bot/Slack/Discord | [N·N.6](./plan-n-empresas-autonomas.md#n6) |
+| Chat-first "desks": la app es mensajería, no dashboard | Grok Bot | [V·V.0](./plan-v-visual-grokbot.md#v0) |
+| Identidad por avatar geométrico + estados en 2 capas | Grok Bot | [V·V.1](./plan-v-visual-grokbot.md#v1) |
+| Aprobaciones como opciones numeradas inline en el hilo | Grok Bot | [V·V.2](./plan-v-visual-grokbot.md#v2) |
 
 copia.md queda COMPLETAMENTE minado. Backlog del torneo conserva lo no-promovido.
 
