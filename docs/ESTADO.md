@@ -1,6 +1,6 @@
 # ESTADO ACTUAL
 
-> Sesion: 2026-08-23 . Fase: Mega-Roadmap SDD-001 v3 aprobado (15 etapas) — arranca PLAN A . SDD mas reciente: SDD-005
+> Sesion: 2026-08-24 . Fase: Mega-Roadmap SDD-001 v3 aprobado (15 etapas) — arranca PLAN A . SDDs recientes: SDD-012, SDD-011, SDD-010
 
 ## Donde estamos
 
@@ -23,11 +23,17 @@ Infra 100% verde + sistema spec-driven con suite humano 12/12 (SDD-002). **ADR-0
 
 ## SDDs recientes
 
+- SDD-012: Multi-Agent GrokBot Patterns — Group Chat, Chief of Staff, Routine Learning (2026-08-24) · docs/SDDs/SDD-012-multi-agent-grokbot-patterns.md
+- SDD-011: Integracion Hermes Agent — A2A protocol, SKILL.md format, 7 subsystems (2026-08-24) · docs/SDDs/SDD-011-integracion-hermes-agent.md
+- SDD-010: Modelo Negocio — 3 escenarios, monetizacion con datos, growth y exit paths (2026-08-24) · docs/SDDs/SDD-010-modelo-negocio.md
 - SDD-005: Cierre Multiplataforma (2026-08-23) · docs/SDDs/SDD-005-cierre-multiplataforma.md
 - SDD-001: Plan Base v3 — maestro de 15 etapas · docs/SDDs/SDD-001-plan-base/README.md
 
 ## Ultimos cambios
 
+- 2026-08-24: SDD-012 Multi-Agent GrokBot Patterns — Group Chat, Chief of Staff, Routine Learning, A2A protocol
+- 2026-08-24: SDD-011 Integracion Hermes Agent — analisis completo hermes-agent (10k archivos, 1.8M LOC) + 7 subsystems
+- 2026-08-24: SDD-010 Modelo Negocio — 3 escenarios monetizacion, datos como activo, growth loops
 - 2026-08-23: ADR-005 D1 ejecutado — workspace Cargo con servidor axum de prueba viva; Plan Base README sección plataforma/sync
 - 2026-08-23: ADR-005 despliegue dual aceptado (crates/core+server, repos bare gitoxide, sandboxes Docker, 3 modos)
 - 2026-08-23: SDD-005 multiplataforma — gen/android versionado, CI matriz 3 SO, workflow APK manual, MULTIPLATAFORMA.md
