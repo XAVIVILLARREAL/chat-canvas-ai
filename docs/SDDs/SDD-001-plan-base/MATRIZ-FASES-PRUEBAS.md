@@ -165,6 +165,17 @@
 | O.2 | MCP público del cerebro | Integration real: Claude Code conectado al MCP responde preguntas del workspace usando nuestro grafo. Snapshot tests de tools |
 | O.3 | Release v1.0 | Checklist DoD gigante: todas las suites humanas históricas re-corridas en las 3 vistas; builds CI verdes; demo documental final |
 
+## INTERMEDIO · Etapa 16 · Canvas Planeación + Consejo de Expertos — `../SDD-005-plan-intermedio.md` (tras Gate F+H)
+| Fase | Nombre | Pruebas |
+|---|---|---|
+| VI.1 | Modelo de documentos | Cargo test parser enlaces/headings con fixture .md real. Integration: crear/editar/borrar doc actualiza grafo |
+| VI.2 | Layout IA del grafo | Unit clustering determinista con seeds. E2E: arrastrar nodo, recargar → posición conservada |
+| VI.3 | Canvas interactivo Obsidian-style | E2E HUMANA: grafo >200 docs sin jank; buscar→subgrafo resaltado; abrir doc desde nodo; móvil 375 operativo |
+| VI.4 | Edición humano+IA sobre el grafo (ETAPA/FASE/PLAN) | Integration síntesis crea doc+edges. E2E HUMANA: selecciona 3 notas→sintetiza→edita→deshacer→re-hacer |
+| VI.5 | CONSEJO DE EXPERTOS: skills auditores visuales | Unit: skill experto compila y gating READ-ONLY bloquea escritura ([G·G.2]). E2E: convoco 2 expertos sobre nodo-PLAN → personajes conectados al subgrafo; escritura directa → bloqueada |
+| VI.6 | Auditoría EN PARALELO + preguntas-opciones | Integration: 3 expertos mock en paralelo agrupados sin cruzarse; respuesta aplica rung DECISION + diff correcto ([D·D.4]). Chaos: experto falla a mitad → marcado, resto sigue. E2E HUMANA: 5 preguntas de 3 expertos → diffs aceptados visibles en el plan |
+| VI.7 | Juice del Consejo (dopaminérgico) | Snapshot por estado de experto × intensidad. E2E: responder 3× → variantes distintas + arpegio audible (audio spy); reduced-motion → flujo completo sin partículas |
+
 ## Transversal V · Visual GrokBot — `plan-v-visual-grokbot.md` (V.0 desde A.1/A.4; V.1–V.2 con F.0/G.7; V.3 con N.6; V.4 con G.6/K.3/U.5 — complementa, no quita nada)
 | Fase | Nombre | Pruebas |
 |---|---|---|
@@ -204,4 +215,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 117 fases** (95 de A–P incl. H.9a/H.9b + 5 de V + 17 de S/T/U). Regenerar tras CADA cambio de fases.
+**Total: 124 fases** (95 de A–P incl. H.9a/H.9b + 5 de V + 17 de S/T/U + 7 del Intermedio VI). Regenerar tras CADA cambio de fases.

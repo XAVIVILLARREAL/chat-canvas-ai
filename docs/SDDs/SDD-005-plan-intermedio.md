@@ -10,7 +10,7 @@ Cada proyecto-tenant ([A.0](./SDD-001-plan-base/plan-a-chat-codex.md#a0)) obtien
 | # | Ventana | Qué es | Inspiración |
 |---|---|---|---|
 | V1 | 🏢 Canva Oficina/Multiagentes | Crear y organizar agentes/equipos; organigrama editable con estados vivos | **YA EXISTE**: [Etapa 6 / plan-f](./SDD-001-plan-base/plan-f-canva-oficina.md) |
-| V2 | 🕸️ **CANVAS PLANEACIÓN** | El "segundo cerebro": grafo vivo de los .md del proyecto ordenado por IA, 100% editable humano+IA — **pantalla de planeación y orden**: crear etapas/fases/planes interactuando con los nodos; la IA crea/modifica/resume .md y hace relaciones directamente | Obsidian graph / Graphify / segundo cerebro de Karpaty |
+| V2 | 🕸️ **CANVAS PLANEACIÓN** | El "segundo cerebro": grafo vivo de los .md del proyecto ordenado por IA, 100% editable humano+IA — **pantalla de planeación y orden**: crear etapas/fases/planes interactuando con los nodos; la IA crea/modifica/resume .md y hace relaciones directamente. **+ CONSEJO DE EXPERTOS**: skills auditores visuales (ciberseguridad, frontend, infraestructura, escalabilidad, arquitectura) que auditan el plan EN PARALELO, hacen preguntas con opciones en un panel animado y refinan el plan contigo | Obsidian graph / Graphify / segundo cerebro de Karpaty |
 | V3 | 📋 Kanban de Resultados | Tablero evidencia-first con animaciones de tests/resultados, para autonomía de horas | Jira optimizado para agentes |
 | V4 | 💬 Canvas de Sesiones | Cards de sesiones por agente: hablar (TTS/STT), ver resultados, retomar | Grok Bot threads + chat apps |
 | V5 | 🎛️ **CONTROL ROOM** | Mapa maestro GLOBAL: todos los proyectos + todas las sesiones de agentes en acción; dar órdenes por voz (STT/TTS) desde un solo lugar | Centro de misión / mission control |
@@ -56,7 +56,38 @@ Seleccionar N nodos → "sintetizar" genera doc-resumen enlazado (agente barato)
 - Órdenes rápidas sobre selección: "relaciona estos", "reordena bajo este criterio", "propón estructura" — siempre con diff previo aceptable por el humano
 - **Pruebas:** Integration síntesis crea doc+edges. E2E humano: selecciona 3 notas→sintetiza→edita resultado→deshacer→re-hacer
 
-**🚪 GATE VI:** abro el grafo de ESTE mismo proyecto: veo clusters reales (docs/, SDDs/, ADRs/), busco "kanban" y solo ese subgrafo brilla, sintetizo 3 ADRs en una nota nueva enlazada, muevo nodos y mi layout sobrevive reinicios. Video + suites verdes.
+<a id="vi5"></a>
+### VI.5 — CONSEJO DE EXPERTOS: skills auditores visuales del plan
+**El sistema de skills visual dentro del Canvas Planeación:** un consejo de expertos invocables que AUDITAN tu plan, detectan lo que no viste y te hacen preguntas para definir lo indefinido — refinando el plan cada vez más.
+
+- **Roster inicial de 5 expertos** (skills precargados en biblioteca GLOBAL [G·G.1](./SDD-001-plan-base/plan-g-skills-lab.md#g1), copiables a local [A·A.0](./SDD-001-plan-base/plan-a-chat-codex.md#a0)): 🔐 **Ciberseguridad** · 🎨 **Frontend** · 🏗️ **Infraestructura** · 📈 **Escalabilidad** · 🧭 **Arquitectura** — cada uno con conocimiento profundo de dominio (system-prompt curado + checklist propio de auditoría) y creables/editables en Skills Lab como cualquier skill; el usuario puede sumar sus propios expertos (legal, finanzas, UX…)
+- Cada experto es un skill estándar con **tool-gating estricto READ-ONLY** sobre `documents`/knowledge ([G·G.2](./SDD-001-plan-base/plan-g-skills-lab.md#g2)) — audita y pregunta, JAMÁS escribe sin aprobación humana
+- **Identidad viva total** ([G·G.7](./SDD-001-plan-base/plan-g-skills-lab.md#g7)): avatar IA, emoji-firma, mini-bio con personalidad, color de departamento ([F·F.0](./SDD-001-plan-base/plan-f-canva-oficina.md#f0) tokens) — el experto SE VE como especialista real, no como un menú
+- **Invocación desde el grafo**: seleccionas nodo(s) ETAPA/FASE/PLAN → "Auditar con…" (elige 1 experto) o "Convocar al consejo" (todos); los expertos aparecen como personajes-nodo alrededor del subgrafo auditado (posiciones persistidas [VI.2](#vi2)); también invocables desde ⌘K ([F·F.7](./SDD-001-plan-base/plan-f-canva-oficina.md#f7))
+- Cada experto LEE el subgrafo y produce: **hallazgos** (brechas, riesgos y puntos ciegos de tu plan que quizá no viste) + **preguntas con opciones** sobre lo que NO está definido — con cita del nodo/doc exacto que motiva cada una
+- **Pruebas:** Unit: skill experto compila y su gating bloquea escritura. E2E: convoco 2 expertos sobre un nodo-PLAN → sus personajes aparecen conectados al subgrafo; intento de escritura directa del experto → bloqueado por gating
+
+<a id="vi6"></a>
+### VI.6 — Panel del Consejo: auditoría EN PARALELO + preguntas con opciones
+- **Los N expertos trabajan EN PARALELO** (una sesión por experto vía provider [C·C.1](./SDD-001-plan-base/plan-c-reasonix-deepseek.md#c1); subagentes reasonix `review`/`security-review` como motor barato donde aplique): mientras piensan, su personaje pulsa "ocupado" y sus hallazgos caen en vivo al panel
+- **Panel derecho "Consejo"**: inbox de cards/bloques ANIMADOS — cada card = 1 pregunta con contexto citado, **OPCIONES clicables** (2–4 radio-cards + "otra…" texto libre + "posponer"); agrupadas por experto con ProgressRing de avance ([U·U.1](./SDD-001-plan-base/plan-u-motivacion.md#u1)); eliges con clicks, sin teclear si no quieres
+- **Responder REFINA EL PLAN**: cada respuesta queda como rung DECISION gobernada ([D·D.4](./SDD-001-plan-base/plan-d-memoria-v3code.md#d4)) y dispara al experto a ACTUALIZAR el .md correspondiente — SIEMPRE con diff previo aceptable por el humano (mismo contrato que [VI.4](#vi4)); nodos-fase/etapa nuevos sugeridos se crean como propuesta enlazada
+- **Cards-debate ante conflictos entre expertos** (p.ej. 🔐 seguridad vs 🎨 velocidad de entrega): ambos exponen punto + trade-off y proponen síntesis; tú eliges opción A/B/síntesis/custom — la discrepancia queda documentada como decisión, no se pierde
+- Barra de progreso global del consejo · responder en cualquier orden · cerrar el panel NO mata sesiones (siguen en background con badge de pendientes)
+- **Pruebas:** Integration: 3 expertos mock en paralelo → preguntas llegan agrupadas sin cruzarse; responder aplica rung+diff correcto al doc. Chaos: un experto falla a mitad → sus preguntas quedan marcadas "sin resolver", el resto sigue. E2E humano: respondo 5 preguntas de 3 expertos → veo los diffs aceptados aplicados al plan
+
+<a id="vi7"></a>
+### VI.7 — Juice del Consejo (GUI dopaminérgica neuropsicológica)
+La sesión de planeación debe SENTIRSE como ser asesorado por un equipo élite — flow + recompensa variable, cero fricción:
+- **Micro-vida de los expertos**: idle (respiración sutil) → thinking (partículas concentrándose en su nodo) → speaking (burbuja resumiendo su hallazgo) → done (check + pose satisfecha) — SOLO transform/opacity, respeta `prefers-reduced-motion`
+- **Respuesta elegida → cascada de juice** ([U·U.1](./SDD-001-plan-base/plan-u-motivacion.md#u1)): squash&stretch de la card + tick verde con hit-stop 100ms + arpegio ascendente; el nodo del grafo afectado PULSA y muestra badge "+refinado"
+- **Recompensa impredecible**: variantes aleatorias de celebración por respuesta (nunca la misma dos veces seguidas = más dopamina)
+- **Hitos del consejo**: "Consenso alcanzado" / "Plan refinado a nivel N" → CelebrationOverlay festivo ([U·U.3](./SDD-001-plan-base/plan-u-motivacion.md#u3)) + **score de madurez del plan** visible (huecos detectados vs respondidos — ver tu progreso es la recompensa)
+- **Cierre de sesión**: "Acta del Consejo" — digest animado de todo lo definido (hallazgos×experto, decisiones tomadas, diffs aplicados) exportable a un doc nuevo enlazado en el grafo
+- Intensidad Apagado/Sutil/Normal/Festivo por scope ([A·A.6](./SDD-001-plan-base/plan-a-chat-codex.md#a6)) · **cero dark patterns**: todas las preguntas son reales del dominio, nunca artificiales para retener
+- **Pruebas GUI:** snapshot visual por estado de experto × intensidad · E2E: responder 3 veces seguidas → variantes distintas + arpegio audible (audio spy) · reduced-motion → sin partículas pero flujo completo funcional
+
+**🚪 GATE VI:** abro el grafo de ESTE mismo proyecto: veo clusters reales (docs/, SDDs/, ADRs/), busco "kanban" y solo ese subgrafo brilla, sintetizo 3 ADRs en una nota nueva enlazada, muevo nodos y mi layout sobrevive reinicios. **Convoco al consejo completo sobre este plan: los 5 expertos auditan en paralelo, me llegan preguntas con opciones al panel derecho, respondo con clicks, veo los diffs aplicados y recibo el acta final — todo fluido y celebratorio.** Video + suites verdes.
 
 ---
 
@@ -161,11 +192,11 @@ Reutiliza el motor de [PLAN J](./plan-j-grafo3d-repomap.md#j3) para navegar graf
 
 | Plan | Semanas |
 |---|---|
-| VI Grafo documentos | 2–2.5 |
+| VI Grafo documentos + **Consejo de Expertos (VI.5–VI.7)** | 4–5 |
 | KR Kanban resultados | 2–2.5 |
 | CR Control Room (sesiones+mapa+órdenes fusionadas) | 2.5–3 |
 | 3D preparación | 1–1.5 |
-| **Total intermedio** | **~7.5–10 semanas** (VI/KR paralelos tras F+H; CR al final — es la vista que unifica) |
+| **Total intermedio** | **~10–12 semanas** (VI/KR paralelos tras F+H; CR al final — es la vista que unifica) |
 
 ## Reglas
 
