@@ -39,7 +39,7 @@
 
 <a id="tbiz"></a>
 ### T.BIZ — Comercial y legal (antes de v1.0)
-- **Licencia elegida y documentada** (recomendación: core MIT/Apache-2.0 + features Pro bajo licencia comercial — open-core) con matriz qué-es-gratis
+- **Licencia elegida y documentada**: core MIT/Apache-2.0 + features Pro bajo licencia comercial (open-core) — estrategia completa de monetización y growth en [SDD-010 Modelo de Negocio](../SDD-010-modelo-negocio.md) (managed hosting $29-149/mes por tenant con margen 60-80%, outcome-premium solo tras >70% success-rate medido, licencias enterprise on-prem ilimitadas anuales)
 - **ToS + Privacy Policy** generados y versionados (local-first ayuda: "tus datos nunca salen" es el pitch)
 - Pricing tiers flaggeados en código desde v1 (Free / Pro / Teams) aunque el pago llegue después
 - Telemetría OPT-IN anónima (nunca contenido) para decisiones de producto

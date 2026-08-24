@@ -20,6 +20,7 @@
 | SDD-007 | Análisis OpenCode+models.dev: registro universal de proveedores (14 ideas) | `./docs/SDDs/SDD-007-analisis-opencode-modelsdev.md` |
 | SDD-008 | Análisis cliente-servidor autónomo + escalado Linux/Kubernetes (3 investigaciones) | `./docs/SDDs/SDD-008-analisis-cliente-servidor-k8s.md` |
 | SDD-009 | Debate adversarial de decisiones clave (web-first, sync build-vs-buy, runtime híbrido) | `./docs/SDDs/SDD-009-debate-decisiones.md` |
+| SDD-010 | Modelo de negocio: 3 escenarios, monetización con datos reales, growth por fases, exit paths | `./docs/SDDs/SDD-010-modelo-negocio.md` |
 | SDD-005 | Cierre Multiplataforma (Android versionado, CI 3 SO) | `./docs/SDDs/SDD-005-cierre-multiplataforma.md` |
 | MULTIPLATAFORMA.md | Comandos para compilar en Windows/macOS/Linux/Android/iOS | `./docs/MULTIPLATAFORMA.md` |
 | referencia de diseno.md | Catalogo de skills de diseno en `reference/` con links | `./docs/referencia de diseno.md` |
