@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
 import { useCanvasStore } from '../stores/canvas-store';
 import type { 
-  Canvas, Skill, Agent, AgentTeam, MCPServer, ExecutionContext,
+  Canvas, Skill, Agent, MCPServer, ExecutionContext,
   CreateCanvasRequest, CreateSkillRequest, CreateAgentRequest,
-  CreateTeamRequest, CreateMCPServerRequest, ExecuteCanvasRequest,
+  CreateMCPServerRequest, ExecuteCanvasRequest,
   AIGenerateNodeRequest, AIGenerateCanvasRequest, AIGenerateSkillRequest,
 } from '../types';
 
@@ -196,43 +196,6 @@ export const useApi = () => {
   }, [request]);
 
   // ============================================
-  // TEAMS API
-  // ============================================
-
-  const fetchTeams = useCallback(async (): Promise<AgentTeam[]> => {
-    return request<AgentTeam[]>('/teams');
-  }, [request]);
-
-  const createTeam = useCallback(async (data: CreateTeamRequest): Promise<AgentTeam> => {
-    return request<AgentTeam>('/teams', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }, [request]);
-
-  const fetchTeam = useCallback(async (id: string): Promise<AgentTeam> => {
-    return request<AgentTeam>(`/teams/${id}`);
-  }, [request]);
-
-  const updateTeam = useCallback(async (id: string, data: Partial<AgentTeam>): Promise<AgentTeam> => {
-    return request<AgentTeam>(`/teams/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-  }, [request]);
-
-  const deleteTeam = useCallback(async (id: string): Promise<void> => {
-    return request<void>(`/teams/${id}`, { method: 'DELETE' });
-  }, [request]);
-
-  const executeTeamCanvas = useCallback(async (teamId: string, trigger: ExecuteCanvasRequest['trigger']): Promise<ExecutionContext> => {
-    return request<ExecutionContext>(`/teams/${teamId}/execute`, {
-      method: 'POST',
-      body: JSON.stringify({ trigger }),
-    });
-  }, [request]);
-
-  // ============================================
   // MCP SERVERS API
   // ============================================
 
@@ -364,15 +327,6 @@ export const useApi = () => {
     }
   }, [fetchAgents]);
 
-  const syncTeams = useCallback(async () => {
-    try {
-      const teams = await fetchTeams();
-      useCanvasStore.getState().setTeams(teams);
-    } catch (error) {
-      console.error('Failed to sync teams:', error);
-    }
-  }, [fetchTeams]);
-
   const syncMcpServers = useCallback(async () => {
     try {
       const servers = await fetchMcpServers();
@@ -419,13 +373,6 @@ export const useApi = () => {
     assignSkillToAgent,
     removeSkillFromAgent,
     chatWithAgent,
-    // Teams
-    fetchTeams,
-    createTeam,
-    fetchTeam,
-    updateTeam,
-    deleteTeam,
-    executeTeamCanvas,
     // MCP
     fetchMcpServers,
     createMcpServer,
@@ -450,7 +397,6 @@ export const useApi = () => {
     syncCanvases,
     syncSkills,
     syncAgents,
-    syncTeams,
     syncMcpServers,
     syncExecutions,
   };

@@ -35,10 +35,6 @@ export type DependencySource = 'npm' | 'pypi' | 'cargo' | 'local' | 'git';
 export type ImprovementTrigger = 'testFailure' | 'performanceRegression' | 'userFeedback' | 'newRequirement' | 'aiOptimization';
 export type AgentRole = 'coordinator' | 'specialist' | 'reviewer' | 'planner' | 'executor' | { custom: string };
 export type AgentStatus = 'idle' | 'working' | 'blocked' | 'error' | 'offline' | 'learning';
-export type TeamRole = 'leader' | 'specialist' | 'coordinator' | 'reviewer' | 'observer';
-export type HierarchyStructure = 'flat' | 'hierarchical' | 'matrix' | 'swarm';
-export type DecisionMaking = 'consensus' | 'leaderDecides' | 'voting' | 'expertiseBased';
-export type CommunicationProtocol = 'a2a' | 'mcp' | 'sharedCanvas' | 'messageBus';
 export type MCPTransport = 'stdio' | 'sse' | 'streamableHttp' | 'websocket';
 export type MCPAuthType = 'none' | 'bearerToken' | 'apiKey' | 'oauth2' | { custom: string };
 export type MCPServerStatus = 'disconnected' | 'connecting' | 'connected' | 'error' | 'unauthorized';
@@ -333,31 +329,6 @@ export interface Agent {
   createdAt: number;
   updatedAt: number;
   createdBy: string;
-}
-
-export interface TeamMember {
-  agentId: string;
-  role: TeamRole;
-  responsibilities: string[];
-  reportsTo?: string;
-}
-
-export interface TeamHierarchy {
-  leaderId: string;
-  structure: HierarchyStructure;
-  decisionMaking: DecisionMaking;
-}
-
-export interface AgentTeam {
-  id: string;
-  name: string;
-  description: string;
-  members: TeamMember[];
-  hierarchy: TeamHierarchy;
-  sharedCanvasId?: string;
-  communicationProtocol: CommunicationProtocol;
-  createdAt: number;
-  updatedAt: number;
 }
 
 export interface MCPCapabilities {
@@ -742,12 +713,6 @@ export interface CreateAgentRequest {
   description: string;
   role: AgentRole;
   created_by: string;
-}
-
-export interface CreateTeamRequest {
-  name: string;
-  description: string;
-  leader_id: string;
 }
 
 export interface CreateMCPServerRequest {

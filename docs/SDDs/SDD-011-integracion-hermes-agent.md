@@ -616,7 +616,7 @@ def get_tool(name: str) -> Optional[ToolEntry]:
 ```
 
 **Dónde insertar:**
-- **`[Hermes→N.N1]`** — Extensión a N.1 (Modelo de empresa)
+- **`[Hermes→N.N1]`** — Extensión a N.1 (Gestión de sesiones)
   - Crear `server/tools/registry.py` (copiar patrón ~200L)
   - Cada skill registra sus tools al activarse
   - Tool-gating verifica contra el registry

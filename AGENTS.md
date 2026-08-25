@@ -4,29 +4,34 @@
 
 ## Qué es este proyecto
 
-**Canvas AI** es una **herramienta de IA generalista** desktop (Tauri v2) para trabajar con múltiples agentes de IA de forma visual y organizada.
+**Canvas AI** es una **herramienta de IA generalista** para trabajar con múltiples agentes de IA de forma visual y organizada.
 
 - **No es un chatbot** — es un entorno de trabajo con canvas visual, sesiones, skills, y automatizaciones
-- **No es una empresa autónoma** — no gestiona presupuestos, roles ni jerarquías de "empleados IA"
-- **Referencias**: Hermes Agent (ACP, subagents, MCP), GrokBot (sessions, chief of staff), ERP AI Canvas (deploy-spec, node types)
+- **Local-first gratis + nube de pago**: los agentes corren en tu máquina (gratis); la nube 24/7 es multi-tenant SaaS **solo para quien pague** (ADR-006)
+- **BYOK** — cada usuario trae su propia API key (modelo Hermes Agent); en local vive en el keychain del OS, en nube cifrada por tenant
+- **Skills = documentos `.md`** — recetas con personalidad, nombre y cara animada que se materializan como agentes/expertos/procesos/flujos
+- **Referencias**: Hermes Agent (ACP, subagents, MCP, BYOK), GrokBot (sessions, sandbox Linux), ERP AI Canvas (deploy-spec, node types)
 - **Documentación**: `docs/INDEX.md` — mapa completo
 - **Estado**: `docs/ESTADO.md` — dónde estamos
+- **Decisiones**: [`docs/ADRs/ADR-006-vision-hibrida-local-nube.md`](docs/ADRs/ADR-006-vision-hibrida-local-nube.md) — visión híbrida (Q1-Q12)
 
 ## La visión
 
 Un usuario puede:
 1. **Ver todo en un Control Room** — canvas infinito con sesiones activas, agentes trabajando, resultados
 2. **Chatear con sesiones** — sidebar con sesiones, panel derecho con markdown vivo, código, previews
-3. **Crear skills visualmente** — formulario sin YAML, avatares generados por IA, multi-agent loops
+3. **Crear skills visualmente** — documento `.md` con personalidad, nombre y cara animada, sin YAML
 4. **Automatizar workflows** — canvas visual tipo n8n mejorado, multi-runtime (Python/TS/Go/Bash/SQL)
-5. **Usar voz** — STT/TTS para hablar con agentes
-6. **Trabajar offline** — Ollama local como fallback
+5. **Usar voz** — STT/TTS para hablar con agentes (etapas finales)
+6. **Trabajar offline** — Ollama local como fallback; todo corre sin internet en local
+7. **Correr 24/7 (opcional)** — con suscripción a la nube, los agentes trabajan aunque cierres la app
 
 ## Stack tecnológico
 
 | Capa | Tecnología | Por qué |
 |---|---|---|
-| Desktop | **Tauri 2.0** | Rust + web frontend, bundles chicos |
+| Desktop | **Tauri 2.0** | Rust + web frontend, bundles chicos — entrega principal (local-first) |
+| Nube (24/7, de pago) | **Rust (axum) + workers Linux** | Multi-tenant SaaS, Postgres+RLS — solo quien paga |
 | Frontend | **React 19 + TypeScript** | Ecosistema, React Compiler |
 | Bundler | **Vite 8 (Rolldown)** | 10-30x más rápido |
 | Canvas 2D | **@xyflow/react v12** | Nodos, edges, zoom, drag-and-drop |
@@ -34,8 +39,12 @@ Un usuario puede:
 | Server state | **React Query v5** | Caching, reintentos |
 | Editor | **Monaco Editor** | VS Code editor embebido |
 | Backend | **Rust (Axum)** | Hub server, DB, seguridad |
-| DB | **SQLite (sqlx)** | Persistencia rápida + SQLiteVec para embeddings |
+| DB local | **SQLite (sqlx)** + SQLiteVec para embeddings | Persistencia local-first, offline |
+| DB nube | **PostgreSQL + RLS** fail-closed por tenant | Multi-tenant (ADR-006) |
+| Secretos | **Keychain OS (keyring)** local · **envelope AES-GCM por tenant** en nube | BYOK — nunca en claro |
+| Modelos | **BYOK (trae tu API key)** — cualquier provider compatible + Ollama local | Modelo Hermes Agent |
 | Agentes | **ACP Protocol** | Hermes Agent, subagent delegation |
+| Sandbox | **Contenedor Linux (Ubuntu)** por tarea, patrón GrokBot | Red denegada por defecto, allowlist, timeout |
 | Herramientas | **MCP (stdio/HTTP/SSE)** | Integración con herramientas externas |
 
 ## Arquitectura
@@ -55,10 +64,16 @@ Un usuario puede:
 │  │  canvas-ai- │  │                      │  │
 │  │  worker      │  │                      │  │
 │  └─────────────┘  └──────────────────────┘  │
-│  SQLite (SQLiteVec embeddings)              │
-│  ACP Protocol (Hermes) para subagentes      │
-│  MCP (stdio/HTTP/SSE) para herramientas    │
+│  SQLite (SQLiteVec embeddings) — local-first  │
+│  ACP Protocol (Hermes) para subagentes        │
+│  MCP (stdio/HTTP/SSE) para herramientas       │
 └─────────────────────────────────────────────┘
+
+  Modo nube (suscripción, multi-tenant):
+  ┌─────────────┐   ┌──────────────┐   ┌──────────────────────┐
+  │ Gateway     │ → │ Postgres+RLS │ → │ Workers Linux 24/7   │
+  │ axum        │   │ por tenant   │   │ (containers Ubuntu)  │
+  └─────────────┘   └──────────────┘   └──────────────────────┘
 ```
 
 ## Reglas arquitectónicas
@@ -68,6 +83,10 @@ Un usuario puede:
 3. **IPC para frontend-backend** — comunicación via comandos Tauri
 4. **Shared types** — tipos de dominio en `packages/shared-types/`
 5. **VR-ready** — todo canvas con coordenadas 3D, 1 unidad = 1 metro, sin absolute CSS
+6. **Híbrido (ADR-006)** — mismo código en local (SQLite, gratis) y nube (Postgres+RLS, de pago); `tenant_id`/`project_id` en TODO dato
+7. **BYOK** — el usuario trae su API key; local → keychain del OS; nube → cifrada por tenant (envelope AES-GCM)
+8. **Sandbox Linux** — el código de agentes corre en contenedor Ubuntu aislado (patrón GrokBot): red denegada por defecto
+9. **Sin "empresa autónoma"** — no hay jerarquías de empleados IA ni presupuestos de empresa; hay sesiones, skills y proyectos
 
 ## Reglas de trabajo
 
@@ -122,9 +141,10 @@ src/
 | `docs/INDEX.md` | Mapa completo de docs |
 | `docs/ESTADO.md` | Estado actual |
 | `docs/SDDs/SDD-001-plan-base/README.md` | Plan maestro |
+| `docs/ADRs/ADR-006-vision-hibrida-local-nube.md` | **Visión híbrida: local-first + nube SaaS de pago (Q1-Q12)** |
 | `docs/SDDs/SDD-005-plan-intermedio.md` | Referencia de fusión (CR→Etapa1, VI→2do cerebro, KR→Plan F, 3D→VR-ready) |
-| `docs/SDDs/SDD-011-integracion-hermes-agent.md` | Integración Hermes |
-| `docs/SDDs/SDD-012-multi-agent-grokbot-patterns.md` | Patrones GrokBot |
+| `docs/SDDs/SDD-011-integracion-hermes-agent.md` | Integración Hermes (BYOK, ACP, MCP) |
+| `docs/SDDs/SDD-012-multi-agent-grokbot-patterns.md` | Patrones GrokBot (sesiones, sandbox Linux) |
 | `docs/SDDs/SDD-013-gui-visual-spec.md` | Design system |
 
 ## VR-ready (regla transversal)

@@ -524,75 +524,6 @@ pub struct AgentMetrics {
 }
 
 /// ============================================================================
-/// EQUIPOS DE AGENTES — Canvas Oficina
-/// ============================================================================
-
-#[derive(Debug, Serialize, Deserialize, Clone, Type, JsonSchema)]
-pub struct AgentTeam {
-    pub id: String,
-    pub name: String,
-    pub description: String,
-    pub members: Vec<TeamMember>,
-    pub hierarchy: TeamHierarchy,
-    pub shared_canvas_id: Option<String>,
-    pub communication_protocol: CommunicationProtocol,
-    pub created_at: i64,
-    pub updated_at: i64,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Type, JsonSchema)]
-pub struct TeamMember {
-    pub agent_id: String,
-    pub role: TeamRole,
-    pub responsibilities: Vec<String>,
-    pub reports_to: Option<String>, // agent_id del supervisor
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Type, JsonSchema, PartialEq)]
-#[serde(rename_all = "snake_case")]
-pub enum TeamRole {
-    Leader,
-    Specialist,
-    Coordinator,
-    Reviewer,
-    Observer,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Type, JsonSchema)]
-pub struct TeamHierarchy {
-    pub leader_id: String,
-    pub structure: HierarchyStructure,
-    pub decision_making: DecisionMaking,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Type, JsonSchema, PartialEq)]
-#[serde(rename_all = "snake_case")]
-pub enum HierarchyStructure {
-    Flat,
-    Hierarchical,
-    Matrix,
-    Swarm,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Type, JsonSchema, PartialEq)]
-#[serde(rename_all = "snake_case")]
-pub enum DecisionMaking {
-    Consensus,
-    LeaderDecides,
-    Voting,
-    ExpertiseBased,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Type, JsonSchema, PartialEq)]
-#[serde(rename_all = "snake_case")]
-pub enum CommunicationProtocol {
-    A2A,           // Agent-to-Agent protocol
-    MCP,           // Via MCP servers
-    SharedCanvas,  // Via canvas compartido
-    MessageBus,    // Event bus interno
-}
-
-/// ============================================================================
 /// MCP — Model Context Protocol Integration
 /// ============================================================================
 
@@ -991,23 +922,3 @@ impl MCPServer {
     }
 }
 
-impl AgentTeam {
-    pub fn new(id: String, name: String, leader_id: String) -> Self {
-        let now = chrono::Utc::now().timestamp_millis();
-        Self {
-            id,
-            name,
-            description: String::new(),
-            members: vec![],
-            hierarchy: TeamHierarchy {
-                leader_id,
-                structure: HierarchyStructure::Hierarchical,
-                decision_making: DecisionMaking::LeaderDecides,
-            },
-            shared_canvas_id: None,
-            communication_protocol: CommunicationProtocol::A2A,
-            created_at: now,
-            updated_at: now,
-        }
-    }
-}

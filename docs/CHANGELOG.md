@@ -2,6 +2,16 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 21 — Visión híbrida ADR-006)
+
+- **ADR-006 APROBADO — VISIÓN HÍBRIDA (Q1-Q12)**: local-first gratis (BYOK, Tauri+SQLite) como PRODUCTO BASE + nube SaaS multi-tenant DE PAGO para ejecución 24/7 (Postgres+RLS + workers Linux). Solo en la nube quien la pague. Documento canónico: `docs/ADRs/ADR-006-vision-hibrida-local-nube.md`
+- **FANTASMA "EMPRESA AUTÓNOMA" ELIMINADO del código**: `AgentTeam`/`TeamMember`/`TeamHierarchy`/`CommunicationProtocol` (crates/core/domain.rs), ruta `/api/teams/*` + `AppState.teams` (crates/server), `Company` (packages/shared-types), `teams` en store/Sidebar/useApi/App (frontend). Build TS + cargo verdes.
+- **BYOK (trae tu API key, modelo Hermes Agent)**: registro universal de proveedores; local → keychain del OS (keyring); nube → cifrado por tenant (envelope AES-GCM). Nada en claro.
+- **Skills = documentos `.md`** (recetas con personalidad, nombre y cara animada); editor visual compila a `.md` sin YAML manual.
+- **Sandbox Linux (patrón GrokBot)**: agentes/código corren en contenedor Ubuntu — red denegada por defecto, allowlist, timeout, kill limpio.
+- **Plan Maestro v3.0**: nueva **Etapa 0 (Fundación)** — schema maestro + migraciones, contrato `event_stream`, secretos BYOK, sandbox Linux, persistencia real (hoy el server vive en `HashMap`). Voz/3D/Consejo de Expertos/dopamina → etapas finales (post-v1).
+- **Higiene**: `package.json` → `canvas-ai`; README.md raíz + LICENSE (MIT) añadidos; ARQUITECTURA v5.0 reconciliada (local-first principal, nube de pago); MATRIZ Etapa 14 y plan-n sincronizados (N.7 modo nube 24/7); SDD-010 ratificado (local gratis + nube suscripción).
+
 ## 2026-08-24 (sesion 20)
 
 - **BLINDAJE DE PRUEBAS v3.10 (aditivo)**: SDD-002 ampliado con contrato de pruebas por fase (criterios de negocio 1:1 con sus pruebas, chaos en I/O, E2E transversal por etapa en cada gate), regla de fases manejables por prompt (slices X.1a/X.1b con mini-gate; lista de fases grandes que siempre se parten: A.4/C.7/D.8/F.0/H.9b/N.2/N.6/VI.6/CR.1-3) y gate de deuda por fase (knip/clippy/biome, 0 TODOs, cobertura, suites históricas, evidencia); README reglas 14-16; matriz con las reglas en el header — sin quitar nada

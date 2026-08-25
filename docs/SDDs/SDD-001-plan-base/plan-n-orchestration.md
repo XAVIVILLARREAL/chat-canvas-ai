@@ -16,6 +16,7 @@
 - Los agentes pueden orquestar **sub-agentes** (multi-agent loops)
 - Todo se visualiza en el **Control Room** (canvas visual)
 - No hay concepto de "empresa", "rol de negocio", "presupuesto de empleado", ni "kill-switch de empleado"
+- **Modo nube (ADR-006)**: quien pague la suscripción puede orquestar sesiones 24/7 — los agentes corren en workers Linux aunque cierres la app; presupuesto y límites por cuenta, no "por empleado"
 
 ---
 
@@ -133,6 +134,20 @@ Sesiones pre-configuradas para casos de uso comunes:
 Plantillas son skills especiales que configuran la sesión completa.
 
 **Pruebas:** E2E: crear desde plantilla → verificar que los agentes están configurados.
+
+---
+
+### N.7 — Modo nube 24/7 (suscripción, ADR-006)
+
+Para quien pague la nube, la orquestación corre 24/7:
+- **Workers Linux** (contenedores Ubuntu, patrón GrokBot) ejecutan los agentes en el servidor
+- La cola de sesiones es **durable** (Postgres + workers stateless `FOR UPDATE SKIP LOCKED`)
+- **BYOK**: se usa la API key del usuario, cifrada por tenant (envelope AES-GCM)
+- **Presupuesto por cuenta**: límite de ejecución diario/mensual configurable; pausa limpia al alcanzarlo
+- El usuario cierra la app → los agentes siguen trabajando → al volver, digest + evidencia en el Control Room
+- Reanudación: la sesión se puede retomar desde cualquier dispositivo (sync L)
+
+**Pruebas:** Integration: 20 tareas en cola → consumo ordenado + corte por presupuesto. Chaos: provider cae → pausa limpia, reanuda al volver. E2E: cierro la app → reabro en otro dispositivo → la sesión siguió y muestra evidencia.
 
 ---
 

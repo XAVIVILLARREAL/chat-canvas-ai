@@ -81,9 +81,9 @@ PLAN U vive SOBRE el Design System de SDD-013. Cada componente dopaminérgico us
 
 <a id="u6"></a>
 ### U.6 — Glanceables fuera de la app (widget de 2 DATOS, patrón Duolingo)
-- Widget de bandeja/desktop con EXACTAMENTE 2 datos: **"¿la empresa operó hoy sola?" (✓/pendiente) + racha de días de operación autónoma** — nada más; el gerente-IA se pone "ansioso" visual cerca del fin de jornada si hay tareas sin cerrar (urgencia progresiva honesta)
+- Widget de bandeja/desktop con EXACTAMENTE 2 datos: **"¿mis agentes corrieron hoy 24/7?" (✓/pendiente) + racha de días de operación continua** (modo nube) — nada más; el agente se pone "ansioso" visual cerca del fin de jornada si hay tareas sin cerrar (urgencia progresiva honesta)
 - Promocionar el widget justo DESPUÉS de una entrega (momento de máxima buena voluntad — táctica Duolingo medida)
-- Badge embebible SVG del estado de la empresa (para compartir con clientes/inversores)
+- Badge embebible SVG del estado de la sesión/automatización (para compartir con clientes/inversores)
 - **Pruebas GUI:** E2E desktop: widget refleja operación del día en vivo; expresión cambia según cercanía de cierre de jornada; badge SVG regenera con datos correctos
 
 <a id="u7"></a>

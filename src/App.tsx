@@ -16,13 +16,11 @@ function App() {
     canvases,
     skills,
     agents,
-    teams,
     mcpServers,
     executions,
     fetchCanvases,
     fetchSkills,
     fetchAgents,
-    fetchTeams,
     fetchMcpServers,
     fetchExecutions,
     createCanvas,
@@ -37,7 +35,6 @@ function App() {
           fetchCanvases(),
           fetchSkills(),
           fetchAgents(),
-          fetchTeams(),
           fetchMcpServers(),
           fetchExecutions(),
         ]);
@@ -46,7 +43,7 @@ function App() {
       }
     };
     loadData();
-  }, [fetchCanvases, fetchSkills, fetchAgents, fetchTeams, fetchMcpServers, fetchExecutions]);
+  }, [fetchCanvases, fetchSkills, fetchAgents, fetchMcpServers, fetchExecutions]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -80,7 +77,6 @@ function App() {
               onTabChange={setSidebarTab}
               skills={skills}
               agents={agents}
-              teams={teams}
               mcpServers={mcpServers}
               executions={executions}
             />

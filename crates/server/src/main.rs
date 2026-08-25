@@ -1,4 +1,4 @@
-//! Servidor central de AI Canvas — APIs para Canvas, Skills, Agents, MCP, Teams
+//! Servidor central de Canvas AI — APIs para Canvas, Skills, Agents, MCP, Executions
 //!
 //! Expone el mismo dominio `canvas-ai-core` via HTTP (Axum).
 //! Compatible con Tauri (IPC) y clientes web.
@@ -28,7 +28,6 @@ pub struct AppState {
     pub canvases: Arc<RwLock<HashMap<String, Canvas>>>,
     pub skills: Arc<RwLock<HashMap<String, Skill>>>,
     pub agents: Arc<RwLock<HashMap<String, Agent>>>,
-    pub teams: Arc<RwLock<HashMap<String, AgentTeam>>>,
     pub mcp_servers: Arc<RwLock<HashMap<String, MCPServer>>>,
     pub executions: Arc<RwLock<HashMap<String, ExecutionContext>>>,
 }
@@ -39,7 +38,6 @@ impl Default for AppState {
             canvases: Arc::new(RwLock::new(HashMap::new())),
             skills: Arc::new(RwLock::new(HashMap::new())),
             agents: Arc::new(RwLock::new(HashMap::new())),
-            teams: Arc::new(RwLock::new(HashMap::new())),
             mcp_servers: Arc::new(RwLock::new(HashMap::new())),
             executions: Arc::new(RwLock::new(HashMap::new())),
         }
@@ -81,13 +79,6 @@ pub struct CreateAgentRequest {
     pub description: String,
     pub role: AgentRole,
     pub created_by: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
-pub struct CreateTeamRequest {
-    pub name: String,
-    pub description: String,
-    pub leader_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
@@ -146,13 +137,6 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/agents/:id/mcp", post(assign_mcp_to_agent).delete(remove_mcp_from_agent))
         .route("/api/agents/:id/chat", post(chat_with_agent))
         .route("/api/agents/:id/memory", get(get_agent_memory).post(update_agent_memory))
-        
-        // Teams CRUD
-        .route("/api/teams", get(list_teams).post(create_team))
-        .route("/api/teams/:id", get(get_team).put(update_team).delete(delete_team))
-        .route("/api/teams/:id/members", post(add_team_member).delete(remove_team_member))
-        .route("/api/teams/:id/canvas", post(set_team_canvas))
-        .route("/api/teams/:id/execute", post(execute_team_canvas))
         
         // MCP Servers
         .route("/api/mcp/servers", get(list_mcp_servers).post(create_mcp_server))
@@ -842,184 +826,6 @@ async fn update_agent_memory(
     agent.updated_at = chrono::Utc::now().timestamp_millis();
     agents.insert(id, agent.clone());
     Ok(Json(agent))
-}
-
-// ============================================================================
-// HANDLERS - TEAMS
-// ============================================================================
-
-async fn list_teams(State(state): State<AppState>) -> Json<Vec<AgentTeam>> {
-    let teams = state.teams.read().await;
-    Json(teams.values().cloned().collect())
-}
-
-async fn create_team(
-    State(state): State<AppState>,
-    Json(req): Json<CreateTeamRequest>,
-) -> Result<Json<AgentTeam>, (StatusCode, String)> {
-    let id = Uuid::new_v4().to_string();
-    let team = AgentTeam::new(id, req.name, req.leader_id);
-    let mut team = team;
-    team.description = req.description;
-    
-    state.teams.write().await.insert(team.id.clone(), team.clone());
-    info!("Created team: {}", team.id);
-    Ok(Json(team))
-}
-
-async fn get_team(
-    State(state): State<AppState>,
-    Path(id): Path<String>,
-) -> Result<Json<AgentTeam>, (StatusCode, String)> {
-    let teams = state.teams.read().await;
-    teams.get(&id)
-        .cloned()
-        .map(Json)
-        .ok_or((StatusCode::NOT_FOUND, "Team not found".into()))
-}
-
-async fn update_team(
-    State(state): State<AppState>,
-    Path(id): Path<String>,
-    Json(mut team): Json<AgentTeam>,
-) -> Result<Json<AgentTeam>, (StatusCode, String)> {
-    let mut teams = state.teams.write().await;
-    let _ = teams.get(&id)
-        .ok_or((StatusCode::NOT_FOUND, "Team not found".into()))?;
-    
-    team.id = id.clone();
-    team.updated_at = chrono::Utc::now().timestamp_millis();
-    teams.insert(id, team.clone());
-    Ok(Json(team))
-}
-
-async fn delete_team(
-    State(state): State<AppState>,
-    Path(id): Path<String>,
-) -> Result<StatusCode, (StatusCode, String)> {
-    state.teams.write().await.remove(&id)
-        .ok_or((StatusCode::NOT_FOUND, "Team not found".into()))?;
-    info!("Deleted team: {}", id);
-    Ok(StatusCode::NO_CONTENT)
-}
-
-async fn add_team_member(
-    State(state): State<AppState>,
-    Path(id): Path<String>,
-    Json(member): Json<TeamMember>,
-) -> Result<Json<AgentTeam>, (StatusCode, String)> {
-    let mut teams = state.teams.write().await;
-    let mut team = teams.get(&id)
-        .cloned()
-        .ok_or((StatusCode::NOT_FOUND, "Team not found".into()))?;
-    
-    if !team.members.iter().any(|m| m.agent_id == member.agent_id) {
-        team.members.push(member);
-        team.updated_at = chrono::Utc::now().timestamp_millis();
-        teams.insert(id, team.clone());
-    }
-    Ok(Json(team))
-}
-
-async fn remove_team_member(
-    State(state): State<AppState>,
-    Path(id): Path<String>,
-    Query(req): Query<RemoveMemberQuery>,
-) -> Result<Json<AgentTeam>, (StatusCode, String)> {
-    let mut teams = state.teams.write().await;
-    let mut team = teams.get(&id)
-        .cloned()
-        .ok_or((StatusCode::NOT_FOUND, "Team not found".into()))?;
-    
-    team.members.retain(|m| m.agent_id != req.agent_id);
-    team.updated_at = chrono::Utc::now().timestamp_millis();
-    teams.insert(id, team.clone());
-    Ok(Json(team))
-}
-
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
-pub struct RemoveMemberQuery {
-    pub agent_id: String,
-}
-
-async fn set_team_canvas(
-    State(state): State<AppState>,
-    Path(id): Path<String>,
-    Json(req): Json<SetTeamCanvasRequest>,
-) -> Result<Json<AgentTeam>, (StatusCode, String)> {
-    let mut teams = state.teams.write().await;
-    let mut team = teams.get(&id)
-        .cloned()
-        .ok_or((StatusCode::NOT_FOUND, "Team not found".into()))?;
-    
-    team.shared_canvas_id = Some(req.canvas_id);
-    team.updated_at = chrono::Utc::now().timestamp_millis();
-    teams.insert(id, team.clone());
-    Ok(Json(team))
-}
-
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
-pub struct SetTeamCanvasRequest {
-    pub canvas_id: String,
-}
-
-async fn execute_team_canvas(
-    State(state): State<AppState>,
-    Path(team_id): Path<String>,
-    Json(req): Json<ExecuteCanvasRequest>,
-) -> Result<Json<ExecutionContext>, (StatusCode, String)> {
-    let team = {
-        let teams = state.teams.read().await;
-        teams.get(&team_id)
-            .cloned()
-            .ok_or((StatusCode::NOT_FOUND, "Team not found".into()))?
-    };
-    
-    let canvas_id = team.shared_canvas_id
-        .ok_or((StatusCode::BAD_REQUEST, "Team has no shared canvas".into()))?;
-    
-    // Execute with team context
-    let mut trigger = req.trigger;
-    trigger.payload = serde_json::json!({
-        "team_id": team_id,
-        "team_members": team.members.iter().map(|m| m.agent_id.clone()).collect::<Vec<_>>(),
-        "payload": trigger.payload,
-    });
-    
-    // Call execute_canvas by constructing the request directly
-    let execution_id = Uuid::new_v4().to_string();
-    let now = chrono::Utc::now().timestamp_millis();
-    
-    let canvas = {
-        let canvases = state.canvases.read().await;
-        canvases.get(&canvas_id)
-            .cloned()
-            .ok_or((StatusCode::NOT_FOUND, "Canvas not found".into()))?
-    };
-    
-    let execution = ExecutionContext {
-        execution_id: execution_id.clone(),
-        canvas_id: canvas_id.clone(),
-        trigger,
-        variables: HashMap::new(),
-        node_states: HashMap::new(),
-        started_at: now,
-        completed_at: None,
-        status: ExecutionStatus::Pending,
-        result: None,
-    };
-    
-    state.executions.write().await.insert(execution_id.clone(), execution.clone());
-    
-    let state_clone = state.clone();
-    let exec_id = execution_id.clone();
-    let canvas_id_for_spawn = canvas_id.clone();
-    tokio::spawn(async move {
-        execute_canvas_internal(state_clone, exec_id, canvas).await;
-    });
-    
-    info!("Started team execution: {} for canvas: {}", execution_id, canvas_id_for_spawn);
-    Ok(Json(execution))
 }
 
 // ============================================================================

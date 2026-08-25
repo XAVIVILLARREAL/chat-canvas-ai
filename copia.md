@@ -1,5 +1,8 @@
 # ARQUITECTURA MAESTRA DE FÁBRICA MULTIAGENTE: SOTA & SÍNTESIS OPEN SOURCE
 
+> ⚠️ **DOCUMENTO HISTÓRICO** — referencia del concepto anterior "Empresa de Desarrollo Autónoma".
+> **Sustituido por [ADR-006](./docs/ADRs/ADR-006-vision-hibrida-local-nube.md)** (2026-08-25): Canvas AI es ahora una herramienta de IA generalista híbrida (local-first gratis + nube de pago). Los patrones técnicos (memoria 6 capas, shadow workspace, eventstream, repo-map, LightRAG) siguen siendo válidos; el marco de "empresa autónoma con empleados IA" NO.
+>
 > **Documento de Arquitectura y Referencia Técnica**  
 > *Sintetiza lo mejor de:* **V3Code**, **Aider**, **OpenHands**, **Cursor (Shadow Workspace & Fast Apply)**, **LightRAG**, **DSPy**, **Cline / Roo Code**, **MetaGPT** y **Zed**.  
 > *Adaptado y Mejorado para:* **Empresa de Desarrollo Autónoma (Tauri 2.0 + React 19 + Rust + Python LangGraph/CrewAI)**  

@@ -1,20 +1,30 @@
-# Canvas AI — Plan Maestro v2.0
+# Canvas AI — Plan Maestro v3.0
 
 > **Herramienta de IA generalista** para trabajar con agentes de IA de forma organizada.
+> **Híbrido:** local-first gratis (BYOK, trae tu API key) + nube multi-tenant de pago para ejecución 24/7 (ADR-006).
 > Open-source, multi-agente, visual, VR-ready.
 
 ---
 
 ## Qué es Canvas AI
 
-Canvas AI es un **desktop app** (Tauri v2) que permite a cualquier persona usar múltiples agentes de IA de forma visual y organizada. No es un chatbot más — es un **entorno de trabajo** donde la IA y el humano colaboran en un mismo espacio visual.
+Canvas AI es un **entorno de trabajo** (Tauri v2 local-first) que permite a cualquier persona usar múltiples agentes de IA de forma visual y organizada. No es un chatbot más — es un espacio donde la IA y el humano colaboran en un mismo canvas.
 
 **Problema que resuelve:** Hoy, usar IA implica pestañear entre ChatGPT, Claude, terminales, editores, y herramientas de automatización. Canvas AI unifica todo en un solo lugar: chat con sesiones, canvas visual para orquestar agentes, skills reutilizables, y automatizaciones avanzadas.
 
+**Modelo (ADR-006):**
+
+| | Local-first (desktop) | Nube (SaaS multi-tenant) |
+|---|---|---|
+| Costo | **Gratis** | **Suscripción** (solo quien la paga) |
+| Agentes | Corren en tu máquina | Workers Linux 24/7 |
+| Modelos | Tu API key (BYOK) + Ollama offline | Tu API key, ejecutada por el servidor |
+| Datos | SQLite local | PostgreSQL + RLS por tenant |
+
 **Referencias arquitectónicas clave:**
-- **Hermes Agent** — patrón de subagentes, MoA, MCP, session persistence, skill system
+- **Hermes Agent** — patrón de subagentes, MoA, MCP, session persistence, **BYOK (trae tu API key)**
 - **ERP AI Canvas (FlowsApp)** — canvas de automatización con deploy-spec universal
-- **GrokBot** — modelo de sesiones con invocación de agentes, chief of staff pattern
+- **GrokBot** — sesiones, chief of staff pattern, **sandbox Linux por contenedor**
 - **Codex/GPT-CDX** — slash commands, allowlists, sandboxed execution, memory rail
 
 ---
@@ -62,7 +72,7 @@ Reemplazo visual de n8n/Activepieces. Basado en el **AI Canvas del ERP Docker Co
 
 ```
 ┌─────────────────────────────────────────────┐
-│  Canvas AI Desktop (Tauri v2)               │
+│  Canvas AI Desktop (Tauri v2 — local-first)  │
 │  ┌─────────────┐  ┌──────────────────────┐  │
 │  │  Rust Core   │  │  React Frontend      │  │
 │  │  (Tauri)     │  │  (@xyflow/react)     │  │
@@ -84,20 +94,25 @@ Reemplazo visual de n8n/Activepieces. Basado en el **AI Canvas del ERP Docker Co
 │  ACP Protocol (Hermes) para subagentes      │
 │  MCP (stdio/HTTP/SSE) para herramientas    │
 └─────────────────────────────────────────────┘
+
+Modo nube (suscripción, multi-tenant — ADR-006):
+  Gateway axum → PostgreSQL+RLS → Workers Linux 24/7 (contenedores Ubuntu)
 ```
 
 **Stack:**
 - **Core**: Rust (`canvas-ai-core` — dominio puro, sin dependencias Tauri/HTTP)
-- **Server**: Rust/Axum (`canvas-ai-server` — REST/WebSocket, sirve al frontend)
-- **Worker**: Rust (`canvas-ai-worker` — spawn de subagentes, procesamiento pesado)
+- **Server**: Rust/Axum (`canvas-ai-server` — REST/WebSocket, sirve al frontend; en nube es el gateway multi-tenant)
+- **Worker**: Rust (`canvas-ai-worker` — spawn de subagentes, sandbox Linux; stateless sin credenciales de DB)
 - **Frontend**: React 19 + TypeScript + Vite 8 + @xyflow/react v12 + Zustand + immer
-- **Almacenamiento**: SQLite con SQLiteVec para embeddings vectoriales (local/Tauri); PostgreSQL para despliegue server/multi-tenant
+- **Almacenamiento**: SQLite + SQLiteVec (local/Tauri, offline) · PostgreSQL + RLS (nube multi-tenant)
+- **Secretos**: keychain del OS (local) · envelope AES-GCM por tenant (nube) — BYOK, nunca en claro
 - **Transporte**: ACP (Agent Communication Protocol) para subagentes, MCP para herramientas
 
-**Reglas arquitectónicas (ADR-005):**
+**Reglas arquitectónicas (ADR-005 + ADR-006):**
 - `canvas-ai-core` NO tiene dependencias de Tauri ni HTTP — es puro dominio
 - Todo canvas se diseña VR-ready (coordenadas 3D, 1 unidad = 1 metro)
 - El frontend NO hace llamadas HTTP directas — todo pasa por el BFF server
+- `tenant_id`/`project_id` en TODO dato desde el día 1 (RLS fail-closed en nube)
 
 ---
 
@@ -153,6 +168,21 @@ interface SpatialMeta {
 ---
 
 ## Plan de construcción (Etapas)
+
+### Etapa 0: Fundación — schema maestro + eventos + secretos
+**Objetivo:** Base de datos y contratos desde el día 1 (antes de cualquier UI). Sin esto, todo lo demás exige retrofit.
+
+- [ ] **Schema maestro** — modelo canónico (sesiones, mensajes, skills, canvases, event_stream, ledger) con migraciones versionadas; `tenant_id`/`project_id` en toda tabla
+- [ ] **Contrato del `event_stream`** — taxonomía de rungs (PROMPT, PHASE, DIFF, TEST_RESULT, DECISION, ESCALATION) append-only; todos los componentes emiten eventos desde v0
+- [ ] **Módulo de secretos BYOK** — API keys del usuario: keychain del OS (local) / envelope AES-GCM por tenant (nube); nunca en claro, nunca al webview
+- [ ] **Sandbox Linux** — contrato del contenedor Ubuntu por tarea (red denegada por defecto, allowlist, timeout, kill limpio) — patrón GrokBot
+- [ ] **Decision Ledger** — tabla append-only con triggers (UPDATE/DELETE rechazados)
+- [ ] **Persistencia real** — sqlx/sqlite conectado (hoy el server vive en memoria `HashMap`)
+
+**Dependencias:** Ninguna (es la base)
+**Gate:** migración corre en SQLite y Postgres → seed produce sesión+evento → verificar append-only → key cifrada y descifrable con la correcta. Suite humana no aplica (fase de infraestructura).
+
+---
 
 ### Etapa 1: Control Room Canvas
 **Objetivo:** Canvas visual infinito donde ves TODAS las sesiones de agentes como nodos vivos — con estado en tiempo real, conexiones, métricas y acciones rápidas.
@@ -215,19 +245,21 @@ interface SpatialMeta {
 ---
 
 ### Etapa 3: Runtime de agentes (Plan C revisado)
-**Objetivo:** Conectar con agentes reales (Reasonix, DeepSeek directo, Ollama local).
+**Objetivo:** Conectar con agentes reales con **BYOK (trae tu API key)**, como Hermes Agent.
 
+- [ ] **Registro universal de proveedores (BYOK)** — cualquier API compatible (OpenAI, Anthropic, OpenRouter, DeepSeek…) se conecta pegando key/URL; selector muestra precio y contexto
 - [ ] ReasonixProvider: spawn serve, health check, SSE streaming, stop graceful
 - [ ] DeepSeekDirectProvider: HTTP directo a DeepSeek API
-- [ ] OllamaProvider: local, para modelos embebidos
+- [ ] OllamaProvider: local, para modelos embebidos y **offline sin internet**
 - [ ] Router inteligente: chat simple → directo, tool-calls → Reasonix, razonamiento → reasoner
 - [ ] Perfiles: economy / balanced / delivery (mapea a configuraciones del proveedor)
 - [ ] Telemetría: métricas por sesión, costo acumulado, cache hits
 - [ ] Cancelación de tareas en curso
 - [ ] ACP Protocol: comunicación entre agentes via JSON-RPC
 - [ ] Subagent Delegation: un skill puede delegar a sub-agentes
+- [ ] **Sandbox Linux**: skills/agentes que ejecutan código corren en contenedor Ubuntu (patrón GrokBot) — red denegada por defecto
 
-**Dependencias:** Etapa 2 (chat funcional)
+**Dependencias:** Etapa 2 (chat funcional), Etapa 0 (secretos BYOK)
 
 ---
 
@@ -247,10 +279,11 @@ interface SpatialMeta {
 ---
 
 ### Etapa 5: Panel de Skills (Plan G revisado)
-**Objetivo:** Crear, probar y usar skills visualmente con identidad.
+**Objetivo:** Crear, probar y usar skills visualmente. **Un skill es un documento `.md`** (receta) con personalidad, nombre y cara animada.
 
+- [ ] **Modelo de skill = `.md` canónico** — frontmatter (nombre, rol, tools permitidos, presupuesto) + instrucciones; el editor visual compila a `.md`, sin YAML manual
 - [ ] CRUD de skills (tabla SQLite, store Zustand, React Query)
-- [ ] Editor visual (formulario por secciones, validación Zod, sin YAML)
+- [ ] Editor visual (formulario por secciones, validación Zod)
 - [ ] Tool-gating estricto (skill declara tools permitidos)
 - [ ] Compilador a dialectos (prompt markdown, reasonix subagent, AGENTS.md)
 - [ ] Laboratorio sandbox (probar skill contra input de ejemplo)
@@ -262,7 +295,7 @@ interface SpatialMeta {
 - [ ] Multi-agent loops (skill orquesta múltiples agentes)
 - [ ] Rutinas por demostración ("follow along" — grabar y re-ejecutar)
 
-**Dependencias:** Etapa 3 (runtime), Etapa 4 (memoria para knowledge)
+**Dependencias:** Etapa 3 (runtime), Etapa 4 (memoria para knowledge), Etapa 0 (contrato de skill)
 
 ---
 
@@ -313,7 +346,7 @@ interface SpatialMeta {
 **Objetivo:** Agentes trabajan por resultados verificables.
 
 - [ ] Tareas con criterios de aceptación estructurados
-- [ ] TestRunner sandbox (ejecución aislada, allowlist, timeout)
+- [ ] TestRunner **sandbox Linux** (contenedor Ubuntu, ejecución aislada, allowlist, timeout) — patrón GrokBot
 - [ ] Resultados en el canvas (pass/fail/cobertura)
 - [ ] Shadow Workspace (pre-ejecutar checks antes de entregar)
 - [ ] Auto-corrección silenciosa (bucle interno sin molestar al humano)
@@ -352,26 +385,29 @@ interface SpatialMeta {
 
 ---
 
-### Etapa 10: Multi-plataforma
-**Objetivo:** Desktop (Windows/Mac/Linux), Web, y preparación VR.
+### Etapa 10: Multi-plataforma + Nube
+**Objetivo:** Desktop (Windows/Mac/Linux) gratis, y nube multi-tenant de pago para ejecución 24/7.
 
 - [ ] Tauri builds para las 3 plataformas desktop
-- [ ] Build web (WASM) para acceso via navegador
+- [ ] Build web (WASM) para acceso via navegador (misma SPA, modo ligero)
 - [ ] API REST completa para clientes externos
-- [ ] Preparación VR (coordinadas 3D, rendering por capas)
-- [ ] Pair programming via WebRTC
+- [ ] **Modo nube (suscripción, ADR-006)**: gateway axum → Postgres+RLS → workers Linux 24/7; los agentes corren aunque cierres la app; **BYOK** (la key del usuario, cifrada por tenant)
+- [ ] **Sandbox Linux** en el worker (contenedores Ubuntu provisionados, patrón GrokBot)
+- [ ] **Sync multi-dispositivo** (sesiones/canvas/skills) para suscriptores
+- [ ] Preparación VR (coordenadas 3D, rendering por capas) — post-v1
 
-**Dependencias:** Etapas 1-8 completas
+**Dependencias:** Etapas 1-8 completas; nube requiere Etapa 0 (RLS/migraciones) + ADR-006
 
 ---
 
 ## Qué NO es Canvas AI
 
 - **No es un chatbot** — es un entorno de trabajo visual con múltiples sesiones y agentes
-- **No es una empresa autónoma** — no gestiona presupuestos, roles, jerarquías ni contratos de "empleados IA"
+- **No es una "empresa autónoma"** — no gestiona jerarquías de "empleados IA", presupuestos de empleados ni dashboards de empresa (eliminado, ADR-006)
 - **No es un reemplazo de ChatGPT** — lo complementa con visualización, orquestación y memoria
 - **No es un ERP** — aunque referencia el AI Canvas del ERP, es una herramienta independiente
 - **No es n8n/Activepieces** — los supera con código nativo multi-runtime y agentes de IA
+- **La nube no es gratuita** — el modo 24/7 es de pago (suscripción); local siempre es gratis con tu API key
 
 ---
 
@@ -379,16 +415,17 @@ interface SpatialMeta {
 
 | Documento | Contenido |
 |---|---|
-| [SDD-011](../SDD-011-integracion-hermes-agent.md) | Integración con Hermes Agent (ACP, MCP, subagents) |
-| [SDD-012](../SDD-012-multi-agent-grokbot-patterns.md) | Patrones multi-agente de GrokBot |
+| [ADR-006](../../ADRs/ADR-006-vision-hibrida-local-nube.md) | **Visión híbrida: local-first + nube SaaS de pago (Q1-Q12)** |
+| [SDD-011](../SDD-011-integracion-hermes-agent.md) | Integración con Hermes Agent (BYOK, ACP, MCP, subagents) |
+| [SDD-012](../SDD-012-multi-agent-grokbot-patterns.md) | Patrones multi-agente de GrokBot (sesiones, sandbox Linux) |
 | [SDD-013](../SDD-013-gui-visual-spec.md) | Design system Obsidian Glass |
 | [plan-a](./plan-a-chat-codex.md) | Chat con sesiones (detallado) |
 | [plan-b](./plan-b-sidepanels-lovable.md) | Editor de código + live preview |
-| [plan-c](./plan-c-reasonix-deepseek.md) | Runtime de agentes (Reasonix, DeepSeek) |
+| [plan-c](./plan-c-reasonix-deepseek.md) | Runtime de agentes (Reasonix, DeepSeek, BYOK) |
 | [plan-d](./plan-d-memoria-v3code.md) | Memoria y knowledge base |
 | [plan-f](./plan-f-canva-oficina.md) | Canvas de automatización + Kanban de resultados |
-| [plan-g](./plan-g-skills-lab.md) | Skills Lab (creación visual) |
-| [plan-h](./plan-h-motor-pruebas.md) | Motor de pruebas y resultados |
+| [plan-g](./plan-g-skills-lab.md) | Skills Lab (recetas `.md` + avatares) |
+| [plan-h](./plan-h-motor-pruebas.md) | Motor de pruebas y resultados (sandbox Linux) |
 | [plan-vi](./plan-vi-second-brain.md) | Segundo Cerebro — grafo de archivos del proyecto |
 
 ---
@@ -403,6 +440,8 @@ interface SpatialMeta {
 | Tauri integration | ✅ Compila, identificador actualizado |
 | Frontend React | ✅ Build exitoso, dev server en :1420 |
 | Canvas ReactFlow | ✅ Componente base funcional |
+| Residuo "empresa autónoma" (teams/company) | ✅ Eliminado (ADR-006) |
+| Etapa 0 — Schema maestro + eventos + secretos | 🚧 Siguiente (persistencia real) |
 | Control Room Canvas (Etapa 1) | 🚧 En progreso |
 | Chat + Sesiones (Etapa 2) | ⬜ Pendiente |
 | Runtime agentes (Etapa 3) | ⬜ Pendiente |
@@ -412,7 +451,9 @@ interface SpatialMeta {
 | Automatización + Kanban (Etapa 6) | ⬜ Pendiente |
 | Pruebas (Etapa 7) | ⬜ Pendiente |
 | Editor código (Etapa 8) | ⬜ Pendiente |
+| Marketplace (Etapa 9) | ⬜ Pendiente |
+| Nube 24/7 multi-tenant (Etapa 10) | ⬜ Pendiente (requiere ADR-006) |
 
 ---
 
-*Última actualización: 2026-08-25*
+*Última actualización: 2026-08-25 (v3.0 — visión híbrida ADR-006)*

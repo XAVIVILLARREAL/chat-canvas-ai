@@ -144,16 +144,16 @@
 |---|---|---|
 | K.3 | Sonidos + política de interrupción (transversal: U.5/V.4/I) | E2E: mock eventos → sonido correcto por tipo (spy Audio); evento menor NO suena pero aparece en digest; toggles persisten |
 
-## Etapa 14 · Orquestación de sesiones — `plan-n-orchestration.md`
+## Etapa 14 · Orquestación de sesiones — `plan-n-orchestration.md` (sin "empresa autónoma", ADR-006)
 | Fase | Nombre | Pruebas |
 |---|---|---|
-| N.1 | Modelo de empresa | Cargo test modelo + presupuesto enforcement (rechaza gasto over-budget). E2E HUMANA: crear empresa completa desde cero |
-| N.2 | Jerarquía + worktrees paralelos | Integration scripted: objetivo simple → PM crea 3 tareas → 2 operativos en paralelo (worktrees distintos) completan → merges limpios → auditoría completa en event_stream |
-| N.3 | Presupuesto + kill-switch | Integration: budget simulado pequeño → pausa al llegar; kill-switch detiene todo <2s sin corrupción |
-| N.4 | Dashboard de empresa | E2E HUMANA: navegar dashboard, filtrar por rol/agente, replay scrubber de un proyecto completo |
-| N.5 | Proyecto demo end-to-end REAL | E2E largo REAL con DeepSeek: "todo-list app con tests" entregado; video completo (≤$20 gate) |
-| N.6 | Group chat + rutinas programadas | Integration: 3 agentes en group chat resuelven handoff sin humano (scripted). E2E HUMANA: conversación grupal en vivo; rutina nocturna programada y verificada + digest matutino |
-| N.7 | Entorno compartido de empresa | Cargo test: acceso sin scope rechazado+auditado; con scope permitido+registrado |
+| N.1 | Gestión de sesiones | E2E: crear 3 sesiones, cambiar entre ellas, aislamiento verificado, export/import |
+| N.2 | Invocación de agentes | E2E: invocar 2 agentes en la misma sesión → contextos aislados + costos separados |
+| N.3 | Delegación de sub-agentes (patrón Hermes ACP) | E2E: skill con 3 sub-agentes → resultado integrado; timeout/retry |
+| N.4 | Control Room: vista de sesiones activas | E2E: 3 sesiones como nodos → layout → interactuar; persistencia tras reinicio |
+| N.5 | Tracking de actividad | Unit tracking events. E2E: dashboard muestra datos reales (costo, agentes usados) |
+| N.6 | Plantillas de sesiones | E2E: crear desde plantilla → agentes configurados |
+| N.7 | Modo nube 24/7 (suscripción, ADR-006) | Integration: cola 20 tareas → consumo ordenado + corte por presupuesto. Chaos: provider cae → pausa limpia. E2E: cierro app → reabro en otro dispositivo → sesión siguió con evidencia |
 
 ## Etapa 15 · Marketplace + v1.0 — `plan-o-marketplace-v1.md`
 | Fase | Nombre | Pruebas |

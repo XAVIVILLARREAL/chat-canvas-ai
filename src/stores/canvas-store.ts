@@ -6,7 +6,6 @@ import type {
   CanvasEdge, 
   Skill, 
   Agent, 
-  AgentTeam, 
   MCPServer,
   ExecutionContext,
   Viewport,
@@ -22,15 +21,13 @@ interface CanvasState {
   selectedEdgeIds: string[];
   viewport: Viewport;
   sidebarOpen: boolean;
-  sidebarTab: 'nodes' | 'skills' | 'agents' | 'teams' | 'mcp' | 'settings' | 'execution';
+  sidebarTab: 'nodes' | 'skills' | 'agents' | 'mcp' | 'settings' | 'execution';
   nodePanelOpen: boolean;
   nodePanelNodeId: string | null;
   skills: Skill[];
   selectedSkillId: string | null;
   agents: Agent[];
   selectedAgentId: string | null;
-  teams: AgentTeam[];
-  selectedTeamId: string | null;
   mcpServers: MCPServer[];
   selectedMcpServerId: string | null;
   executions: ExecutionContext[];
@@ -43,7 +40,6 @@ interface CanvasState {
   setCanvases: (canvases: Canvas[]) => void;
   setSkills: (skills: Skill[]) => void;
   setAgents: (agents: Agent[]) => void;
-  setTeams: (teams: AgentTeam[]) => void;
   setMcpServers: (servers: MCPServer[]) => void;
   setExecutions: (executions: ExecutionContext[]) => void;
   setLoading: (loading: boolean) => void;
@@ -51,7 +47,6 @@ interface CanvasState {
   fetchCanvases: () => Promise<void>;
   fetchSkills: () => Promise<void>;
   fetchAgents: () => Promise<void>;
-  fetchTeams: () => Promise<void>;
   fetchMcpServers: () => Promise<void>;
   fetchExecutions: () => Promise<void>;
   setCurrentCanvas: (canvas: Canvas) => void;
@@ -87,10 +82,6 @@ interface CanvasState {
   updateAgent: (agent: Agent) => void;
   removeAgent: (id: string) => void;
   setSelectedAgent: (id: string | null) => void;
-  addTeam: (team: AgentTeam) => void;
-  updateTeam: (team: AgentTeam) => void;
-  removeTeam: (id: string) => void;
-  setSelectedTeam: (id: string | null) => void;
   addMcpServer: (server: MCPServer) => void;
   updateMcpServer: (server: MCPServer) => void;
   removeMcpServer: (id: string) => void;
@@ -160,8 +151,6 @@ export const useCanvasStore = create<CanvasState>()(
     selectedSkillId: null,
     agents: [],
     selectedAgentId: null,
-    teams: [],
-    selectedTeamId: null,
     mcpServers: [],
     selectedMcpServerId: null,
     executions: [],
@@ -313,7 +302,6 @@ export const useCanvasStore = create<CanvasState>()(
     setCanvases: (canvases: Canvas[]) => set((state: CanvasState) => { state.canvases = canvases; }),
     setSkills: (skills: Skill[]) => set((state: CanvasState) => { state.skills = skills; }),
     setAgents: (agents: Agent[]) => set((state: CanvasState) => { state.agents = agents; }),
-    setTeams: (teams: AgentTeam[]) => set((state: CanvasState) => { state.teams = teams; }),
     setMcpServers: (servers: MCPServer[]) => set((state: CanvasState) => { state.mcpServers = servers; }),
     setExecutions: (executions: ExecutionContext[]) => set((state: CanvasState) => { state.executions = executions; }),
     setLoading: (loading: boolean) => set((state: CanvasState) => { state.loading = loading; }),
@@ -322,7 +310,6 @@ export const useCanvasStore = create<CanvasState>()(
     fetchCanvases: async () => { try { const response = await fetch('/api/canvases'); if (response.ok) { const canvases = await response.json(); get().setCanvases(canvases); } } catch (error) { console.error('Failed to fetch canvases:', error); } },
     fetchSkills: async () => { try { const response = await fetch('/api/skills'); if (response.ok) { const skills = await response.json(); get().setSkills(skills); } } catch (error) { console.error('Failed to fetch skills:', error); } },
     fetchAgents: async () => { try { const response = await fetch('/api/agents'); if (response.ok) { const agents = await response.json(); get().setAgents(agents); } } catch (error) { console.error('Failed to fetch agents:', error); } },
-    fetchTeams: async () => { try { const response = await fetch('/api/teams'); if (response.ok) { const teams = await response.json(); get().setTeams(teams); } } catch (error) { console.error('Failed to fetch teams:', error); } },
     fetchMcpServers: async () => { try { const response = await fetch('/api/mcp/servers'); if (response.ok) { const servers = await response.json(); get().setMcpServers(servers); } } catch (error) { console.error('Failed to fetch MCP servers:', error); } },
     fetchExecutions: async () => { try { const response = await fetch('/api/executions'); if (response.ok) { const executions = await response.json(); get().setExecutions(executions); } } catch (error) { console.error('Failed to fetch executions:', error); } },
 
@@ -335,11 +322,6 @@ export const useCanvasStore = create<CanvasState>()(
     updateAgent: (agent: Agent) => set((state: CanvasState) => { const idx = state.agents.findIndex((a: Agent) => a.id === agent.id); if (idx >= 0) state.agents[idx] = agent; }),
     removeAgent: (id: string) => set((state: CanvasState) => { state.agents = state.agents.filter((a: Agent) => a.id !== id); if (state.selectedAgentId === id) state.selectedAgentId = null; }),
     setSelectedAgent: (id: string | null) => set((state: CanvasState) => { state.selectedAgentId = id; }),
-
-    addTeam: (team: AgentTeam) => set((state: CanvasState) => { state.teams.push(team); }),
-    updateTeam: (team: AgentTeam) => set((state: CanvasState) => { const idx = state.teams.findIndex((t: AgentTeam) => t.id === team.id); if (idx >= 0) state.teams[idx] = team; }),
-    removeTeam: (id: string) => set((state: CanvasState) => { state.teams = state.teams.filter((t: AgentTeam) => t.id !== id); if (state.selectedTeamId === id) state.selectedTeamId = null; }),
-    setSelectedTeam: (id: string | null) => set((state: CanvasState) => { state.selectedTeamId = id; }),
 
     addMcpServer: (server: MCPServer) => set((state: CanvasState) => { state.mcpServers.push(server); }),
     updateMcpServer: (server: MCPServer) => set((state: CanvasState) => { const idx = state.mcpServers.findIndex((s: MCPServer) => s.id === server.id); if (idx >= 0) state.mcpServers[idx] = server; }),

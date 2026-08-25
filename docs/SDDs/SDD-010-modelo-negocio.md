@@ -1,27 +1,27 @@
-# SDD-010 — Modelo de Negocio: Tauri vs Web, Monetización y Growth (investigación profunda)
+# SDD-010 — Modelo de Negocio: Local-first gratis + Nube SaaS de pago, Monetización y Growth
 
-> Fecha: 2026-08-24 · Estado: Propuesto · Método: 3 investigaciones paralelas (outcome-pricing · growth devtools · datos previos de hosting/costos SDD-008)
-> Complementa [PLAN T·T.BIZ](./plan-t-excelencia.md#tbiz) y responde el dilema del usuario: *web vs Tauri, cómo monetizar, qué da más crecimiento como startup*.
+> Fecha: 2026-08-24 · Actualizado: 2026-08-25 (ratificado por [ADR-006](./ADRs/ADR-006-vision-hibrida-local-nube.md)) · Estado: **Aprobado (dirección)** · Método: 3 investigaciones paralelas (outcome-pricing · growth devtools · datos previos de hosting/costos SDD-008)
+> Complementa [PLAN T·T.BIZ](./plan-t-excelencia.md#tbiz).
 
-## 1 · Los 3 ESCENARIOS DE USO (todos soportados por la misma arquitectura ADR-005)
+## 1 · MODELO HÍBRIDO (ADR-006) — local-first gratis + nube de pago
 
-| Escenario | Qué corre dónde | Cliente ideal | Por qué existe |
+| Escenario | Qué corre dónde | Costo | Por qué existe |
 |---|---|---|---|
-| **A · Todo-local** | App + agentes + Ollama en TU máquina | Dev privacy-maximalista / offline | Privacidad absoluta, costo LLM cero |
-| **B · Servidor propio** | Backend en TU Linux/docker + dispositivos acceden | Power-user / pequeña empresa que quiere control | Escalable, persistente, multi-dispositivo, tus llaves |
-| **C · Nube gestionada** | TODO en NUESTRA infra (multi-tenant) | Usuario no-técnico / equipo que no quiere operar nada | Cero fricción — aquí vive el negocio recurrente |
+| **A · Local-first (PRODUCTO BASE)** | App Tauri + agentes + Ollama en TU máquina; BYOK (tu API key en el keychain del OS) | **Gratis** | Privacidad, offline, dueño de tus datos — el producto principal |
+| **B · Nube 24/7 (SaaS multi-tenant, DE PAGO)** | Agentes corriendo en NUESTROS workers Linux 24/7; Postgres+RLS por tenant; BYOK cifrada por tenant | **Suscripción** ($29-149/mes) | "Mis agentes trabajan aunque cierre la app" + sync multi-dispositivo |
+| **C · Servidor propio (power-user)** | Backend en TU Linux/docker | Gratis (self-host) | Control total para quien lo quiera operar |
 
-**El mismo codebase sirve los 3** (crates `core`+`server`+[shell] de ADR-005): lo único que cambia es dónde apunta el cliente.
+**El mismo codebase sirve los 3** (crates `core`+`server`+shell): lo único que cambia es dónde apunta el cliente y si se cobra. **Regla de negocio: la nube solo la paga quien la usa.**
 
-## 2 · TAURI vs WEB — por escenario (síntesis del debate [SDD-009](./SDD-009-debate-decisiones.md))
+## 2 · TAURI vs WEB — resuelto por ADR-006
 
-| | Escenario A (todo-local) | Escenario B (servidor propio) | Escenario C (nube) |
+| | Escenario A (local-first) | Escenario B (nube de pago) | Escenario C (self-host) |
 |---|---|---|---|
-| **Web-first** | ⚠️ Limitado (FSA API solo Chromium; sin acceso profundo a FS) | ✅ Ideal — navegador apunta a tu servidor | ✅✅ ÓPTIMO — conversión máxima, cero fricción |
-| **CLI ligero** | ✅ Para power-users (patrón Devin/Claude Code) | ✅ Opcional | — |
-| **Tauri desktop** | ✅✅ Su ÚNICO hogar natural (empaqueta el escenario A completo: app+agentes+Ollama) | 🟡 Posible pero redundante | 🔴 Contraevidenciado (mercado votó URL; SmartScreen/notarización = impuesto 15-25% descargas; WebKitGTK frágil) |
+| **Tauri desktop** | ✅✅ PRODUCTO PRINCIPAL (local-first, gratis, BYOK) | 🟡 Cliente ligero opcional | — |
+| **Web-first** | 🟡 SPA servida por gateway en modo lectura/ligero | ✅✅ ÓPTIMO — conversión máxima, cero fricción | ✅ Ideal — navegador apunta a tu servidor |
+| **CLI ligero** | ✅ Para power-users (patrón Devin/Claude Code) | ✅ Opcional | ✅ Opcional |
 
-**VEREDICTO integrado**: construir **web-first** (el gateway axum sirve la React app — funciona para B y C desde el día 1) + **Tauri-shell DESPUÉS como el producto del escenario A** ("Canvas AI Local — privacidad total, IA en tu máquina") — se convierte en un SKU/edición, no en el producto principal. El CLI llega en fase de crecimiento. ⚠️ Pendiente ratificación del usuario.
+**VEREDICTO ratificado (ADR-006, Q1):** **local-first es el producto principal** (Tauri + SQLite, gratis, BYOK). La nube es un **SKU de pago** (suscripción, multi-tenant, workers 24/7). La web es la misma SPA servida por el gateway para el modo nube.
 
 ## 3 · MONETIZACIÓN — los 3 modelos con datos reales
 

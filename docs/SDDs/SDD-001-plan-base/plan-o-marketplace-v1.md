@@ -3,11 +3,11 @@
 > [← Maestro](./README.md) · [← PLAN N](./plan-n-orchestration.md)
 > Depende de: Etapa 14. Cierra el roadmap hacia la visión completa (marketplace del AGENTS.md original).
 
-**Entregable:** empresas, skills y plantillas se empaquetan y comparten; release 1.0 pulido.
+**Entregable:** skills, proyectos y plantillas de sesiones se empaquetan y comparten; release 1.0 pulido. (La "empresa autónoma" fue eliminada — ADR-006: se empaquetan sesiones/skills/proyectos, no empresas.)
 
 <a id="o1"></a>
 ### O.1 — Bundles `.canvas-ai-bundle`
-- Empaquetador: empresa (roles+skills+plantillas de tareas) → paquete firmado (hash+manifest) importable 1-click en otra instalación; skills exportables individualmente a todos los dialectos ([G·G.3](./plan-g-skills-lab.md#g3))
+- Empaquetador: **proyecto** (skills + plantillas de sesiones + config de canvas) → paquete firmado (hash+manifest) importable 1-click en otra instalación; skills exportables individualmente a todos los dialectos ([G·G.3](./plan-g-skills-lab.md#g3))
 - **Pruebas:** Cargo test roundtrip export→import idempotente; firma verificada; import malicioso rechazado (validación manifest)
 
 <a id="o2"></a>
@@ -24,7 +24,7 @@
 
 ## 🚪 GATE O — v1.0
 
-Instalador descargado desde CI corre en una máquina limpia: creo empresa desde bundle de terceros, la opero con voz, veo su oficina animada, entrego un proyecto real con PR. **La fábrica visual de empresas de desarrollo es realidad.**
+Instalador descargado desde CI corre en una máquina limpia: importo un proyecto desde bundle de terceros (skills + sesiones), lo opero, entrego un proyecto real con PR. **La fábrica visual de agentes de desarrollo es realidad.**
 
 ---
 [← Maestro](./README.md) · [← PLAN N](./plan-n-orchestration.md)

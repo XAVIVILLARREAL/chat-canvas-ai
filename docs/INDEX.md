@@ -72,6 +72,11 @@
 | ADR-003 | Voz y Sincronización | Pendiente |
 | ADR-004 | Integración GitHub | Pendiente |
 | ADR-005 | Modelo Despliegue Dual | Aceptado |
+| ADR-006 | **Visión híbrida: local-first gratis + nube SaaS multi-tenant de pago (Q1-Q12)** | **Aceptado** |
+
+## Decisiones del análisis de plan (Q1-Q12)
+
+Ver [`ADR-006`](./ADRs/ADR-006-vision-hibrida-local-nube.md) — híbrido local+nube, BYOK, skills `.md`, sandbox Linux (GrokBot), sin "empresa autónoma".
 
 ## Otros
 

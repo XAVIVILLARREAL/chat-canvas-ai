@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  Bot, Zap, Users, Plug, Play, Settings,
+  Bot, Zap, Plug, Play, Settings,
   Plus, Search, Edit, Trash2, Play as PlayIcon, Pause, RotateCcw,
   ExternalLink, Eye,
 } from 'lucide-react';
@@ -8,18 +8,17 @@ import {
   useCanvasStore 
 } from '../stores/canvas-store';
 import type { 
-  Skill, Agent, AgentTeam, MCPServer, ExecutionContext,
+  Skill, Agent, MCPServer, ExecutionContext,
   AgentStatus, AgentRole 
 } from '../types';
 import { AGENT_STATUS_COLORS, AGENT_ROLE_COLORS } from '../types';
 import './Sidebar.css';
 
 interface SidebarProps {
-  activeTab: 'nodes' | 'skills' | 'agents' | 'teams' | 'mcp' | 'settings' | 'execution';
+  activeTab: 'nodes' | 'skills' | 'agents' | 'mcp' | 'settings' | 'execution';
   onTabChange: (tab: SidebarProps['activeTab']) => void;
   skills: Skill[];
   agents: Agent[];
-  teams: AgentTeam[];
   mcpServers: MCPServer[];
   executions: ExecutionContext[];
 }
@@ -29,7 +28,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onTabChange,
   skills,
   agents,
-  teams,
   mcpServers,
   executions,
 }) => {
@@ -38,15 +36,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setSelectedSkill,
     selectedAgentId,
     setSelectedAgent,
-    selectedTeamId,
-    setSelectedTeam,
     selectedMcpServerId,
     setSelectedMcpServer,
     currentExecutionId,
     setCurrentExecution,
     removeSkill,
     removeAgent,
-    removeTeam,
     removeMcpServer,
   } = useCanvasStore();
 
@@ -55,7 +50,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const tabs = [
     { id: 'skills', label: 'Skills', icon: Zap, count: skills.length },
     { id: 'agents', label: 'Agentes', icon: Bot, count: agents.length },
-    { id: 'teams', label: 'Equipos', icon: Users, count: teams.length },
     { id: 'mcp', label: 'MCP', icon: Plug, count: mcpServers.length },
     { id: 'execution', label: 'Ejecuciones', icon: Play, count: executions.length },
     { id: 'settings', label: 'Config', icon: Settings, count: 0 },
@@ -63,7 +57,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const filteredSkills = skills.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.description.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredAgents = agents.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.description.toLowerCase().includes(searchQuery.toLowerCase()));
-  const filteredTeams = teams.filter(t => t.name.toLowerCase().includes(searchQuery.toLowerCase()) || t.description.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredMcpServers = mcpServers.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.description.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredExecutions = executions.filter(e => e.executionId.toLowerCase().includes(searchQuery.toLowerCase()) || e.canvasId.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -87,7 +80,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="sidebar-content">
         {activeTab === 'skills' && <SkillList skills={filteredSkills} selectedId={selectedSkillId} onSelect={setSelectedSkill} onAdd={() => {}} onRemove={removeSkill} />}
         {activeTab === 'agents' && <AgentList agents={filteredAgents} selectedId={selectedAgentId} onSelect={setSelectedAgent} onAdd={() => {}} onRemove={removeAgent} />}
-        {activeTab === 'teams' && <TeamList teams={filteredTeams} selectedId={selectedTeamId} onSelect={setSelectedTeam} onAdd={() => {}} onRemove={removeTeam} />}
         {activeTab === 'mcp' && <McpServerList servers={filteredMcpServers} selectedId={selectedMcpServerId} onSelect={setSelectedMcpServer} onAdd={() => {}} onRemove={removeMcpServer} />}
         {activeTab === 'execution' && <ExecutionList executions={filteredExecutions} currentExecutionId={currentExecutionId} onSelect={setCurrentExecution} />}
         {activeTab === 'settings' && <SettingsPanel />}
@@ -112,12 +104,6 @@ const AgentList: React.FC<{ agents: Agent[]; selectedId: string | null; onSelect
   </div>
   );
 };
-
-const TeamList: React.FC<{ teams: AgentTeam[]; selectedId: string | null; onSelect: (id: string | null) => void; onAdd: () => void; onRemove: (id: string) => void }> = ({ teams, selectedId, onSelect, onAdd, onRemove }) => (
-  <div className="sidebar-list"><div className="list-header"><h3>Equipos</h3><button className="add-btn" onClick={onAdd} title="Nuevo Equipo"><Plus width={14} height={14} /></button></div>
-  {teams.length === 0 ? <div className="empty-state"><p>No hay equipos</p><button className="btn-primary" onClick={onAdd}><Plus width={14} height={14} /> Crear Equipo</button></div> : <ul className="item-list">{teams.map(team => (<li key={team.id} className={`item ${selectedId === team.id ? 'selected' : ''}`} onClick={() => onSelect(team.id)}><div className="item-main"><span className="item-icon" style={{ color: '#8b5cf6' }}><Users width={14} height={14} /></span><div className="item-info"><span className="item-name">{team.name}</span><span className="item-meta">{team.members.length} miembros · {team.hierarchy.structure}</span></div></div><div className="item-actions"><button className="item-action" onClick={(e) => { e.stopPropagation(); onSelect(team.id); }} title="Ejecutar"><PlayIcon width={12} height={12} /></button><button className="item-action" onClick={(e) => { e.stopPropagation(); onSelect(team.id); }} title="Editar"><Edit width={12} height={12} /></button><button className="item-action danger" onClick={(e) => { e.stopPropagation(); onRemove(team.id); }} title="Eliminar"><Trash2 width={12} height={12} /></button></div></li>))}</ul>}
-  </div>
-);
 
 const McpServerList: React.FC<{ servers: MCPServer[]; selectedId: string | null; onSelect: (id: string | null) => void; onAdd: () => void; onRemove: (id: string) => void }> = ({ servers, selectedId, onSelect, onAdd, onRemove }) => {
   const getStatusColor = (status: MCPServer['status']) => { switch (status) { case 'connected': return '#22c55e'; case 'connecting': return '#f59e0b'; case 'error': return '#ef4444'; case 'unauthorized': return '#ec4899'; default: return '#64748b'; }};

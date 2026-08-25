@@ -1,18 +1,19 @@
 # ARQUITECTURA.md — Arquitectura de Canvas AI
 
 > Documento maestro de arquitectura. Siempre consultar antes de crear componentes, servicios o features nuevas.
-> **v4.0 (2026-08-25)**: alineada con la nueva dirección de Canvas AI como herramienta de IA generalista.
+> **v5.0 (2026-08-25)**: alineada con **ADR-006** — visión híbrida local-first (gratis) + nube multi-tenant de pago (BYOK).
 
 ## Visión general
 
-**Canvas AI** es una herramienta de IA generalista desktop (Tauri v2) con React + Rust. El gateway Rust (Axum) sirve la SPA React y soporta REST + SSE/WS de streaming. Un crate de dominio compartido (`canvas-ai-core`) alimenta al servidor y al shell Tauri. Los agentes se comunican via ACP Protocol (Hermes) y MCP (stdio/HTTP/SSE).
+**Canvas AI** es una herramienta de IA generalista **híbrida**: el producto base es **local-first** (Tauri v2 + SQLite, gratis, BYOK), y existe un **modo nube** multi-tenant de pago (Postgres+RLS + workers Linux 24/7) para quien quiera ejecución continua. El gateway Rust (Axum) sirve la SPA React y soporta REST + SSE/WS de streaming. Un crate de dominio compartido (`canvas-ai-core`) alimenta al servidor y al shell Tauri. Los agentes se comunican via ACP Protocol (Hermes) y MCP (stdio/HTTP/SSE). **BYOK**: cada usuario trae su API key (keychain del OS en local; cifrada por tenant en nube).
 
-**Referencias arquitectónicas**: Hermes Agent (ACP, subagents, MCP), GrokBot (sessions), ERP AI Canvas (deploy-spec, node types).
+**Referencias arquitectónicas**: Hermes Agent (ACP, subagents, MCP, BYOK), GrokBot (sessions, sandbox Linux), ERP AI Canvas (deploy-spec, node types).
 
 ```
 +-----------------------------------------------------+
-|              CLIENTE (navegador v1 / Tauri futuro)   |
-|  src/ — SPA React (cómputo client-first)            |
+|              CLIENTE (Tauri desktop = principal)     |
+|  src/ — SPA React (cómputo client-first, local)     |
+|  + SQLite + SQLiteVec (datos locales, offline)      |
 +-----------------------------------------------------+
 |              GATEWAY (Rust axum, stateless)          |
 |  crates/server — sirve SPA + REST + SSE/WS           |
@@ -21,12 +22,13 @@
 |  Agentes · Tareas · Skills · Sesiones · Memoria      |
 +-----------------------------------------------------+
 |          WORKERS de agentes (Rust, sin DB creds)     |
-|  crates/worker — cola SKIP LOCKED · sandboxes · hb   |
+|  crates/worker — cola SKIP LOCKED · sandbox Linux    |
+|  (nube 24/7) · spawn local (desktop) · hb 30s        |
 +-----------------------------------------------------+
-|        DATOS (Postgres+RLS · MinIO · Valkey)         |
+|        DATOS (local: SQLite · nube: Postgres+RLS)    |
 +-----------------------------------------------------+
 ```
-> ✅ `crates/worker` creado (2026-08-24, patrón Everruns): stateless sin credenciales de DB, heartbeat 30s — el claim SKIP LOCKED y el sandbox Docker llegan con C.3/H.9a.
+> ✅ `crates/worker` creado (2026-08-24, patrón Everruns): stateless sin credenciales de DB, heartbeat 30s — el claim SKIP LOCKED y el sandbox Linux llegan con C.3/H.9a. En modo nube los workers son los que corren los agentes 24/7 (ADR-006 Q3/Q8).
 
 ## Principio de cómputo CLIENT-FIRST (escalabilidad — regla transversal dura)
 
@@ -78,24 +80,26 @@
 
 | Plataforma | Runtime | Backend | Frontend | Estado |
 |---|---|---|---|---|
-| **Navegador (v1 — WEB-FIRST)** | Chromium/Safari/Firefox | Gateway axum (servidor) | React | Activo (meta) |
-| Celular/tablet | Navegador (UI adaptada, ADR-001) | idem | React | Activo (meta) |
-| Servidor | Rust (axum + workers) | Rust | N/A | Activo (meta) |
-| Tauri shell (diferido, solo con demanda) | Tauri 2 + WebView | Rust local (crates/core) | React | Diferido |
+| **Desktop (local-first, gratis)** | Tauri 2 + WebView | Rust local (crates/core) + SQLite | React | Principal (ADR-006) |
+| **Nube 24/7 (suscripción, multi-tenant)** | Navegador / desktop | Gateway axum + Postgres+RLS + workers Linux | React | Diferido (requiere ADR-006, de pago) |
+| Celular/tablet | Navegador (UI adaptada, ADR-001) | idem nube / local | React | Activo (meta) |
+| Servidor (workers 24/7) | Linux (contenedores Ubuntu, patrón GrokBot) | Rust (axum + workers) | N/A | Activo (meta) |
 
 ## Reglas de arquitectura
 
-1. **Cómputo client-first**: toda capacidad que pueda correr en el cliente va al cliente (tabla arriba); prohibido mandar al servidor trabajo que el navegador puede hacer gratis.
-2. **Un solo frontend** — todo React en `src/`, adaptación via `useResponsive()`, no hay `src-desktop/` ni `src-mobile/`.
-3. **Dominio puro en Rust** (`crates/core`) sin Tauri ni HTTP — consumido por server y (futuro) tauri-shell.
-4. **Workers stateless** — sin credenciales de DB; reclaman tareas con `FOR UPDATE SKIP LOCKED` + heartbeat.
-5. **Multi-tenant con Postgres + RLS fail-closed** (patrón tenaxum/Everruns); `tenant_id`/`project_id` en TODO dato desde el día 1 ([A·A.0]).
-6. **Secretos SOLO en el servidor/Rust** — jamás al webview ni al bundle.
-7. **Auth MVP desde el día 1** (modo servidor): sesión/token + RLS fail-closed; passkeys/QR post-base ([SDD-008]).
-8. **Postgres en Compose desde el día 1** (dev web-first): RLS se prueba real; SQLite solo Tauri offline.
-7. **Eventos**: efímeros por bus (broadcast por sesión) · durables en Postgres append-only (Ledger).
-8. **Cada capa expone su contraparte MCP** (visión V3Code).
-9. **Responsive TOTAL** — todas las pantallas operables en móvil 375 (ver AGENTS.md §Diseno responsive).
+1. **Cómputo client-first**: toda capacidad que pueda correr en el cliente va al cliente; prohibido mandar al servidor trabajo que el navegador puede hacer gratis. En local-first, **casi todo es local**.
+2. **Híbrido local + nube (ADR-006)**: mismo dominio y frontend; local = SQLite (gratis), nube = Postgres+RLS (de pago); `tenant_id`/`project_id` en TODO dato desde el día 1 (RLS fail-closed en nube).
+3. **BYOK**: el usuario trae su API key. Local → keychain del OS (crate `keyring`). Nube → cifrada por tenant (envelope AES-GCM, KEK por tenant). Nunca en claro, nunca al webview.
+4. **Sandbox Linux (patrón GrokBot)**: el código de agentes corre en contenedor Ubuntu aislado — red denegada por defecto, allowlist, timeout, kill limpio.
+5. **Un solo frontend** — todo React en `src/`, adaptación via `useResponsive()`, no hay `src-desktop/` ni `src-mobile/`.
+6. **Dominio puro en Rust** (`crates/core`) sin Tauri ni HTTP — consumido por server y tauri-shell.
+7. **Workers stateless** — sin credenciales de DB; reclaman tareas con `FOR UPDATE SKIP LOCKED` + heartbeat.
+8. **Secretos SOLO en el servidor/Rust local** — jamás al webview ni al bundle.
+9. **Auth MVP desde el día 1** (modo nube): sesión/token + RLS fail-closed; passkeys/QR post-base ([SDD-008]).
+10. **Postgres en Compose desde el día 1** (para probar RLS real); SQLite es el almacén local por defecto.
+11. **Eventos**: efímeros por bus (broadcast por sesión) · durables en Postgres/SQLite append-only (Ledger).
+12. **Cada capa expone su contraparte MCP** (visión V3Code).
+13. **Responsive TOTAL** — todas las pantallas operables en móvil 375 (ver AGENTS.md §Diseno responsive).
 
 ## Anti-patrones de arquitectura
 
@@ -107,6 +111,8 @@
 | `src-desktop/`, `src-mobile/` | `src/` con `useResponsive()` | Un solo frontend |
 | Tipos duplicados sin sincronizar | `packages/shared-types/` + tauri-specta | Consistencia |
 | Workers con credenciales de DB | Workers stateless (cola SKIP LOCKED) | Superficie de ataque mínima |
+| Keys del usuario en claro / en el bundle | Keychain del OS (local) · cifrado por tenant (nube) | BYOK seguro (ADR-006) |
+| Nube gratuita para todo el mundo | Local gratis · nube 24/7 de pago | Modelo de negocio (ADR-006) |
 
 ## Checklist de arquitectura (antes de PR)
 

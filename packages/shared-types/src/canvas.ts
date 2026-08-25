@@ -1,6 +1,6 @@
 export interface CanvasNode {
   id: string;
-  type: "agent" | "skill" | "task" | "company";
+  type: "agent" | "skill" | "task" | "session";
   position: { x: number; y: number };
   data: Record<string, unknown>;
   width?: number;
