@@ -1,121 +1,158 @@
-# PLAN A — Chat núcleo Codex
+# PLAN A — Chat con Sesiones
 
-> [← Maestro](./README.md) · Siguiente: [PLAN B →](./plan-b-sidepanels-lovable.md)
-> Base de todos los demás planes. Copia los patrones de interacción de OpenAI Codex.
+> [← Maestro](./README.md) · [PLAN B →](./plan-b-sidepanels-lovable.md)
+> Referencia primaria: Hermes Agent (session persistence, subagent delegation, executive functions)
+> Referencia secundaria: GrokBot (session sidebar, chief of staff, proactive behavior)
 
-**Entregable:** abres la app, chateas con streaming, controlas permisos con 2 perillas, el historial persiste, slash commands funcionan.
+**Entregable:** Chat funcional con sesiones persistentes, sidebar de navegación, streaming de respuestas, y conexión con múltiples proveedores de IA.
+
+---
+
+## Qué construimos
+
+Un chat que no es solo un input + output. Es un **entorno de trabajo** donde:
+- Cada conversación es una **sesión** persistente (se reanuda, se busca, se organiza)
+- El usuario puede invocar **agentes** específicos dentro de una sesión
+- Las respuestas se renderizan con **markdown vivo**, código con syntax highlight, y previews de apps
+- El **costo** de cada interacción es visible en tiempo real
+- La **memoria** de sesiones anteriores alimenta las nuevas
+
+---
 
 ## Fases
 
-<a id="a0"></a>
-### A.0 — Proyectos como TENANTS: cards + tabs + historial aislado (FUNDACIÓN, va sobre todo lo demás)
-- **Modelo**: tabla `projects`; TODAS las demás tablas (sessions, messages, event_stream, knowledge, tasks, settings-overrides) llevan `project_id` — aislamiento total estilo multitenant, pero por proyecto de software
-- **Cards de selección**: al abrir la app, grid de tarjetas simples (avatar/color generado, nombre, última actividad, agentes activos) — seleccionar y entrar. Crear/renombrar/archivar proyecto desde ahí
-- **Auth MVP (prerequisito v3.8)**: en modo servidor (web-first) A.0 incluye sesión/token simple con **RLS fail-closed desde el día 1**; passkeys/QR-pairing ([SDD-008](../SDD-008-analisis-cliente-servidor-k8s.md)) quedan post-base — sin esto el gateway público no arranca
-- **Tabs de proyectos**: barra superior con los proyectos ABIERTOS como tabs (estilo navegador) — cambiar entre ellos sin cerrar nada; cada tab conserva su chat/sesión activa; las tabs se restauran tras reiniciar
-- **Historial 100% aislado**: las conversaciones de un proyecto JAMÁS se mezclan con otro; buscar/fork/export opera dentro del proyecto actual
-- **Tareas en background entre tabs**: cambiar de tab NO detiene al agente del otro proyecto — sigue trabajando (badge de actividad en su tab)
-- **Configuraciones por proyecto persistidas**: modelo preferido, permisos default, apariencia del workspace — cada tenant recuerda lo suyo ([A·A.6](./plan-a-chat-codex.md#a6) herencia global→proyecto)
-- **Global vs Local decidido por el usuario** para MCP ([PLAN P](./plan-p-centro-mcp.md)), skills ([G](./plan-g-skills-lab.md)) y agentes: biblioteca GLOBAL compartida O "hacer copia local" editable sin afectar a otros proyectos — toggle explícito por elemento
-- **Pruebas:**
-  - Unit: repos filtran por project_id en TODAS las consultas; resolución de scopes global→local
-  - Integration: proyecto A no ve NADA de B (queries cross-tenant vacías); override local no muta el global; restauración de tabs tras reinicio
-  - E2E funcional: crear 2 proyectos → alternar tabs → historiales separados → skill global usada en ambos → copia local editada solo afecta a uno
-  - Suite HUMANA @core: entro por card, cambio de tab como usuario real, veo que nada se mezcló
+### A.1 — Modelo de datos de sesiones
 
-<a id="a1"></a>
-### A.1 — AppShell + stores
-- Layout 3 paneles responsive según ADR-001: Sidebar proyectos / ChatPanel / WorkArea placeholder
-- Stores Zustand: `session-store` (sesión activa, mensajes), `ui-store` (paneles, perillas)
-- `useResponsive` wired a AppShell
-- **Pruebas:** Vitest stores+hook. E2E: layout mobile 375px (BottomNav) y desktop 1440px (sidebar)
+Tabla `sessions` en SQLite:
+```
+id, title, created_at, updated_at, project_id, 
+agent_config (JSON), status (active/archived/deleted),
+total_tokens, total_cost_usd, metadata (JSON)
+```
 
-<a id="a2"></a>
-### A.2 — Persistencia SQLite
-- Tablas `sessions`, `messages` via sqlx (migraciones embebidas) — **ambas con `project_id` desde el día 1**
-- **Schema maestro (prerequisito v3.8)**: ANTES de crear tablas, mini-SDD con TODAS las tablas del roadmap (`sessions, messages, event_stream, tasks, skills, documents, workspace_knowledge, human_invariants, decisions, companies, budgets, repos, mcp_servers…`) + `tenant_id` en cada una + **contrato canónico de `event_stream`/rung** (event_type + payload) — se implementa por fases, pero los IDs/columnas quedan fijados una vez
-- **Tabla `settings` CIFRADA (AES-GCM) aquí**: primitiva que consumen [A·A.3](./plan-a-chat-codex.md#a3) (API keys) y [A·A.6](./plan-a-chat-codex.md#a6) (hub) ([A·A.0](./plan-a-chat-codex.md#a0)): el aislamiento multitenant NO se retrofittea después · **KEK decidida (v3.8)**: env var / keyring con fallback cifrado (patrón [T.SEC](./plan-t-excelencia.md#tsec))
-- Commands Tauri CRUD + bindings tauri-specta
-- **Pruebas:** Cargo test repositorios; integration roundtrip mensaje
+Tabla `messages`:
+```
+id, session_id, role (user/assistant/system/tool), 
+content, model, tokens_prompt, tokens_completion,
+cost_usd, timestamp, metadata (JSON)
+```
 
-<a id="a3"></a>
-### A.3 — Trait AgentProvider + DeepSeekDirect
+Store Zustand `useSessionStore`:
+- `sessions: Session[]` — lista de sesiones
+- `activeSessionId: string | null`
+- `messages: Map<string, Message[]>` — mensajes por sesión
+- CRUD completo con optimistic updates via React Query
+
+**Pruebas:** Cargo test schema + CRUD. E2E: crear sesión, enviar mensaje, verificar persistencia.
+
+---
+
+### A.2 — Sidebar de sesiones
+
+Componente `SessionSidebar` (panel izquierdo):
+- Lista cronológica de sesiones (más recientes arriba)
+- Búsqueda por título/contenido (FTS5)
+- Filtros: activas / archivadas / todas
+- Carpetas/etiquetas para organizar
+- Acciones: renombrar, archivar, eliminar, duplicar
+- Indicador de sesión activa (highlight + badge de costo)
+- Botón "Nueva sesión" prominente
+
+**Diseño:** Obsidian Glass theme (bg-slate-900/80, backdrop-blur-xl, border-white/10)
+
+**Pruebas:** E2E: crear 3 sesiones, buscar, filtrar, archivar, eliminar.
+
+---
+
+### A.3 — Panel de chat
+
+Componente `ChatPanel` (panel derecho):
+- **Mensajes**: markdown renderizado (react-markdown + rehype-highlight)
+- **Código**: syntax highlight con Prism/Shiki, botón copiar, bloques expandibles
+- **Streaming**: SSE o WebSocket, tokens aparecen en tiempo real
+- **Input**: textarea con auto-resize, slash commands, adjuntos de archivos
+- **Tool calls**: renderizado especial (mostrar tool name, args, resultado colapsable)
+- **Costo visible**: badge en cada mensaje con tokens + USD
+
+Slash commands:
+- `/compact` — comprimir historial viejo a resumen
+- `/agent <nombre>` — cambiar de agente
+- `/skill <nombre>` — invocar un skill
+- `/run <comando>` — ejecutar comando en sandbox
+- `/help` — listar comandos disponibles
+
+**Pruebas:** E2E: enviar mensaje, verificar streaming, probar slash commands.
+
+---
+
+### A.4 — Trait AgentProvider (Rust)
+
 ```rust
 #[async_trait]
-trait AgentProvider {
-    async fn send(&self, session: &SessionId, msg: &str, policy: &PermissionPolicy) -> EventStream;
-    fn capabilities(&self) -> Capabilities;
+pub trait AgentProvider: Send + Sync {
+    async fn send_message(&self, msg: &str, ctx: &SessionContext) -> AgentStream;
+    async fn cancel(&self, request_id: &str) -> Result<()>;
+    fn name(&self) -> &str;
+    fn capabilities(&self) -> ProviderCapabilities;
 }
 ```
-- `DeepSeekDirect`: HTTP SSE en Rust (key cifrada en tabla settings — JAMÁS al webview)
-- Streaming → evento Tauri `chat://chunk`
-- **Pruebas:** unit con mock-server SSE; integration orden de chunks
 
-<a id="a4"></a>
-### A.4 — UX Codex (el corazón copiado)
-- **2 perillas ortogonales** junto al composer (patrón Codex):
-  - Perilla 1 alcance: `Solo lectura | Workspace | Total` 
-  - Perilla 2 aprobación: `Nunca | Al salir del sandbox | Siempre`
-  - Presets con nombre: **Auto** (workspace+al-salir), **Lectura**, **Plan**
-  - Traducción a modos Reasonix (`ask/auto/plan/acceptEdits/dontAsk`) documentada para [PLAN C](./plan-c-reasonix-deepseek.md#c1)
-- Cards de tool-call: nombre + args colapsados + resultado + estado — **viven INLINE en el hilo** (superficie chat-first estilo GrokBot) y las **aprobaciones usan opciones numeradas** (▸ 1. X · 2. Y) NATIVAMENTE aquí (es el corazón UX Codex); [V·V.2](./plan-v-visual-grokbot.md#v2) (con F.0) UNIFICA después esta primitiva con el Consejo de Expertos y aplica el pulido [SDD-013](../SDD-013-gui-visual-spec.md) — el panel WorkArea es el zoom, no el flujo
-- **Streaming vía abstracción de transporte**: en WEB-FIRST los tokens llegan por WebSocket/SSE del gateway directo al navegador; bajo el futuro instalable Tauri el MISMO contrato viaja por Channel IPC — la UI nunca cambia ([PLAN S·S3](./plan-s-despliegue-costos.md#s3))
-- **Superficie visual**: la conversación (burbujas, desks, cards de tool-call, aprobaciones numeradas) se construye con los tokens de [SDD-013](../SDD-013-gui-visual-spec.md) (GlassCard + texto §1) — chat-first GrokBot ([PLAN V](./plan-v-visual-grokbot.md#v0)) sobre el Design System, nunca CSS improvisado
-  - Regla día-1: URL del API configurable en runtime + notificaciones/archivos SIEMPRE por capas de abstracción → agregar shells nativos mañana costará cero reescritura
-- Visor de diff unificado inline en el chat
-- Panel terminal colapsable (salida de comandos del agente)
-- **Slash commands**: `/resume` (dentro del proyecto actual), `/fork`, `/status`, `/permissions` (parser propio; `/compact` llega con [D](./plan-d-memoria-v3code.md#d1))
-- Aprobar/rechazar acción pendiente con scopes "una vez" vs "toda la sesión" (Codex)
-- **Pruebas:** E2E browser-mode con provider MOCK scriptado (sin key real): prompt→streaming→tool-call→aprobar→diff visible→slash fork duplica sesión
+Implementaciones:
+- **ReasonixProvider**: spawn `reasonix serve`, SSE streaming, health check, graceful stop
+- **DeepSeekDirectProvider**: HTTP directo a DeepSeek API, streaming SSE
+- **OllamaProvider**: local, para modelos embebidos
 
-<a id="a5"></a>
-### A.5 — Medidor y debug de contexto (ganadora torneo)
-- Widget en vivo de QUÉ ve el agente: desglose de tokens por fuente (system · AGENTS.md · rungs · knowledge · tool-results · historial) y % de ventana de contexto usada
-- Semáforo anticipado: qué se comprimirá/expulsará en el próximo turno ([C·C.5](./plan-c-reasonix-deepseek.md#c5)) antes de que ocurra — sin sorpresas de caché fría
-- Modo debug: inspeccionar el request EXACTO enviado (capturado en el trait [A·A.3](./plan-a-chat-codex.md#a3)) y reproducirlo
-- Knobs por scope ([A·A.6](./plan-a-chat-codex.md#a6)): límites de contexto por fuente, presupuesto por proyecto
-- **Pruebas:**
-  - Unit: desglose de tokens por fuente correcto con fixtures sintéticos
-  - Integration: request capturado por mock coincide 1:1 con lo que el medidor muestra
-  - E2E humano: abrir el medidor durante una sesión real → el desglose coincide con el costo mostrado; ajusto un límite → la siguiente request refleja el cambio
+Router inteligente:
+- Chat simple sin tools → DeepSeekDirect (sin overhead de 31k tokens de Reasonix)
+- Tarea con tool-calls → Reasonix (perfiles economy/balanced)
+- Planificación dura → deepseek-reasoner
 
-<a id="a6"></a>
-### A.6 — Centro de Configuración (flexible para todos los públicos)
-- Hub unificado accesible desde sidebar, con **búsqueda de ajustes** y dos modos de presentación: **tarjetas en lenguaje claro** (no-programadores: toggles, descripciones humanas, presets) y **modo crudo** (programadores: JSON editable con validación)
-- Categorías: Cuenta · Apariencia · Modelos y proveedores · Permisos/Sandbox por defecto · Notificaciones · Voz · Sync · Presupuestos · Privacidad/Datos · Atajos · MCP ([PLAN P](./plan-p-centro-mcp.md)) · Avanzado
-- **Jerarquía completa de 5 scopes**: Global → Proyecto → Equipo/Empresa → Agente → Subagente, con herencia y override visible en cada campo: badge "heredado de: Global" / "modificado aquí" (patrón VS Code "Modified in"), tooltip con la cadena completa de overrides, reset que elimina SOLO la capa actual, merge declarado POR TIPO (escalares reemplazan · arrays se fusionan · políticas 🔒 enforced arriba que abajo no tocan — patrón Cursor Team Rules/Claude managed), validación que marca claves "no configurables en este nivel" (patrón Codex), y **vista de VALOR EFECTIVO** con origen (patrón git --show-origin) + diff renderizado antes/después del override
-- Aplica a TODO lo configurable: contexto/caché ([C·C.5](./plan-c-reasonix-deepseek.md#c5)), memorias ([D·D.8](./plan-d-memoria-v3code.md#d8)), respaldos ([H·H.9](./plan-h-motor-pruebas.md#h9)), skills/MCP global-vs-local, permisos, voz, presupuestos
-- Alcance GLOBAL vs POR-PROYECTO con herencia y override visible ("este proyecto sobreescribe X")
-- Import/export de configuración portable · Modo seguro (arranca sin terceros) · Reset por categoría con confirmación · Todo cambio auditado en el Ledger
-- **Pruebas:** Unit store settings + herencia global/proyecto. E2E humano: no-programador cambia un ajuste solo con clicks; programador edita JSON crudo validado; override por proyecto visible
+**Pruebas:** Cargo test trait + implementaciones mock. Integration: chat real con DeepSeek.
 
-<a id="a7"></a>
-### A.7 — Modo ENCARGO: dar trabajo, no prompts (patrón Grok Bot)
-- Alternativa al prompt libre: botón "Nuevo encargo" con campos en lenguaje humano — **qué resultado esperas** (criterios), **cuándo** (al terminar / fecha), **autonomía** (me consultas siempre / solo lo peligroso / todo tuyo)
-- El encargo se convierte internamente en tarea con criterios ([H·H.1](./plan-h-motor-pruebas.md#h1)) — el agente trabaja y "vuelve cuando está listo o necesita juicio"
-- **v1 (Etapa 1)**: modelo de tarea MÍNIMO (título + criterios de texto + autonomía); [H·H.1] (Etapa 8) lo formaliza con criterios tipados y ciclo SOP sin cambiar la UI (mismo store, misma pantalla)
-- Menos como promptear, más como delegar a un compañero
-- **Pruebas:** E2E humano: crear encargo sin escribir un prompt; agente mock lo completa; notificación de vuelta con evidencia
+---
 
-<a id="a8"></a>
-### A.8 — Resume inteligente al abrir (patrón Grok Bot)
-- Al abrir la app: tarjeta contextual por sesión activa — "ayer quedaste en X, el agente dejó Y pendiente, ¿continúo?"
-- Reconstruye contexto desde rungs del Ledger ([D·D.1](./plan-d-memoria-v3code.md#d1)) y ofrece continuar/ignorar/descartar con un click
-- **v1 (Etapa 1)**: resume desde el estado persistido de la sesión (última tarea, mensajes pendientes); [D·D.1] (Etapa 4) lo enriquece reconstruyendo contexto desde el Ledger
-- **Pruebas:** Integration: sesión interrumpida → resume card correcta. E2E humano: cerrar a mitad de tarea → reabrir → continuar fluido
+### A.5 — Memory Rail
 
-<a id="a9"></a>
-### A.9 — Ramas visuales al editar mensajes (patrón ChatGPT)
-- Al editar un mensaje ([A·A.4](./plan-a-chat-codex.md#a4) `/fork`): navegadores ‹2/3› sobre el mensaje para moverse entre ramas de la conversación
-- Indicador de rama activa en el header + acceso a "otras ramas" con su resultado final comparado
-- **Pruebas:** Unit tree-store. E2E humano: edito mensaje 2 veces → flechas ‹› navegan alternativas sin perder ninguna
+Franja vertical junto al chat:
+- Muestra rungs de la sesión (eventos tipados: PROMPT, DIFF, DECISION, TEST_RESULT)
+- Icono por tipo de rung
+- Click en rung → filtra el chat a ese momento
+- Scrubber: arrastrar para navegar la sesión
+- Coloreado por sesión (paleta consistente)
+
+**Pruebas:** E2E: sesión con múltiples rungs, navegación por memory rail.
+
+---
+
+### A.6 — Persistencia y reanudación
+
+- Todas las sesiones se guardan en SQLite al momento
+- Al reanudar sesión: cargar historial completo, reconstruir contexto
+- `/compact` genera un resumen LLM del historial viejo y lo guarda como system message
+- Export: sesión → JSONL compatible con formato Codex
+- Import: JSONL → sesión reconstruida
+
+**Pruebas:** Cargo test serialización/deserialización. E2E: crear sesión, cerrar app, reanudar.
+
+---
+
+### A.7 — Widget de costo
+
+Badge flotante en el chat:
+- Tokens totales de la sesión (prompt + completion)
+- Costo acumulado en USD
+- Cache hits (si aplica)
+- Costo por mensaje (hover)
+- historial de costos por sesión (gráfico simple)
+
+**Pruebas:** Unit: cálculo de costos. E2E: verificar que el badge actualiza con cada mensaje.
+
+---
 
 ## 🚪 GATE A (demo verificable)
 
-1. Conversación REAL con DeepSeek (key de prueba) con streaming carácter a carácter
-2. Cambiar la perilla de aprobación cambia el comportamiento observado (mock pregunta o no)
-3. `/fork` crea sesión hermana; historial sobrevive reinicio completo de la app
-4. Evidencia: video + suites verdes (vitest/cargo/playwright)
+Abro Canvas AI → creo nueva sesión → escribo "hola" → recibo respuesta con streaming → el mensaje aparece en la memory rail → cierro y reabro → la sesión persiste → veo el costo acumulado → cambio a otra sesión → vuelvo → todo intacto. Slash commands funcionan. Suite humana verde.
 
 ---
+
 [← Maestro](./README.md) · [PLAN B →](./plan-b-sidepanels-lovable.md)

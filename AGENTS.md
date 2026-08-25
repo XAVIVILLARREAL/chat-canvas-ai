@@ -1,617 +1,143 @@
-# AGENTS.md — Canvas AI (plataforma visual de automatización con agentes)
+# AGENTS.md — Canvas AI
 
-> Guia de trabajo para los agentes en este proyecto. Leer antes de tocar codigo.
+> Guía de trabajo para agentes AI en este proyecto. Leer antes de tocar código.
 
-## Que es este proyecto
+## Qué es este proyecto
 
-Una **plataforma visual de automatización con agentes** hecha en **Rust + React**: un sistema donde los usuarios crean flujos de trabajo completos usando agentes de IA, con un canvas visual como interfaz principal. No es un editor de código — es una **fábrica visual de automatizaciones** donde los agentes trabajan, prueban y entregan resultados.
+**Canvas AI** es una **herramienta de IA generalista** desktop (Tauri v2) para trabajar con múltiples agentes de IA de forma visual y organizada.
 
-- **Idea rectora:** *Crear empresas de desarrollo autonomas visualmente, donde los agentes son empleados que trabajan por resultados y pruebas, no por codigo.*
-- **Documentacion:** `docs/INDEX.md` — mapa completo de todos los .md del proyecto.
-- **Estado actual:** `docs/ESTADO.md` — donde estamos ahora (corto, autoadministrado).
-- **Historial:** `docs/CHANGELOG.md` — append-only, cada sesion deja rastro.
+- **No es un chatbot** — es un entorno de trabajo con canvas visual, sesiones, skills, y automatizaciones
+- **No es una empresa autónoma** — no gestiona presupuestos, roles ni jerarquías de "empleados IA"
+- **Referencias**: Hermes Agent (ACP, subagents, MCP), GrokBot (sessions, chief of staff), ERP AI Canvas (deploy-spec, node types)
+- **Documentación**: `docs/INDEX.md` — mapa completo
+- **Estado**: `docs/ESTADO.md` — dónde estamos
 
-## La vision
+## La visión
 
-### Producto principal
+Un usuario puede:
+1. **Ver todo en un Control Room** — canvas infinito con sesiones activas, agentes trabajando, resultados
+2. **Chatear con sesiones** — sidebar con sesiones, panel derecho con markdown vivo, código, previews
+3. **Crear skills visualmente** — formulario sin YAML, avatares generados por IA, multi-agent loops
+4. **Automatizar workflows** — canvas visual tipo n8n mejorado, multi-runtime (Python/TS/Go/Bash/SQL)
+5. **Usar voz** — STT/TTS para hablar con agentes
+6. **Trabajar offline** — Ollama local como fallback
 
-Un sistema donde puedes:
+## Stack tecnológico
 
-1. **Crear una empresa de desarrollo** — armas un equipo de agentes IA con roles (dev, QA, reviewer, PM, devops), cada uno con skills especializados
-2. **Visualizar la oficina** — canva animado estilo juego donde ves a los agentes trabajando en tiempo real
-3. **Crear agentes con skills** — editor visual de skills (sin YAML), laboratorio para probarlos, exportar a cualquier dialecto (opencode, Cursor, Claude Code)
-4. **Trabajar por resultados** — los agentes ejecutan tareas, corren pruebas, entregan diffs; tu apruebas o rechazas
-5. **Sincronizar entre dispositivos** — celular, desktop, y a futuro gafas de RA; continuar donde dejaste
-6. **Comunicarte con voz** — hablar con los agentes, que te respondan con TTS
-7. **Detectar actividad** — sonidos/notificaciones cuando un agente deja de trabajar o necesita aprobacion
-8. **Git nativo en la app** — push, pull, branches, pull requests todo desde la interfaz visual, sin terminal
-9. **Revision de errores** — el sistema detecta errores automaticamente y los asigna al agente correcto para su arreglo
-10. **Superposiciones de agentes** — cuando un agente falla, otro agente puede superponerse y tomar control de la tarea
-
-### El diferenciador visual
-
-- **Identidad visual dirigida por IA** — la IA elige estilo y recursos visuales (ver Recursos de diseno visual) buscando el maximo impacto en cada pantalla
-- **Oficina animada** — agentes como personajes con estados visibles (trabajando, bloqueado, esperando)
-- **Canva interactivo** — nodos, conexiones, zoom, drag-and-drop, minimap
-- **Grafo 3D** — visualizacion de relaciones entre archivos, imports, llamadas
-- **Facil de usar** — disenado para crear sistemas complejos sin escribir codigo de configuracion
-
-### El enfoque: pruebas y resultados, no codigo
-
-Los agentes no solo escriben codigo — **prueban y demuestran resultados**:
-
-- Cada tarea tiene criterios de aceptacion verificables
-- Los agentes corren pruebas automaticamente
-- Los resultados se muestran en el canva (pass/fail, cobertura, diffs)
-- El humano aprueba basado en evidencia, no en codigo
-- Las empresas se construyen sobre ciclos de: **plan -> implementar -> probar -> aprobar -> entregar**
-
-## Stack tecnologico
-
-| Capa | Tecnologia | Por que |
+| Capa | Tecnología | Por qué |
 |---|---|---|
-| Framework | **Tauri 2.0** | Rust backend + web frontend, bundles chicos, seguridad |
-| Frontend | **React 19.2 + TypeScript** | Ecosistema enorme, React Compiler, hooks modernos |
-| Bundler | **Vite 8 (Rolldown)** | 10-30x mas rapido que Rollup, un solo bundler Rust |
-| TS Compiler | **TypeScript-Go (tsgo)** | 10-100x mas rapido que tsc, TypeScript 7 nativo en Go |
-| React Compiler | **Oxc Transform** | Memorizacion automatica, 10x mas rapido que Babel |
-| IPC type-safe | **tauri-specta** | Genera bindings TypeScript desde comandos Rust |
-| Lint + Format | **Biome** | Rust-based, 10-35x mas rapido que ESLint+Prettier |
-| Lint adicional | **oxlint** | Parser/linter Rust ultra-rapido, reglas complementarias |
-| Codigo muerto | **knip** | Detecta imports, funciones y tipos no usados |
-| Estado global | **Zustand** | 1KB, sin boilerplate, DevTools, persistencia via plugin |
-| Estado server | **TanStack React Query** | Caching, reintentos, loading states automaticos |
-| Estilos | **CSS moderno + TailwindCSS** | Container queries, :has(), nesting; el estilo lo define la IA con skills de diseno |
-| Editor | **Monaco Editor** | VS Code editor, LSP nativo, 100+ lenguajes |
-| Canva 2D | **ReactFlow** | Nodos, edges, zoom, drag-and-drop, minimap |
-| Canva 3D | **Three.js** | Grafo del proyecto, visualizacion de relaciones |
-| VR/Gafas | **WebXR** (futuro, Etapa 19) | Inmersivo en gafas Meta Quest/Apple Vision Pro — preparado desde F.0 con SpatialMeta |
-| Backend | **Rust (Tauri)** | Hub server, DB, filesystem, seguridad |
-| DB local | **SQLite (sqlx)** | Persistencia rapida y segura |
-| Persistencia UI | **tauri-plugin-store** | Store nativo JSON, persiste estado del canva/config |
-| Agentes | **Python (CrewAI + LangGraph)** | Orquestacion de agentes, grafos de estado |
-| Voz | **Web Speech API + TTS** | STT nativo del browser, TTS via API |
-| Comunicacion | **WebSocket** | Real-time con Python service (agentes) |
-| Notificaciones | **tauri-plugin-notification** | Sonidos + notificaciones nativas |
-| Testing E2E | **Playwright + tauri-plugin-playwright** | Tests E2E en CI, Chromium + WebKit, modo Tauri real |
+| Desktop | **Tauri 2.0** | Rust + web frontend, bundles chicos |
+| Frontend | **React 19 + TypeScript** | Ecosistema, React Compiler |
+| Bundler | **Vite 8 (Rolldown)** | 10-30x más rápido |
+| Canvas 2D | **@xyflow/react v12** | Nodos, edges, zoom, drag-and-drop |
+| Estado | **Zustand + immer** | 1KB, immutable updates |
+| Server state | **React Query v5** | Caching, reintentos |
+| Editor | **Monaco Editor** | VS Code editor embebido |
+| Backend | **Rust (Axum)** | Hub server, DB, seguridad |
+| DB | **SQLite (sqlx)** | Persistencia rápida + SQLiteVec para embeddings |
+| Agentes | **ACP Protocol** | Hermes Agent, subagent delegation |
+| Herramientas | **MCP (stdio/HTTP/SSE)** | Integración con herramientas externas |
 
 ## Arquitectura
 
 ```
-+-----------------------------------------------------+
-|               FRONTEND (React + TypeScript)          |
-|                                                     |
-|  +-------------+ +----------+ +------------------+ |
-|  | Canva 2D/3D | | Editor   | | Panel de agentes | |
-|  | ReactFlow   | | Monaco   | | (estados, voz)   | |
-|  | Three.js    | | LSP      | |                  | |
-|  +-------------+ +----------+ +------------------+ |
-|  +-------------+ +----------+ +------------------+ |
-|  | Skills Lab  | | Tablero  | | Chat con agentes | |
-|  | (crear,     | | Kanban   | | (voz + texto)    | |
-|  |  probar)    | |          | |                  | |
-|  +-------------+ +----------+ +------------------+ |
-+----------------------|------------------------------+
-                       | IPC (Tauri commands)
-+----------------------|------------------------------+
-|               BACKEND RUST                           |
-|                                                     |
-|  +----------+ +----------+ +----------------------+|
-|  | Hub      | | SQLite   | | Filesystem +         ||
-|  | Server   | | (sqlx)   | | Procesos del SO      ||
-|  | (axum)   | |          | |                      ||
-|  +----------+ +----------+ +----------------------+|
-|  +----------+ +----------+ +----------------------+|
-|  | Seguridad| | Sync multi-device                ||
-|  | (crypto) | | (WebSocket)                      ||
-|  +----------+ +----------------------------------+|
-+----------------------|------------------------------+
-                       | WebSocket / HTTP
-+----------------------|------------------------------+
-|            CEREBRO (Python, separado)                |
-|                                                     |
-|  +----------+ +----------+ +----------------------+|
-|  | LangGraph| | CrewAI   | | MCP Server           ||
-|  | (grafos) | | (crews)  | | (herramientas)       ||
-|  +----------+ +----------+ +----------------------+|
-|  +----------+ +----------+ +----------------------+|
-|  | Skills   | | Memoria  | | Checkpoints          ||
-|  | engine   | | agente   | | (persistencia)       ||
-|  +----------+ +----------+ +----------------------+|
-+-----------------------------------------------------+
+┌─────────────────────────────────────────────┐
+│  Canvas AI Desktop (Tauri v2)               │
+│  ┌─────────────┐  ┌──────────────────────┐  │
+│  │  Rust Core   │  │  React Frontend      │  │
+│  │  canvas-ai-  │  │  (@xyflow/react)     │  │
+│  │  core (lib)  │  │  Zustand + immer     │  │
+│  │             │  │  React Query          │  │
+│  │  canvas-ai- │  │  Monaco Editor        │  │
+│  │  server      │  │                      │  │
+│  │  (Axum)      │  │                      │  │
+│  │             │  │                      │  │
+│  │  canvas-ai- │  │                      │  │
+│  │  worker      │  │                      │  │
+│  └─────────────┘  └──────────────────────┘  │
+│  SQLite (SQLiteVec embeddings)              │
+│  ACP Protocol (Hermes) para subagentes      │
+│  MCP (stdio/HTTP/SSE) para herramientas    │
+└─────────────────────────────────────────────┘
 ```
 
-## Recursos de diseno visual (reference/)
+## Reglas arquitectónicas
 
-Skills y guias de diseno clonadas localmente para dar identidad grafica al proyecto. **Fuente canónica visual: [`SDD-013-gui-visual-spec.md`](./docs/SDDs/SDD-013-gui-visual-spec.md) — la IA lee SDD-013 ANTES de tocar cualquier UI.** Consultar antes de tocar UI.
-
-| Recurso | Ruta | Estado | Uso |
-|---|---|---|---|
-| **apple-design-skill** (dickwu) | `reference/apple-design-skill/` | ✅ Instalado | Auditor UI/UX basado en Apple HIG, multiplataforma (Tauri + web). 53 guias en `references/hig/` (color, tipografia, accesibilidad, dark mode, glassmorphism, liquid-glass) |
-| **impeccable** (pbakaus) | `reference/impeccable/` | ✅ Instalado | Lenguaje anti-"estetica IA generica": tipografia, color, motion, **spatial** (profundidad 3D). Comandos: polish, audit, critique, animate. Critico para 3D/gafas |
-| **react-bits** (DavidHDev) | `reference/react-bits/` | ✅ Instalado | Componentes interactivos de alto impacto: Spotlight Cards, Click Spark, fondos Silk/Aurora, Blur Text, Glare Hover. Skills: find-animation-opportunities, improve-animations, apple-design |
-| **ui-ux-pro-max** | `reference/ui-ux-pro-max/` | ❌ No clone (GitHub auth) | Catalogo de estilos: 84 estilos (glassmorphism, claymorphism, brutalismo...), 192 paletas, 74 pares tipograficos, 98 reglas UX. Clonar manualmente |
-| **liquid-glass-web** (Zettersten) | `reference/liquid-glass-web/` | ❌ No clone (GitHub auth) | Liquid Glass real en web: CSS `backdrop-filter` + SVG `feDisplacementMap` (refraccion real, no solo blur), plantillas React. Clonar manualmente |
-| **magic-ui** | `reference/magic-ui/` | ❌ No clone (GitHub auth) | 150+ componentes animados React+Tailwind+Motion: Border Beam, Animated Beam (aristas de luz), meteors, particles, Globe 3D. Clonar manualmente |
-| **v3code** | `reference/v3code/` | ❌ No encontrado | Arquitectura de 3 capas de memoria, Memory Rail, gutter de atribucion. Clonar si se necesita |
-
-### Como elegir (decide la IA)
-
-1. **La IA elige el skill y el estilo visual** segun la tarea, buscando siempre el resultado mas impresionante — no hay identidad fija predefinida
-2. Puede combinar recursos: `ui-ux-pro-max` para elegir estilo + paleta + tipografia, `impeccable` para pulir y evitar la estetica generica de IA, `liquid-glass-web` para efectos de vidrio en el canva, `apple-design-skill` para auditar contraste/accesibilidad antes de entregar
-3. Evitar mezclar dos estilos prescriptivos contradictorios en la misma pantalla
-4. Criterio final intransferible: jerarquia clara, contraste WCAG AA, motion con proposito, coherencia entre pantallas
-5. Actualizar con `git pull` dentro de cada carpeta (son clones shallow)
+1. **canvas-ai-core** NO tiene dependencias de Tauri ni HTTP — es puro dominio
+2. **Un solo frontend** — todo React en `src/`, no `src-desktop/`
+3. **IPC para frontend-backend** — comunicación via comandos Tauri
+4. **Shared types** — tipos de dominio en `packages/shared-types/`
+5. **VR-ready** — todo canvas con coordenadas 3D, 1 unidad = 1 metro, sin absolute CSS
 
 ## Reglas de trabajo
 
-1. **SDD por feature** — antes de implementar, escribir el diseno (objetivo, flujo, contratos, tests)
-2. **TDD** — primero el test que falla, despues el codigo que lo pasa
-3. **CI desde dia 1** — `pnpm typecheck` (tsgo) + `pnpm test` + `cargo test`
-4. **Gate por fase** — cada fase tiene su verificacion; una fase no se cierra sin pasar su gate
-5. **Definition of Done** — tests verdes + probado en 2 plataformas + gate cumplido
-6. Max 3 intentos por error antes de escalar al humano
-7. **Responsive first** — toda UI se disena mobile-first, despues se adapta a desktop (ver ADR-001 + RESPONSIVE.md)
-8. **Simpleza ante todo** — no sobrecomplicar; si una solucion tiene mas de 3 pasos, buscar una mas simple (TODO el proyecto: React, Rust, tests, scripts)
-9. **Orden en codigo** — mantener estructura logica: imports ordenados, archivos por responsabilidad, carpetas por dominio (TODO el proyecto)
-10. **Sin deuda tecnica** — no hacer "fix temporal"; si se detecta, documentar y arreglar antes de continuar (TODO el proyecto)
+1. **SDD por feature** — antes de implementar, escribir el diseño
+2. **TDD** — primero test que falla, después código que lo pasa
+3. **CI desde día 1** — `pnpm typecheck` + `pnpm test` + `cargo test`
+4. **Gate por fase** — cada fase tiene verificación; no se cierra sin gate
+5. **Responsive first** — mobile-first, después desktop
+6. **Simpleza ante todo** — no sobrecomplicar; YAGNI
+7. **Sin deuda técnica** — no hacer "fix temporal"
+8. **Orden en código** — imports ordenados, carpetas por dominio
 
-## Arquitectura (siempre se sigue)
-
-**Una sola arquitectura para todo el proyecto.** No hay versiones separadas ni codebases duplicados.
-
-### Capas
-
-| Capa | Ubicacion | Tecnologia | Responsabilidad |
-|---|---|---|---|
-| Frontend | `src/` | React + TypeScript | UI compartida (desktop + mobile) |
-| Backend Local | `src-tauri/` | Rust | Tauri commands, SQLite, seguridad |
-| Backend Server | `services/python/` | Python + FastAPI | CrewAI, LangGraph, orquestacion |
-| Shared Types | `packages/shared-types/` | TypeScript | Tipos de dominio compartidos |
-
-### Reglas de arquitectura
-
-1. **Un solo frontend** — todo React va en `src/`, no hay `src-desktop/` ni `src-mobile/`
-2. **Adaptacion via codigo** — usar `useResponsive()` para cambiar comportamiento, no archivos separados
-3. **Python aislado** — nunca mezclar Python con Node.js o Rust en la misma carpeta
-4. **Shared types** — los tipos de dominio van en `packages/shared-types/`, no duplicar
-5. **Platform-specific** — logica especifica de plataforma en `src-tauri/src/platforms/`
-6. **IPC para frontend-backend** — comunicacion via comandos Tauri, no imports directos
-7. **WS/HTTP para server** — comunicacion con Python via WebSocket o HTTP, no IPC
-
-### Documentacion
-
-- **ADR-002:** `docs/ADRs/ADR-002-arquitectura-hibrida.md` — decisiones de arquitectura
-- **ARQUITECTURA.md:** `docs/ARQUITECTURA.md` — diagramas, estructura, reglas
-
-## Codigo limpio y ordenado (siempre se sigue — TODO el proyecto)
-
-**El codigo debe ser legible, predecible y mantenible en TODAS las capas:** React, Rust, TypeScript, tests, scripts, configs. Si otro agente o humano lo abre, debe entenderlo en minutos, no horas. No hay excepciones por "ser solo un script" o "ser temporal".
-
-### Reglas de orden
-
-1. **Una responsabilidad por archivo** — un componente, un hook, un utilitario
-2. **Imports ordenados** — primero externos (react, zustand), despues internos (@/components, @/hooks)
-3. **Carpetas por dominio** — no por tipo (no `components/`, `hooks/`; si `canva/`, `agents/`, `skills/`)
-4. **Nombres descriptivos** — `useCanvasZoom` no `useHelper2`; `AgentCard` no `Card`
-5. **Funciones pequenas** — maximo 50 lineas por funcion; si es mas grande, dividir
-6. **Constantes arriba** — valores magicos no existen; siempre `const MAX_AGENTS = 10`
-
-### Estructura de carpetas
+## Estructura de carpetas
 
 ```
 src/
   components/
-    layout/       — AppShell, Header, Sidebar, BottomNav
     canvas/       — ReactFlow, nodos, edges
-    agents/       — AgentCard, AgentPanel
+    chat/         — ChatPanel, SessionSidebar
+    editor/       — Monaco, file explorer
     skills/       — SkillCard, SkillEditor
-    ui/           — Button, Input, Modal (generics)
+    ui/           — Button, Input, Modal
   hooks/
-    useResponsive.ts
-    useCanvas.ts
-    useAgents.ts
   stores/
-    app-store.ts
-  utils/
-    format.ts
-    validate.ts
+  lib/
   types/
-    agent.ts
-    skill.ts
-    canvas.ts
 ```
 
-### Reglas de simpleza
-
-1. **No abstractar prematuramente** — si solo se usa una vez, no crear abstraccion
-2. **No crear wrappers inutiles** — si TailwindCSS ya hace algo, no envolverlo
-3. **No over-engineering** — un `if` simple es mejor que un patron de diseno con 5 archivos
-4. **Config > Codigo** — preferir configuracion flexible sobre codigo rigido
-5. **Features no son capas** — no crear `features/canvas/CanvasContainer/CanvasPresenter/`
-6. **YAGNI** — You Ain't Gonna Need It; no construir para "futuro" que no existe
-
-### Anti-patrones a evitar
-
-| Mal | Bien | Por que |
-|---|---|---|
-| `utils/helpers.ts` con 200 lineas | `utils/format.ts`, `utils/validate.ts` | Responsabilidad unica |
-| `components/` con 50 archivos | `components/canva/`, `components/agents/` | Organizacion por dominio |
-| `handleClick`, `handleClick2`, `handleClick3` | `handleAgentClick`, `handleSkillClick` | Nombres descriptivos |
-| `any` en tipos | Tipo especifico o `unknown` | Type safety |
-| `// TODO: arreglar despues` | Arreglar ahora o documentar en SDD | Sin deuda tecnica |
-| Copy-paste de 100 lineas | Extraer a funcion compartida | DRY |
-| `useEffect` con 10 dependencias | Dividir en efectos mas pequenos | Mantenibilidad |
-
-### Checklist de orden (antes de PR)
-
-- [ ] Archivos en carpetas correctas por dominio
-- [ ] Imports ordenados (externos primero, internos despues)
-- [ ] Funciones < 50 lineas
-- [ ] Sin valores magicos (constantes extraidas)
-- [ ] Sin `any` (tipos definidos)
-- [ ] Sin TODOs pendientes (arreglar o documentar en SDD)
-- [ ] Nombres descriptivos (sin `data1`, `temp`, `helper`)
-- [ ] Un componente por archivo
-- [ ] Tests cubren casos principales
-
-## Diseno responsive (siempre se sigue)
-
-> **REGLA TRANSVERSAL DURA: TODAS las pantallas, secciones, ventanas, modales, paneles y flows del proyecto son RESPONSIVE y usables en celular.** No existe pantalla "solo desktop", ni seccion "solo web", ni "provisionalmente no movil". Si una pantalla no se puede operar completa en un celular (375px), la feature NO existe. Mobile-first SIEMPRE; desktop es un caso especial, no al reves.
-
-**Todo componente UI se disena para mobile primero.** Desktop es un caso especial, no al reves.
-
-### Reglas clave
-
-1. **Mobile-first** — escribir estilos para mobile, despues usar `md:`, `lg:`, `xl:` para desktop
-2. **AppShell adaptativo** — usar hook `useResponsive()` para cambiar layout
-3. **Breakpoints** — usar defaults de Tailwind (sm:640, md:768, lg:1024, xl:1280)
-4. **Touch targets** — minimo 44px en mobile, 24px en desktop
-5. **Canvas adaptativo** — ReactFlow con config mobile (minimap oculto, controls flotantes)
-6. **Navegacion** — BottomNav en mobile, Sidebar en desktop
-7. **Paneles** — BottomSheet en mobile, RightPanel en desktop
-8. **Animaciones** — respetar `prefers-reduced-motion`
-9. **Testing** — Playwright testea TODA pantalla/seccion en ambas vistas (mobile 375px + desktop 1440px); un gate GUI sin verificacion mobile NO cierra
-10. **Cobertura total** — el checklist por pantalla incluye: layout sin scroll horizontal, touch targets ≥44px, BottomSheet/BottomNav en mobile, contenido completo accesible sin hover (nada depende de hover en movil), texto legible sin zoom, modales a pantalla completa en movil
-11. **Regresion** — la suite humana responsive (`responsive-human.spec.ts`) se re-corre en CADA gate y antes de cada tag; cualquier cambio visual nuevo exige su paso mobile
-
-### Hook `useResponsive`
-
-```typescript
-const { isMobile, isTablet, isDesktop, width } = useResponsive();
-```
-
-Uso en componentes:
-```tsx
-{isMobile ? <MobileHeader /> : <DesktopHeader />}
-```
-
-### Documentacion
-
-- **ADR-001:** `docs/ADRs/ADR-001-responsive-design.md` — decisiones de arquitectura
-- **RESPONSIVE.md:** `docs/RESPONSIVE.md` — guia practica con componentes
-
-## Flujo SDD obligatorio (siempre se sigue)
-
-**Todo desarrollo sigue este flujo.** Sin excepciones. Ni rapido ni rapido.
-
-### Fase de diseno (SDD)
-
-1. **Crear SDD** en `docs/SDDs/SDD-XXX-nombre.md` antes de tocar codigo
-2. **Definir fases y prefases** — cada feature se divide en:
-   - **Fase X.1** — logica pura (unit tests)
-   - **Fase X.2** — integracion (integration tests)
-   - **Fase X.3** — UI/interfaz grafica (E2E Playwright)
-   - **Fase X.4** — pulido visual y responsive
-3. **Cada prefase tiene su gate** — no se avanza sin pasar el gate anterior
-
-### Prefases de pruebas E2E (Playwright CLI)
-
-Cuando la feature involucra **interfaz grafica (GUI)**, se crean pruebas E2E con Playwright — **SIEMPRE en las dos vistas: mobile 375px (viewport celular + touch) y desktop 1440px**. Una feature GUI sin su corrida mobile no se cierra:
-
-**Simulacion humana:**
-- `page.click('selector')` — clickear botones, links, elementos
-- `page.fill('selector', 'texto')` — escribir en inputs, forms
-- `page.press('selector', 'Enter')` — presionar teclas
-- `page.hover('selector')` — hover sobre elementos
-- `page.dragAndDrop('source', 'target')` — drag and drop (canva)
-- `page.mouse.wheel(0, 100)` — scroll
-
-**Verificacion:**
-- `expect(page.locator('h1')).toContainText('texto')` — verificar texto visible
-- `expect(page.getByRole('button')).toBeEnabled()` — verificar estado
-- `expect(page.locator('.loading')).not.toBeVisible()` — verificar que algo desaparece
-- `expect(page).toHaveURL(/pattern/` — verificar navegacion
-
-**Debugging:**
-- `console.log` del browser se captura via `page.on('console', ...)`
-- `page.screenshot({ path: 'evidence/paso-N.png' })` — evidencia visual por paso
-- `page.video.start()` / `page.video.stop()` — grabar video completo del test
-- `trace: 'on-first-retry'` — trace completo en fallos
-- `page.locator('selector').highlight()` — resaltar elemento para debug visual
-
-**Estructura de test E2E para GUI:**
-```typescript
-test.describe("Feature X", () => {
-  test("flujo completo: crear → editar → eliminar", async ({ page }) => {
-    // Paso 1: Navegar
-    await page.goto("/");
-    await expect(page.locator("h1")).toContainText("Empresa Dev");
-
-    // Paso 2: Crear
-    await page.getByRole("button", { name: "Crear" }).click();
-    await page.fill('input[name="nombre"]', "Mi Agente");
-    await page.getByRole("button", { name: "Guardar" }).click();
-
-    // Paso 3: Verificar
-    await expect(page.getByText("Mi Agente")).toBeVisible();
-    await page.screenshot({ path: "evidence/01-creado.png" });
-
-    // Paso 4: Editar
-    await page.getByText("Mi Agente").click();
-    await page.fill('input[name="nombre"]', "Agente Editado");
-    await page.getByRole("button", { name: "Guardar" }).click();
-
-    // Paso 5: Verificar edicion
-    await expect(page.getByText("Agente Editado")).toBeVisible();
-    await page.screenshot({ path: "evidence/02-editado.png" });
-
-    // Paso 6: Eliminar
-    await page.getByRole("button", { name: "Eliminar" }).click();
-    await page.getByRole("button", { name: "Confirmar" }).click();
-
-    // Paso 7: Verificar eliminacion
-    await expect(page.getByText("Agente Editado")).not.toBeVisible();
-    await page.screenshot({ path: "evidence/03-eliminado.png" });
-  });
-});
-```
-
-### Criterio de aprobacion
-
-Una feature se considera **completada** solo cuando:
-
-- [ ] SDD creado y aprobado
-- [ ] Todas las fases del SDD cumplidas
-- [ ] Unit tests verdes
-- [ ] Integration tests verdes
-- [ ] E2E Playwright tests verdes (si hay GUI)
-- [ ] Screenshots de evidencia en `evidence/`
-- [ ] Console sin errores en el browser
-- [ ] Gate de la fase cerrado
-- [ ] Commit con evidencia adjunta
-
-## Gestion automatica de documentacion
-
-La AI gestiona los documentos **sola**, sin intervencion humana. El humano solo revisa y aprueba.
-
-### Al iniciar sesion (automatico)
-
-1. Leer `docs/ESTADO.md` -> saber fase actual, SDDs recientes, gates pendientes
-2. Leer ultimas 10 lineas de `docs/CHANGELOG.md` -> que paso recientemente
-3. Si `ESTADO.md` no existe -> crear uno base con el formato actual
-
-### Durante la sesion (automatico)
-
-| Accion | Documento | Accion |
-|---|---|---|
-| Disenar una feature | `docs/SDDs/SDD-XXX-nombre.md` | Crear SDD con numeracion secuencial |
-| Decidir algo de arquitectura | `docs/ADRs/ADR-XXX-nombre.md` | Crear ADR |
-| Completar un gate | `docs/SDDs/SDD-001-plan-base/MATRIZ-FASES-PRUEBAS.md` + `docs/ESTADO.md` | Marcar fase/gate cumplido y actualizar estado |
-| Cualquier accion significativa | `docs/CHANGELOG.md` | Append al dia actual |
-| Cambiar la arquitectura | `docs/ARQUITECTURA.md` | Actualizar seccion afectada |
-
-### Al cerrar sesion (automatico)
-
-1. Reescribir `docs/ESTADO.md` (formato corto: donde estamos, gates pendientes, SDDs recientes)
-2. Actualizar `docs/INDEX.md` si se crearon docs nuevos
-3. Actualizar `docs/ARQUITECTURA.md` si cambio la arquitectura
-
-### Numeracion
-
-- **SDDs:** buscar el SDD mas alto existente + 1 (empezar desde SDD-001 para nuevos)
-- **ADRs:** buscar el ADR mas alto existente + 1 (empezar desde ADR-001 para nuevos)
-- **CHANGELOG:** append al dia actual; **nunca** editar dias anteriores
-
-### Formato de ESTADO.md (se reescribe completo cada sesion)
-
-```
-# ESTADO ACTUAL
-
-> Sesion: YYYY-MM-DD . Fase: nombre . SDD mas reciente: SDD-XXX
-
-## Donde estamos
-(breve resumen de 5 lineas)
-
-## Gates pendientes
-- [ ] Gate X: descripcion
-
-## SDDs recientes
-- SDD-XXX: nombre (fecha)
-
-## Ultimos cambios
-(ultimas 5 lineas del CHANGELOG)
-```
-
-## Roadmap
-
-### Fase 1 — Fundacion visual (Semanas 1-3)
-- Setup Tauri + React + TailwindCSS + TypeScript
-- Canva 2D basico con ReactFlow (nodos arrastrables, edges)
-- Tema visual base (la IA lo define usando los skills de `reference/`)
-- Primer agente visual en el canva (nodo con estado)
-- Tablero Kanban basico
-
-### Fase 2 — Skills y agentes (Semanas 4-6)
-- Editor visual de skills (formularios, drag-and-drop)
-- Skills engine en Python (parseo, ejecucion)
-- Laboratorio de skills (probar en sandbox)
-- Exportar skills a dialectos (opencode, Cursor, Claude Code)
-- Roles de agente (dev, QA, reviewer, PM, devops)
-
-### Fase 3 — Motor de pruebas (Semanas 7-9)
-- Sistema de tareas con criterios de aceptacion
-- Ejecucion de pruebas automaticas
-- Resultados en el canva (pass/fail, cobertura)
-- Diffs visuales y aprobacion humana
-- Ciclo plan -> implementar -> probar -> aprobar
-
-### Fase 4 — Comunicacion y sync (Semanas 10-12)
-- Chat con agentes (texto)
-- Voz (STT para hablar, TTS para que respondan)
-- Notificaciones sonoras (agente trabaja, necesita aprobacion, se detuvo)
-- Sync basico entre dispositivos via WebSocket
-- Grafo 3D del proyecto con Three.js
-
-### Fase 5 — Empresa autonoma (Semanas 13-16)
-- Crear empresa completa (asignar roles, configurar skills)
-- Orquestacion CrewAI (agentes trabajando en paralelo)
-- LangGraph para grafos de estado
-- Dashboard de la empresa (metricas, progreso)
-- Exportar resultados
-
-## Features pendientes (documentadas en ADRs)
-
-### Integracion GitHub (ADR-004)
-- Login con GitHub (OAuth)
-- Ver repos del usuario
-- Clonar repositorios
-- Push/Pull desde la app
-- Crear Pull Requests
-- Ver y crear Issues
-- Gestionar ramas
-
-### Voz (ADR-003)
-- STT: Web Speech API nativo del browser
-- TTS: Edge TTS (voces naturales en espanol)
-- Comandos de voz para agentes
-- Respuestas por voz de los agentes
-
-### Sincronizacion (ADR-003)
-- Sync sesiones via WebSocket (estado de agentes)
-- Sync config via WebSocket (preferencias)
-- Sync skills via WebSocket (skills creados)
-- Resolucion de conflictos (LWW para config, merge manual para sesiones)
-
-### Documentacion de ADRs
-
-| ADR | Tema | Estado |
-|---|---|---|
-| ADR-001 | Responsive Design y Cross-Platform | Aprobado |
-| ADR-002 | Arquitectura Hibrida Monorepo | Aprobado |
-| ADR-003 | Voz y Sincronizacion | Pendiente |
-| ADR-004 | Integracion GitHub | Pendiente |
-
-
-## 🪟 LAS 5 VENTANAS DEL PROYECTO (lógica de negocio — ver SDD-005)
-
-Cada proyecto de desarrollo (tenant, [A.0]) tiene SU PROPIO conjunto de ventanas visuales. Son vistas sobre los mismos datos (Ledger/knowledge/sesiones), no silos:
-
-1. **🏢 CANVA MULTIAGENTES** (Etapa 6) — organigrama editable: equipos, flujos de skills, creación de bots complejos. Nodos-agentes con estados vivos.
-2. **🕸️ GRAFO DE DOCUMENTOS** (Plan Intermedio, Etapa 16) — estilo Obsidian/Graphify: grafo de los .md del proyecto organizado por IA pero TOTALMENTE editable por el humano; síntesis y resúmenes humano+IA sencillos y prácticos. **+ CONSEJO DE EXPERTOS** (5 skills auditores que refinan el plan) **+ DISCOVERY HUB** (explorador de repos GitHub + Repo Scout IA que sugiere repos relevantes según el contexto del proyecto). Debe verse increíble (cerebros de Obsidian).
-3. **📋 KANBAN DE RESULTADOS** (Plan Intermedio, Etapa 17) — tipo Jira pero optimizado para agentes: cards y bloques ANIMADOS mostrando evidencia (tests Playwright pasando/fallando, resultados por etapa); orientado a dejar a la IA trabajando horas autónomamente y ver qué se consiguió.
-4. **🎛️ CONTROL ROOM** (Plan Intermedio, Etapa 18 — fusiona sesiones+mapa global) — TODAS las sesiones de agentes como cards vivas (hablar TTS/STT, ver resultados, retomar) sobre el mapa maestro GLOBAL de todos los proyectos en acción: métricas vivas, órdenes por voz/texto enrutadas al destino correcto, modo vigilancia de excepciones. Mission control del sistema entero.
-
-**Principio de NEURO-GRATIFICACIÓN (PLAN U — aplica a TODO el producto):**
-
-El sistema DEBE ser neuro-gratificante por diseño: cada proceso de desarrollo se convierte en una escalera de sensaciones y emociones positivas ancladas a PROGRESO REAL. No es decoración — es el motor emocional del producto.
-
-*La dopamina como mecánica central:* el cerebro libera dopamina en la ANTICIPACIÓN y el LOGRO de metas visibles. Por eso cada acción del usuario/agentes debe tener un eco visual-sonoro-propio proporcional: token que fluye (anticipación), test ✓ (micro-logro sonoro), criterio cumplido (pop), tarjeta que vuela a DONE (recompensa visible), GATE cerrado (celebración festiva), nivel de agente que sube (progresión), recap semanal (orgullo consolidado).
-
-*Las sensaciones objetivo por momento:*
-- **Anticipación** mientras el agente trabaja: energía visible, "está ocurriendo algo"
-- **Satisfacción** al ver completarse cada pieza: tick/pop/cierre con peso físico
-- **Orgullo** ante evidencia acumulada: antes/después, stats, rachas honestas
-- **Pertenencia** hacia los agentes: identidad, voz, evolución — son colegas, no herramientas
-- **Calma controlada** en modo vigilancia: todo bajo control, excepciones visibles
-
-*Guardarraíles éticos innegociables:* la dopamina SOLO de progreso VERIFICABLE del Ledger (jamás logros falsos, culpa de rachas, urgencia artificial ni comparación pública sin consentimiento); intensidad configurable Apagado/Festivo; `prefers-reduced-motion` y silencio respetados siempre; métrica norte = sesiones que terminan en ENTREGA, no tiempo-en-app.
-
-Detalle completo y fases v2 (juice calibrado, flow-protection, inbox de resultados, widget glanceable): [PLAN U](./docs/SDDs/SDD-001-plan-base/plan-u-motivacion.md).
-
-**Principio de EQUIPO VIVO (estilo Gems — aplica a skills y agentes):**
-
-Cada skill y cada agente NO es una configuración — es un PERSONAJE con vida propia que puedes armar, observar, dirigir y ver crecer. Objetivo emocional: *sentir que realmente tienes un equipo*.
-
-- **Identidad generada por IA**: avatar único consistente, emoji-firma, mini-bio de personalidad con carácter, voz TTS propia ([PLAN G·G.7](./docs/SDDs/SDD-001-plan-base/plan-g-skills-lab.md#g7))
-- **Ceremonia de nacimiento**: crear un miembro dispara la presentación festiva del nuevo compañero — contratar se siente
-- **Presencia continua**: su avatar vive en la Oficina, el Kanban, las Sesiones y la Control Room; su emoji firma cada rung que genera; su voz responde cuando le hablas
-- **Organización neuro-psicológica**: departamentos con color coherente, el equipo se lee de un vistazo, jerarquía clara PM→operativos
-- **Manipulación total**: armar, clonar, promover, pausar, despedir — el dueño manipula su empresa entera como piezas vivas, nunca como YAML
-- Regla Octocat aplicada: el personaje JAMÁS habla por hablar (sus reportes llegan por canales serios); evoluciona por logros y jamás se deteriora
-
-**Regla transversal**: toda la capa visual se construye con tokens/primitivas del Design System ([F.0]) y con `SpatialMeta` (x, y, z?, cluster, camera) como tipo espacial obligatorio — estructuras de datos ESPACIALMENTE listas para proyeccion futura en 3D/gafas. Renderer agnostico: ReactFlow (2D) → Three.js (3D) → WebXR (gafas) es solo cambiar el "executor", no los componentes ni los datos. Cadena: `SpatialMeta(F.0) → ReactFlow(F.1) → persistencia(F.4) → Three.js(J.3) → gafas(3D.1-3D.2)`. Ver seccion Roadmap VR/Gafas arriba.
-
-Detalle completo y fases: `docs/SDDs/SDD-005-plan-intermedio.md` · El Canvas Planeación (V2) alimenta Kanban/motor; la Control Room (V5) unifica todos los proyectos.
-
-## 🥽 ROADMAP VR / GAFAS — Preparacion desde el dia 1
-
-> **Filosofia:** el producto EMPIEZA en 2D (pantallas), pero toda arquitectura esta preparada para escalar a gafas VR/AR sin refactor. La clave: `SpatialMeta` (F.0) + renderer agnostico (regla #13) + Three.js como puente.
-
-### Cadena de renderizado (ya definida en Plan Base)
-
-```
-SpatialMeta(F.0) → ReactFlow 2D(F.1) → persistencia(F.4) → Three.js 3D(J.3) → WebXR gafas(3D.1-3D.2)
-```
-
-### Que significa "preparado para gafas" AHORA (sin hacer nada extra)
-
-| Capa | En 2D (ahora) | En 3D/gafas (futuro) | Que cambia |
-|------|---------------|----------------------|------------|
-| **Datos** | `SpatialMeta {x, y, z:null, cluster, camera}` en cada nodo | Mismo tipo, `z` populated por force-directed | Solo el valor de `z` |
-| **Renderer** | ReactFlow (nodos DOM) | Three.js (WebGPU) → WebXR | Solo el "executor", no los componentes |
-| **Persistencia** | `event_stream` guarda x,y | Mismo `event_stream` guarda x,y,z | Agrega `z` al guardar |
-| **Controles** | Mouse drag + wheel zoom | Orbit + touch + hand tracking | Capa de input diferente |
-| **UI** | CSS + Tailwind | Three.js scene + HTML overlay | Mismo Design System, diferente rendering |
-
-### Hardware objetivo (cuando llegue el momento)
-
-| Gafas | Procesador | GPU | WebXR | Viabilidad |
-|-------|-----------|-----|-------|------------|
-| **Meta Quest 3/3S** | Snapdragon XR2 Gen 2 | Adreno 740 | ✅ nativo | **Ideal** — standalone, $299-499, 80% mercado |
-| **Apple Vision Pro** | M2 + R1 | Apple GPU | ✅ WebXR via Safari | Premium, ecosistema Apple |
-| **Pico 4** | Snapdragon XR2 Gen 2 | Adreno 740 | ✅ WebXR | Alternativa Android |
-| **HoloLens 2** | Qualcomm 850 | Adreno 630 | ⚠️ limitado | Enterprise, no consumer |
-
-### Arquitectura tecnica para gafas (cuando se implemente)
-
-```
-┌─────────────┐     WiFi/WebRTC      ┌──────────────────┐
-│  Gafas 3D   │ ◄──────────────────► │  Celular/PC      │
-│  (decodifica │   video H.264/AV1    │  (renderiza       │
-│   píxeles)  │   + input tracking   │   Three.js/WebXR) │
-└─────────────┘                      └────────┬─────────┘
-                                              │ Internet
-                                     ┌────────▼─────────┐
-                                     │  Servidor Linux   │
-                                     │  (agentes, DB,    │
-                                     │   lógica negocio) │
-                                     └──────────────────┘
-```
-
-**Reglas de diseño para gafas (ya aplicadas desde F.0):**
-1. **SpatialMeta** en cada nodo — `z` es null en 2D, populated en 3D
-2. **Renderer agnóstico** — componentes del Design System, no de ReactFlow
-3. **Persistencia espacial** — posiciones en `event_stream`, no solo en store
-4. **Performance client-side** — Three.js WebGPU corre en el cliente (F.6 benchmark: 100 nodos @ 60fps)
-5. **LOD (Level of Detail)** — distances grandes = nodos simplificados (J.3)
-
-### Skills de diseno relevantes para 3D/gafas
-
-| Skill | Que aporta para 3D | Prioridad |
-|-------|-------------------|-----------|
-| **impeccable** | Dominio `spatial` — profundidad, jerarquía espacial, anti-generico en 3D | Alta |
-| **liquid-glass-web** | Efectos de vidrio translúcido en paneles 3D (backdrop-filter + feDisplacementMap) | Alta |
-| **apple-design-skill** | Guías HIG para interfaces espaciales, dark mode, contraste en 3D | Media |
-| **magic-ui** | Globe 3D, Animated Beam (conexiones 3D), partículas atmosféricas | Media |
-| **react-bits** | Silk/Aurora backgrounds para entornos 3D inmersivos | Baja |
-
-### Criterio de transición 2D → 3D
-
-El cambio de 2D a 3D NO es un "proyecto grande" — es **cambiar el renderer**:
-1. Las posiciones ya están en `event_stream` (desde F.4)
-2. Los tipos ya tienen `SpatialMeta` con `z` (desde F.0)
-3. Three.js ya está como dependencia (desde Etapa 10/J.3)
-4. Solo falta: instanciar Three.js en vez de ReactFlow, calcular `z`, y conectar WebXR
-
-**Estimación de esfuerzo cuando se decida hacer el salto:** ~2-3 semanas (vs meses si no hubiera preparación).
+## Código limpio
+
+1. Una responsabilidad por archivo
+2. Imports ordenados (externos primero, internos después)
+3. Carpetas por dominio, no por tipo
+4. Nombres descriptivos (no `helper2`, `data1`)
+5. Funciones < 50 líneas
+6. Sin valores mágicos (constantes extraídas)
+7. Sin `any` (tipos definidos)
+8. Sin TODOs pendientes
+
+## Flujo SDD obligatorio
+
+1. Crear SDD en `docs/SDDs/SDD-XXX-nombre.md`
+2. Definir fases: X.1 (unit), X.2 (integration), X.3 (E2E GUI), X.4 (responsive)
+3. Cada fase tiene su gate — no se avanza sin gate anterior
+4. E2E Playwright en mobile (375px) Y desktop (1440px)
+5. Feature completada solo cuando: SDD ✓ + tests verdes + gate cerrado + commit
+
+## Documentación
+
+| Documento | Qué es |
+|---|---|
+| `docs/INDEX.md` | Mapa completo de docs |
+| `docs/ESTADO.md` | Estado actual |
+| `docs/SDDs/SDD-001-plan-base/README.md` | Plan maestro |
+| `docs/SDDs/SDD-005-plan-intermedio.md` | 4 ventanas visuales |
+| `docs/SDDs/SDD-011-integracion-hermes-agent.md` | Integración Hermes |
+| `docs/SDDs/SDD-012-multi-agent-grokbot-patterns.md` | Patrones GrokBot |
+| `docs/SDDs/SDD-013-gui-visual-spec.md` | Design system |
+
+## VR-ready (regla transversal)
+
+Todas las vistas canvas se diseñan para VR futuro:
+1. Coordenadas 3D, 1 unidad = 1 metro
+2. Sin tamaños absolutos en píxeles
+3. Sin absolute positioning en canvas
+4. `vr={{}}` preparado en ReactFlow
+5. Animaciones: solo transform y opacity (GPU-friendly)
+6. Profundidad Z planificada (capas para 3D)
+7. Colores WCAG AAA (legibles en AR)
+
+---
+
+*Última actualización: 2026-08-25*

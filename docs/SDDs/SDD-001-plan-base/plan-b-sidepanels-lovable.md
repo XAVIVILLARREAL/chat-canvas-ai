@@ -1,76 +1,120 @@
-# PLAN B — Sidepanels Lovable (ver lo que se construye)
+# PLAN B — Editor de Código + Live Preview
 
-> [← Maestro](./README.md) · [← PLAN A](./plan-a-chat-codex.md) · [PLAN C →](./plan-c-reasonix-deepseek.md)
-> Depende de: [PLAN A](./plan-a-chat-codex.md) (stores, provider trait, eventos).
+> [← PLAN A](./plan-a-chat-codex.md) · [← Maestro](./README.md) · [PLAN C →](./plan-c-reasonix-deepseek.md)
+> Referencia: VS Code (editor), Lovable (live preview), Cursor (AI integration)
 
-**Entregable:** pides una mini-app y la VES aparecer archivo por archivo, con preview corriendo en vivo.
+**Entregable:** Editor de código completo dentro de la app, con file explorer, syntax highlight, live preview, e integración directa con el chat.
+
+---
+
+## Qué construimos
+
+Un editor que permite trabajar con código **sin salir de Canvas AI**:
+- File explorer para navegar el proyecto
+- Editor con syntax highlight multi-lenguaje
+- Live preview de apps web (React, Next.js, etc.)
+- Integración con el chat: seleccionar código → preguntar al agente
+- Terminal integrada (embebida, no full terminal)
+
+---
 
 ## Fases
 
-<a id="b1"></a>
-### B.1 — Workspace virtual + detección Codex
-- Proyecto activo en `~/EmpresaDev/projects/<id>/` (fs scoped por Rust) — con [A·A.0](./plan-a-chat-codex.md#a0), cambiar de TAB cambia árbol+editor+preview completos: cada proyecto vive en su mundo
-- Artefactos versionados ([B·B.9](./plan-b-sidepanels-lovable.md#b9)) y diffs siempre dentro del proyecto activo
+### B.1 — File Explorer
 
-- Detección inicial estilo Codex: carpeta con git → preset **Auto**; sin git → **Solo lectura** hasta que el usuario confíe
-- File tree lazy + commands fs seguros (anti path-traversal, cargo deny list)
-- **Pruebas:** Cargo test seguridad paths. E2E: árbol refleja archivos creados por el agente
+Sidebar de archivos:
+- Árbol de directorios (lazy loading para proyectos grandes)
+- Iconos por tipo de archivo (iconos de Lucide)
+- Búsqueda por nombre (fuzzy match)
+- Acciones: crear archivo/carpeta, renombrar, eliminar, duplicar
+- Drag & drop para reordenar
+- Indicadores: modificado (dot), nuevo (badge), conflicto (warning)
+- Filtros: archivos modificados, archivos del proyecto, archivos ignorados (.gitignore)
 
-<a id="b2"></a>
-### B.2 — Editor Monaco
-- Tabs de archivos abiertos; read/write real; guardar Cmd/Ctrl+S
-- Indicador "AGENTS.md cargado" del proyecto (solo lectura v1 — el que lo lee es Reasonix, ver [C·C.2](./plan-c-reasonix-deepseek.md#c2))
-- **Pruebas:** E2E abrir archivo escrito por agente, editarlo, persistir
+**Pruebas:** E2E: navegar proyecto, crear archivo, renombrar, eliminar.
+
+---
+
+### B.2 — Editor de código
+
+Embebido via `@monaco-editor/react` o CodeMirror 6:
+- Syntax highlight multi-lenguaje (TypeScript, Python, Rust, Go, SQL, etc.)
+- Múltiples tabs (archivos abiertos)
+- Búsqueda y reemplazo (regex soportado)
+- Auto-guardado configurable (timeout o al perder foco)
+- Indicador de línea/columna
+- Minimap (opcional, configurable)
+- Keybindings estándar (Ctrl+S guardar, Ctrl+Z undo, etc.)
+- Folding de código
+- Bracket matching
+- Autocompletado básico (monaco nativo)
+
+**Pruebas:** E2E: abrir archivo, editar, guardar, verificar persistencia.
+
+---
 
 ### B.3 — Live Preview
-- iframe sandbox (`allow-scripts`, origen opaco, sin same-origin al app) renderizando el index.html del proyecto
-- Watcher de escrituras (notify crate) → debounce 300ms → evento `workspace://changed` → refresh preview
-- **Pruebas:** unit debounce watcher. E2E: agente escribe HTML → preview actualizado <2s
 
-<a id="b4"></a>
-### B.4 — Sincronización chat ↔ paneles (patrón desktop Codex)
-- Click en card de tool-call ([A·A.4](./plan-a-chat-codex.md#a4)) abre el archivo/diff tocado en la WorkArea
-- **Diff clicable con feedback**: cada fila de diff tiene acción "feedback" → texto se inyecta como contexto del siguiente turno
-- Badge "N cambios" en tab Preview mientras el agente genera
-- **Pruebas:** E2E flujo integrado completo
+Panel de preview alongside (split view horizontal o vertical):
+- iframe sandboxed para apps web
+- Hot reload (watcher del directorio del proyecto)
+- Control: refresh, zoom, mobile/desktop toggle
+- URL bar (navegar dentro del preview)
+- Console output integrado (errores del iframe)
+- Responsive toggle (375px, 768px, 1024px, 1440px)
 
-<a id="b5"></a>
-### B.5 — Fast Apply: escritura especulativa (copia.md §Cursor/Morph)
-- Desacoplar razonamiento del agente de la ESCRITURA: los diffs llegan como stream y se aplican a archivo a >velocidad de lectura humana, sin truncamientos ni reescrituras completas
-- Protocolo: eventos `file_delta` (path, range, contenido) desde el provider → aplicador en Rust con cola ordenada → optimistic UI en Monaco/Preview mientras persiste
-- Si un delta llega inválido → rollback del archivo a último estado bueno + aviso inline (fail-safe)
-- **Pruebas:** Cargo test aplicador: 500 deltas/sec sintéticos sin pérdida ni desorden. E2E humano: ver un archivo grande escribirse fluido en vivo
+**Stack para preview:**
+- Vite dev server embebido (para proyectos Vite/React)
+- iframe con srcdoc para snippets estáticos
+- WebSocket para HMR
 
-<a id="b6"></a>
-### B.6 — @menciones de archivos/símbolos (ganadora torneo #002)
-- En el composer: escribir `@` abre dropdown fuzzy con archivos del proyecto (del árbol [B·B.1](./plan-b-sidepanels-lovable.md#b1)); al existir índice AST ([J·J.1](./plan-j-grafo3d-repomap.md#j1)) también símbolos
-- La mención inserta un chip visual que el provider convierte en contexto anclado
-- **Dependencia blanda de [J·J.1](./plan-j-grafo3d-repomap.md#j1)**: sin índice AST (hasta Etapa 10) las menciones son de ARCHIVOS; cuando J.1 exista se añaden símbolos automáticamente — enhancement progresivo, B.6 NO espera ni bloquea a J
-- **Pruebas GUI:** E2E humano: teclear `@app` filtra <100ms, flechas navegan, Enter inserta chip; el chip llega al agente como ruta anclada
+**Pruebas:** E2E: crear proyecto React mínimo, preview muestra la app, hot reload funciona.
 
-<a id="b7"></a>
-### B.7 — Revisión por HUNKS (ganadora torneo #124)
-- El visor diff permite aceptar/rechazar CADA hunk independiente (no todo-o-nada); estado parcial persiste por archivo
-- Hunks rechazados se devuelven al agente como feedback estructurado con el motivo
-- **Pruebas GUI:** E2E humano: diff de 3 hunks → aprueba 2, rechaza 1 con nota → solo los aprobados se aplican; el rechazo aparece citado en el siguiente turno del agente
+---
 
-<a id="b8"></a>
-### B.8 — Consola preview → "enviar error al agente" (ganadora torneo #143)
-- Errores runtime del iframe capturados (window.onerror dentro del sandbox); botón formatea `[archivo:línea + stack + screenshot]` y lo envía como turno al agente
-- **Pruebas GUI:** E2E: mock lanza TypeError en preview → badge clicable → click envía contexto completo → respuesta corrige y error desaparece
+### B.4 — Integración con el chat
 
-<a id="b9"></a>
-### B.9 — Artefactos versionados (patrón Claude artifacts)
-- El preview/archivo principal de una tarea se trata como ARTEFACTO con historial de versiones navegable
-- Selector ‹v2/v5› + comparación side-by-side entre dos versiones + "restaurar esta versión" (con rung en Ledger)
-- Cada versión muestra quién/cuándo (agente o humano) y qué criterio la cambió
-- **Pruebas:** Integration versionado automático por escritura relevante. E2E humano: navegar 3 versiones, comparar side-by-side, restaurar antigua
+El editor y el chat se comunican:
+- **Seleccionar código → preguntar**: selection en el editor → se inyecta como contexto en el chat
+- **Diff view**: cuando el agente propone un cambio, se muestra un diff side-by-side en el editor
+- **Apply diff**: el agente genera un diff → el usuario aprueba → se aplica al archivo
+- **Code actions**: botón flotante sobre selección → "Preguntar al agente", "Explicar", "Refactorizar"
+- **Chat sobre archivo**: panel contextual que muestra el archivo actual y permite preguntar sobre él
+
+**Pruebas:** E2E: seleccionar código, preguntar al agente, verificar contexto injectado.
+
+---
+
+### B.5 — Terminal embebida
+
+Terminal ligera integrada:
+- Shell del sistema (bash/zsh/powershell según plataforma)
+- Output colapsable desde el chat (cuando el agente ejecuta comandos)
+- Historial de comandos
+- Auto-complete básico
+- No es una terminal full — es para comandos rápidos del proyecto
+
+**Pruebas:** E2E: ejecutar `ls`, verificar output, historial funciona.
+
+---
+
+### B.6 — Gestión de proyectos
+
+Vista de proyecto:
+- Abrir carpeta del sistema como proyecto
+- Proyectos recientes (sidebar)
+- .canvas-aiignore (similar a .gitignore)
+- Configuración por proyecto (en `.canvas-ai/config.json`)
+- Snapshot del proyecto (guardar estado completo)
+
+**Pruebas:** E2E: abrir proyecto, verificar file explorer, cerrar y reabrir.
+
+---
 
 ## 🚪 GATE B (demo verificable)
 
-Prompt real: *"crea una landing para una cafetería"* → aparecen archivos en el árbol, Monaco los muestra al click, el preview renderiza la página terminada en vivo. El usuario no tocó código. Feedback en un diff se refleja en la corrección del agente.
-
-Evidencia: video + suites verdes.
+Abro Canvas AI → abro un proyecto React existente → veo el file explorer → abro un archivo → edito y guardo → el live preview se actualiza → selecciono código y pregunto al agente → el agente responde con un diff → aprobo el diff → se aplica → ejecuto un comando en la terminal → funciona. Suite humana verde.
 
 ---
-[← Maestro](./README.md) · [← PLAN A](./plan-a-chat-codex.md) · [PLAN C →](./plan-c-reasonix-deepseek.md)
+
+[← PLAN A](./plan-a-chat-codex.md) · [← Maestro](./README.md) · [PLAN C →](./plan-c-reasonix-deepseek.md)

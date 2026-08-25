@@ -1,63 +1,189 @@
-# PLAN G — Etapa 7: Skills Lab
+# PLAN G — Skills Lab
 
-> [← Maestro](./README.md) · [← PLAN F](./plan-f-canva-oficina.md) · [PLAN H →](./plan-h-motor-pruebas.md)
-> Depende de: Etapas 3 (providers), 4 (memoria). Patrón de empaquetado: SKILL.md de Codex.
+> [← PLAN F](./plan-f-canva-oficina.md) · [← Maestro](./README.md) · [PLAN H →](./plan-h-motor-pruebas.md)
+> Referencia primaria: Hermes Agent (skill system, 3 tiers, progressive disclosure)
+> Referencia: Codex (SKILL.md, tool-gating), Gemini Gems (identidad visual)
 
-**Entregable:** crear skills visualmente (sin YAML), probarlos en laboratorio, y exportarlos a cualquier dialecto agéntico — el usuario arma la "planta" de su empresa.
+**Entregable:** Crear skills visualmente (sin YAML), probarlos en laboratorio, y usarlos como agentes con identidad propia — avatares, voces, personalidad.
 
-## Qué es un skill aquí
+---
 
-Un skill = contrato estructurado: `{nombre, rol, triggers, instrucciones, herramientas permitidas, modelo preferido, criterios de éxito}`. Internamente se compila a lo que cada motor entienda.
+## Qué es un skill
 
-<a id="g1"></a>
+Un skill = **contrato estructurado + identidad visual**:
+- **Contrato**: nombre, rol, triggers, instrucciones, herramientas permitidas, modelo preferido, criterios de éxito
+- **Identidad**: avatar generado por IA, emoji-firma, mini-bio de personalidad, voz TTS
+- **Comportamiento**: puede orquestar múltiples agentes (multi-agent loop)
+
+Internamente se compila a lo que cada motor entienda (prompt markdown, reasonix subagent, AGENTS.md snippet).
+
+---
+
+## Fases
+
 ### G.1 — Modelo de datos + CRUD
-- Tabla `skills` en SQLite; store Zustand + React Query; UI lista/grid con búsqueda FTS5 ([D·D.2](./plan-d-memoria-v3code.md#d2))
-- **Alcance elegido por el usuario** ([A·A.0](./plan-a-chat-codex.md#a0)): skill GLOBAL (biblioteca compartida entre proyectos) o COPIA LOCAL editable sin afectar a otros — toggle visible y linaje "derivada de X" cuando es copia
-- **Pruebas:** Cargo test repos. E2E humano: crear/editar/duplicar/eliminar skill desde cero
 
-<a id="g2"></a>
-### G.2 — Editor visual + Tool-Gating (copia.md §Cline/RooCode)
-- Formulario por secciones (rol, triggers, herramientas con toggles, modelo), sin YAML visible; validación Zod en vivo; vista previa compilada a JSON
-- **Tool-gating estricto**: el skill declara las ÚNICAS herramientas que su agente puede montar — el orquestador monta SOLO esas por sesión, evitando congestión de prompts y acciones fuera de rol
-- Presets de gating por rol (dev: edit+build; QA: test+read; reviewer: read-only) editables
-- **Pruebas:** Unit validación + enforcement de gating (agente QA no puede invocar write). E2E humano: crear skill completo solo con clicks y tecleo
+Tabla `skills` en SQLite:
+```
+id, name, role, description, triggers (JSON), 
+instructions (text), allowed_tools (JSON), preferred_model,
+success_criteria (JSON), avatar_url, emoji, personality_bio,
+voice_id, scope (global/local), project_id,
+created_at, updated_at, metadata (JSON)
+```
 
-<a id="g3"></a>
-### G.3 — Compilador a dialectos
-- `SkillCompiler`: skill → dialecto objetivo. v1: prompt-system markdown (universal), reasonix subagent profile (`reasonix subagent create` formato verificado en servidor), AGENTS.md snippet
-- Arquitectura extensible por trait (nuevos dialectos sin tocar UI)
-- **Pruebas:** Cargo test compiler snapshot tests por dialecto. Roundtrip: compilar→ejecutar en reasonix real→respuesta esperada
+Store Zustand + React Query:
+- `useSkillStore`: lista de skills, activos
+- React Query: CRUD con optimistic updates
+- UI: lista/grid con búsqueda FTS5
 
-<a id="g4"></a>
-### G.4 — Laboratorio sandbox
-- Panel "Probar": ejecuta el skill contra un input de ejemplo usando el provider activo ([C·C.1](./plan-c-reasonix-deepseek.md#c1)), muestra salida + costo del ensayo (--metrics); historial de pruebas por skill
-- **Pruebas:** E2E: probar skill real con DeepSeek barato; costo del ensayo visible; resultado persistido
+Alcance:
+- **Global**: compartido entre todos los proyectos
+- **Local**: solo visible en un proyecto (derivada de un global con linaje)
 
-<a id="g5"></a>
-### G.5 — Optimizador DSPy-lite *(tardía, opcional)*
-- Re-compilar instrucciones del skill comparando tasa de éxito de sus pruebas históricas (motor H); sugerir mejora aceptada por humano (gobernanza varve: propuesta→aceptación)
-- **Pruebas:** Integration con corpus del motor de pruebas
+**Pruebas:** Cargo test repos. E2E: crear/editar/duplicar/eliminar skill.
 
-<a id="g6"></a>
-### G.6 — Rutinas por demostración "follow along" (patrón Grok Bot)
-- Modo GRABAR: el humano hace el trabajo una vez (en la app o CLI) mientras el sistema observa acciones y contexto
-- Al terminar → propone un skill editable con los pasos detectados; el humano corrige/ajusta y acepta (gobernanza [D·D.4](./plan-d-memoria-v3code.md#d4))
-- La rutina aceptada se re-ejecuta on-demand o programada, y mejora con cada corrección
-- **Pruebas:** Integration: sesión grabada de N pasos → skill propuesto con N pasos correctos; corrección humana se persiste. E2E humano: grabo "preparar release" → skill creado → lo ejecuto programado
+---
 
-<a id="g7"></a>
-### G.7 — Identidad viva de Skills y Agentes (estilo Gems de Gemini)
-- **Al crear/editar un skill o agente se le da VIDA**: generador de AVATAR por IA (imagen consistente derivada de nombre+rol, con variantes hasta elegir; fallback procedural por hash si la IA no responde) + **EMOJI-FIRMA** único sugerido + **mini-bio de personalidad** escrita por la IA (1-2 frases con carácter) + voz TTS asignada ([K·K.1](./plan-k-voz.md#k1))
-- **Ceremonia de NACIMIENTO**: al guardar, overlay festivo "Nace [nombre] — bienvenido al equipo" presentando al nuevo miembro con su avatar animado (reutiliza CelebrationOverlay de [U·U.3](./plan-u-motivacion.md#u3)) — la contratación se SIENTE · la VOZ TTS ([K·K.1](./plan-k-voz.md#k1)) se completa en el INTERMEDIO (v3.8: K.1/K.2 están ahí, las consume CR) — el resto de la identidad (avatar/emoji/bio/ceremonia) NO depende de K
-- El personaje ES la identidad en todo el sistema: presente y animado según estado real en Canva Oficina ([F·F.2](./plan-f-canva-oficina.md#f2)), Kanban, Canvas Sesiones y Control Room; habla con su voz; su emoji aparece en cada rung que genera
-- Pestaña "Identidad" dentro del SkillEditor con preview EN VIVO del personaje mientras editas
-- Biblioteca de identidades reutilizable: mismo rol → misma familia visual; skill clonado hereda linaje
-- Neuro-psicológicamente organizado: agrupación por departamento con color coherente ([F·F.0](./plan-f-canva-oficina.md#f0) tokens) — el equipo SE LEE de un vistazo
-- **Pruebas GUI:** E2E humano completo: crear skill → eliges entre 3 avatares generados → ceremonia de nacimiento → el personaje aparece en Oficina/Sesiones con su emoji · probar en laboratorio responde CON su avatar y voz · editar bio actualiza en todas las ventanas · caída de IA genera avatar procedural sin romper flujo
+### G.2 — Editor visual
+
+Formulario por secciones (sin YAML visible):
+- **Sección Identidad**: nombre, rol, emoji (selector), descripción
+- **Sección Instrucciones**: textarea con markdown preview
+- **Sección Herramientas**: toggles por tool (read, write, edit, test, build, etc.)
+- **Sección Modelo**: selector de modelo (deepseek-v4-flash, reasoner, ollama)
+- **Sección Triggers**: palabras/frases que activan el skill
+- **Sección Criterios**: checklist de éxito
+
+Validación Zod en vivo. Vista previa compilada a JSON.
+
+Tool-gating estricto:
+- El skill declara las ÚNICAS herramientas que puede usar
+- El orquestador monta SOLO esas por sesión
+- Presets por rol: dev (edit+build), QA (test+read), reviewer (read-only)
+
+**Pruebas:** Unit validación + enforcement. E2E: crear skill completo solo con clicks.
+
+---
+
+### G.3 — Generador de avatar por IA
+
+Al crear/editar un skill:
+1. **Input**: nombre + rol del skill
+2. **Generación**: llamar a API de generación de imágenes (DALL-E, Stable Diffusion, o fallback procedural)
+3. **Variantes**: generar 3 opciones, el usuario elige
+4. **Fallback**: si la IA no responde, avatar procedural basado en hash del nombre (colores consistentes)
+5. **Consistencia**: mismo rol → misma familia visual (ej: "dev" = tonos azules, "QA" = tonos verdes)
+
+**Formato**: PNG 512x512, fondo transparente, estilo flat/illustration
+**Almacenamiento**: SQLite (blob) o filesystem con referencia
+
+**Pruebas:** E2E: crear skill → generar 3 avatares → elegir uno → verificar que se muestra en la UI.
+
+---
+
+### G.4 — Identidad viva (estilo Gems de Gemini)
+
+Cada skill tiene una **personalidad completa**:
+- **Avatar**: imagen consistente (generada o procedural)
+- **Emoji-firma**: emoji único que representa al skill (🎯 para PM, 🔍 para QA, etc.)
+- **Mini-bio**: 1-2 frases con carácter, escrita por IA ("Soy el revisor de código. Me gusta la limpieza y odio los magic numbers.")
+- **Voz TTS**: voz asignada para speak-back (opcional)
+
+La identidad se muestra en:
+- Lista de skills (avatar + emoji + nombre)
+- Chat (cuando el skill responde, su avatar aparece)
+- Control Room canvas (nodo del skill muestra avatar)
+- Historial de ejecuciones (emoji por cada rung generado)
+
+**Ceremonia de creación**: al guardar un skill nuevo, overlay festivo "Nace [nombre] — bienvenido al equipo" con avatar animado.
+
+**Pruebas:** E2E: crear skill → ceremonia → personaje aparece en chat y canvas → editar bio → actualiza en todas partes.
+
+---
+
+### G.5 — Compilador a dialectos
+
+`SkillCompiler`: skill → dialecto objetivo.
+
+Dialectos v1:
+- **Prompt markdown**: universal, funciona en cualquier LLM
+- **Reasonix subagent**: formato `reasonix subagent create`
+- **AGENTS.md snippet**: para proyectos que usan AGENTS.md
+- **Hermes ACP**: para orquestación via ACP protocol
+
+Arquitectura extensible por trait (nuevos dialectos sin tocar UI).
+
+**Pruebas:** Cargo test compiler snapshot tests por dialecto. Roundtrip: compilar → ejecutar → respuesta esperada.
+
+---
+
+### G.6 — Laboratorio sandbox
+
+Panel "Probar skill":
+- Input de ejemplo (textarea)
+- Ejecutar contra el provider activo
+- Mostrar: salida + costo del ensayo + tiempo
+- Historial de pruebas por skill
+- Comparar pruebas (antes/después de editar)
+
+**Pruebas:** E2E: probar skill con DeepSeek barato, costo visible, resultado persistido.
+
+---
+
+### G.7 — Multi-agent loops
+
+Un skill puede orquestar **múltiples agentes** en secuencia o paralelo:
+
+```
+Skill "Code Review" 
+  → Sub-agent 1: lint code (parallel)
+  → Sub-agent 2: run tests (parallel)
+  → Sub-agent 3: check security (parallel)
+  → Agregador: combinar resultados
+  → LLM: generar reporte final
+```
+
+Configuración visual:
+- Drag de agentes al canvas del skill
+- Conexiones entre agentes (data flow)
+- Configuración por agente (modelo, tools, timeout)
+- Modo secuencial vs paralelo
+- Agregador (cómo combinar resultados)
+
+**Pruebas:** E2E: crear skill con 3 sub-agentes paralelos → ejecutar → verificar resultado agregado.
+
+---
+
+### G.8 — Rutinas por demostración
+
+Modo "Follow Along" (patrón GrokBot):
+1. **Grabar**: humano hace el trabajo una vez mientras el sistema observa
+2. **Detectar**: el sistema identifica pasos, herramientas, contexto
+3. **Proponer**: generar skill editable con los pasos detectados
+4. **Corregir**: humano ajusta, agrega, elimina pasos
+5. **Ejecutar**: rutina re-ejecutada on-demand o programada
+6. **Mejorar**: cada corrección se persiste, el skill mejora con uso
+
+**Pruebas:** Integration: sesión grabada → skill propuesto → corrección → re-ejecución.
+
+---
+
+### G.9 — Skills globales y locales
+
+- **Globales**: biblioteca compartida entre todos los proyectos del usuario
+- **Locales**: copia editable de un global, solo visible en un proyecto
+- **Linaje**: "derivada de X" — se muestra la origen
+- **Sync**: opcional, sincronizar local → global (push mejoras)
+
+**Pruebas:** E2E: crear global → derivar local → editar local → verificar que global no cambia.
+
+---
 
 ## 🚪 GATE G (demo verificable)
 
-Desde cero y sin YAML: creo skill "QA-Tester" (rol qa, triggers "revisar/tests", tools read+test, modelo flash) → lo compilo → lo pruebo en el laboratorio contra un mini-proyecto → veo respuesta y costo → lo exporto como subagent-profile de Reasonix y funciona en CLI. Suite humana ampliada verde.
+Desde cero y sin YAML: creo skill "QA-Tester" → le doy nombre → genero 3 avatares → elijo uno → escribo mini-bio → le asigno tools (read+test) → lo compilo → lo pruebo en laboratorio contra un mini-proyecto → veo respuesta y costo → el skill aparece en el panel con su avatar → lo ejecuto en una sesión de chat → responde con su identidad. Suite humana verde.
 
 ---
-[← Maestro](./README.md) · [← PLAN F](./plan-f-canva-oficina.md) · [PLAN H →](./plan-h-motor-pruebas.md)
+
+[← PLAN F](./plan-f-canva-oficina.md) · [← Maestro](./README.md) · [PLAN H →](./plan-h-motor-pruebas.md)

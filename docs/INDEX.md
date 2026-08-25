@@ -1,62 +1,85 @@
-# INDEX DE DOCUMENTACION
+# INDEX DE DOCUMENTACIÓN
 
-> Mapa completo de todos los .md del proyecto. Actualizado automaticamente.
+> Mapa completo de todos los .md del proyecto. Actualizado 2026-08-25.
 
 ## Documentos principales
 
-| Documento | Descripcion | Ubicacion |
+| Documento | Descripción | Ubicación |
 |---|---|---|
-| AGENTS.md | Guia de trabajo para agentes AI | `./AGENTS.md` |
-| copia.md | Analisis maestro y lecciones de V3Code | `./copia.md` |
-| ESTADO.md | Estado actual (autoadministrado) | `./docs/ESTADO.md` |
+| AGENTS.md | Guía de trabajo para agentes AI | `./AGENTS.md` |
+| ESTADO.md | Estado actual | `./docs/ESTADO.md` |
 | CHANGELOG.md | Historial append-only | `./docs/CHANGELOG.md` |
-| INFRA.md | Mejoras de infraestructura | `./docs/INFRA.md` |
-| SDD-001 | Plan Base: maestro + 5 planes referenciados (Chat Codex, Sidepanels Lovable, Reasonix+DeepSeek, Memoria V3Code, Integración) | `./docs/SDDs/SDD-001-plan-base/README.md` |
-| SDD-002 | Sistema de pruebas spec-driven + suite Playwright humano | `./docs/SDDs/SDD-002-testing-spec-driven.md` |
-| SDD-003 | Torneo 500 ideas → 20 ganadoras (backlog vivo incluido) | `./docs/SDDs/SDD-003-torneo-500-ideas.md` |
-| SDD-004 | Análisis Grok Bot (xAI/Cursor): extracción total 28 ideas | `./docs/SDDs/SDD-004-analisis-grokbot.md` |
-| SDD-005 | PLAN INTERMEDIO: 4 ventanas visuales (grafo docs, kanban resultados, canvas sesiones, 3D) | `./docs/SDDs/SDD-005-plan-intermedio.md` |
-| SDD-006 | Investigación SOTA: KV-cache/cuantización/compresión + jerarquías config + memorias multi-tipo | `./docs/SDDs/SDD-006-investigacion-cache-memoria.md` |
-| SDD-007 | Análisis OpenCode+models.dev: registro universal de proveedores (14 ideas) | `./docs/SDDs/SDD-007-analisis-opencode-modelsdev.md` |
-| SDD-008 | Análisis cliente-servidor autónomo + escalado Linux/Kubernetes (3 investigaciones) | `./docs/SDDs/SDD-008-analisis-cliente-servidor-k8s.md` |
-| SDD-009 | Debate adversarial de decisiones clave (web-first, sync build-vs-buy, runtime híbrido) | `./docs/SDDs/SDD-009-debate-decisiones.md` |
-| SDD-010 | Modelo de negocio: 3 escenarios, monetización con datos reales, growth por fases, exit paths | `./docs/SDDs/SDD-010-modelo-negocio.md` |
-| SDD-011 | Integración Hermes Agent: A2A protocol, SKILL.md format, 7 subsystems | `./docs/SDDs/SDD-011-integracion-hermes-agent.md` |
-| SDD-012 | Multi-Agent GrokBot Patterns: Group Chat, Chief of Staff, Routine Learning | `./docs/SDDs/SDD-012-multi-agent-grokbot-patterns.md` |
-| SDD-013 | GUI Visual Spec: Obsidian Glass design system, oklch tokens, motion, Liquid Glass, neuro-gratification | `./docs/SDDs/SDD-013-gui-visual-spec.md` |
-| SDD-005 | Cierre Multiplataforma (Android versionado, CI 3 SO) | `./docs/SDDs/SDD-005-cierre-multiplataforma.md` |
-| MULTIPLATAFORMA.md | Comandos para compilar en Windows/macOS/Linux/Android/iOS | `./docs/MULTIPLATAFORMA.md` |
-| referencia de diseno.md | Catalogo de skills de diseno en `reference/` con links | `./docs/referencia de diseno.md` |
-| INDEX.md | Este archivo | `./docs/INDEX.md` |
-| RESPONSIVE.md | Guia de responsive design | `./docs/RESPONSIVE.md` |
 | ARQUITECTURA.md | Arquitectura del proyecto | `./docs/ARQUITECTURA.md` |
 
-## Directorios de documentacion
+## Plan Base (SDD-001) — v2.0
 
-| Directorio | Contenido |
-|---|---|
-| `docs/SDDs/` | Software Design Documents (creados por AI) — SDD-001 Plan Base vigente · SDD-005 multiplataforma |
-| `docs/ADRs/` | Architecture Decision Records (creados por AI) |
-| `reference/` | Recursos de diseno y arquitectura de referencia (`v3code`, `apple-design-skill`, `ui-ux-pro-max`, etc.) |
-| `_reciclaje/` | Archivos obsoletos de versiones anteriores |
+| Plan | Contenido | Ubicación |
+|---|---|---|
+| **README.md** | Plan Maestro: 10 etapas, arquitectura, reglas VR-ready | `./docs/SDDs/SDD-001-plan-base/README.md` |
+| Plan A | Chat con sesiones (Hermes patterns, Memory Rail) | `./docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md` |
+| Plan B | Editor de código + live preview (Monaco, file explorer) | `./docs/SDDs/SDD-001-plan-base/plan-b-sidepanels-lovable.md` |
+| Plan C | Runtime de agentes (Reasonix, DeepSeek, Ollama) | `./docs/SDDs/SDD-001-plan-base/plan-c-reasonix-deepseek.md` |
+| Plan D | Memoria y knowledge (SQLiteVec, FTS5) | `./docs/SDDs/SDD-001-plan-base/plan-d-memoria-v3code.md` |
+| Plan E | Integración total | `./docs/SDDs/SDD-001-plan-base/plan-e-integracion-total.md` |
+| Plan F | Canvas de automatización (deploy-spec, compiler) | `./docs/SDDs/SDD-001-plan-base/plan-f-canva-oficina.md` |
+| Plan G | Skills Lab (avatares IA, multi-agent loops) | `./docs/SDDs/SDD-001-plan-base/plan-g-skills-lab.md` |
+| Plan H | Motor de pruebas y resultados | `./docs/SDDs/SDD-001-plan-base/plan-h-motor-pruebas.md` |
+| Plan I | Revisión y superposiciones | `./docs/SDDs/SDD-001-plan-base/plan-i-revision-superposiciones.md` |
+| Plan J | Grafo 3D / RepoMap | `./docs/SDDs/SDD-001-plan-base/plan-j-grafo3d-repomap.md` |
+| Plan K | Voz (STT/TTS) | `./docs/SDDs/SDD-001-plan-base/plan-k-voz.md` |
+| Plan L | Local-first / offline | `./docs/SDDs/SDD-001-plan-base/plan-l-local-first.md` |
+| Plan M | GitHub integration | `./docs/SDDs/SDD-001-plan-base/plan-m-github.md` |
+| Plan N | Orquestación de sesiones y agentes | `./docs/SDDs/SDD-001-plan-base/plan-n-empresas-autonomas.md` |
+| Plan O | n8n Canvas (automatización visual) | `./docs/SDDs/SDD-001-plan-base/plan-o-n8n-canvas.md` |
+| Plan P | Pixel-perfect GUI | `./docs/SDDs/SDD-001-plan-base/plan-p-pixel-perfect-gui.md` |
+| Plan T | Excelencia (calidad total) | `./docs/SDDs/SDD-001-plan-base/plan-t-excelencia.md` |
+| Plan U | Motivación / neuro-gratificación | `./docs/SDDs/SDD-001-plan-base/plan-u-motivacion.md` |
+| Plan V | Visual GrokBot | `./docs/SDDs/SDD-001-plan-base/plan-v-visual-grokbot.md` |
+| Plan X | Data apps | `./docs/SDDs/SDD-001-plan-base/plan-x-data-apps.md` |
+| MATRIZ-FASES | Matriz de ejecución | `./docs/SDDs/SDD-001-plan-base/MATRIZ-FASES-PRUEBAS.md` |
 
-## ADRs vigentes
+## Plan Intermedio (SDD-005) — v2.0
+
+| Plan | Contenido | Ubicación |
+|---|---|---|
+| **SDD-005** | 4 ventanas visuales: Control Room, Planeación, Kanban, 3D | `./docs/SDDs/SDD-005-plan-intermedio.md` |
+| Plan CR | Control Room (canvas de sesiones) | `./docs/SDDs/SDD-005-plan-intermedio.md#plan-cr` |
+| Plan VI | Canvas Planeación (grafo docs + Consejo de Expertos) | `./docs/SDDs/SDD-005-plan-intermedio.md#plan-vi` |
+| Plan KR | Kanban de Resultados | `./docs/SDDs/SDD-005-plan-intermedio.md#plan-kr` |
+| Plan 3D | Preparación espacial (gafas/futuro) | `./docs/SDDs/SDD-005-plan-intermedio.md#plan-3d` |
+
+## SDDs complementarios
+
+| SDD | Contenido | Ubicación |
+|---|---|---|
+| SDD-002 | Sistema de pruebas spec-driven | `./docs/SDDs/SDD-002-testing-spec-driven.md` |
+| SDD-003 | Torneo 500 ideas → 20 ganadoras | `./docs/SDDs/SDD-003-torneo-500-ideas.md` |
+| SDD-004 | Análisis Grok Bot | `./docs/SDDs/SDD-004-analisis-grokbot.md` |
+| SDD-006 | Investigación cache/memoria | `./docs/SDDs/SDD-006-investigacion-cache-memoria.md` |
+| SDD-007 | Análisis OpenCode | `./docs/SDDs/SDD-007-analisis-opencode-modelsdev.md` |
+| SDD-008 | Análisis cliente-servidor | `./docs/SDDs/SDD-008-analisis-cliente-servidor-k8s.md` |
+| SDD-009 | Debate decisiones | `./docs/SDDs/SDD-009-debate-decisiones.md` |
+| SDD-010 | Modelo de negocio | `./docs/SDDs/SDD-010-modelo-negocio.md` |
+| SDD-011 | Integración Hermes Agent | `./docs/SDDs/SDD-011-integracion-hermes-agent.md` |
+| SDD-012 | Multi-Agent GrokBot | `./docs/SDDs/SDD-012-multi-agent-grokbot-patterns.md` |
+| SDD-013 | GUI Visual Spec (Obsidian Glass) | `./docs/SDDs/SDD-013-gui-visual-spec.md` |
+| SDD-014 | Cierre multiplataforma | `./docs/SDDs/SDD-014-cierre-multiplataforma.md` |
+
+## ADRs
 
 | ADR | Tema | Estado |
 |---|---|---|
-| ADR-001 | Responsive Design y Cross-Platform | Aprobado |
-| ADR-002 | Arquitectura Hibrida Monorepo | Aprobado |
-| ADR-003 | Voz y Sincronizacion | Pendiente |
-| ADR-004 | Integracion GitHub | Pendiente |
-| ADR-005 | Modelo Despliegue Dual (local-first + servidor nube, workspace Cargo) | Aceptado |
-| ADR-005 | Modelo de Despliegue Dual (local-first + servidor nube, crates Rust) | Aceptado |
+| ADR-001 | Responsive Design | Aprobado |
+| ADR-002 | Arquitectura Híbrida Monorepo | Aprobado |
+| ADR-003 | Voz y Sincronización | Pendiente |
+| ADR-004 | Integración GitHub | Pendiente |
+| ADR-005 | Modelo Despliegue Dual | Aceptado |
 
-## Documentos archivados (no vigentes)
+## Otros
 
-Los siguientes documentos estan en `_reciclaje/docs_obsoletos/` y no reflejan el estado actual:
-
-- ETAPA1.md, FUNDACION.md, PLAN.md, ROADMAP.md, PRODUCTO.md, SUPER_PLAN.md
-- ARQUITECTURA.md, MEJORAS.md
-- SDDs (SDD-102 a SDD-128) — eran de la version Flutter
-- ADRs (ADR-001 a ADR-005) — eran de la version Flutter
-- legacy/ — docs antiguos
+| Documento | Ubicación |
+|---|---|
+| MULTIPLATAFORMA.md | `./docs/MULTIPLATAFORMA.md` |
+| RESPONSIVE.md | `./docs/RESPONSIVE.md` |
+| INFRA.md | `./docs/INFRA.md` |
+| referencia de diseño.md | `./docs/referencia de diseno.md` |

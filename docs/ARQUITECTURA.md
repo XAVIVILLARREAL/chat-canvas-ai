@@ -1,11 +1,13 @@
-# ARQUITECTURA.md — Arquitectura de Empresa Dev
+# ARQUITECTURA.md — Arquitectura de Canvas AI
 
 > Documento maestro de arquitectura. Siempre consultar antes de crear componentes, servicios o features nuevas.
-> **v3.5 (2026-08-24)**: alineada con ADR-005 (web-first, servidor Rust) + SDD-008 (escalado) + Plan Base v3.4. El modelo anterior (Tauri-first + backend Python) quedó superado — ver nota de supercesión en [ADR-002](./ADRs/ADR-002-arquitectura-hibrida.md).
+> **v4.0 (2026-08-25)**: alineada con la nueva dirección de Canvas AI como herramienta de IA generalista.
 
-## Vision general
+## Visión general
 
-Plataforma **WEB-FIRST** de orquestación de agentes: el gateway Rust (axum) **sirve la SPA React** y sostiene REST + SSE/WS de streaming; un crate de dominio compartido (`crates/core`) alimenta al servidor y al shell Tauri (diferido, solo con demanda demostrada). **Cero Python en el servidor** — la orquestación de agentes la hacen los providers Rust + Reasonix ([PLAN C](./SDDs/SDD-001-plan-base/plan-c-reasonix-deepseek.md)) y el stack del servidor está fijado en [PLAN S](./SDDs/SDD-001-plan-base/plan-s-despliegue-costos.md).
+**Canvas AI** es una herramienta de IA generalista desktop (Tauri v2) con React + Rust. El gateway Rust (Axum) sirve la SPA React y soporta REST + SSE/WS de streaming. Un crate de dominio compartido (`canvas-ai-core`) alimenta al servidor y al shell Tauri. Los agentes se comunican via ACP Protocol (Hermes) y MCP (stdio/HTTP/SSE).
+
+**Referencias arquitectónicas**: Hermes Agent (ACP, subagents, MCP), GrokBot (sessions), ERP AI Canvas (deploy-spec, node types).
 
 ```
 +-----------------------------------------------------+
