@@ -1,6 +1,6 @@
 //! Servidor central de AI Canvas — APIs para Canvas, Skills, Agents, MCP, Teams
 //!
-//! Expone el mismo dominio `empresa-dev-core` via HTTP (Axum).
+//! Expone el mismo dominio `canvas-ai-core` via HTTP (Axum).
 //! Compatible con Tauri (IPC) y clientes web.
 
 use axum::{
@@ -10,7 +10,7 @@ use axum::{
     routing::{get, post, put, delete},
     Router,
 };
-use empresa_dev_core::domain::*;
+use canvas_ai_core::domain::*;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

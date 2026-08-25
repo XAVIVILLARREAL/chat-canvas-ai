@@ -1,7 +1,7 @@
 [package]
-name = "empresa-dev-core"
+name = "canvas-ai-core"
 version = "0.1.0"
-description = "Dominio puro de AI Canvas — sin Tauri ni HTTP (ADR-005 D1)"
+description = "Dominio puro de Canvas AI — sin Tauri ni HTTP (ADR-005 D1)"
 edition = "2021"
 
 [dependencies]

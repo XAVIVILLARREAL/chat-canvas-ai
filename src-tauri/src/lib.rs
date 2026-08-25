@@ -1,4 +1,4 @@
-use empresa_dev_core::domain::{Agent, AgentRole};
+use canvas_ai_core::domain::{Agent, AgentRole};
 use specta_typescript::Typescript;
 use tauri::Manager;
 

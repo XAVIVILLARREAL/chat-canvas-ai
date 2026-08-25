@@ -18,14 +18,14 @@ async fn main() {
         .and_then(|v| v.parse().ok())
         .unwrap_or(30);
 
-    println!("[empresa-dev-worker] {worker_id} arrancando (stateless, sin credenciales DB)");
+    println!("[canvas-ai-worker] {worker_id} arrancando (stateless, sin credenciales DB)");
 
     // Bucle de vida: heartbeat + (futuro) claim de tareas SKIP LOCKED.
     let mut tick = tokio::time::interval(Duration::from_secs(heartbeat_secs));
     tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
     loop {
         tick.tick().await;
-        println!("[empresa-dev-worker] {worker_id} heartbeat ok");
+        println!("[canvas-ai-worker] {worker_id} heartbeat ok");
     }
 }
 

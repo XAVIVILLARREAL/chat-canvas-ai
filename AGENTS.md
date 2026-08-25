@@ -1,10 +1,10 @@
-# AGENTS.md — Empresa Dev (Tauri + multiagente visual)
+# AGENTS.md — Canvas AI (plataforma visual de automatización con agentes)
 
 > Guia de trabajo para los agentes en este proyecto. Leer antes de tocar codigo.
 
 ## Que es este proyecto
 
-Un **entorno de desarrollo agenteico visual** hecho en **Tauri** (React + Rust): un sistema multiagente donde los usuarios crean **empresas de desarrollo de programacion** completas usando agentes de IA basados en skills, con un canva visual como interfaz principal. No es un editor de codigo — es una **fabrica visual de empresas de desarrollo** donde los agentes trabajan, prueban y entregan resultados.
+Una **plataforma visual de automatización con agentes** hecha en **Rust + React**: un sistema donde los usuarios crean flujos de trabajo completos usando agentes de IA, con un canvas visual como interfaz principal. No es un editor de código — es una **fábrica visual de automatizaciones** donde los agentes trabajan, prueban y entregan resultados.
 
 - **Idea rectora:** *Crear empresas de desarrollo autonomas visualmente, donde los agentes son empleados que trabajan por resultados y pruebas, no por codigo.*
 - **Documentacion:** `docs/INDEX.md` — mapa completo de todos los .md del proyecto.

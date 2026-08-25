@@ -1,11 +1,11 @@
 [package]
-name = "empresa-dev-server"
+name = "canvas-ai-server"
 version = "0.1.0"
-description = "Servidor central de AI Canvas — APIs para Canvas, Skills, Agents, MCP, Teams"
+description = "Servidor central de Canvas AI — APIs para Canvas, Skills, Agents, MCP, Teams"
 edition = "2021"
 
 [dependencies]
-empresa-dev-core = { path = "../core" }
+canvas-ai-core = { path = "../core" }
 axum.workspace = true
 tokio.workspace = true
 serde_json.workspace = true

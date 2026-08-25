@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicegui-systems/nicegui/main/.tauri/tauri.conf.schema.json",
-  "productName": "Empresa Dev",
+  "productName": "Canvas AI",
   "version": "0.1.0",
-  "identifier": "com.empresa-dev.app",
+  "identifier": "com.canvas-ai.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Empresa Dev",
+        "title": "Canvas AI",
         "width": 1280,
         "height": 800,
         "minWidth": 900,
