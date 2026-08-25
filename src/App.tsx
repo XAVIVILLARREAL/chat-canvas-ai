@@ -1,72 +1,95 @@
-import { useAppStore } from "./stores/app-store";
+import { useEffect } from 'react';
+import { Canvas } from './components/Canvas';
+import { Sidebar } from './components/Sidebar';
+import { Header } from './components/Header';
+import { ToastContainer } from './components/ToastContainer';
+import { ModalProvider } from './components/Modal';
+import { useCanvasStore } from './stores/canvas-store';
+import './styles.css';
 
-export function App() {
-  const { agents, selectedAgent, selectAgent, addAgent } = useAppStore();
+function App() {
+  const {
+    currentCanvas,
+    sidebarOpen,
+    sidebarTab,
+    loading,
+    canvases,
+    skills,
+    agents,
+    teams,
+    mcpServers,
+    executions,
+    fetchCanvases,
+    fetchSkills,
+    fetchAgents,
+    fetchTeams,
+    fetchMcpServers,
+    fetchExecutions,
+    createCanvas,
+    setCurrentCanvas,
+    setSidebarTab,
+  } = useCanvasStore();
 
-  const handleCreateAgent = () => {
-    addAgent({
-      id: crypto.randomUUID(),
-      name: `Agente ${agents.length + 1}`,
-      role: "dev",
-      status: "idle",
-      skills: [],
-    });
-  };
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          fetchCanvases(),
+          fetchSkills(),
+          fetchAgents(),
+          fetchTeams(),
+          fetchMcpServers(),
+          fetchExecutions(),
+        ]);
+      } catch (error) {
+        console.error('Failed to load initial data:', error);
+      }
+    };
+    loadData();
+  }, [fetchCanvases, fetchSkills, fetchAgents, fetchTeams, fetchMcpServers, fetchExecutions]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if ((e.metaKey || e.ctrlKey) && e.key === 'n') { e.preventDefault(); createCanvas(); }
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'e') { e.preventDefault(); }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [createCanvas]);
+
+  const handleSwitchCanvas = (canvas: any) => setCurrentCanvas(canvas);
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Empresa Dev</h1>
-        <p className="subtitle">Sistema multiagente visual</p>
-      </header>
-
-      <main className="app-main">
-        <section className="canvas-section">
-          <h2>Oficina</h2>
-          <div className="canvas">
-            {agents.length === 0 ? (
-              <div className="empty-state">
-                <p>No hay agentes creados</p>
-                <button
-                  type="button"
-                  className="btn-primary"
-                  onClick={handleCreateAgent}
-                >
-                  Crear primer agente
-                </button>
-              </div>
-            ) : (
-              <div className="agents-grid">
-                {agents.map((agent) => (
-                  <button
-                    key={agent.id}
-                    type="button"
-                    className={`agent-card ${selectedAgent?.id === agent.id ? "selected" : ""}`}
-                    onClick={() => selectAgent(agent)}
-                  >
-                    <div className={`agent-status status-${agent.status}`} />
-                    <span className="agent-name">{agent.name}</span>
-                    <span className="agent-role">{agent.role}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-
-        <aside className="panel">
-          <h2>Panel</h2>
-          {selectedAgent ? (
-            <div className="agent-detail">
-              <h3>{selectedAgent.name}</h3>
-              <p>Rol: {selectedAgent.role}</p>
-              <p>Estado: {selectedAgent.status}</p>
-            </div>
-          ) : (
-            <p className="empty-state">Selecciona un agente</p>
-          )}
-        </aside>
-      </main>
-    </div>
+    <ModalProvider>
+      <div className="app">
+        <Header 
+          currentCanvas={currentCanvas}
+          canvases={canvases}
+          onCreateCanvas={createCanvas}
+          onSwitchCanvas={handleSwitchCanvas}
+          loading={loading}
+        />
+        <main className="app-main">
+          <section className="canvas-section"><Canvas /></section>
+          <aside className={`sidebar ${sidebarOpen ? 'open' : 'collapsed'}`} style={{ width: sidebarOpen ? 320 : 0 }}>
+            <Sidebar 
+              activeTab={sidebarTab}
+              onTabChange={setSidebarTab}
+              skills={skills}
+              agents={agents}
+              teams={teams}
+              mcpServers={mcpServers}
+              executions={executions}
+            />
+          </aside>
+        </main>
+        <ToastContainer />
+      </div>
+    </ModalProvider>
   );
 }
+
+export default App;

@@ -1,5 +1,5 @@
 {
-  "name": "empresa-dev",
+  "name": "ai-canvas",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -41,8 +41,13 @@
   },
   "dependencies": {
     "@tanstack/react-query": "5.101.4",
+    "@xyflow/react": "^12.3.0",
+    "clsx": "^2.1.1",
+    "immer": "^11.1.18",
+    "lucide-react": "^0.454.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "tailwind-merge": "^2.5.4",
     "zustand": "5.0.15"
   }
 }

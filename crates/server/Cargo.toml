@@ -1,11 +1,27 @@
 [package]
 name = "empresa-dev-server"
 version = "0.1.0"
-description = "Servidor central de Empresa Dev (modo nube, ADR-005 D6)"
+description = "Servidor central de AI Canvas — APIs para Canvas, Skills, Agents, MCP, Teams"
 edition = "2021"
 
 [dependencies]
 empresa-dev-core = { path = "../core" }
-axum = "0.8"
+axum.workspace = true
 tokio.workspace = true
 serde_json.workspace = true
+serde.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+thiserror.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+reqwest.workspace = true
+async-trait.workspace = true
+dashmap.workspace = true
+tokio-util.workspace = true
+futures.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+schemars.workspace = true
+rmcp.workspace = true

@@ -1,4 +1,4 @@
-use empresa_dev_core::domain::{Agent, Task};
+use empresa_dev_core::domain::{Agent, AgentRole};
 use specta_typescript::Typescript;
 use tauri::Manager;
 
@@ -10,7 +10,7 @@ use tauri::Manager;
 #[tauri::command]
 #[specta::specta]
 fn draft_agent(id: String, name: String) -> Agent {
-    Agent::new(id, name)
+    Agent::new(id, name, AgentRole::Custom("dev".into()), "tauri-user".into())
 }
 
 #[tauri::command]
@@ -25,10 +25,10 @@ fn get_app_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
-// Los tipos Task/Agent se referencian en la firma de comandos/export specta
+// Los tipos Agent/AgentRole se referencian en la firma de comandos/export specta
 // para mantenerlos vivos hasta que las fases A/B los consuman.
 #[allow(dead_code)]
-type DomainTypes = (Agent, Task);
+type DomainTypes = (Agent, AgentRole);
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
