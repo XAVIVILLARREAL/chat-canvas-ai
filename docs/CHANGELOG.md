@@ -2,6 +2,17 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 22 — Capa de producto profesional)
+
+- **PRD v1.0** (`docs/PRD.md`): producto primero — 4 personas + JTBD por vista + 16 features (MVP-1/2/3) cada una con **resultado medible Playwright humano** (clicks+teclado) · anti-scope explícito · riesgos top 5
+- **PRODUCT-METRICS** (`docs/PRODUCT-METRICS.md`): north-star **"sesiones que terminan en ENTREGA"** canónica · activación/retención D7/costo-por-entrega · **10 eventos de producto** al `event_stream` desde v0 · telemetría OPT-IN anónima (local-first: se recopila en el dispositivo, el usuario decide exportar)
+- **MVP-ROADMAP** (`docs/MVP-ROADMAP.md`): MVP-1 (semanas 1-6, base operativa) → MVP-2 (7-14, memoria+skills+resultados) → MVP-3 (15-24, automatización+nube+mercado) · gate humano por MVP · riesgos y presupuesto $20/gate
+- **SCHEMA-MAESTRO** (`docs/SCHEMA-MAESTRO.md`): Etapa 0 **concretada** — DDL canónico (projects/sessions/messages/event_stream/skills+versions/providers/documents/executions/settings), migraciones versionadas, taxonomía de rungs, OpenAPI del gateway
+- **CONTRATO-SKILL** (`docs/CONTRATO-SKILL.md`): frontmatter `.md` exacto (name/slug/role/model_tier/budget/tools_allowlist/personality…) con ejemplo real + 8 roles + tipos (agente/expert/proceso/flujo)
+- **THREAT-MODEL** (`docs/THREAT-MODEL.md`): amenazas por capa (cliente/sandbox/gateway) + **frontera numérica del sandbox Linux** (CPU 1 · RAM 512MB · disco 1GB · pids 128 · timeout 60s · red off · mounts read-only) + **flujo BYOK** (keychain local / envelope AES-GCM por tenant)
+- **plan-i18n** (`docs/SDDs/SDD-001-plan-base/plan-i18n.md`): **multilenguaje simple desde el día 1** — diccionarios JSON + hook `useI18n`, 6 idiomas iniciales (es/en/pt/de/fr/it), fallback a `en`, RTL-ready, script CI de claves faltantes
+- **plan-a realineado a A.0-A.9** (BYOK, "projects como scope" — adiós fantasma "tenants", circuit breaker, backup integral) · **plan-s realineado a ADR-006** (Tauri = producto base, no "diferido") · **MATRIZ**: +Etapa 0 (0.1-0.6), A.0 renombrada, post-v1 marcado (Q6: Consejo/Voz/3D/CR/Dopamina)
+
 ## 2026-08-25 (sesion 21 — Visión híbrida ADR-006)
 
 - **ADR-006 APROBADO — VISIÓN HÍBRIDA (Q1-Q12)**: local-first gratis (BYOK, Tauri+SQLite) como PRODUCTO BASE + nube SaaS multi-tenant DE PAGO para ejecución 24/7 (Postgres+RLS + workers Linux). Solo en la nube quien la pague. Documento canónico: `docs/ADRs/ADR-006-vision-hibrida-local-nube.md`

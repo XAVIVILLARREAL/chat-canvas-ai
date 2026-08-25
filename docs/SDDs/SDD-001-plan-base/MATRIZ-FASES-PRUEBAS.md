@@ -3,12 +3,22 @@
 > Generada de los planes (fuente de verdad). **Regenerar en CADA cambio de fases** (regla de ejecución #10 del [README](./README.md)).
 > Orden = ORDEN DE EJECUCIÓN maestro (no alfabético): así la matriz es también el checklist de construcción.
 > Capas por fase: **[U]**nit vitest · **[I]**ntegración cargo/mock · **[E]**2E Playwright · **[H]**umana suite modo persona.
-> **Reglas duras**: fase GUI ⇒ **[E]+[H] obligatorias** · **toda fase GUI se prueba en móvil 375px + desktop 1440px** (suite humana `responsive-human.spec.ts` en cada gate — no hay pantalla "solo desktop") · **cómputo client-first**: todo lo que pueda correr en el cliente va al cliente (server = datos, no CPU de usuarios) · **toda UI usa los tokens de [SDD-013](../SDD-013-gui-visual-spec.md) (Obsidian Glass)** — CSS improvisado prohibido, checklist §7 auditado en F.5 · **cada fase es manejable por prompt (slices si excede ~1 sesión IA)** · **criterios de negocio 1:1 con sus pruebas + E2E transversal por etapa en cada gate** · fase sin fila aquí NO se construye · presupuesto APIs reales **máx $20/gate** (el resto mock-first ~$0) · evidencia de gate = video + `evidence/`.
+> **Reglas duras**: fase GUI ⇒ **[E]+[H] obligatorias** · **toda fase GUI se prueba en móvil 375px + desktop 1440px** (suite humana `responsive-human.spec.ts` en cada gate — no hay pantalla "solo desktop") · **cómputo client-first**: todo lo que pueda correr en el cliente va al cliente (server = datos, no CPU de usuarios) · **toda UI usa los tokens de [SDD-013](../SDD-013-gui-visual-spec.md) (Obsidian Glass)** — CSS improvisado prohibido, checklist §7 auditado en F.5 · **cada fase es manejable por prompt (slices si excede ~1 sesión IA)** · **criterios de negocio 1:1 con sus pruebas + E2E transversal por etapa en cada gate** · fase sin fila aquí NO se construye · presupuesto APIs reales **máx $20/gate** (el resto mock-first ~$0) · evidencia de gate = video + `evidence/` · **i18n multilenguaje desde el día 1** ([plan-i18n](./plan-i18n.md)) · **eventos de producto al `event_stream` desde v0** ([PRODUCT-METRICS](../../PRODUCT-METRICS.md)) · **[PRD](../../PRD.md) como fuente de "qué construir"** (features→resultado humano).
 
-## Etapa 1 · Chat núcleo Codex + tenants — `plan-a-chat-codex.md`
+## Etapa 0 · Fundación (schema maestro + eventos + secretos) — `SCHEMA-MAESTRO.md` + `THREAT-MODEL.md`
 | Fase | Nombre | Pruebas |
 |---|---|---|
-| A.0 | Proyectos como TENANTS (FUNDACIÓN) | Unit: repos filtran por project_id; scopes global→local. Integration: cross-tenant vacío; override local no muta global; tabs restauran tras reinicio. E2E: 2 proyectos alternando tabs, skill global vs copia local. HUMANA @core: entrar por card, cambiar tab, nada se mezcla |
+| 0.1 | Schema maestro + migraciones | Cargo test repos en SQLite y Postgres; migración idempotente up/down/up; `project_id` en toda tabla ([SCHEMA-MAESTRO](../../SCHEMA-MAESTRO.md)) |
+| 0.2 | Contrato `event_stream` (ledger) | Trigger append-only rechaza UPDATE/DELETE; seed project→session→message→rung; taxonomía completa ([PRODUCT-METRICS](../../PRODUCT-METRICS.md)) |
+| 0.3 | Secretos BYOK + vault | Key cifrada/descifrable con la correcta; nunca en claro al webview ([THREAT-MODEL](../../THREAT-MODEL.md)) |
+| 0.4 | Frontera del sandbox Linux | Contrato de contenedor: límites CPU/RAM/disco/timeout, red off, mounts read-only ([THREAT-MODEL](../../THREAT-MODEL.md)) |
+| 0.5 | OpenAPI del gateway | Tipos specta→OpenAPI generado sin errores; frontend consumible |
+| 0.6 | i18n infraestructura | Unit hook `useI18n` + snapshot diccionario; fallback a `en` ([plan-i18n](./plan-i18n.md)) |
+
+## Etapa 1 · Chat núcleo + proyectos como scope — `plan-a-chat-codex.md` (ADR-006)
+| Fase | Nombre | Pruebas |
+|---|---|---|
+| A.0 | Proyectos como SCOPE (FUNDACIÓN) | Unit: repos filtran por project_id; scopes global→proyecto. Integration: cross-proyecto vacío; override local no muta global; tabs restauran tras reinicio. E2E: 2 proyectos alternando tabs, skill global vs copia local. HUMANA @core: entrar por card, cambiar tab, nada se mezcla |
 | A.1 | AppShell + stores | Vitest stores+hook. E2E: layout mobile 375px (BottomNav) y desktop 1440px (sidebar) |
 | A.2 | Persistencia SQLite (settings CIFRADA) | Cargo test repositorios. Integration: roundtrip mensaje con project_id |
 | A.3 | Trait AgentProvider + DeepSeekDirect | Unit con mock-server SSE. Integration: orden de chunks |
@@ -164,6 +174,7 @@
 
 ## INTERMEDIO (INTERCALADO v3.8 — cada ventana tras su fase base habilitadora; NO después de la base) — `../SDD-005-plan-intermedio.md`
 > VI tras F/G · KR tras H · 3D tras J · K.1/K.2 con CR · CR al final (paralelo a N/O). Consejo de Expertos ADELANTADO: audita los gates de la propia base (dogfood).
+> **Q6 · POST-V1 (no bloquean base ni MVP-3):** Consejo de Expertos (VI.5–VI.8) · Voz (K.1/K.2) · 3D (J.3/3D.*) · Control Room (CR.*) · Dopaminérgico (U.2–U.8). Se diseñan, se referencian, pero NO entran a MVP-1/2/3.
 
 ### Etapa 16 · Canvas Planeación — VI.1–VI.4 (tras Gate F: necesita D.2 + F.1)
 | Fase | Nombre | Pruebas |
@@ -251,4 +262,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 137 fases** — **base 114** (A–P 92 incl. H.9a/H.9b, sin J.3/K.1/K.2 + V 5 + S/T/U 17) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases.
+**Total: 143 fases** — **Etapa 0 6** + **base 114** (A–P 92 incl. H.9a/H.9b, sin J.3/K.1/K.2 + V 5 + S/T/U 17) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8).

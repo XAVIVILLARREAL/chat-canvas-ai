@@ -1,7 +1,7 @@
 # PLAN S — Despliegue, Costos y Stack Eficiente (transversal, datos verificados ago-2026)
 
 > [← Maestro](./README.md) · Investiga y fija CÓMO desplegar barato hoy sin bloquear el escalado mañana. Fuentes: investigación con sub-agentes sobre Hetzner/ARM/PaaS/LLM-pricing, stack Rust 2026 y cliente Tauri 2.x.
-> **Prerequisito de Etapa 1**: S.1 (hosting) y S.2 (stack servidor) se ejecutan ANTES de arrancar Etapa 1 — el gateway axum sirve la web desde el día 1 y el stack ya está ~70% ejecutado (crates/core + crates/server). S.3 (Tauri) SOLO cuando haya demanda demostrada (WEB-FIRST, [ADR-005](../ADRs/ADR-005-modelo-despliegue-dual.md)); S.4 continuo.
+> **Alineado con [ADR-006](../ADRs/ADR-006-vision-hibrida-local-nube.md)**: local-first (Tauri) es el **producto base** (gratis, BYOK); la nube es el SKU **de pago** (suscripción). S.3 (Tauri) ya NO es "diferido": es la entrega principal. S.1 (hosting) y S.2 (stack servidor) se ejecutan en la **Etapa 10 (nube)** y S.4 continuo. El gateway axum sirve la SPA en ambos modos.
 
 <a id="s1"></a>
 ## S · 1 — Hosting por etapas con COSTOS REALES
@@ -41,7 +41,9 @@ Referencia dura: el equivalente gestionado (Fly/Railway/Render con app+DB+egress
 WebSocket 10k conexiones: KBs por conexión (no MBs) — sobrado en un contenedor pequeño; broadcast acotado + dashmap + Message::Binary + heartbeat.
 
 <a id="s3"></a>
-## S · 3 — Cliente Tauri eficiente (patrones obligatorios)
+## S · 3 — Cliente Tauri eficiente (patrones obligatorios — PRODUCTO BASE, ADR-006)
+
+> El shell Tauri es la entrega principal (local-first). Estos patrones son obligatorios, no opcionales.
 
 1. **Streaming del agente = Command async + `Channel<TokenEvent>`** (tagged enum, batch coalescido ~30ms en Rust): NO `emit` ni fetch-SSE dentro del webview (iOS pausa todo en background; el stream vive en reqwest/Rust y sobrevive)
 2. Payloads grandes (snapshots canva, diffs): `Channel<Vec<u8>>` binario — **11× más rápido @64KB** que JSON IPC; JSON basta para tokens (<1KB)

@@ -49,9 +49,10 @@
 <a id="c3"></a>
 ### C.3 — Robustez
 - Reconexión si muere serve; cancelación en curso (`task stop`); timeouts por fase
+- **Circuit breaker por proveedor (desde el día 1)**: key inválida, 429/rate-limit, timeout, 5xx → degradación controlada (fallback a otro provider del registro o modo local Ollama) sin tumbar el chat; estados `open/half-open/closed` con backoff; error accionable al usuario, la sesión nunca se pierde ([PRD](./PRD.md) F2)
 - Fail-open: Reasonix no arranca → aviso claro + opción modo directo DeepSeekDirect
 - **Sandbox dev (v3.8)**: docker socket del host montado SOLO en el worker (`crates/worker`), jamás en el gateway; red denegada por defecto ([H·H.9a](./plan-h-motor-pruebas.md#h9a))
-- **Pruebas:** chaos integration kill -9 → recuperación automática; estado consistente post-cancel
+- **Pruebas:** chaos integration kill -9 → recuperación automática; estado consistente post-cancel. Chaos: provider devuelve basura/429 → circuit breaker aísla y el chat sigue con fallback
 
 <a id="c5"></a>
 > **C.4 (reservada)**: el hueco es intencional — el "contexto/caché" que ocuparía se integró en C.5 (SDD-006 §1) y el registro de proveedores en C.7 (SDD-007). Los IDs de fase son estables y no se reutilizan.

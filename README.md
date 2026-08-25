@@ -35,6 +35,12 @@ Canvas AI es un entorno de trabajo donde humanos y agentes de IA colaboran en un
 | Documento | Contenido |
 |---|---|
 | [`AGENTS.md`](./AGENTS.md) | Guía de trabajo para agentes IA |
+| [`docs/PRD.md`](./docs/PRD.md) | Producto: personas, JTBD, features → resultado medible |
+| [`docs/PRODUCT-METRICS.md`](./docs/PRODUCT-METRICS.md) | North-star, activación, retención, eventos |
+| [`docs/MVP-ROADMAP.md`](./docs/MVP-ROADMAP.md) | MVP-1/2/3 time-boxed |
+| [`docs/SCHEMA-MAESTRO.md`](./docs/SCHEMA-MAESTRO.md) | Modelo canónico de datos (Etapa 0) |
+| [`docs/CONTRATO-SKILL.md`](./docs/CONTRATO-SKILL.md) | Formato `.md` de skills |
+| [`docs/THREAT-MODEL.md`](./docs/THREAT-MODEL.md) | Amenazas, sandbox, BYOK |
 | [`docs/INDEX.md`](./docs/INDEX.md) | Mapa completo de docs |
 | [`docs/SDDs/SDD-001-plan-base/README.md`](./docs/SDDs/SDD-001-plan-base/README.md) | Plan maestro |
 | [`docs/ARQUITECTURA.md`](./docs/ARQUITECTURA.md) | Arquitectura |

@@ -10,6 +10,12 @@
 | ESTADO.md | Estado actual | `./docs/ESTADO.md` |
 | CHANGELOG.md | Historial append-only | `./docs/CHANGELOG.md` |
 | ARQUITECTURA.md | Arquitectura del proyecto | `./docs/ARQUITECTURA.md` |
+| **PRD.md** | **Producto: personas, JTBD, features→resultado humano** | `./docs/PRD.md` |
+| **PRODUCT-METRICS.md** | **North-star, activación, eventos, telemetría** | `./docs/PRODUCT-METRICS.md` |
+| **MVP-ROADMAP.md** | **MVP-1/2/3 time-boxed** | `./docs/MVP-ROADMAP.md` |
+| **SCHEMA-MAESTRO.md** | **Modelo canónico de datos (Etapa 0)** | `./docs/SCHEMA-MAESTRO.md` |
+| **CONTRATO-SKILL.md** | **Formato `.md` de skills** | `./docs/CONTRATO-SKILL.md` |
+| **THREAT-MODEL.md** | **Amenazas, sandbox Linux, BYOK** | `./docs/THREAT-MODEL.md` |
 
 ## Plan Base (SDD-001) — v2.0
 
@@ -30,6 +36,7 @@
 | Plan L | Local-first / offline | `./docs/SDDs/SDD-001-plan-base/plan-l-local-first.md` |
 | Plan M | GitHub integration | `./docs/SDDs/SDD-001-plan-base/plan-m-github.md` |
 | Plan N | Orquestación de sesiones y agentes | `./docs/SDDs/SDD-001-plan-base/plan-n-orchestration.md` |
+| **Plan I18N** | **Multilenguaje simple desde el día 1** | `./docs/SDDs/SDD-001-plan-base/plan-i18n.md` |
 | Plan VI | Segundo Cerebro — grafo de archivos del proyecto | `./docs/SDDs/SDD-001-plan-base/plan-vi-second-brain.md` |
 | Plan P | Pixel-perfect GUI | `./docs/SDDs/SDD-001-plan-base/plan-p-pixel-perfect-gui.md` |
 | Plan T | Excelencia (calidad total) | `./docs/SDDs/SDD-001-plan-base/plan-t-excelencia.md` |

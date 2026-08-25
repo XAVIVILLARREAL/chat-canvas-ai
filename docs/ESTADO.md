@@ -16,11 +16,24 @@
 - Build completo exitoso
 - Residuo "empresa autónoma" eliminado del código (core, server, shared-types, frontend) ✅
 
-## Próximo paso (Etapa 0)
+## Próximo paso (Etapa 0 — ya concretada)
 
-- [ ] **Schema maestro + migraciones** — el server aún vive en `HashMap` en memoria; conectar sqlx/sqlite + Postgres
-- [ ] **Contrato `event_stream`** (ledger append-only)
-- [ ] **Módulo de secretos BYOK** (keychain OS / cifrado por tenant)
+- [ ] **Implementar schema maestro + migraciones** — el server aún vive en `HashMap` en memoria; conectar sqlx/sqlite + Postgres ([SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md))
+- [ ] **Contrato `event_stream`** (ledger append-only) + eventos de producto ([PRODUCT-METRICS](./PRODUCT-METRICS.md))
+- [ ] **Módulo de secretos BYOK** (keychain OS / cifrado por tenant) ([THREAT-MODEL](./THREAT-MODEL.md))
+- [ ] **Frontera del sandbox Linux** (números) ([THREAT-MODEL](./THREAT-MODEL.md))
+- [ ] **OpenAPI del gateway** (specta) ([SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md))
+
+## Nueva capa de producto (2026-08-25)
+
+- **PRD** (`docs/PRD.md`) — personas + JTBD + features→resultado medible Playwright humano
+- **PRODUCT-METRICS** (`docs/PRODUCT-METRICS.md`) — north-star "sesiones que terminan en ENTREGA", activación, retención, eventos, telemetría opt-in
+- **MVP-ROADMAP** (`docs/MVP-ROADMAP.md`) — MVP-1 (base) / MVP-2 (memoria+skills+resultados) / MVP-3 (automatización+nube+mercado)
+- **SCHEMA-MAESTRO** (`docs/SCHEMA-MAESTRO.md`) — Etapa 0 concreta (sessions/messages/event_stream/skills/providers/settings + DDL)
+- **CONTRATO-SKILL** (`docs/CONTRATO-SKILL.md`) — frontmatter `.md` exacto + ejemplo + roles
+- **THREAT-MODEL** (`docs/THREAT-MODEL.md`) — amenazas por capa + frontera sandbox + flujo BYOK
+- **plan-i18n** (`docs/SDDs/SDD-001-plan-base/plan-i18n.md`) — multilenguaje simple desde el día 1 (es/en/pt/de/fr/it)
+- Plan A realineado a A.0-A.9 (BYOK, projects como scope) · Plan S realineado a ADR-006 (Tauri = producto base) · Circuit breaker + backup integral añadidos
 
 ## Gates pendientes
 

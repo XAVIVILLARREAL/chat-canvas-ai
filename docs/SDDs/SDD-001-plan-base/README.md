@@ -169,6 +169,8 @@ interface SpatialMeta {
 
 ## Plan de construcción (Etapas)
 
+> **Orden de ejecución = [MVP-ROADMAP](../../MVP-ROADMAP.md) + [MATRIZ](./MATRIZ-FASES-PRUEBAS.md)** (chat-first: Etapa 2 primero). Las etapas 1-10 son **capacidades**; se construyen en el orden del roadmap, no en su numeración aquí. El **Control Room (Etapa 1) se construye al final** como vista que consume todo (post-v1, Q6) — alineado con ARQUITECTURA y la MATRIZ.
+
 ### Etapa 0: Fundación — schema maestro + eventos + secretos
 **Objetivo:** Base de datos y contratos desde el día 1 (antes de cualquier UI). Sin esto, todo lo demás exige retrofit.
 
@@ -184,7 +186,7 @@ interface SpatialMeta {
 
 ---
 
-### Etapa 1: Control Room Canvas
+### Etapa 1: Control Room Canvas *(se construye al final — post-v1, Q6)*
 **Objetivo:** Canvas visual infinito donde ves TODAS las sesiones de agentes como nodos vivos — con estado en tiempo real, conexiones, métricas y acciones rápidas.
 
 **CR.1 — Canvas de sesiones:**
@@ -415,18 +417,27 @@ interface SpatialMeta {
 
 | Documento | Contenido |
 |---|---|
+| [PRD](../../PRD.md) | **Producto: personas, JTBD y features → resultado medible Playwright humano** |
+| [PRODUCT-METRICS](../../PRODUCT-METRICS.md) | **North-star, activación, retención, eventos y telemetría** |
+| [MVP-ROADMAP](../../MVP-ROADMAP.md) | **MVP-1/2/3 time-boxed** con entregables por fase |
+| [SCHEMA-MAESTRO](../../SCHEMA-MAESTRO.md) | **Etapa 0 concreta: modelo canónico + migraciones + event_stream** |
+| [CONTRATO-SKILL](../../CONTRATO-SKILL.md) | **Formato `.md` de skills (frontmatter + ejemplo)** |
+| [THREAT-MODEL](../../THREAT-MODEL.md) | **Modelo de amenazas, sandbox Linux y flujo BYOK** |
 | [ADR-006](../../ADRs/ADR-006-vision-hibrida-local-nube.md) | **Visión híbrida: local-first + nube SaaS de pago (Q1-Q12)** |
 | [SDD-011](../SDD-011-integracion-hermes-agent.md) | Integración con Hermes Agent (BYOK, ACP, MCP, subagents) |
 | [SDD-012](../SDD-012-multi-agent-grokbot-patterns.md) | Patrones multi-agente de GrokBot (sesiones, sandbox Linux) |
 | [SDD-013](../SDD-013-gui-visual-spec.md) | Design system Obsidian Glass |
-| [plan-a](./plan-a-chat-codex.md) | Chat con sesiones (detallado) |
+| [plan-a](./plan-a-chat-codex.md) | Chat con sesiones (A.0-A.9, BYOK) |
 | [plan-b](./plan-b-sidepanels-lovable.md) | Editor de código + live preview |
-| [plan-c](./plan-c-reasonix-deepseek.md) | Runtime de agentes (Reasonix, DeepSeek, BYOK) |
+| [plan-c](./plan-c-reasonix-deepseek.md) | Runtime de agentes (BYOK, circuit breaker) |
 | [plan-d](./plan-d-memoria-v3code.md) | Memoria y knowledge base |
 | [plan-f](./plan-f-canva-oficina.md) | Canvas de automatización + Kanban de resultados |
 | [plan-g](./plan-g-skills-lab.md) | Skills Lab (recetas `.md` + avatares) |
 | [plan-h](./plan-h-motor-pruebas.md) | Motor de pruebas y resultados (sandbox Linux) |
+| [plan-i18n](./plan-i18n.md) | **Multilenguaje simple desde el día 1** |
 | [plan-vi](./plan-vi-second-brain.md) | Segundo Cerebro — grafo de archivos del proyecto |
+
+> **Post-v1 (Q6):** Voz (K), 3D/VR, Control Room completo (CR), Consejo de Expertos (VI.5+) y dopamina (U.2-U.8) permanecen en el plan marcados como post-v1 — se diseñan pero no bloquean base ni MVP-3.
 
 ---
 
@@ -441,7 +452,10 @@ interface SpatialMeta {
 | Frontend React | ✅ Build exitoso, dev server en :1420 |
 | Canvas ReactFlow | ✅ Componente base funcional |
 | Residuo "empresa autónoma" (teams/company) | ✅ Eliminado (ADR-006) |
-| Etapa 0 — Schema maestro + eventos + secretos | 🚧 Siguiente (persistencia real) |
+| **PRD + Métrica norte + MVP roadmap** | ✅ Escritos ([PRD](../../PRD.md), [PRODUCT-METRICS](../../PRODUCT-METRICS.md), [MVP-ROADMAP](../../MVP-ROADMAP.md)) |
+| **Etapa 0 — Schema maestro + eventos + secretos** | ✅ **Concretada** ([SCHEMA-MAESTRO](../../SCHEMA-MAESTRO.md), [THREAT-MODEL](../../THREAT-MODEL.md)) — pendiente implementación (persistencia real) |
+| Contrato de skill `.md` | ✅ Escrito ([CONTRATO-SKILL](../../CONTRATO-SKILL.md)) |
+| i18n multilenguaje | ✅ Plan aprobado ([plan-i18n](./plan-i18n.md)) |
 | Control Room Canvas (Etapa 1) | 🚧 En progreso |
 | Chat + Sesiones (Etapa 2) | ⬜ Pendiente |
 | Runtime agentes (Etapa 3) | ⬜ Pendiente |
@@ -453,6 +467,7 @@ interface SpatialMeta {
 | Editor código (Etapa 8) | ⬜ Pendiente |
 | Marketplace (Etapa 9) | ⬜ Pendiente |
 | Nube 24/7 multi-tenant (Etapa 10) | ⬜ Pendiente (requiere ADR-006) |
+| Voz / 3D / Consejo de Expertos / Dopamina | 🔜 Post-v1 (marcados, no bloquean) |
 
 ---
 
