@@ -23,10 +23,12 @@ Canvas AI es un **desktop app** (Tauri v2) que permite a cualquier persona usar 
 
 ### 1. Control Room (Canvas visual)
 Vista tipo **Affine/Miro**: un canvas infinito donde se ve todo el estado del trabajo.
-- Sesiones activas como nodos conectados
-- Agentes trabajando (animaciones de progreso en tiempo real)
-- Notas, resultados, artefactos colocados libremente
-- **VR-ready**: todo el canvas se diseña para funcionar en gafas holográficas en el futuro (coordenadas 3D, sin tamaños absolutos en píxeles, sistema de unidades en metros)
+- Sesiones activas como nodos conectados (CR.1)
+- Acciones rápidas desde cada nodo: pausar, retomar, abrir chat (CR.2)
+- Métricas en vivo y alertas (CR.3)
+- Organización espacial semántica con búsqueda fuzzy (CR.4)
+- Modo vigilancia para excepciones (CR.5)
+- **VR-ready**: coordenadas 3D, SpatialMeta unificado
 
 ### 2. Chat con sesiones
 Estilo **GrokBot**: barra lateral con sesiones, panel derecho con rendering vivo.
@@ -36,13 +38,14 @@ Estilo **GrokBot**: barra lateral con sesiones, panel derecho con rendering vivo
 - Slash commands (`/compact`, `/agent`, `/skill`, `/run`)
 - Streaming de respuestas en tiempo real
 
-### 3. Panel de Skills
-Skills como **ciudadanos de primera clase** con identidad visual.
-- Lista visual de skills (cada uno con avatar generado por IA)
-- **Multi-agent loops**: un skill puede orquestar múltiples agentes en secuencia o en paralelo
-- Skills globales (compartidos entre proyectos) y locales (por proyecto)
-- Creación visual de skills (formulario, no YAML)
-- **Neuro-psicológicamente gratificante**: avatares animados, estados visuales de progreso, ceremonias de creación
+### 3. Segundo Cerebro (Grafo de archivos del proyecto)
+Estilo **Obsidian**: vista en el sidepanel que muestra los archivos del proyecto como un grafo vivo.
+- Grafo interactivo de archivos .md, ADRs, planes — navegar la documentación como un mapa
+- Edición de archivos markdown inline con ayuda de IA (crear, editar, planeación)
+- Búsqueda fuzzy, clustering por carpeta/tags, hover = preview del documento
+- Wiki-style links `[[enlace]]` entre documentos
+- **Consejo de Expertos**: skills auditores que auditan tu plan en paralelo
+- **Discovery Hub**: explorador de repos GitHub para agregar referencias
 
 ### 4. Canvas de Automatización
 Reemplazo visual de n8n/Activepieces. Basado en el **AI Canvas del ERP Docker Compose**.
@@ -51,6 +54,7 @@ Reemplazo visual de n8n/Activepieces. Basado en el **AI Canvas del ERP Docker Co
 - Canvas compiler: convierte el grafo visual en código ejecutable
 - Workflow-as-code codec (serialización/deserialización)
 - **Multi-runtime**: Python, TypeScript, Go, Bash, SQL — el canvas no limita el lenguaje
+- **Vista Kanban** (pantalla secundaria): tablero evidencia-first con bloques animados de tests, modo autonomía prolongada, evidencia por etapa
 
 ---
 
@@ -128,24 +132,66 @@ Todas las vistas canvas se diseñan para funcionar actualmente en 2D y en el fut
 7. **Colores y contraste**: WCAG AAA para legibilidad en AR (aire, no pantalla)
 8. **Estados de agentes**: usar iconos/animaciones, no solo color (accesibilidad)
 
+### Modelo espacial transversal (3D)
+
+Tipo `SpatialMeta` reutilizado por todas las ventanas:
+```typescript
+interface SpatialMeta {
+  x: number;          // posición horizontal (unidades = metros)
+  y: number;          // posición vertical
+  z?: number | null;  // profundidad (null en 2D, calculada en 3D)
+  cluster?: string;   // agrupación semántica
+  camera?: { position: [number, number, number]; target: [number, number, number] };
+}
+```
+
+- `z` es `null` en 2D — ReactFlow ignora; Three.js calcula con force-directed
+- Al hacer drag → SpatialMeta se guarda inmediatamente
+- Exportador a JSON espacial común (escena) para todas las ventanas
+- **Visor 3D unificado** (prototipo): navegar las ventanas como capas 3D de un mismo mundo, controles orbit/touch, LOD (Level of Detail), 60fps con datos reales del proyecto
+
 ---
 
 ## Plan de construcción (Etapas)
 
-### Etapa 1: Control Room Canvas (SDD-005)
-**Objetivo:** Canvas visual infinito con nodos de sesión, agentes, notas y resultados.
+### Etapa 1: Control Room Canvas
+**Objetivo:** Canvas visual infinito donde ves TODAS las sesiones de agentes como nodos vivos — con estado en tiempo real, conexiones, métricas y acciones rápidas.
 
+**CR.1 — Canvas de sesiones:**
 - [ ] Canvas ReactFlow con pan/zoom infinito
-- [ ] Tipos de nodos: Session, Agent, Note, Result, Skill, Automation
-- [ ] Conexiones entre nodos (edges con label)
-- [ ] Sidebar de nodos (palette) para arrastrar al canvas
-- [ ] Persistencia del canvas en SQLite (posición, conexiones, metadatos)
+- [ ] Nodo Session: título, avatar del agente activo, estado (active/thinking/working/done), preview del último mensaje, costo acumulado
+- [ ] Nodo Skill: avatar del skill, estado, conexión a sesiones que lo usan
+- [ ] Nodo Note: notas libres del usuario (contexto, ideas, pendientes)
+- [ ] Nodo Result: resultado de una tarea (pass/fail, diff, archivo generado)
+- [ ] Edges: conexiones entre sesiones↔skills, sesiones↔resultados
+- [ ] Layout automático: sesiones activas arriba, skills a la izquierda, resultados abajo, notas a los lados (force-directed, respeta posiciones humanas)
+
+**CR.2 — Acciones rápidas desde el nodo:**
+- [ ] Click en Session → abrir chat / pausar / retomar / ver evidencia / duplicar / archivar
+- [ ] Click en Skill → editar / probar (sandbox) / ver historial de ejecuciones
 - [ ] Toolbar: zoom-to-fit, minimap, export PNG
-- [ ] **VR-ready**: coordenadas 3D, sin absolute positioning, `vr={{}}`
+
+**CR.3 — Métricas en vivo:**
+- [ ] Sidebar o overlay con: sesiones activas, agentes trabajando, costo total del día, agentes más usados, sesiones más productivas
+- [ ] Alertas: sesión stuck (>30min), provider caído, costo alto (>umbral configurable)
+
+**CR.4 — Organización espacial semántica:**
+- [ ] Agrupación opcional por proyecto, agente, o tema
+- [ ] Búsqueda fuzzy que ilumina nodos relevantes
+- [ ] Filtros: por agente, estado, costo, fecha
+
+**CR.5 — Modo vigilancia:**
+- [ ] Pantalla dedicada que solo muestra excepciones (sesiones stuck, provider caído, tests fallando, errores en agentes)
+- [ ] Sonido/visual diferenciado por severidad
+
+**Cross-cutting:**
+- [ ] Persistencia del canvas en SQLite (posición, conexiones, metadatos)
 - [ ] Store Zustand con immer para estado del canvas
 - [ ] Canvas vacío con onboarding (tutorial interactivo)
+- [ ] **VR-ready**: coordenadas 3D, sin absolute positioning, `vr={{}}`
 
 **Dependencias:** Ninguna (es la base visual)
+**Gate:** abro Canvas AI → veo 3 sesiones activas como nodos → click en una → abro chat → regreso → sesión sigue activa → veo métricas → busco "auth" → nodo se ilumina → pauso sesión → verifico que se pausó. Suite humana verde.
 
 ---
 
@@ -220,8 +266,27 @@ Todas las vistas canvas se diseñan para funcionar actualmente en 2D y en el fut
 
 ---
 
-### Etapa 6: Canvas de Automatización (Plan F revisado)
-**Objetivo:** Visual workflow builder tipo n8n, basado en el AI Canvas del ERP.
+### Etapa 5.5: Segundo Cerebro — Grafo de archivos (Plan VI)
+**Objetivo:** Vista estilo Obsidian en el sidepanel — el "segundo cerebro" donde navegas, editas y planeas con IA los archivos del proyecto.
+
+- [ ] Modelo de documentos: tabla `documents` (path, title, summary, tags, embeddings SQLiteVec)
+- [ ] Watcher de archivos: detecta .md nuevos/cambiados del workspace
+- [ ] Indexador de enlaces wiki-style `[[enlace]]` y headings → edges del grafo
+- [ ] Layout IA del grafo: clustering automático por carpeta/tags/similitud, posiciones persistidas
+- [ ] Canvas interactivo estilo Obsidian: nodos-tarjeta, edges curvos, zoom/pan, minimap, búsqueda fuzzy
+- [ ] Hover = preview del documento, click = abre en editor
+- [ ] Edición humano+IA: sintetizar N nodos en doc-resumen, resumir, editar inline, crear nodos ETAPA/FASE/PLAN
+- [ ] Planeación asistida: órdenes rápidas ("relaciona estos", "reordena", "propón estructura") con diff previo
+- [ ] **Consejo de Expertos**: 5 skills auditores (Ciberseguridad, Frontend, Infraestructura, Escalabilidad, Arquitectura) que auditan tu plan en paralelo, con inbox de cards y preguntas
+- [ ] **Discovery Hub**: explorador de repos GitHub, Repo Scout (sugiere repos según contexto), agregar como nodo en grafo
+
+**Dependencias:** Etapa 4 (memoria/workspace knowledge), Etapa 8 (editor de código)
+**Gate:** abro grafo de ESTE proyecto → veo clusters reales (docs/, SDDs/) → busco "kanban" → subgrafo brilla → sintetizo 3 ADRs en nota nueva enlazada → muevo nodos → layout sobrevive reinicios. Convoco consejo → expertos auditan en paralelo → respondo con clicks → diffs aplicados. Abro Discovery Hub → busco repo → agrego como referencia. Suite humana verde.
+
+---
+
+### Etapa 6: Canvas de Automatización + Kanban (Plan F revisado)
+**Objetivo:** Visual workflow builder tipo n8n + vista Kanban de resultados.
 
 - [ ] Node type registry (8 tipos: LLM, agent, tool, code, trigger, condition, transform, output)
 - [ ] Deploy-spec universal (contrato TypeScript para ejecución)
@@ -233,8 +298,14 @@ Todas las vistas canvas se diseñan para funcionar actualmente en 2D y en el fut
 - [ ] Historial de ejecuciones con logs
 - [ ] **VR-ready**: canvas preparado para visualización 3D
 - [ ] Integración con Control Room (automatizaciones como nodos)
+- [ ] **KR.1 — Tablero de resultados**: columnas objetivo→en-curso→verificado→entregado, cards con evidencia (tests, diffs, costo)
+- [ ] **KR.2 — Bloques animados de pruebas**: bloque se llena verde test-por-test, fallo = rojo pulsante + diff clicable
+- [ ] **KR.3 — Modo autonomía prolongada**: "trabaja X horas" con cola que se consume, digest cada N tareas, límite de costo
+- [ ] **KR.4 — Vista evidencia por etapa**: click en card → panel lateral con timeline de rungs (plan→diffs→tests→review)
+- [ ] **KR.5 — Filtros y salud del board**: filtrar por agente/etapa/estado, indicador de estancamiento, cuarentena de tests flaky
 
-**Dependencias:** Etapa 1 (canvas base), Etapa 3 (runtime para ejecutar)
+**Dependencias:** Etapa 1 (canvas base), Etapa 3 (runtime para ejecutar), Etapa 7 (motor de pruebas para evidencia)
+**Gate kanban:** activo "trabaja 4 horas" con 15 tareas → me alejo → vuelvo: tablero muestra bloques verdes animados, 12 entregadas, 2 en revisión, 1 bloqueada. Abro evidencia y todo está ahí. Suite humana verde.
 
 ---
 
@@ -308,7 +379,6 @@ Todas las vistas canvas se diseñan para funcionar actualmente en 2D y en el fut
 
 | Documento | Contenido |
 |---|---|
-| [SDD-005](../SDD-005-plan-intermedio.md) | Diseño visual de las 4 ventanas |
 | [SDD-011](../SDD-011-integracion-hermes-agent.md) | Integración con Hermes Agent (ACP, MCP, subagents) |
 | [SDD-012](../SDD-012-multi-agent-grokbot-patterns.md) | Patrones multi-agente de GrokBot |
 | [SDD-013](../SDD-013-gui-visual-spec.md) | Design system Obsidian Glass |
@@ -316,9 +386,10 @@ Todas las vistas canvas se diseñan para funcionar actualmente en 2D y en el fut
 | [plan-b](./plan-b-sidepanels-lovable.md) | Editor de código + live preview |
 | [plan-c](./plan-c-reasonix-deepseek.md) | Runtime de agentes (Reasonix, DeepSeek) |
 | [plan-d](./plan-d-memoria-v3code.md) | Memoria y knowledge base |
-| [plan-f](./plan-f-canva-oficina.md) | Canvas de automatización |
+| [plan-f](./plan-f-canva-oficina.md) | Canvas de automatización + Kanban de resultados |
 | [plan-g](./plan-g-skills-lab.md) | Skills Lab (creación visual) |
 | [plan-h](./plan-h-motor-pruebas.md) | Motor de pruebas y resultados |
+| [plan-vi](./plan-vi-second-brain.md) | Segundo Cerebro — grafo de archivos del proyecto |
 
 ---
 
@@ -337,7 +408,8 @@ Todas las vistas canvas se diseñan para funcionar actualmente en 2D y en el fut
 | Runtime agentes (Etapa 3) | ⬜ Pendiente |
 | Memoria (Etapa 4) | ⬜ Pendiente |
 | Skills (Etapa 5) | ⬜ Pendiente |
-| Automatización (Etapa 6) | ⬜ Pendiente |
+| Segundo Cerebro (Etapa 5.5) | ⬜ Pendiente |
+| Automatización + Kanban (Etapa 6) | ⬜ Pendiente |
 | Pruebas (Etapa 7) | ⬜ Pendiente |
 | Editor código (Etapa 8) | ⬜ Pendiente |
 

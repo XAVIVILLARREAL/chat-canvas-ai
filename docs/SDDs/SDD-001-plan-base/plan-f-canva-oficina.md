@@ -1,10 +1,11 @@
-# PLAN F — Canvas de Automatización
+# PLAN F — Canvas de Automatización + Kanban de Resultados
 
 > [← PLAN E](./plan-e-integracion-total.md) · [← Maestro](./README.md) · [PLAN G →](./plan-g-skills-lab.md)
 > Referencia primaria: ERP Docker Compose AI Canvas (FlowsApp) — deploy-spec, node types, compiler
 > Referencia: n8n/Activepieces (UX visual), Hermes Agent (agent orchestration)
+> **KR (Kanban de Resultados)** es una pantalla secundaria de este plan — no vive por separado.
 
-**Entregable:** Visual workflow builder para automatizaciones con agentes de IA, basado en el AI Canvas del ERP pero mejorado con multi-runtime y orquestación de agentes.
+**Entregable:** Visual workflow builder para automatizaciones + vista Kanban evidencia-first donde se ve el progreso de tareas con evidencia real (tests, diffs, costo).
 
 ---
 
@@ -181,9 +182,77 @@ Todo el canvas se diseña para VR:
 
 ---
 
+## KR — Vista Kanban de Resultados (pantalla secundaria)
+
+> **KR es una vista del Canvas de Automatización**, no una ventana separada. Se accede desde un tab/toggle dentro de la misma vista de Oficina.
+
+### KR.1 — Tablero de resultados
+
+Columnas: **objetivo → en-curso → verificado → entregado**
+
+- Cards = tareas con evidencia: mini-gráfica de tests, contador de criterios ✓, costo USD, duración
+- Filtros por agente, estado, proyecto
+- Cada card muestra el nodo de automatización asociado (si existe)
+
+**Pruebas:** Unit: estados de card. E2E: tarea avanza columnas con eventos reales.
+
+---
+
+### KR.2 — Bloques animados de pruebas
+
+Al correr tests:
+- Bloque de la card se **llena verde test-por-test** (animación progresiva)
+- Fallo → bloque **rojo pulsante** + diff clicable
+- Animación de **"batería completada"** al pasar todos los tests
+- Sonido diferenciado (opcional, respeta configuración)
+
+**Pruebas:** Parser de resultados → eventos UI. E2E con mock runner.
+
+---
+
+### KR.3 — Modo autonomía prolongada
+
+Botón **"trabaja X horas"**:
+- Cola de tareas se consume sola (el agente toma decisiones)
+- Kanban muestra progreso en vivo (cards se mueven entre columnas)
+- Digest cada N tareas (resumen automático de qué se hizo)
+- **Límite de costo configurable** (corte seguro — el agente se detiene al llegar al tope)
+- Notificación al humano cuando termina o cuando necesita decisión
+
+**Pruebas:** Integration: cola mock → consumo ordenado + corte por presupuesto.
+
+---
+
+### KR.4 — Vista evidencia por etapa
+
+Click en card → panel lateral con **timeline de rungs** de ESA tarea:
+- plan → diffs → tests → review
+- Thumbnails de screenshots cuando existan
+- Costo total de la tarea (tokens + USD)
+- Expandir/colver rungs individuales
+
+**Pruebas:** E2E humano: recorrer evidencia completa sin salir del kanban.
+
+---
+
+### KR.5 — Filtros y salud del board
+
+- Filtrar por agente / etapa / estado-de-tests
+- Indicadores de **estancamiento** (tarea >X horas sin cambio → badge amarillo)
+- Indicador de **tests flaky** (cuarentena — tests que pasan/fallen intermitentemente)
+- Resumen del board: total tareas, % completado, costo total, tiempo promedio
+
+**Pruebas:** E2E: filtros combinados; card estancada muestra badge.
+
+---
+
 ## 🚪 GATE F (demo verificable)
 
-Abro Canvas AI → voy al canvas de automatización → arrastro un nodo LLM → le configuro el prompt → arrastro un nodo Code (Python) → conecto LLM → Code → arrastro un nodo Output → conecto todo → le doy Execute → veo los nodos iluminarse en orden → el output aparece en el nodo final → guardo el flujo → lo exporto como JSON → lo importo de nuevo → el canvas se reconstruye idéntico. Suite humana verde.
+**Canvas de automatización:** abro Canvas AI → voy al canvas de automatización → arrastro un nodo LLM → le configuro el prompt → arrastro un nodo Code (Python) → conecto LLM → Code → arrastro un nodo Output → conecto todo → le doy Execute → veo los nodos iluminarse en orden → el output aparece en el nodo final → guardo el flujo → lo exporto como JSON → lo importo de nuevo → el canvas se reconstruye idéntico.
+
+**Kanban:** activo "trabaja 4 horas" con 15 tareas → me alejo → vuelvo: tablero muestra bloques verdes animados de tests, 12 entregadas, 2 en revisión, 1 bloqueada con causa. Abro evidencia de cualquiera y todo está ahí.
+
+Suite humana verde.
 
 ---
 
