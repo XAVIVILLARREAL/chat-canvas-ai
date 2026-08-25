@@ -1,4 +1,4 @@
-# SDD-010 · Integración de patrones Hermes Agent → Empresa Dev
+# SDD-011 · Integración de patrones Hermes Agent → Canvas AI
 
 > Fecha: 2026-08-24 · Estado: Propuesto · Inspiración: [Hermes Agent](https://github.com/NousResearch/hermes-agent/) (MIT, Nous Research)
 > **Este documento NO modifica los planes existentes.** Amplía la visión y agrega mejoras concretas que se insertan en los planes originales sin romper nada.
@@ -6,7 +6,7 @@
 
 ## Objetivo
 
-Extraer los patrones arquitectónicos más valiosos de Hermes Agent e integrarlos como mejoras incrementales en los 15 planes existentes de Empresa Dev. Cada inserción se indica con el formato: **`[Hermes→Plan·Fase]`** para que al ejecutar la fase, se incluya la mejora sin modificar el alcance original.
+Extraer los patrones arquitectónicos más valiosos de Hermes Agent e integrarlos como mejoras incrementales en los 15 planes existentes de Canvas AI. Cada inserción se indica con el formato: **`[Hermes→Plan·Fase]`** para que al ejecutar la fase, se incluya la mejora sin modificar el alcance original.
 
 ---
 
@@ -371,7 +371,7 @@ metadata:
 
 **Dónde insertar:**
 - **`[Hermes→G.1]`** — Extensión a G.1 (Modelo de datos)
-  - Adoptar el formato SKILL.md como estándar de Empresa Dev
+  - Adoptar el formato SKILL.md como estándar de Canvas AI
   - Crear `server/skills/skill_schema.py` con validación del frontmatter
   - Migrar skills existentes al nuevo formato
   - **Costo:** 1 día
@@ -509,7 +509,7 @@ def density_stats(nodes, edges) -> dict:
 {"from": "gpt", "value": "content\n"}
 {"from": "tool", "value": "<tool_response>\n{tool_call_id, name, content}\n</tool_response>"}
 
-# Campos adicionales para Empresa Dev:
+# Campos adicionales para Canvas AI:
 {
     "session_id": "...",
     "project_id": "...",  # multitenant

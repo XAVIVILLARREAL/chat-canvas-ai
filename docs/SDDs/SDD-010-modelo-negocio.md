@@ -21,7 +21,7 @@
 | **CLI ligero** | ✅ Para power-users (patrón Devin/Claude Code) | ✅ Opcional | — |
 | **Tauri desktop** | ✅✅ Su ÚNICO hogar natural (empaqueta el escenario A completo: app+agentes+Ollama) | 🟡 Posible pero redundante | 🔴 Contraevidenciado (mercado votó URL; SmartScreen/notarización = impuesto 15-25% descargas; WebKitGTK frágil) |
 
-**VEREDICTO integrado**: construir **web-first** (el gateway axum sirve la React app — funciona para B y C desde el día 1) + **Tauri-shell DESPUÉS como el producto del escenario A** ("Empresa Dev Local — privacidad total, IA en tu máquina") — se convierte en un SKU/edición, no en el producto principal. El CLI llega en fase de crecimiento. ⚠️ Pendiente ratificación del usuario.
+**VEREDICTO integrado**: construir **web-first** (el gateway axum sirve la React app — funciona para B y C desde el día 1) + **Tauri-shell DESPUÉS como el producto del escenario A** ("Canvas AI Local — privacidad total, IA en tu máquina") — se convierte en un SKU/edición, no en el producto principal. El CLI llega en fase de crecimiento. ⚠️ Pendiente ratificación del usuario.
 
 ## 3 · MONETIZACIÓN — los 3 modelos con datos reales
 

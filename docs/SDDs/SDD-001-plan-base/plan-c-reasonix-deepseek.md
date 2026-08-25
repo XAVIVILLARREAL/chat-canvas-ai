@@ -99,7 +99,7 @@ Para quien use APIs de cualquier empresa: **75+ proveedores sin escribir código
 
 **d) small_model + lista verificada**
 - `small_model` separado para tareas internas baratas (títulos de sesión, resúmenes chicos, rung-resúmenes) — conecta al router [C·C.2](./plan-c-reasonix-deepseek.md#c2)
-- Lista "Modelos verificados Empresa Dev" curada por nosotros (patrón Zen) + guía proveedor-por-proveedor de obtención de key (alimenta plantillas [P·P.4](./plan-p-centro-mcp.md#p4))
+- Lista "Modelos verificados Canvas AI" curada por nosotros (patrón Zen) + guía proveedor-por-proveedor de obtención de key (alimenta plantillas [P·P.4](./plan-p-centro-mcp.md#p4))
 
 - **Pruebas (matriz completa):**
   - Unit: parser/validador del registro · merge catálogo remoto↔local · blacklist/whitelist filter · small_model routing

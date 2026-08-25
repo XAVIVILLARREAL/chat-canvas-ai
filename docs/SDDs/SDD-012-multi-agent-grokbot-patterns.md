@@ -6,7 +6,7 @@
 
 ## 1. Resumen Ejecutivo
 
-Este SDD define la arquitectura multi-agente de Empresa Dev inspirada en:
+Este SDD define la arquitectura multi-agente de Canvas AI inspirada en:
 - **GrokBot**: Group chat, Chief of Staff, Routine Learning, comportamiento proactivo
 - **Hermes Agent**: A2A Protocol, Skills format (SKILL.md), Subagent lifecycle
 - **Microsoft Agent Framework**: Orchestration patterns (sequential, concurrent, handoff, group)
@@ -17,9 +17,9 @@ Este SDD define la arquitectura multi-agente de Empresa Dev inspirada en:
 
 ## 2. Análisis Comparativo
 
-### 2.1 GrokBot vs Hermes vs Empresa Dev
+### 2.1 GrokBot vs Hermes vs Canvas AI
 
-| Característica | GrokBot | Hermes | Empresa Dev (actual) | Empresa Dev (SDD-012) |
+| Característica | GrokBot | Hermes | Canvas AI (actual) | Canvas AI (SDD-012) |
 |---|---|---|---|---|
 | **Group Chat** | ✅ Bots coordinan en thread | ❌ No tiene | ❌ No existe | ✅ A2A + shared context |
 | **Chief of Staff** | ✅ Un bot gestiona especialistas | ⚠️ delegate_task | ⚠️ Plan N (concepto) | ✅ Orchestrator pattern |
@@ -94,7 +94,7 @@ Cada agente expone su "Agent Card" para descubrimiento:
   "url": "http://localhost:3030/agents/research",
   "capabilities": ["web_search", "data_analysis", "report_generation"],
   "version": "1.0.0",
-  "provider": "empresa-dev",
+  "provider": "canvas-ai",
   "skills": ["research-skill", "data-analysis"]
 }
 ```
@@ -128,7 +128,7 @@ En GrokBot, los Bots se colocan en un "group chat" donde coordinan trabajo:
 - Asignan ownership
 - Solo traen al humano para decisiones de juicio
 
-#### 3.3.2 Implementación en Empresa Dev
+#### 3.3.2 Implementación en Canvas AI
 
 ```rust
 // Estructura para Group Chat
@@ -177,7 +177,7 @@ pub enum MessageType {
 En GrokBot internamente:
 > "A chief of staff sits on top, with a specialist for each lane: inbox management, expenses, recruiting, bug fixes, or operations."
 
-#### 3.4.2 Implementación en Empresa Dev
+#### 3.4.2 Implementación en Canvas AI
 
 ```rust
 // Chief of Staff = Orchestrator
@@ -218,7 +218,7 @@ impl ChiefOfStaff {
 En GrokBot:
 > "The best way for a Bot to learn your workflow is to ask it to follow along the next time you do a job. It watches the steps and remembers how you like the work done. It saves your workflow as a routine."
 
-#### 3.5.2 Implementación en Empresa Dev
+#### 3.5.2 Implementación en Canvas AI
 
 **Fase 1: Observación**
 ```rust
@@ -283,7 +283,7 @@ observed_from: "user-workflow"
 En GrokBot:
 > "Over time they become more proactive, picking up work before you need to ask and knowing when something needs your attention."
 
-#### 3.6.2 Implementación en Empresa Dev
+#### 3.6.2 Implementación en Canvas AI
 
 ```rust
 pub struct ProactiveEngine {
@@ -358,7 +358,7 @@ metadata:
 ...
 ```
 
-### 4.2 Formato Empresa Dev (adaptado)
+### 4.2 Formato Canvas AI (adaptado)
 
 ```markdown
 ---
@@ -403,7 +403,7 @@ metadata:
 
 ### 4.3 Diferencias clave con Hermes
 
-| Campo | Hermes | Empresa Dev |
+| Campo | Hermes | Canvas AI |
 |---|---|---|
 | `source` | No tiene | `manual\|routine_learning\|imported` |
 | `difficulty` | No tiene | `beginner\|intermediate\|advanced` |

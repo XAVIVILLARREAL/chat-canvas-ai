@@ -1,6 +1,6 @@
 # RESPONSIVE.md — Guia de Responsive Design
 
-> Guia practica para desarrollar interfaces responsive en Empresa Dev. Siempre consultar antes de crear componentes UI.
+> Guia practica para desarrollar interfaces responsive en Canvas AI. Siempre consultar antes de crear componentes UI.
 
 ## Hook principal: `useResponsive`
 

@@ -1,6 +1,6 @@
 # MULTIPLATAFORMA.md — Compilar en cada plataforma
 
-> SDD-005 · Empresa Dev es una sola codebase (ADR-002) que compila para desktop (Windows/macOS/Linux) y mobile (Android/iOS) via Tauri 2.0.
+> SDD-005 · Canvas AI es una sola codebase (ADR-002) que compila para desktop (Windows/macOS/Linux) y mobile (Android/iOS) via Tauri 2.0.
 
 ## Requisitos comunes
 
@@ -9,7 +9,7 @@ pnpm install          # deps frontend
 cargo --version       # toolchain Rust
 ```
 
-> **Workspace Cargo (ADR-005 D1):** el repo es un workspace con `crates/core` (dominio compartido), `crates/server` (binario axum modo nube) y `src-tauri` (shell desktop/mobile). Los comandos Rust corren desde la raíz con `--workspace`: `cargo test --workspace`, `cargo check --workspace`. El servidor local: `cargo run -p empresa-dev-server` → http://localhost:3030/healthz.
+> **Workspace Cargo (ADR-005 D1):** el repo es un workspace con `crates/core` (dominio compartido), `crates/server` (binario axum modo nube) y `src-tauri` (shell desktop/mobile). Los comandos Rust corren desde la raíz con `--workspace`: `cargo test --workspace`, `cargo check --workspace`. El servidor local: `cargo run -p canvas-ai-server` → http://localhost:3030/healthz.
 
 ## Desktop
 

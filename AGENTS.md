@@ -122,7 +122,7 @@ src/
 | `docs/INDEX.md` | Mapa completo de docs |
 | `docs/ESTADO.md` | Estado actual |
 | `docs/SDDs/SDD-001-plan-base/README.md` | Plan maestro |
-| `docs/SDDs/SDD-005-plan-intermedio.md` | 4 ventanas visuales |
+| `docs/SDDs/SDD-005-plan-intermedio.md` | Referencia de fusión (CR→Etapa1, VI→2do cerebro, KR→Plan F, 3D→VR-ready) |
 | `docs/SDDs/SDD-011-integracion-hermes-agent.md` | Integración Hermes |
 | `docs/SDDs/SDD-012-multi-agent-grokbot-patterns.md` | Patrones GrokBot |
 | `docs/SDDs/SDD-013-gui-visual-spec.md` | Design system |

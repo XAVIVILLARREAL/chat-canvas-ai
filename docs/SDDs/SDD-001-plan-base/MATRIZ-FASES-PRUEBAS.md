@@ -144,7 +144,7 @@
 |---|---|---|
 | K.3 | Sonidos + política de interrupción (transversal: U.5/V.4/I) | E2E: mock eventos → sonido correcto por tipo (spy Audio); evento menor NO suena pero aparece en digest; toggles persisten |
 
-## Etapa 14 · Empresas autónomas — `plan-n-empresas-autonomas.md`
+## Etapa 14 · Orquestación de sesiones — `plan-n-orchestration.md`
 | Fase | Nombre | Pruebas |
 |---|---|---|
 | N.1 | Modelo de empresa | Cargo test modelo + presupuesto enforcement (rechaza gasto over-budget). E2E HUMANA: crear empresa completa desde cero |
@@ -158,7 +158,7 @@
 ## Etapa 15 · Marketplace + v1.0 — `plan-o-marketplace-v1.md`
 | Fase | Nombre | Pruebas |
 |---|---|---|
-| O.1 | Bundles `.empresa-bundle` | Cargo test roundtrip export→import idempotente; firma verificada; import malicioso rechazado (validación manifest) |
+| O.1 | Bundles `.canvas-ai-bundle` | Cargo test roundtrip export→import idempotente; firma verificada; import malicioso rechazado (validación manifest) |
 | O.2 | MCP público del cerebro | Integration real: Claude Code conectado al MCP responde preguntas del workspace usando nuestro grafo. Snapshot tests de tools |
 | O.3 | Release v1.0 | Checklist DoD gigante: todas las suites humanas históricas re-corridas en las 3 vistas; builds CI verdes; demo documental final |
 

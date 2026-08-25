@@ -29,7 +29,7 @@
 | OC7 | Locales first-class: Ollama/LM Studio/llama.cpp/LM-Studio-like | [C.6](./plan-c-reasonix-deepseek.md#c6) ampliado |
 | OC8 | **`small_model`** para tareas internas baratas (títulos, resúmenes chicos) | C.7·d — conecta con router [C.6](./plan-c-reasonix-deepseek.md#c6) |
 | OC9 | Gateways con headers custom (Helicone/Cloudflare) | C.7·a options.headers |
-| OC10 | Lista curada verificada por el equipo (Zen) | C.7·d "Modelos verificados Empresa Dev" |
+| OC10 | Lista curada verificada por el equipo (Zen) | C.7·d "Modelos verificados Canvas AI" |
 | OC11 | `/models` picker con precio/contexto visible al elegir | C.7·c UI |
 | OC12 | auth.json separado del config (credenciales ≠ preferencias) | C.7·b seguridad |
 | OC13 | Device flow GitHub/OAuth browser para desktop apps | [M·M.1](./plan-m-github.md#m1) ya previsto; reutilizar mecanismo |

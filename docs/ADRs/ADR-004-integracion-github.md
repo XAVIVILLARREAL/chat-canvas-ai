@@ -4,7 +4,7 @@
 
 ## Contexto
 
-Empresa Dev necesita gestionar codigo fuente. Los desarrolladores ya usan GitHub. No reinventar la rueda: integrarse con GitHub en vez de crear un sistema de version control propio.
+Canvas AI necesita gestionar codigo fuente. Los desarrolladores ya usan GitHub. No reinventar la rueda: integrarse con GitHub en vez de crear un sistema de version control propio.
 
 ## Decision: Integracion profunda con GitHub
 
@@ -45,7 +45,7 @@ GET /user/repos
 git clone <url> --depth 1
 ```
 - Clon superficial (solo HEAD) para rapido
-- Ubicacion: `~/empresa-dev/repos/<nombre>`
+- Ubicacion: `~/canvas-ai/repos/<nombre>`
 - Opcion de clonar completo despues
 
 **Crear repositorio:**

@@ -21,7 +21,7 @@
 | Plan C | Runtime de agentes (Reasonix, DeepSeek, Ollama) | `./docs/SDDs/SDD-001-plan-base/plan-c-reasonix-deepseek.md` |
 | Plan D | Memoria y knowledge (SQLiteVec, FTS5) | `./docs/SDDs/SDD-001-plan-base/plan-d-memoria-v3code.md` |
 | Plan E | Integración total | `./docs/SDDs/SDD-001-plan-base/plan-e-integracion-total.md` |
-| Plan F | Canvas de automatización (deploy-spec, compiler) | `./docs/SDDs/SDD-001-plan-base/plan-f-canva-oficina.md` |
+| Plan F | Canvas de automatización + Kanban de resultados | `./docs/SDDs/SDD-001-plan-base/plan-f-canva-oficina.md` |
 | Plan G | Skills Lab (avatares IA, multi-agent loops) | `./docs/SDDs/SDD-001-plan-base/plan-g-skills-lab.md` |
 | Plan H | Motor de pruebas y resultados | `./docs/SDDs/SDD-001-plan-base/plan-h-motor-pruebas.md` |
 | Plan I | Revisión y superposiciones | `./docs/SDDs/SDD-001-plan-base/plan-i-revision-superposiciones.md` |
@@ -29,8 +29,8 @@
 | Plan K | Voz (STT/TTS) | `./docs/SDDs/SDD-001-plan-base/plan-k-voz.md` |
 | Plan L | Local-first / offline | `./docs/SDDs/SDD-001-plan-base/plan-l-local-first.md` |
 | Plan M | GitHub integration | `./docs/SDDs/SDD-001-plan-base/plan-m-github.md` |
-| Plan N | Orquestación de sesiones y agentes | `./docs/SDDs/SDD-001-plan-base/plan-n-empresas-autonomas.md` |
-| Plan O | n8n Canvas (automatización visual) | `./docs/SDDs/SDD-001-plan-base/plan-o-n8n-canvas.md` |
+| Plan N | Orquestación de sesiones y agentes | `./docs/SDDs/SDD-001-plan-base/plan-n-orchestration.md` |
+| Plan VI | Segundo Cerebro — grafo de archivos del proyecto | `./docs/SDDs/SDD-001-plan-base/plan-vi-second-brain.md` |
 | Plan P | Pixel-perfect GUI | `./docs/SDDs/SDD-001-plan-base/plan-p-pixel-perfect-gui.md` |
 | Plan T | Excelencia (calidad total) | `./docs/SDDs/SDD-001-plan-base/plan-t-excelencia.md` |
 | Plan U | Motivación / neuro-gratificación | `./docs/SDDs/SDD-001-plan-base/plan-u-motivacion.md` |
@@ -38,15 +38,13 @@
 | Plan X | Data apps | `./docs/SDDs/SDD-001-plan-base/plan-x-data-apps.md` |
 | MATRIZ-FASES | Matriz de ejecución | `./docs/SDDs/SDD-001-plan-base/MATRIZ-FASES-PRUEBAS.md` |
 
-## Plan Intermedio (SDD-005) — v2.0
+## SDD-005 — Referencia de fusión (historical)
 
-| Plan | Contenido | Ubicación |
+| Documento | Contenido | Ubicación |
 |---|---|---|
-| **SDD-005** | 4 ventanas visuales: Control Room, Planeación, Kanban, 3D | `./docs/SDDs/SDD-005-plan-intermedio.md` |
-| Plan CR | Control Room (canvas de sesiones) | `./docs/SDDs/SDD-005-plan-intermedio.md#plan-cr` |
-| Plan VI | Canvas Planeación (grafo docs + Consejo de Expertos) | `./docs/SDDs/SDD-005-plan-intermedio.md#plan-vi` |
-| Plan KR | Kanban de Resultados | `./docs/SDDs/SDD-005-plan-intermedio.md#plan-kr` |
-| Plan 3D | Preparación espacial (gafas/futuro) | `./docs/SDDs/SDD-005-plan-intermedio.md#plan-3d` |
+| **SDD-005** | Referencia de fusión — CR→Etapa1, VI→segundo cerebro, KR→Plan F, 3D→VR-ready | `./docs/SDDs/SDD-005-plan-intermedio.md` |
+
+> **Nota:** SDD-005 fue fusionado en el Plan Base v2.1. El Control Room vive en Etapa 1 del README, el Segundo Cerebro en plan-vi, el Kanban en plan-f, y el 3D en las reglas VR-ready.
 
 ## SDDs complementarios
 

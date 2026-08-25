@@ -1,6 +1,6 @@
 # PLAN VI — Segundo Cerebro (Grafo de archivos del proyecto)
 
-> [← PLAN H](./plan-h-motor-pruebas.md) · [← Maestro](./README.md)
+> [← PLAN H](./plan-h-motor-pruebas.md) · [← Maestro](./README.md) · [PLAN F →](./plan-f-canva-oficina.md)
 > Referencia: Obsidian Graph View, Karpathy's "second brain" concept, V3Code memory
 > **Este plan reemplaza el antiguo "Canvas de Planeación" del SDD-005.** Ahora vive en el sidepanel.
 

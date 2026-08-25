@@ -91,7 +91,7 @@ Reemplazo visual de n8n/Activepieces. Basado en el **AI Canvas del ERP Docker Co
 - **Server**: Rust/Axum (`canvas-ai-server` — REST/WebSocket, sirve al frontend)
 - **Worker**: Rust (`canvas-ai-worker` — spawn de subagentes, procesamiento pesado)
 - **Frontend**: React 19 + TypeScript + Vite 8 + @xyflow/react v12 + Zustand + immer
-- **Almacenamiento**: SQLite con SQLiteVec para embeddings vectoriales
+- **Almacenamiento**: SQLite con SQLiteVec para embeddings vectoriales (local/Tauri); PostgreSQL para despliegue server/multi-tenant
 - **Transporte**: ACP (Agent Communication Protocol) para subagentes, MCP para herramientas
 
 **Reglas arquitectónicas (ADR-005):**

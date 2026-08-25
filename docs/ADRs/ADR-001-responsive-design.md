@@ -4,7 +4,7 @@
 
 ## Contexto
 
-Empresa Dev es una app visual (canva 2D/3D, agentes, skills) que debe funcionar en:
+Canvas AI es una app visual (canva 2D/3D, agentes, skills) que debe funcionar en:
 - **Desktop:** Windows, macOS, Linux (pantallas 1024px+)
 - **Mobile:** Android, iOS (pantallas 320px-1024px)
 

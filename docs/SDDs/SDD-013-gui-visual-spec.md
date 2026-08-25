@@ -2,13 +2,13 @@
 
 > Fecha: 2026-08-24 · Estado: Aprobado · v1.1 (integrada al Plan Base v3.9)
 > Referencias: `reference/` (liquid-glass-web, impeccable, magic-ui, ui-ux-pro-max, apple-design-skill, react-bits)
-> **Aplica a TODO el plan base** (no solo F): F.0 (Design System) · F.1–F.7 (Canva) · A.4 (chat-first) · V (Visual GrokBot: avatares/estados) · U (dopamina) · K.3 (sonido) · T.A11Y (contraste) · ventanas intermedio (VI, KR, CR, 3D)
+> **Aplica a TODO el plan base** (no solo F): Design System (este SDD) · F.1–F.7 + KR (Canva + Kanban) · A.4 (chat-first) · V (Visual GrokBot: avatares/estados) · U (dopamina) · K.3 (sonido) · T.A11Y (contraste) · VI (Segundo Cerebro)
 
 ## Relación con el Plan Base (cómo se funde — v3.9)
 
 | Dónde vive | Qué aporta SDD-013 | Referencia |
 |---|---|---|
-| **[F·F.0](./SDD-001-plan-base/plan-f-canva-oficina.md#f0)** | Tokens oklch "Obsidian Glass", primitivas (GlassCard/AgentNode/AnimatedBeam/Toast), motion, sonido, Liquid Glass — F.0 ES la implementación del §1-§4 | fuente canónica visual |
+| **Este SDD (SDD-013)** | Tokens oklch "Obsidian Glass", primitivas (GlassCard/AgentNode/AnimatedBeam/Toast), motion, sonido, Liquid Glass — fuente canónica visual | §1-§4 |
 | **[PLAN V](./SDD-001-plan-base/plan-v-visual-grokbot.md)** | Los avatares geométricos y estados 2 capas usan los tokens de identidad/estado de §1.1 (el color de QUIÉN sale de la paleta de identidad, no de estados semánticos) | V.1 |
 | **[PLAN U](./SDD-001-plan-base/plan-u-motivacion.md)** | Cada primitiva dopaminérgica usa token + animación §2 + sonido §5.3 (tabla de mapeo en plan-u) | U.1–U.8 |
 | **[K·K.3](./SDD-001-plan-base/plan-k-voz.md#k3)** | La tabla de sonidos §5.3 (teoría musical: arpegio/tritono/chime por evento) es canónica para la política de interrupción | K.3 |

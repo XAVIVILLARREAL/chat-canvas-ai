@@ -5,7 +5,7 @@
 
 ## Contexto
 
-Empresa Dev necesita funcionar en:
+Canvas AI necesita funcionar en:
 - **Desktop:** Windows, macOS, Linux (ya funciona con Tauri 2.0)
 - **Mobile:** Android, iOS (Tauri mobile)
 - **Server:** Python service (CrewAI + LangGraph)
@@ -33,7 +33,7 @@ La pregunta clave: como organizar el codigo para que sea escalable, mantenible y
 ## Arquitectura resultante
 
 ```
-empresa-dev/
+canvas-ai/
 ├── src/                    # React frontend (COMPARTIDO)
 │   ├── components/
 │   │   ├── layout/         # AppShell, Header, Sidebar, BottomNav

@@ -4,7 +4,7 @@
 
 ## Contexto
 
-Empresa Dev necesita:
+Canvas AI necesita:
 1. **Comunicacion por voz** — el usuario habla con los agentes, los agentes responden con TTS
 2. **Sincronizacion** — continuar donde dejaste en otro dispositivo
 

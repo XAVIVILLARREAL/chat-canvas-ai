@@ -1,6 +1,6 @@
 # PLAN M — Etapa 13: GitHub nativo
 
-> [← Maestro](./README.md) · [← PLAN L](./plan-l-sync-cowork.md) · [PLAN N →](./plan-n-empresas-autonomas.md)
+> [← Maestro](./README.md) · [← PLAN L](./plan-l-sync-cowork.md) · [PLAN N →](./plan-n-orchestration.md)
 > Depende de: base 1-5. ADR-004 del repo. Git en Rust: gitoxide (lectura) + CLI git (operaciones complejas) detrás de trait GitService.
 
 **Entregable:** todo el ciclo git/GitHub desde la app, sin terminal — pensado para que los AGENTES también lo operen.
@@ -25,4 +25,4 @@
 Demo completa: login GitHub → clono un repo real → agente implementa feature ([H](./plan-h-motor-pruebas.md#h3)) → review automático ([I·I.1](./plan-i-revision-superposiciones.md#i1)) → commit + push desde UI → PR abierto con resumen generado de las decisiones de la sesión. Video + suites verdes.
 
 ---
-[← Maestro](./README.md) · [← PLAN L](./plan-l-sync-cowork.md) · [PLAN N →](./plan-n-empresas-autonomas.md)
+[← Maestro](./README.md) · [← PLAN L](./plan-l-sync-cowork.md) · [PLAN N →](./plan-n-orchestration.md)

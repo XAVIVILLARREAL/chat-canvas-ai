@@ -30,13 +30,14 @@
 ## SDDs recientes
 
 - SDD-001 v2.0: Plan Maestro reescrito — herramienta IA generalista, 10 etapas · `docs/SDDs/SDD-001-plan-base/README.md`
-- SDD-005 v2.0: Plan Intermedio reescrito — 4 ventanas visuales (CR, VI, KR, 3D) · `docs/SDDs/SDD-005-plan-intermedio.md`
+- SDD-005 v2.0: Referencia de fusión — CR→Etapa1, VI→segundo cerebro, KR→Plan F, 3D→VR-ready · `docs/SDDs/SDD-005-plan-intermedio.md`
 - SDD-013: GUI Visual Spec — Obsidian Glass · `docs/SDDs/SDD-013-gui-visual-spec.md`
 - SDD-012: Multi-Agent GrokBot Patterns · `docs/SDDs/SDD-012-multi-agent-grokbot-patterns.md`
 - SDD-011: Integración Hermes Agent · `docs/SDDs/SDD-011-integracion-hermes-agent.md`
 
 ## Últimos cambios
 
+- 2026-08-25: **Fusión SDD-005 en plan base** — CR→Etapa1, VI→plan-vi-second-brain.md, KR→plan-f, 3D→VR-ready rules
 - 2026-08-25: **Reescritura masiva de planes** — SDD-001, Plan A, B, F, G, N, SDD-005 reescritos para nueva dirección (herramienta IA generalista, no "empresa autónoma")
 - 2026-08-25: **Rename completado** — folder, Cargo packages, Tauri config, Rust imports → canvas-ai
 - 2026-08-24: SDD-013 GUI Visual Spec — Obsidian Glass design system

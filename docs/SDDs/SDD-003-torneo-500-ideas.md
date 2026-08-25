@@ -644,7 +644,7 @@ Rubrica: Valor / Viabilidad / Mantenibilidad / Encaje (máx 20). Corte: ≥17 y 
    - Capa 3 Invariantes/Human-Lock → [D·D.2](./plan-d-memoria-v3code.md#d2)
    - Capa 4 Estructural/RepoMap-PageRank → [PLAN J](./plan-j-grafo3d-repomap.md)
    - Capa 5 Empresarial/Knowledge dual → [D·D.5](./plan-d-memoria-v3code.md#d5)
-   - Capa 6 Procedimental/Roles-Skills-DSPy → [PLAN G](./plan-g-skills-lab.md) + [N](./plan-n-empresas-autonomas.md)
+   - Capa 6 Procedimental/Roles-Skills-DSPy → [PLAN G](./plan-g-skills-lab.md) + [N](./plan-n-orchestration.md)
 
 ## ETAPAS DE PRUEBA OBLIGATORIAS por ganadora
 
