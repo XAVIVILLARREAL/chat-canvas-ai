@@ -56,6 +56,15 @@ Cada métrica tiene su gate humano:
 | Entrega | Suite humana: aprobar diff + ver tests verdes + estado `done` en canva ([H·H.3](./SDDs/SDD-001-plan-base/plan-h-motor-pruebas.md)) |
 | Costo/entrega | Badge de costo visible subiendo durante stream + total correcto ([A·A.7](./SDDs/SDD-001-plan-base/plan-a-chat-codex.md)) |
 
-## 5 · Dashboard sugerido (post-MVP-2)
+## 5 · Observabilidad del cliente (errores y crashes)
+
+Profesional = saber cuándo algo se rompe, sin exponer datos:
+- **ErrorBoundary por ventana** — nunca pantalla muerta; botón "reintentar" + "exportar diagnóstico" (sin secrets).
+- **Error tracking OPT-IN** (igual que telemetría): `client.error` en el `event_stream` (tipo de error, ruta, versión, stack *anonimizado*, sin prompts ni contenido).
+- **Crashes nube:** `tracing → OTLP` del gateway/workers; alertas en p99 TTFT, rate 5xx, cola de workers >5 min ([SLO-RELIABILITY](./SLO-RELIABILITY.md)).
+- **Reporte desde la UI:** botón "Feedback" → plantilla prellenada con diagnóstico ([LAUNCH-CHECKLIST](./LAUNCH-CHECKLIST.md)).
+- **Regla:** el error nunca contiene la API key ni diffs del usuario.
+
+## 6 · Dashboard sugerido (post-MVP-2)
 
 Una pantalla interna (dev/insights, no pública): north-star en tendencia 7/30d · activación por cohorte · retención D7 · costo por entrega · top skills · salud de proveedores. Fuente: `event_stream` agregado.

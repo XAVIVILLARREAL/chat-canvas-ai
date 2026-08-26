@@ -37,7 +37,7 @@
 
 - [ ] cargo-audit/deny limpios · axe-core verde · i18n sin strings duras · contraste AA
 - [ ] Chaos suite 6/6 · drill de backup ≤ 30 min · perf budgets en CI
-- [ ] [SECURITY.md](./SECURITY.md) activo + `security.txt` publicado
+- [ ] [SECURITY.md](../SECURITY.md) activo + `security.txt` publicado
 
 ## 6 · Launch (growth, SDD-010)
 

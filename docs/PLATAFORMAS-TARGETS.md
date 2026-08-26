@@ -1,6 +1,6 @@
 # PLATAFORMAS-TARGETS — Qué se instala dónde (matriz canónica)
 
-> **Producto:** Canvas AI · **Estado:** v1.0 · 2026-08-25 · Base: [ADR-006](./ADR-006-vision-hibrida-local-nube.md), [MULTIPLATAFORMA](./MULTIPLATAFORMA.md)
+> **Producto:** Canvas AI · **Estado:** v1.0 · 2026-08-25 · Base: [ADR-006](./ADRs/ADR-006-vision-hibrida-local-nube.md), [MULTIPLATAFORMA](./MULTIPLATAFORMA.md)
 > **Respuesta a la pregunta:** el plan construye **ambos lados** — el **servidor Linux 24/7** (nube de pago) Y los **clientes instalables** en Windows, macOS, Linux, Android e iOS (local-first, gratis). Esta matriz es la fuente de verdad de entregables por plataforma.
 
 ## 1 · Modelo de despliegue (2 caras)

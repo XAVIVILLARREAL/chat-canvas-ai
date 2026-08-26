@@ -1,6 +1,6 @@
 # Entorno local de desarrollo
 
-> **Producto:** Canvas AI · **Base:** [ADR-006](./ADR-006-vision-hibrida-local-nube.md), [SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md)
+> **Producto:** Canvas AI · **Base:** [ADR-006](./ADRs/ADR-006-vision-hibrida-local-nube.md), [SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md)
 > Objetivo: en 3 comandos tienes el stack completo corriendo y conectado (frontend → gateway Rust).
 
 ## Stack hoy (scaffold)

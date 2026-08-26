@@ -23,6 +23,12 @@
 | **LAUNCH-CHECKLIST.md** | **Checklist de lanzamiento profesional** | `./docs/LAUNCH-CHECKLIST.md` |
 | **DEV-ENVIRONMENT.md** | **Cómo correr el stack hoy + objetivo** | `./docs/DEV-ENVIRONMENT.md` |
 | **PLATAFORMAS-TARGETS.md** | **Qué se instala dónde: servidor Linux + clientes Win/mac/Linux/Android/iOS/web** | `./docs/PLATAFORMAS-TARGETS.md` |
+| **AUTH.md** | **Autenticación: local sin cuenta · nube con RLS** | `./docs/AUTH.md` |
+| **API.md** | **Inventario REST del gateway (borrador canónico)** | `./docs/API.md` |
+| **DATA-LIFECYCLE.md** | **Migraciones, backup/restore, GDPR** | `./docs/DATA-LIFECYCLE.md` |
+| **FEATURE-FLAGS.md** | **Mecanismo de flags (pricing + dark-launch)** | `./docs/FEATURE-FLAGS.md` |
+| **UX-STANDARDS.md** | **Atajos, estados de UI, ayuda in-app** | `./docs/UX-STANDARDS.md` |
+| **EJECUCION-ORDEN.md** | **Checklist de construcción en orden exacto** | `./docs/EJECUCION-ORDEN.md` |
 | SECURITY.md | Política de seguridad | `./SECURITY.md` |
 | CONTRIBUTING.md | Guía de contribución | `./CONTRIBUTING.md` |
 

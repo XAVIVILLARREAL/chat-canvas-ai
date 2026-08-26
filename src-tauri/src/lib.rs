@@ -16,7 +16,7 @@ fn draft_agent(id: String, name: String) -> Agent {
 #[tauri::command]
 #[specta::specta]
 fn greet(name: String) -> String {
-    format!("Hello, {}! Welcome to Empresa Dev.", name)
+    format!("Hello, {}! Welcome to Canvas AI.", name)
 }
 
 #[tauri::command]

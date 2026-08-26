@@ -7,9 +7,9 @@
 
 <a id="l1"></a>
 ### L.1 — SyncHub server (el puente)
-- Hub WebSocket opcional self-hosted (binario Rust del crate `server` de [ADR-005](../ADRs/ADR-005-modelo-despliegue-dual.md)): sincroniza sesiones, config y skills ([G](./plan-g-skills-lab.md)) por device-pairing con token QR efímero
+- Hub WebSocket opcional self-hosted (binario Rust del crate `server` de [ADR-005](../../ADRs/ADR-005-modelo-despliegue-dual.md)): sincroniza sesiones, config y skills ([G](./plan-g-skills-lab.md)) por device-pairing con token QR efímero
 - Conflictos: **LWW para config**, merge manual asistido para sesiones (ADR-003); todo cifrado en tránsito
-- En modo servidor ([ADR-005·D4](../ADRs/ADR-005-modelo-despliegue-dual.md)): los agentes corren EN el hub con sandboxes Docker y siguen trabajando aunque TODOS los dispositivos se desconecten
+- En modo servidor ([ADR-005·D4](../../ADRs/ADR-005-modelo-despliegue-dual.md)): los agentes corren EN el hub con sandboxes Docker y siguen trabajando aunque TODOS los dispositivos se desconecten
 - **Pruebas:** Integration: 2 clientes mock → misma sesión converge; conflicto LWW resuelto documentado; agente sigue activo tras desconectar ambos clientes
 
 <a id="l2"></a>
@@ -37,7 +37,7 @@
 
 ## 🚪 GATE L (demo verificable)
 
-Dos ventanas simulando dos dispositivos: sesión creada en "laptop" aparece en "celular" con historial completo; config editada en ambos → conflicto resuelto eligiendo; Co-Work: B ve en vivo mientras A chatea; desconecto AMBOS y el agente sigue trabajando en el servidor ([ADR-005](../ADRs/ADR-005-modelo-despliegue-dual.md)). Video doble-pantalla + suites verdes.
+Dos ventanas simulando dos dispositivos: sesión creada en "laptop" aparece en "celular" con historial completo; config editada en ambos → conflicto resuelto eligiendo; Co-Work: B ve en vivo mientras A chatea; desconecto AMBOS y el agente sigue trabajando en el servidor ([ADR-005](../../ADRs/ADR-005-modelo-despliegue-dual.md)). Video doble-pantalla + suites verdes.
 
 ---
 [← Maestro](./README.md) · [← PLAN K](./plan-k-voz.md) · [PLAN M →](./plan-m-github.md)

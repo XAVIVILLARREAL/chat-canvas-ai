@@ -1,7 +1,7 @@
 # PLAN S — Despliegue, Costos y Stack Eficiente (transversal, datos verificados ago-2026)
 
 > [← Maestro](./README.md) · Investiga y fija CÓMO desplegar barato hoy sin bloquear el escalado mañana. Fuentes: investigación con sub-agentes sobre Hetzner/ARM/PaaS/LLM-pricing, stack Rust 2026 y cliente Tauri 2.x.
-> **Alineado con [ADR-006](../ADRs/ADR-006-vision-hibrida-local-nube.md)**: local-first (Tauri) es el **producto base** (gratis, BYOK); la nube es el SKU **de pago** (suscripción). S.3 (Tauri) ya NO es "diferido": es la entrega principal. S.1 (hosting) y S.2 (stack servidor) se ejecutan en la **Etapa 10 (nube)** y S.4 continuo. El gateway axum sirve la SPA en ambos modos.
+> **Alineado con [ADR-006](../../ADRs/ADR-006-vision-hibrida-local-nube.md)**: local-first (Tauri) es el **producto base** (gratis, BYOK); la nube es el SKU **de pago** (suscripción). S.3 (Tauri) ya NO es "diferido": es la entrega principal. S.1 (hosting) y S.2 (stack servidor) se ejecutan en la **Etapa 10 (nube)** y S.4 continuo. El gateway axum sirve la SPA en ambos modos.
 
 <a id="s1"></a>
 ## S · 1 — Hosting por etapas con COSTOS REALES

@@ -25,7 +25,7 @@
 - **Pruebas:** Cargo test repos; integration roundtrip mensaje con project_id.
 
 ### A.3 — Trait AgentProvider + BYOK + DeepSeekDirect
-- `trait AgentProvider` (Rust): `send_message`, `cancel`, `name`, `capabilities` ([PRD](./PRD.md) F2).
+- `trait AgentProvider` (Rust): `send_message`, `cancel`, `name`, `capabilities` ([PRD](../../PRD.md) F2).
 - **Registro universal de proveedores (BYOK)**: OpenAI/Anthropic/OpenRouter/DeepSeek/Ollama via key+URL; key en keychain (local) / vault cifrado (nube) — jamás al webview ([THREAT-MODEL](../../THREAT-MODEL.md)).
 - DeepSeekDirectProvider (HTTP+SSE), OllamaProvider (local/offline), ReasonixProvider (spawn+SSE) en C.
 - Router: chat simple → directo; tool-calls → reasonix; razonamiento → reasoner.
@@ -45,7 +45,7 @@
 - **Pruebas:** unit store + herencia; E2E HUMANA: no-programador cambia ajuste con clicks; programador edita JSON; override por proyecto visible.
 
 ### A.7 — Modo ENCARGO (v1)
-- "Haz X" sin escribir prompt: tarea mínima con criterios; el agente la completa; notificación de vuelta con evidencia ([PRD](./PRD.md) F6). Formalizado en H.1.
+- "Haz X" sin escribir prompt: tarea mínima con criterios; el agente la completa; notificación de vuelta con evidencia ([PRD](../../PRD.md) F6). Formalizado en H.1.
 - **Pruebas:** E2E HUMANA: crear encargo sin escribir prompt; agente mock lo completa; notificación con evidencia.
 
 ### A.8 — Resume inteligente (v1)

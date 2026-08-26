@@ -436,6 +436,12 @@ interface SpatialMeta {
 | [SCHEMA-MAESTRO](../../SCHEMA-MAESTRO.md) | **Etapa 0 concreta: modelo canónico + migraciones + event_stream** |
 | [CONTRATO-SKILL](../../CONTRATO-SKILL.md) | **Formato `.md` de skills (frontmatter + ejemplo)** |
 | [THREAT-MODEL](../../THREAT-MODEL.md) | **Modelo de amenazas, sandbox Linux y flujo BYOK** |
+| [AUTH](../../AUTH.md) | **Auth: local sin cuenta · nube con RLS** |
+| [API](../../API.md) | **Inventario REST del gateway** |
+| [DATA-LIFECYCLE](../../DATA-LIFECYCLE.md) | **Migraciones, backup/restore, GDPR** |
+| [FEATURE-FLAGS](../../FEATURE-FLAGS.md) | **Flags de tiers + dark-launch** |
+| [UX-STANDARDS](../../UX-STANDARDS.md) | **Atajos, estados de UI, ayuda** |
+| [EJECUCION-ORDEN](../../EJECUCION-ORDEN.md) | **Checklist de construcción en orden** |
 | [ADR-006](../../ADRs/ADR-006-vision-hibrida-local-nube.md) | **Visión híbrida: local-first + nube SaaS de pago (Q1-Q12)** |
 | [SDD-011](../SDD-011-integracion-hermes-agent.md) | Integración con Hermes Agent (BYOK, ACP, MCP, subagents) |
 | [SDD-012](../SDD-012-multi-agent-grokbot-patterns.md) | Patrones multi-agente de GrokBot (sesiones, sandbox Linux) |

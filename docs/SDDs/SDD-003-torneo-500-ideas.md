@@ -639,12 +639,12 @@ Rubrica: Valor / Viabilidad / Mantenibilidad / Encaje (máx 20). Corte: ≥17 y 
 1. **Interfaz increíble de Codex** ← ganadoras 4,5,6,7,9 (+ plan A completo)
 2. **Caché optimizado de Reasonix** ← ganadoras 1,2,3 (fase C.5 nueva, mecanismo medido: `cache_hit_tokens` real)
 3. **Las 6 capas de memoria de V3Code** (mecanismo de copia.md §2) — mapeo explícito:
-   - Capa 1 Episódica/Shadow → [H·H.5](./plan-h-motor-pruebas.md#h5)
-   - Capa 2 Auditoría/EventStream+rungs → [D·D.1](./plan-d-memoria-v3code.md#d1)
-   - Capa 3 Invariantes/Human-Lock → [D·D.2](./plan-d-memoria-v3code.md#d2)
-   - Capa 4 Estructural/RepoMap-PageRank → [PLAN J](./plan-j-grafo3d-repomap.md)
-   - Capa 5 Empresarial/Knowledge dual → [D·D.5](./plan-d-memoria-v3code.md#d5)
-   - Capa 6 Procedimental/Roles-Skills-DSPy → [PLAN G](./plan-g-skills-lab.md) + [N](./plan-n-orchestration.md)
+   - Capa 1 Episódica/Shadow → [H·H.5](./SDD-001-plan-base/plan-h-motor-pruebas.md#h5)
+   - Capa 2 Auditoría/EventStream+rungs → [D·D.1](./SDD-001-plan-base/plan-d-memoria-v3code.md#d1)
+   - Capa 3 Invariantes/Human-Lock → [D·D.2](./SDD-001-plan-base/plan-d-memoria-v3code.md#d2)
+   - Capa 4 Estructural/RepoMap-PageRank → [PLAN J](./SDD-001-plan-base/plan-j-grafo3d-repomap.md)
+   - Capa 5 Empresarial/Knowledge dual → [D·D.5](./SDD-001-plan-base/plan-d-memoria-v3code.md#d5)
+   - Capa 6 Procedimental/Roles-Skills-DSPy → [PLAN G](./SDD-001-plan-base/plan-g-skills-lab.md) + [N](./SDD-001-plan-base/plan-n-orchestration.md)
 
 ## ETAPAS DE PRUEBA OBLIGATORIAS por ganadora
 

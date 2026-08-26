@@ -1,6 +1,6 @@
 # Security Policy
 
-**Producto:** Canvas AI · Complementa [THREAT-MODEL](./THREAT-MODEL.md) y [plan-t](./SDDs/SDD-001-plan-base/plan-t-excelencia.md#tsec)
+**Producto:** Canvas AI · Complementa [THREAT-MODEL](./docs/THREAT-MODEL.md) y [plan-t](./docs/SDDs/SDD-001-plan-base/plan-t-excelencia.md#tsec)
 
 ## Reportar una vulnerabilidad
 
@@ -23,6 +23,6 @@ En foco: ejecución de código no confiable (sandbox Linux), gestión de secreto
 - `cargo-audit` + `cargo-deny` + SBOM (cyclonedx) en CI; fallo en CVE crítico.
 - Dependencias pineadas con checksums; `pnpm` lockfile.
 - CSP estricta del webview; markdown sanitizado; preview en iframe sandbox.
-- Secretos BYOK nunca en el bundle ni al webview ([THREAT-MODEL](./THREAT-MODEL.md)).
+- Secretos BYOK nunca en el bundle ni al webview ([THREAT-MODEL](./docs/THREAT-MODEL.md)).
 - Workers sin credenciales de DB; sandbox por contenedor Linux con red off.
 - Vulnerabilidades críticas → release urgente fuera de cadencia.

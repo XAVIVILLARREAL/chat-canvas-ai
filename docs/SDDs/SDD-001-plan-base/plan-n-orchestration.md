@@ -1,6 +1,6 @@
 # PLAN N — Orquestación de Sesiones y Agentes
 
-> [← PLAN M](./plan-m-voz-texto.md) · [← Maestro](./README.md) · [PLAN O →](./plan-o-marketplace-v1.md)
+> [← PLAN M](./plan-m-github.md) · [← Maestro](./README.md) · [PLAN O →](./plan-o-marketplace-v1.md)
 > **Este plan REEMPLAZA el concepto obsoleto de "Empresas Autónomas"**
 > Canvas AI NO crea empresas autónomas. Es una herramienta de IA generalista donde el usuario orquesta sesiones y agentes.
 
@@ -157,4 +157,4 @@ Abro Canvas AI → creo una sesión "Mi Proyecto" → invoco el skill "Coder" �
 
 ---
 
-[← PLAN M](./plan-m-voz-texto.md) · [← Maestro](./README.md) · [PLAN O →](./plan-o-marketplace-v1.md)
+[← PLAN M](./plan-m-github.md) · [← Maestro](./README.md) · [PLAN O →](./plan-o-marketplace-v1.md)

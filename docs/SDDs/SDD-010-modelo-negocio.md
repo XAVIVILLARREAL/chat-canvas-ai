@@ -1,7 +1,7 @@
 # SDD-010 — Modelo de Negocio: Local-first gratis + Nube SaaS de pago, Monetización y Growth
 
-> Fecha: 2026-08-24 · Actualizado: 2026-08-25 (ratificado por [ADR-006](./ADRs/ADR-006-vision-hibrida-local-nube.md)) · Estado: **Aprobado (dirección)** · Método: 3 investigaciones paralelas (outcome-pricing · growth devtools · datos previos de hosting/costos SDD-008)
-> Complementa [PLAN T·T.BIZ](./plan-t-excelencia.md#tbiz).
+> Fecha: 2026-08-24 · Actualizado: 2026-08-25 (ratificado por [ADR-006](../ADRs/ADR-006-vision-hibrida-local-nube.md)) · Estado: **Aprobado (dirección)** · Método: 3 investigaciones paralelas (outcome-pricing · growth devtools · datos previos de hosting/costos SDD-008)
+> Complementa [PLAN T·T.BIZ](./SDD-001-plan-base/plan-t-excelencia.md#tbiz).
 
 ## 1 · MODELO HÍBRIDO (ADR-006) — local-first gratis + nube de pago
 
@@ -28,7 +28,7 @@
 ### Modelo 1 · Open-core + Managed Hosting (nube gestionada) — **EL MOTOR PRINCIPAL**
 Validado por: n8n ($40M ARR, valuación $5.2B), Supabase, PostHog, GitLab.
 - Core open-source (MIT/Apache) self-host gratis ilimitado → comunidad + confianza + distribución
-- **Cobramos por alojar en NUESTROS servidores**: costo real nuestro $16-110/mes por tenant ([PLAN S·S1](./plan-s-despliegue-costos.md#s--1--hosting-por-etapas-con-costos-reales)) → precio $29-149/mes por tier = **margen 60-80%**
+- **Cobramos por alojar en NUESTROS servidores**: costo real nuestro $16-110/mes por tenant ([PLAN S·S1](./SDD-001-plan-base/plan-s-despliegue-costos.md#s--1--hosting-por-etapas-con-costos-reales)) → precio $29-149/mes por tier = **margen 60-80%**
 - Free tier diseñado para chocar muro de proyecto serio (limitar amplitud/historial, no solo rate-limit)
 - Conversión: patrón Windsurf free-bottom-up → equipos → enterprise
 
@@ -72,4 +72,4 @@ Harvey: $1,200-2,000+/abogado/mes SIN outcome (cuando el valor percibido es alt�
 Los compradores pagan por: **ARR creciente × usuarios activos × talento**, en ese orden. Maximiza ambas opciones manteniendo ARR auditable y retención enterprise >120%.
 
 ---
-[← Maestro](./README.md)
+[← Maestro](./SDD-001-plan-base/README.md)

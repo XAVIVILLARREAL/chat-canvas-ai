@@ -2,6 +2,20 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 25 — Auditoría completa del plan)
+
+- **Auditoría exhaustiva** del plan → se arreglaron/cerraron los huecos encontrados:
+- **23 links rotos** en la documentación (rutas relativas mal calculadas en DEV-ENVIRONMENT/PLATAFORMAS-TARGETS/SDD-010/SDD-003/SDD-004/SDD-007/plan-a/c/l/n/s + SECURITY) y un nombre stale `plan-m-voz-texto.md`→`plan-m-github.md`. Verificador automático: **0 rotos**.
+- **Código sin rastros "empresa"**: `src-tauri/src/lib.rs` greet → "Canvas AI"; proyecto Android re-empaquetado `com.empresa_dev.app` → `com.canvas.ai.app` (namespace, applicationId, manifest package, themes, MainActivity movido a `com/canvas/ai/app/`). (El `empresa-dev-server` del smoke era un server zombie de la carpeta vieja en :3030.)
+- **Docs nuevos** (cierran huecos que faltaban para "profesional real"):
+  - `AUTH.md` — aclaración clave: **local SIN cuenta/login** (dueño de tu máquina) vs **nube con cuenta+sesión+RLS fail-closed** + flujo y anti-patrones
+  - `API.md` — inventario REST canónico (~40 endpoints por recurso) + convenciones (versionado v1, errores, SSE, auth)
+  - `DATA-LIFECYCLE.md` — migraciones sqlx (up/down, rollback vía backup), backup/restore con RPO, GDPR (acceso/portabilidad/erasure/retención) con endpoint por derecho
+  - `FEATURE-FLAGS.md` — mapa centralizado de flags (tiers pricing + dark-launch de features arriesgadas), enforcement server-side, bundle Free sin código Pro
+  - `UX-STANDARDS.md` — atajos de teclado, estados de UI obligatorios (carga/vacío/error/offline/streaming/saving), ayuda in-app, anti-patrones
+  - `EJECUCION-ORDEN.md` — checklist de construcción en orden exacto fase por fase hasta v1.0 (navegación del plan)
+  - `PRODUCT-METRICS` +observabilidad del cliente (error tracking opt-in, ErrorBoundary, alertas nube)
+
 ## 2026-08-25 (sesion 24 — Matriz de targets por plataforma: servidor + clientes)
 
 - **PLATAFORMAS-TARGETS** (`docs/PLATAFORMAS-TARGETS.md`): matriz canónica "**qué se instala dónde**" — responde la duda de arquitectura: el plan construye **AMBOS**, el **servidor Linux 24/7** (gateway axum + workers + Postgres+RLS + sandbox, Docker+runbook) Y los **clientes instalables**:

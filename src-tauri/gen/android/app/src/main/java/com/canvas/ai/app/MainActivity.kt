@@ -1,4 +1,4 @@
-package com.empresa_dev.app
+package com.canvas.ai.app
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

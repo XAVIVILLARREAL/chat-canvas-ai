@@ -39,6 +39,19 @@
 - **LAUNCH-CHECKLIST** (`docs/LAUNCH-CHECKLIST.md`) — distribución, feedback loop, legal, growth
 - **DEV-ENVIRONMENT** (`docs/DEV-ENVIRONMENT.md`) — 3 comandos para correr el stack
 - **PLATAFORMAS-TARGETS** (`docs/PLATAFORMAS-TARGETS.md`) — matriz canónica "qué se instala dónde": servidor Linux 24/7 + clientes Windows/macOS/Linux/Android/iOS/web. **Cierra la duda "¿el plan construye el servidor o los clientes?": construye AMBOS.** iOS es el único entregable pendiente de generar (`tauri ios init` en un Mac → `src-tauri/gen/apple/`); Etapa 10 y MATRIZ MP.1-MP.6 lo hacen explícito; release.yml ahora builda los 3 desktops.
+
+## Auditoría completa del plan (2026-08-25)
+
+- **23 links rotos arreglados** en docs (rutas relativas mal calculadas + nombre stale `plan-m-voz-texto`→`plan-m-github`). Verificador: 0 rotos.
+- **Código sin rastros de "empresa"**: `lib.rs` (greet) → "Canvas AI"; Android re-empaquetado `com.empresa_dev.app` → `com.canvas.ai.app` (namespace, applicationId, manifest, theme, MainActivity movido). El `empresa-dev-server` del smoke era un zombie de la carpeta vieja en :3030, no de este repo (el crate ya era `canvas-ai-server`).
+- **Nuevos docs (cierran huecos de auditoría)**:
+  - `AUTH.md` — local SIN cuenta; nube = cuenta+sesión+RLS fail-closed
+  - `API.md` — inventario REST canónico (~40 endpoints) + convenciones
+  - `DATA-LIFECYCLE.md` — migraciones sqlx, backup/restore B2, GDPR (export/erasure/retención)
+  - `FEATURE-FLAGS.md` — mapa de flags (tiers + dark-launch), enforcement server-side
+  - `UX-STANDARDS.md` — atajos, estados de UI obligatorios, ayuda in-app
+  - `EJECUCION-ORDEN.md` — checklist de construcción en orden exacto (MVP-1/2/3)
+  - `PRODUCT-METRICS` +sección 5 (observabilidad/errores del cliente)
 - **plan-i18n** (`docs/SDDs/SDD-001-plan-base/plan-i18n.md`) — multilenguaje simple desde el día 1 (es/en/pt/de/fr/it)
 - **Fix de usabilidad:** frontend ya conecta con el gateway (proxy Vite `/api`→:3030 + `VITE_API_BASE`) — antes el frontend no podía hablar con su backend en dev
 - **Repo profesionalizado:** SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, plantillas de issue/PR, release workflow, .editorconfig

@@ -87,7 +87,7 @@ Sistema de **"compañeros IA siempre encendidos"** (bots) que:
 | 15 | Computer compartido por cuenta | 🔄 Adaptado: N.7 entorno compartido CON auditoría por acceso |
 | 16 | Menos promptear, más delegar | ✅ A.7 Modo ENCARGO (resultado+plazo+autonomía) |
 | 17 | Trabajo aterriza en tools reales, no drafts | ✅ Ya es nuestro core (commits/PRs reales) — principio reforzado |
-| 18 | Conectores/MCP donde exista, computer-use el resto | 🔄 Escalera equivalente: MCP/tools primero ([PLAN P](./plan-p-centro-mcp.md)), terminal después |
+| 18 | Conectores/MCP donde exista, computer-use el resto | 🔄 Escalera equivalente: MCP/tools primero ([PLAN P](./SDD-001-plan-base/plan-p-centro-mcp.md)), terminal después |
 | 19 | Solo te llama para judgment calls | ✅ K.3 + cola unificada A.4/I.4 |
 | 20 | Zero-config onboarding: mensajéalo y ya | ✅ A.1 empty-states + wizard primer agente |
 | 21 | Retomar trabajo de conversaciones viejas | ✅ A.8 resume inteligente al abrir |

@@ -48,6 +48,12 @@ Canvas AI es un entorno de trabajo donde humanos y agentes de IA colaboran en un
 | [`docs/LAUNCH-CHECKLIST.md`](./docs/LAUNCH-CHECKLIST.md) | Lanzamiento profesional |
 | [`docs/DEV-ENVIRONMENT.md`](./docs/DEV-ENVIRONMENT.md) | Cómo correr el stack |
 | [`docs/PLATAFORMAS-TARGETS.md`](./docs/PLATAFORMAS-TARGETS.md) | Qué se instala dónde (servidor + 6 clientes) |
+| [`docs/AUTH.md`](./docs/AUTH.md) | Auth: local sin cuenta · nube con RLS |
+| [`docs/API.md`](./docs/API.md) | Inventario REST del gateway |
+| [`docs/DATA-LIFECYCLE.md`](./docs/DATA-LIFECYCLE.md) | Migraciones, backup, GDPR |
+| [`docs/FEATURE-FLAGS.md`](./docs/FEATURE-FLAGS.md) | Flags de pricing + dark-launch |
+| [`docs/UX-STANDARDS.md`](./docs/UX-STANDARDS.md) | Atajos, estados UI, ayuda |
+| [`docs/EJECUCION-ORDEN.md`](./docs/EJECUCION-ORDEN.md) | Qué construir en qué orden |
 | [`docs/INDEX.md`](./docs/INDEX.md) | Mapa completo de docs |
 | [`docs/SDDs/SDD-001-plan-base/README.md`](./docs/SDDs/SDD-001-plan-base/README.md) | Plan maestro |
 | [`docs/ARQUITECTURA.md`](./docs/ARQUITECTURA.md) | Arquitectura |
