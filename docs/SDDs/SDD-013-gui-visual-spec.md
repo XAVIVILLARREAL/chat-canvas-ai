@@ -435,4 +435,46 @@ CALMA CONTROLADA (modo vigilancia)
 
 ---
 
-Este SDD es la **fuente canónica** de toda decisión visual. F.0 lo referencia, la IA lo lee antes de tocar UI, y F.5 lo audita contra este checklist. La escalera §8 garantiza que nada construido hoy bloquee las gafas VR de mañana.
+## 9. Catálogo de Juice neuro-graficado (v4.2 — implementado en `src/styles.css`)
+
+> Clases CSS listas para usar. Reglas de oro: solo `transform`/`opacity`/`filter` (GPU), tokens oklch, `prefers-reduced-motion` apaga todo. El verificador `pnpm test:visual` bloquea hex hardcodeado y absolute en canvas.
+
+### 9.1 Animaciones (keyframes)
+
+| Clase/keyframe | Sensación | Cuándo usar |
+|---|---|---|
+| `.agent-alive` | **Respiración** (scale 1→1.03 + brillo, 3.2s) | Avatar/nodo de agente `working` — "está vivo" |
+| `.agent-working` | Glow pulsante en borde | Nodo activo esperando resultado |
+| `.juice-success` | Squash & stretch (pop 0.45s spring) | Al completar tarea/test/entrega — 600ms y quitar |
+| `.stagger > *` | Entrada flotante escalonada (80ms por hijo) | Listas/cards que aparecen — nunca todas de golpe |
+| `.skeleton` + `::after` | Barra de luz barriendo (1.6s) | Carga — NUNCA spinners |
+| `.edge-flow` | Dash flow en edges SVG | Conexiones activas del canva |
+| `.mesh-bg` | Fondo mesh animado (2 blobs oklch drifting 24s) | Canvas vacío / onboarding / hero |
+
+### 9.2 Micro-interacciones
+
+| Clase/regla | Comportamiento |
+|---|---|
+| `.juice-hover` | Hover: levita -2px + glow · Active: press scale(0.975) instantáneo |
+| `button:active` global | Press scale(0.97) — todo botón responde al tacto |
+| `.item-list .item:hover` | Levita -1px + ring de acento al 12% |
+| `:focus-visible` | Ring oklch 2px con offset — accesible Y bello |
+| `::selection` | Marca de marca (accent 35%) |
+| Scrollbar | Premium: thumb redondeado translúcido, hover más claro |
+
+### 9.3 Liquid Glass profundidades
+
+| Clase | Uso |
+|---|---|
+| `.glass-panel` + `::before` | Panel con reflejo specular superior (capa 3) |
+| `.glass-deep` | Modales/palettes: blur 40px saturate 1.8 brightness 1.05 |
+
+### 9.4 Aplicado al scaffold
+
+`.item-list .item` (hover juice) · `.agent-avatar` (alive si working) · `.sidebar-tab` (press) · `.canvas-section.mesh-bg` (fondo vivo) · `button:active` universal.
+
+**Regla de adición:** cada micro-interacción nueva entra AQUÍ primero (clase + sensación + cuándo), luego a CSS. Prohibido animar sin documentar en este catálogo.
+
+---
+
+Este SDD es la **fuente canónica** de toda decisión visual. F.0 lo referencia, la IA lo lee antes de tocar UI, y F.5 lo audita contra este checklist. La escalera §8 garantiza que nada construido hoy bloquee las gafas VR de mañana; el catálogo §9 hace que TODO se sienta vivo.

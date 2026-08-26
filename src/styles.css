@@ -777,3 +777,264 @@ body {
     padding: var(--space-3) var(--space-4);
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   OBSIDIAN GLASS V2 · NEURO-JUICE (SDD-013 §9)
+   Micro-interacciones que hacen la app viva y adictiva.
+   Reglas: solo transform/opacity/filter (GPU) · oklch only ·
+   prefers-reduced-motion apaga TODO.
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── KEYFRAMES NEURO ─────────────────────────────────── */
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50%      { transform: scale(1.03); filter: brightness(1.15); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 12px oklch(0.75 0.15 250 / 0.2); }
+  50%      { box-shadow: 0 0 28px oklch(0.75 0.15 250 / 0.45); }
+}
+
+@keyframes success-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12); }
+  60%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes shimmer-slide {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(200%); }
+}
+
+@keyframes beam-flow {
+  to { stroke-dashoffset: -24; }
+}
+
+@keyframes mesh-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33%      { transform: translate(3%, -4%) rotate(4deg); }
+  66%      { transform: translate(-3%, 3%) rotate(-3deg); }
+}
+
+@keyframes spin-orbit {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── UTILIDADES JUICE ────────────────────────────────── */
+
+/* Agente VIVO: respira suavemente (usa en avatares/nodos working) */
+.agent-alive {
+  animation: breathe 3.2s var(--ease-in-out-quart) infinite;
+}
+.agent-working {
+  animation: pulse-glow 2s ease-in-out infinite;
+  border-color: oklch(0.75 0.15 250 / 0.5) !important;
+}
+
+/* Pop de éxito: squash & stretch al completar (aplicar 600ms) */
+.juice-success {
+  animation: success-pop 0.45s var(--ease-spring);
+}
+
+/* Entrada flotante escalonada: .stagger en hijos */
+.stagger > * {
+  opacity: 0;
+  animation: float-in 0.4s var(--ease-out-expo) forwards;
+}
+.stagger > *:nth-child(1) { animation-delay: calc(var(--duration-fast)); }
+.stagger > *:nth-child(2) { animation-delay: 80ms; }
+.stagger > *:nth-child(3) { animation-delay: 140ms; }
+.stagger > *:nth-child(4) { animation-delay: 200ms; }
+.stagger > *:nth-child(5) { animation-delay: 260ms; }
+.stagger > *:nth-child(n+6) { animation-delay: 320ms; }
+
+/* Hover juice estándar: levita + brilla */
+.juice-hover {
+  transition:
+    transform var(--duration-fast) var(--ease-out-expo),
+    box-shadow var(--duration-normal) var(--ease-out-expo),
+    border-color var(--duration-fast);
+}
+.juice-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+.juice-hover:active {
+  transform: translateY(0) scale(0.975);
+  transition-duration: var(--duration-instant);
+}
+
+/* Skeleton premium: barra de luz que barre */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  min-height: 1em;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 60%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(0.92 0.01 260 / 0.07),
+    transparent
+  );
+  animation: shimmer-slide 1.6s var(--ease-in-out-quart) infinite;
+}
+
+/* Focus ring neuro (accesible Y hermoso) */
+:focus-visible {
+  outline: 2px solid oklch(0.75 0.15 250 / 0.7);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Selección de texto con marca de marca */
+::selection {
+  background: oklch(0.75 0.15 250 / 0.35);
+  color: var(--text-primary);
+}
+
+/* Scrollbar premium */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: oklch(0.3 0.02 260 / 0.5);
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.42 0.04 260 / 0.7);
+  background-clip: content-box;
+}
+
+/* ─── LIQUID GLASS V2 (profundidades) ─────────────────── */
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  position: relative;
+}
+.glass-panel::before {
+  /* Reflejo specular superior (capa 3 Liquid Glass) */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    oklch(0.92 0.01 260 / 0.08),
+    transparent 30%
+  );
+}
+.glass-deep {
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.05);
+  background: oklch(0.14 0.02 260 / 0.78);
+  box-shadow: var(--shadow-xl), inset 0 1px 0 var(--glass-highlight);
+}
+
+/* Fondo mesh animado (vacíos del canvas / onboarding) */
+.mesh-bg {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-void);
+}
+.mesh-bg::before,
+.mesh-bg::after {
+  content: "";
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.16;
+  animation: mesh-drift 24s ease-in-out infinite;
+  pointer-events: none;
+}
+.mesh-bg::before {
+  top: -25%;
+  left: -10%;
+  background: radial-gradient(circle, oklch(0.65 0.18 300), transparent 70%);
+}
+.mesh-bg::after {
+  bottom: -30%;
+  right: -10%;
+  background: radial-gradient(circle, oklch(0.72 0.14 200), transparent 70%);
+  animation-delay: -12s;
+}
+
+/* Edges iluminados del canva (SVG dash flow) */
+.edge-flow {
+  stroke-dasharray: 8 16;
+  animation: beam-flow 0.9s linear infinite;
+}
+
+/* ─── REDUCED MOTION (respeta al usuario, SIEMPRE) ────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .stagger > * { opacity: 1; }
+}
+
+/* ─── V2 APLICADO AL SCAFFOLD (bind de clases existentes) ── */
+
+/* Listas del sidebar: entrada escalonada + hover juice */
+.item-list { display: flex; flex-direction: column; gap: 2px; }
+.item-list .item {
+  transition:
+    transform var(--duration-fast) var(--ease-out-expo),
+    box-shadow var(--duration-normal) var(--ease-out-expo),
+    background-color var(--duration-fast),
+    border-color var(--duration-fast);
+}
+.item-list .item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md), oklch(0.75 0.15 250 / 0.12) 0 0 0 1px;
+}
+.item-list .item:active {
+  transform: scale(0.985);
+  transition-duration: var(--duration-instant);
+}
+
+/* Avatares de agentes VIVOS */
+.agent-avatar {
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+.agent-avatar:hover { transform: scale(1.08); }
+
+/* Tabs del sidebar con indicador deslizante suave */
+.sidebar-tab {
+  transition:
+    background-color var(--duration-fast),
+    color var(--duration-fast),
+    transform var(--duration-instant) var(--ease-spring);
+}
+.sidebar-tab:active { transform: scale(0.95); }
+
+/* Botones: micro-press universal */
+button:not(:disabled) { will-change: transform; }
+button:not(:disabled):active { transform: scale(0.97); }
+
+/* Header con vidrio profundo al hacer scroll-less (siempre glass) */
+.app-header {
+  background: oklch(0.11 0.015 260 / 0.75);
+}

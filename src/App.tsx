@@ -70,7 +70,7 @@ function App() {
           loading={loading}
         />
         <main className="app-main">
-          <section className="canvas-section"><Canvas /></section>
+          <section className="canvas-section mesh-bg"><Canvas /></section>
           <aside className={`sidebar ${sidebarOpen ? 'open' : 'collapsed'}`} style={{ width: sidebarOpen ? 320 : 0 }}>
             <Sidebar 
               activeTab={sidebarTab}
