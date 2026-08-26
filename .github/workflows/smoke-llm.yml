@@ -1,0 +1,20 @@
+name: smoke-llm
+
+# Humo del provider free-first contra OpenRouter REAL ($0).
+# Manual solamente — requiere secret OPENROUTER_API_KEY en el repo.
+on:
+  workflow_dispatch:
+
+jobs:
+  provider-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Humo del provider free-first
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          CANVAS_TEST_MODEL: stealth/ox-alpha
+        run: node scripts/test-provider.mjs

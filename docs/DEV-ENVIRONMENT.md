@@ -47,8 +47,8 @@ export OPENROUTER_API_KEY=sk-or-v1-...
 ```
 3. Registrar el provider en la app (BYOK, pantalla Providers):
    - Provider: `openrouter` · Base URL: `https://openrouter.ai/api/v1`
-   - Modelo de pruebas: **`opencode/x-preview-f-free`** (ox-alpha, `:free`)
-4. Los tests E2E/humanos con LLM real corren contra este provider — **$0 ilimitado para desarrollo**.
+   - Modelo de pruebas: **`stealth/ox-alpha`** (ox-alpha, gratis — ctx 1M, verificado $0 2026-08-25)
+4. Los tests E2E/humanos con LLM real corren contra este provider — **$0 ilimitado para desarrollo**. Smoke rápido: `node scripts/test-provider.mjs`.
 
 ### En CI (opcional)
 - Guardar `OPENROUTER_API_KEY` como secret de GitHub → el job de humo puede correr 1 mensaje real por build sin costo.
