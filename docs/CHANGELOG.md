@@ -2,6 +2,12 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 30 — Calidad visual Liquid Glass → VR transversal)
+
+- **SDD-013 §8 — Escalera visual**: L1 Liquid Glass 2D (hoy, MVPs) → L2 Espacial con SpatialMeta (post-v1) → L3 gafas VR/AR. Reglas no negociables por componente (SpatialMeta en unidades-metro, tokens oklch solo, transform/opacity, renderer-agnóstico, Z planificada, contraste AA→AAA) + camino a VR por hitos (F.0 → 3D.1 → J.3 → 3D.2 → WebXR exploratorio).
+- **Enforcement automático**: `scripts/check-visual.mjs` + `pnpm test:visual` + job CI — hex hardcodeado y `position:absolute` en canvas no pueden CRECER (baseline: 49 violaciones heredadas del scaffold; la deuda solo baja; `--update-baseline` tras arreglar).
+- **Alineación total**: AGENTS.md (VR-ready apunta a SDD-013 §8), README maestro (sección VR-ready), MATRIZ header (Liquid Glass + escalera §8 + test:visual).
+
 ## 2026-08-25 (sesion 29 — Tarjeta de Fase canónica + micro-mejoras F29-F32)
 
 - **Tarjeta de Fase** (SDD-002 v4.1): formato canónico que separa **Resultado esperado (observable)** de las pruebas por capa [U/I/E/H] + gate + riesgos + estimación. Obligatoria en el DoR (MATRIZ header). Responde: "¿las fases aclaran los resultados esperados y las pruebas de calidad?" — ahora sí, con contrato explícito por fase.

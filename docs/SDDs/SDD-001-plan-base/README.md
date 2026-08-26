@@ -148,7 +148,9 @@ Canvas AI adopta los patrones probados de Hermes Agent:
 
 ## Reglas VR-ready (obligatorias para todo canvas)
 
-Todas las vistas canvas se diseñan para funcionar actualmente en 2D y en el futuro en **gafas holográficas 2D/3D**:
+> **Fuente canónica:** [SDD-013 §8 — Escalera visual Liquid Glass → Espacial → VR](../SDD-013-gui-visual-spec.md). Resumen:
+
+Todas las vistas canvas se diseñan para funcionar actualmente en 2D con **Liquid Glass** y escalar mañana a **gafas holográficas 2D/3D** sin refactor:
 
 1. **Sistema de coordenadas**: origen en el centro, 1 unidad = 1 metro
 2. **Sin tamaños absolutos en píxeles**: usar proporciones relativas o unidades del canvas

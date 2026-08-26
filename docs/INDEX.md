@@ -12,6 +12,7 @@
 | [PRODUCT-DIFFERENTIATORS](./PRODUCT-DIFFERENTIATORS.md) | Los 7 diferenciadores "increíbles" (brújula anti-scope) |
 | [PRODUCT-METRICS](./PRODUCT-METRICS.md) | North-star, activación, retención, eventos, telemetría |
 | [PRICING-TIERS](./PRICING-TIERS.md) | Free local $0 / Pro $29 / Teams $99 |
+| [SDD-013](./SDDs/SDD-013-gui-visual-spec.md) | Obsidian Glass + Liquid Glass + escalera §8 hacia VR (fuente canónica visual) |
 | [UX-STANDARDS](./UX-STANDARDS.md) | Atajos, estados de UI, ayuda in-app |
 
 ## Nivel 2 · Arquitectura y decisiones

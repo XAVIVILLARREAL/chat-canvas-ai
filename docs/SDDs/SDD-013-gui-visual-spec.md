@@ -395,4 +395,44 @@ CALMA CONTROLADA (modo vigilancia)
 
 ---
 
-Este SDD es la **fuente canónica** de toda decisión visual. F.0 lo referencia, la IA lo lee antes de tocar UI, y F.5 lo audita contra este checklist.
+## 8. Escalera visual: Liquid Glass → Espacial → VR (v4.1)
+
+> Toda decisión visual debe funcionar HOY en 2D con Liquid Glass **y** escalar mañana a gafas VR sin refactor. La escalera define los 3 niveles y lo que cada nivel exige a los componentes.
+
+### 8.1 Los 3 niveles
+
+| Nivel | Cuándo | Render | Qué exige |
+|---|---|---|---|
+| **L1 · Glass 2D** (hoy, MVP-1/2/3) | web + desktop | CSS/SVG (4 capas §4.1) | tokens oklch · checklist §7 · responsive 375/1440 |
+| **L2 · Espacial** (post-v1) | canvas con profundidad | Three.js/WebGPU sobre SpatialMeta | coordenadas 3D (1u=1m) · z calculada por layout · capas de profundidad |
+| **L3 · VR/AR gafas** (futuro) | WebXR / nativo | renderer espacial | legibilidad AR (contraste AAA) · targets ≥44px equivalentes · confort visual (sin motion sickness: solo transform/opacity) |
+
+### 8.2 Reglas de escalabilidad (por componente — no negociables desde L1)
+
+1. **Posición SIEMPRE por SpatialMeta** (`x,y,z?` en unidades-metro) — jamás `position:absolute` en px dentro del canvas.
+2. **Tamaños relativos** al sistema del canvas (proporciones/unidades), no píxeles absolutos.
+3. **Colores SOLO por token oklch** — el hex hardcodeado rompe temas y calibración AR.
+4. **Animaciones solo `transform` + `opacity`** (GPU-friendly en todos los niveles).
+5. **Componentes agnósticos al renderer**: GlassCard/AgentNode/AnimatedBeam se definen una vez; el nivel decide cómo proyectarlos (DOM hoy, malla 3D mañana).
+6. **Profundidad Z planificada**: `z: null` en 2D; capas semánticas definidas (fondo < nodos < edges < overlays).
+7. **Contraste progresivo**: AA en L1 → AAA en L3 (legibilidad en AR); la paleta oklch ya lo soporta.
+
+### 8.3 Gates automáticos (en CI)
+
+- `scripts/check-visual.mjs`: falla si crece la deuda (`hex` hardcodeado o `absolute` en componentes de UI vs baseline) — la deuda actual queda registrada y solo puede BAJAR.
+- Contraste AA automatizado contra paleta §1.1 ([F·F.0]).
+- Checklist §7 auditado en F.5 y re-auditado antes de cada tag.
+
+### 8.4 Camino a VR (qué se construye cuándo)
+
+| Hito | Fase | Entregable |
+|---|---|---|
+| Tokens + Liquid Glass | F.0 (MVP-2) | design system Obsidian Glass completo |
+| SpatialMeta transversal | 3D.1 (post-v1) | schema + persistencia + roundtrip |
+| Visor 3D del repo-map | J.3 (post-v1) | rotar/zoom/click a archivo, 60fps @500 archivos |
+| Visor unificado 3 capas | 3D.2 (post-v1) | grafo+kanban+sesiones como capas del mismo mundo |
+| WebXR | exploratorio | prototipo de lectura de Control Room en gafas |
+
+---
+
+Este SDD es la **fuente canónica** de toda decisión visual. F.0 lo referencia, la IA lo lee antes de tocar UI, y F.5 lo audita contra este checklist. La escalera §8 garantiza que nada construido hoy bloquee las gafas VR de mañana.

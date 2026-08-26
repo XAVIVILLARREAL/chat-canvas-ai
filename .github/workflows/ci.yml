@@ -37,6 +37,9 @@ jobs:
       - name: Cobertura GUI 100% (COVERAGE-GUI ↔ tests humanos)
         run: pnpm test:coverage
 
+      - name: Calidad visual (SDD-013 §8 — Liquid Glass → VR)
+        run: pnpm test:visual
+
       - name: Tests frontend
         run: pnpm test
 

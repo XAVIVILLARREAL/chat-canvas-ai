@@ -176,14 +176,16 @@ src/
 
 ## VR-ready (regla transversal)
 
-Todas las vistas canvas se diseñan para VR futuro:
-1. Coordenadas 3D, 1 unidad = 1 metro
-2. Sin tamaños absolutos en píxeles
-3. Sin absolute positioning en canvas
-4. `vr={{}}` preparado en ReactFlow
-5. Animaciones: solo transform y opacity (GPU-friendly)
-6. Profundidad Z planificada (capas para 3D)
-7. Colores WCAG AAA (legibles en AR)
+Todas las vistas canvas se diseñan para funcionar hoy en 2D con **Liquid Glass** y escalar mañana a gafas VR sin refactor — la escalera completa (L1 Glass 2D → L2 Espacial → L3 VR/AR), reglas por componente y gates automáticos viven en **[SDD-013 §8](docs/SDDs/SDD-013-gui-visual-spec.md)**:
+
+1. Posición SIEMPRE por SpatialMeta (x,y,z? en unidades-metro) — jamás `position:absolute` en px dentro del canvas
+2. Tamaños relativos al canvas, no píxeles absolutos
+3. Colores SOLO tokens oklch (hex hardcodeado prohibido — `pnpm test:visual` lo bloquea)
+4. Animaciones: solo transform y opacity (GPU-friendly)
+5. Componentes agnósticos al renderer (GlassCard/AgentNode/AnimatedBeam se proyectan distinto por nivel)
+6. Profundidad Z planificada (`z: null` en 2D; capas semánticas)
+7. Contraste AA hoy → AAA en AR
+8. Enforcement en CI: `pnpm test:visual` con baseline — la deuda visual solo puede BAJAR
 
 ---
 
