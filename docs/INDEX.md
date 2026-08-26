@@ -29,6 +29,8 @@
 | **FEATURE-FLAGS.md** | **Mecanismo de flags (pricing + dark-launch)** | `./docs/FEATURE-FLAGS.md` |
 | **UX-STANDARDS.md** | **Atajos, estados de UI, ayuda in-app** | `./docs/UX-STANDARDS.md` |
 | **EJECUCION-ORDEN.md** | **Checklist de construcción en orden exacto** | `./docs/EJECUCION-ORDEN.md` |
+| **COVERAGE-GUI.md** | **Cobertura 100%: cada botón/función/feature → test humano Playwright** | `./docs/COVERAGE-GUI.md` |
+| **WORKFLOW-AGENTICO.md** | **Loop: 5 sub-agentes en paralelo + debug en tiempo real + iteración** | `./docs/WORKFLOW-AGENTICO.md` |
 | SECURITY.md | Política de seguridad | `./SECURITY.md` |
 | CONTRIBUTING.md | Guía de contribución | `./CONTRIBUTING.md` |
 

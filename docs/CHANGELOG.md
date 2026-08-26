@@ -2,6 +2,14 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 26 — Cobertura GUI 100% + loop agéntico con sub-agentes en paralelo)
+
+- **REGLA DURA COBERTURA GUI 100%** (AGENTS.md + SDD-002 + MATRIZ): todo botón, función y feature tiene su prueba **Playwright humano (clicks+teclado)** — sin prueba = la feature NO existe; un botón nuevo sin su prueba = PR rechazado.
+- **COVERAGE-GUI** (`docs/COVERAGE-GUI.md`): tabla maestra que mapea **cada elemento interactivo → su test humano**, ≥50 elementos en los 3 MVPs (AppShell, chat, config, providers, editor, skills, memoria, kanban, oficina, automatización, nube, sync, github, marketplace, GDPR). Fila `⬜→✅` = gate.
+- **WORKFLOW-AGENTICO** (`docs/WORKFLOW-AGENTICO.md`): loop obligatorio por fase **ANALYZE (5 sub-agentes en paralelo: spec/tests/riesgo/seguridad/UX) → DECIDE → MODIFY (TDD humano) → TEST (Playwright humano + debug en tiempo real con consola/red) → ITERATE (máx 5) → DECIDE**. Sub-agentes en paralelo en TODO el plan (gates, refactors, post-mortems, PRs).
+- **Enfoque en resultados funcionales**: "done" = el humano opera la feature y obtiene el resultado (video en `evidence/`); compilar NO es done. Definición formalizada en AGENTS.md, SDD-002, CONTRIBUTING y WORKFLOW-AGENTICO.
+- **CONTRIBUTING** actualizado: checklist de feature incluye fila de COVERAGE-GUI + ANALYZE paralelo + evidencia humana.
+
 ## 2026-08-25 (sesion 25 — Auditoría completa del plan)
 
 - **Auditoría exhaustiva** del plan → se arreglaron/cerraron los huecos encontrados:

@@ -99,6 +99,33 @@ Un usuario puede:
 7. **Sin deuda técnica** — no hacer "fix temporal"
 8. **Orden en código** — imports ordenados, carpetas por dominio
 
+## 🔴 COBERTURA GUI 100% (REGLA DURA — no negociable)
+
+> **Todo botón, función y feature TIENE su prueba GUI con Playwright humano** (clicks + teclado, móvil 375 + desktop 1440, video en `evidence/`). Sin prueba = la feature **NO existe**. Compilar no es una feature.
+
+- Cada fila de [COVERAGE-GUI](./docs/COVERAGE-GUI.md) lista un elemento interactivo → su test humano. La fila pasa de `⬜` a `✅` solo con suite verde + video.
+- **Un botón nuevo sin prueba = PR rechazado.** El checklist de PR ([CONTRIBUTING](./CONTRIBUTING.md)) lo verifica.
+- Todo test se ejecuta como persona real: clicks con delays, teclado, hover, scroll, menús; en **modo debug** se capturan `console.error`, `pageerror`, `requestfailed` y HTTP ≥400 en tiempo real.
+- Regla de la MATRIZ: fase GUI sin fila de cobertura aquí = fase incompleta.
+
+## 🔄 LOOP DE DESARROLLO AGÉNTICO (por fase — en TODO el plan)
+
+Cada fase del [EJECUCION-ORDEN](./docs/EJECUCION-ORDEN.md) corre este loop (máx 5 ciclos antes de escalar):
+
+```
+1. ANALYZE  → 5 sub-agentes EN PARALELO (spec · tests · riesgo · seguridad · UX)
+2. DECIDE   → síntesis de los análisis → plan del slice (código a tocar + tests a crear)
+3. MODIFY   → implementación del slice (TDD: test humano primero)
+4. TEST     → Playwright humano CLI (clicks+teclado) + debug en tiempo real
+5. ITERATE  → corregir según evidencia; repetir 3-4 hasta verde (máx 5)
+6. DECIDE   → gate cerrado o escalar (dividir slice / pedir ayuda)
+```
+
+- **Sub-agentes en paralelo** en análisis de TODO el plan (cada fase, cada gate, cada cambio grande): cada uno aporta su ángulo y se fusiona la síntesis — nunca se implementa a ciegas.
+- **Debug en tiempo real:** correr la suite humana en vivo (`pnpm test:e2e:human`), capturar consola/red, corregir al instante; nada de "revisar después".
+- **Resultados funcionales:** la evidencia de cada fase es el video del humano operando la feature y el resultado obtenido (no el código escrito).
+- Detalle del método: [WORKFLOW-AGENTICO](./docs/WORKFLOW-AGENTICO.md) y [COVERAGE-GUI](./docs/COVERAGE-GUI.md).
+
 ## Estructura de carpetas
 
 ```

@@ -102,6 +102,20 @@ Antes de cerrar CUALQUIER fase (no solo los gates grandes):
 
 Una fase que cierra con deuda nueva NO está cerrada.
 
+## COBERTURA 100% de elementos interactivos (regla dura — v4.0)
+
+> **Todo botón, función y feature tiene su prueba humana Playwright (clicks+teclado).** La tabla maestra es [COVERAGE-GUI](../COVERAGE-GUI.md): cada elemento interactivo → su spec. Sin fila `✅` = la feature NO existe.
+
+1. **Un elemento nuevo = una fila nueva en el MISMO PR** que lo crea (se revisa en el PR template).
+2. El gate de fase exige sus filas en `✅` (regla EJECUCION-ORDEN + AGENTS.md).
+3. El test humano se escribe **antes/igual que** el código (TDD humano): falla → implementar → verde.
+4. **Resultado funcional:** "done" = el humano **opera** la feature y obtiene el resultado (video en `evidence/`). Compilar NO es done.
+5. **Debug en tiempo real:** en el fallo se abre consola/red/video y se corrige al instante (nunca adivinar).
+
+## Loop de desarrollo agéntico (v4.0 — sub-agentes en paralelo + iteración)
+
+Cada fase corre el loop de [WORKFLOW-AGENTICO](../WORKFLOW-AGENTICO.md): **ANALYZE (5 sub-agentes en paralelo: spec/tests/riesgo/seguridad/UX) → DECIDE → MODIFY (TDD humano) → TEST (Playwright humano + debug en vivo) → ITERATE (máx 5) → DECIDE (gate o escalar)**. Análisis en paralelo en TODO el plan, no solo al inicio.
+
 ## Anti-patrones prohibidos
 
 | Prohibido | Por qué |

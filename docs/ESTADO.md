@@ -44,6 +44,8 @@
 
 - **23 links rotos arreglados** en docs (rutas relativas mal calculadas + nombre stale `plan-m-voz-texto`→`plan-m-github`). Verificador: 0 rotos.
 - **Código sin rastros de "empresa"**: `lib.rs` (greet) → "Canvas AI"; Android re-empaquetado `com.empresa_dev.app` → `com.canvas.ai.app` (namespace, applicationId, manifest, theme, MainActivity movido). El `empresa-dev-server` del smoke era un zombie de la carpeta vieja en :3030, no de este repo (el crate ya era `canvas-ai-server`).
+- **Regla dura COBERTURA GUI 100%** (`AGENTS.md` + `SDD-002` + `MATRIZ`): todo botón/función/feature tiene su prueba humana Playwright (clicks+teclado); sin prueba = no existe. Tabla maestra: [COVERAGE-GUI](./COVERAGE-GUI.md) (≥50 elementos mapeados MVP-1/2/3).
+- **Loop de desarrollo agéntico** ([WORKFLOW-AGENTICO](./WORKFLOW-AGENTICO.md)): por fase → ANALYZE (5 sub-agentes en paralelo: spec/tests/riesgo/seguridad/UX) → DECIDE → MODIFY (TDD humano) → TEST (Playwright humano + debug en tiempo real) → ITERATE (máx 5) → DECIDE. Enfoque en **resultados funcionales** (video evidencia), no "compila".
 - **Nuevos docs (cierran huecos de auditoría)**:
   - `AUTH.md` — local SIN cuenta; nube = cuenta+sesión+RLS fail-closed
   - `API.md` — inventario REST canónico (~40 endpoints) + convenciones

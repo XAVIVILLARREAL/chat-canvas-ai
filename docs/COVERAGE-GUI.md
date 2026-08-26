@@ -1,0 +1,96 @@
+# COVERAGE-GUI — Cobertura 100%: cada botón/función/feature con su prueba Playwright humano
+
+> **Producto:** Canvas AI · **Estado:** v1.0 · 2026-08-25 · **REGLA DURA** (AGENTS.md): sin prueba humana → la feature NO existe.
+> Método de ejecución: [WORKFLOW-AGENTICO](./WORKFLOW-AGENTICO.md) · Suite humana: `pnpm test:e2e:human` (clicks+teclado, móvil 375 + desktop 1440, video en `evidence/`).
+
+## Cómo leer esta tabla
+
+- Cada fila = **un elemento interactivo** (botón, input, shortcut, menú, dropdown, nodo del canvas, comando).
+- `Test` = id del spec Playwright humano (creado en `e2e/human/tests/<feature>.spec.ts`).
+- Estado: `⬜` no escrito · `🟡` escrito, sin gate · `✅` suite verde + video.
+- **Una fila nueva de UI sin su test = PR rechazado.** Se marca en el PR template.
+
+## MVP-1 — Base operativa
+
+| Vista | Elemento interactivo | Acción (clicks+teclado) | Test | Estado |
+|---|---|---|---|---|
+| AppShell | BottomNav móvil / Sidebar desktop | navegar entre 6 tabs | `appshell.spec.ts` | ⬜ |
+| AppShell | Toggle sidebar | abrir/cerrar panel | `appshell.spec.ts` | ⬜ |
+| Proyectos | Tarjeta proyecto | crear/cambiar/borrar proyecto | `proyectos.spec.ts` | ⬜ |
+| Sesiones | Botón "Nueva sesión" | crear sesión | `chat.spec.ts` | ⬜ |
+| Sesiones | Sidebar de sesiones | buscar, filtrar, archivar, renombrar, duplicar | `chat.spec.ts` | ⬜ |
+| Chat | Input de mensaje | escribir + Enter (streaming) | `chat.spec.ts` | ⬜ |
+| Chat | Slash commands `/agent /skill /run /compact /help` | invocar y ver efecto | `chat.spec.ts` | ⬜ |
+| Chat | Botón copiar código | copiar bloque | `chat.spec.ts` | ⬜ |
+| Chat | Tool-call render | aprobar/rechazar tool-call | `chat.spec.ts` | ⬜ |
+| Chat | Diff por hunks | aprobar hunk 1, rechazar hunk 2 | `chat.spec.ts` | ⬜ |
+| Chat | Rama de edición ‹/› | editar mensaje y navegar alternativas | `chat.spec.ts` | ⬜ |
+| Chat | Memory Rail / scrubber | navegar rungs | `chat.spec.ts` | ⬜ |
+| Chat | Medidor de contexto | abrir, ver desglose, ajustar límite | `contexto.spec.ts` | ⬜ |
+| Chat | Widget de costo | ver badge por mensaje/sesión | `chat.spec.ts` | ⬜ |
+| Config | Panel 2 públicos (no-programador / JSON) | cambiar ajustes, override por proyecto | `config.spec.ts` | ⬜ |
+| Config | Conectar provider BYOK | pegar key, validar, probar | `providers.spec.ts` | ⬜ |
+| Encargo | Modo encargo | pedir tarea sin prompt, recibir evidencia | `encargo.spec.ts` | ⬜ |
+| Resume | Reanudar sesión interrumpida | cerrar y reabrir, continuar fluido | `chat.spec.ts` | ⬜ |
+| Editor | File explorer | abrir/crear/editar archivo | `editor.spec.ts` | ⬜ |
+| Editor | Live preview sandboxed | agente escribe HTML → preview <2s | `editor.spec.ts` | ⬜ |
+| Editor | Fast apply | archivo grande escribiéndose en vivo | `editor.spec.ts` | ⬜ |
+| Onboarding | Primer arranque guiado | nuevo usuario → primer agente <5 min | `onboarding.spec.ts` | ⬜ |
+| Backup | Export/import workspace | backup completo ida y vuelta | `backup.spec.ts` | ⬜ |
+| i18n | Selector de idioma | cambiar es→de→pt sin recargar, fallback en | `i18n.spec.ts` | ⬜ |
+
+## MVP-2 — Memoria + Skills + Resultados
+
+| Vista | Elemento interactivo | Acción | Test | Estado |
+|---|---|---|---|---|
+| Skills | CRUD skill (editor visual) | crear/editar/duplicar/eliminar solo con clicks | `skills.spec.ts` | ⬜ |
+| Skills | Ceremonia de creación | guardar skill → overlay nacimiento + avatar | `skills.spec.ts` | ⬜ |
+| Skills | Laboratorio sandbox | probar skill contra input, ver costo | `skills.spec.ts` | ⬜ |
+| Skills | Tool-gating | skill QA no puede escribir (bloqueado) | `skills.spec.ts` | ⬜ |
+| Skills | Rutinas "follow along" | grabar N pasos → skill propuesto | `skills.spec.ts` | ⬜ |
+| Memoria | Knowledge / decisiones | preguntar y ver la decisión citada | `memoria.spec.ts` | ⬜ |
+| Memoria | Human-Tweak Lock | editar línea a mano → candado, no sobreescribe | `memoria.spec.ts` | ⬜ |
+| Pruebas | Resultado en canvas | agente implementa → tests verdes → aprobar | `pruebas.spec.ts` | ⬜ |
+| Kanban | Drag tarea todo→doing→done | arrastrar tarjetas + persistencia | `kanban.spec.ts` | ⬜ |
+| Kanban | Bloques animados de tests | test por test llenándose (rojo pulsante en fallo) | `kanban.spec.ts` | ⬜ |
+| Kanban | Vista evidencia por etapa | click en card → timeline de rungs | `kanban.spec.ts` | ⬜ |
+| Oficina | Canva ReactFlow | arrastrar nodo, conectar 2 nodos, zoom rueda/pinch | `oficina.spec.ts` | ⬜ |
+| Oficina | Command Palette ⌘K | 3 letras + Enter ejecuta acción | `oficina.spec.ts` | ⬜ |
+| Oficina | Nodos-agente vivos | crear agente → nodo aparece con estado | `oficina.spec.ts` | ⬜ |
+
+## MVP-3 — Automatización + Nube + Mercado
+
+| Vista | Elemento interactivo | Acción | Test | Estado |
+|---|---|---|---|---|
+| Canvas auto | Nodos 8 tipos + deploy-spec | armar flujo visual → compilar → ejecutar | `automatizacion.spec.ts` | ⬜ |
+| Canvas auto | Conectores (HTTP/MCP/Cron) | configurar conector y disparar | `automatizacion.spec.ts` | ⬜ |
+| Nube | Login/registro | cuenta → sesión → logout | `nube.spec.ts` | ⬜ |
+| Nube | Modo 24/7 | cerrar app → reabrir en otro dispositivo con evidencia | `nube.spec.ts` | ⬜ |
+| Nube | Límites de tier | free tocando muro → mensaje upgrade | `nube.spec.ts` | ⬜ |
+| Sync | Multi-dispositivo | editar en desktop → aparece en móvil → resolver conflicto | `sync.spec.ts` | ⬜ |
+| GitHub | Ciclo git sin terminal | feature→commit→push→PR + diff por hunks | `github.spec.ts` | ⬜ |
+| Marketplace | Export/import bundle | firmar skill → importar en otra instalación | `marketplace.spec.ts` | ⬜ |
+| Backup nube | GDPR export/erasure | export completo / borrado por tenant | `gdpr.spec.ts` | ⬜ |
+
+## Reglas
+
+1. **Toda fila es obligatoria.** Un elemento interactivo nuevo añade su fila en el mismo PR.
+2. **El gate de fase exige sus filas `✅`.** (Regla MATRIZ + EJECUCION-ORDEN).
+3. Los tests se escriben **antes/igual que** el código (TDD humano): fallan → implementar → verdes.
+4. **Debug en tiempo real:** si un test falla, correr en vivo y capturar consola/red, no adivinar.
+
+## Suites existentes del scaffold (mantener/expandir — ya en `e2e/human/tests/`)
+
+| Vista | Elemento interactivo | Acción (clicks+teclado) | Test | Estado |
+|---|---|---|---|---|
+| Boot | Arranque de la app | abrir app → título visible, layout sin roturas | `boot.spec.ts` | 🟡 |
+| Agentes | Card de agente | crear agente → card → click → detalle → seleccionar/deseleccionar | `create-agent.spec.ts` | 🟡 |
+| Teclado | Navegación 100% teclado | Tab/Enter/Escape, foco visible | `keyboard-nav.spec.ts` | 🟡 |
+| Responsive | Misma app en 375/1440 | navegación humana en móvil y desktop | `responsive-human.spec.ts` | 🟡 |
+
+## Generar una fila nueva
+
+```markdown
+| <Vista> | <elemento> | <acción humano> | `<feature>.spec.ts` | ⬜ |
+```
+Cada fila nace en el mini-SDD de la feature y se completa en su gate.

@@ -12,6 +12,9 @@ Gracias por querer aportar. Este repo usa un flujo **spec-driven** estricto: cad
 
 ## Reglas duras
 
+- **COBERTURA GUI 100%:** todo botón/función/feature lleva su prueba humana Playwright (clicks+teclado) — añade su fila a [COVERAGE-GUI](./docs/COVERAGE-GUI.md) en el MISMO PR. **Un botón nuevo sin su prueba = PR rechazado.**
+- **Resultados funcionales:** "done" = el humano opera la feature y obtiene el resultado (video en `evidence/`). Compilar NO es done.
+- **Loop agéntico:** cada fase corre ANALYZE (5 sub-agentes en paralelo) → DECIDE → MODIFY → TEST → ITERATE (máx 5) → DECIDE ([WORKFLOW-AGENTICO](./docs/WORKFLOW-AGENTICO.md)).
 - **No rompas gates:** si tu cambio toca UI, la suite humana de esa zona debe quedar verde.
 - **i18n:** nunca strings hardcodeadas; usa el diccionario ([plan-i18n](./docs/SDDs/SDD-001-plan-base/plan-i18n.md)).
 - **Sin deuda nueva:** 0 TODOs; biome limpio en tus archivos (la deuda preexistente no es excusa para añadir más).
@@ -22,8 +25,10 @@ Gracias por querer aportar. Este repo usa un flujo **spec-driven** estricto: cad
 
 - [ ] mini-SDD en `docs/SDDs/`
 - [ ] fase(s) en la `MATRIZ` (fase sin fila NO se construye)
+- [ ] fila(s) en [COVERAGE-GUI](./docs/COVERAGE-GUI.md) (todo botón/función → su test humano)
+- [ ] ANALYZE: 5 sub-agentes en paralelo (spec/tests/riesgo/seguridad/UX) → síntesis
 - [ ] tests unit/integration en cargo/vitest
-- [ ] E2E humano Playwright (móvil+desktop) + video en `evidence/`
+- [ ] E2E humano Playwright (clicks+teclado, móvil+desktop) + video en `evidence/`
 - [ ] `pnpm check:all` + `pnpm test` + `cargo test` verdes
 - [ ] CHANGELOG + ESTADO actualizados
 - [ ] commit semántico + push

@@ -18,6 +18,7 @@
     "test:e2e:human": "npx playwright test --config=e2e/playwright.human.config.ts",
     "test:e2e:human:core": "npx playwright test --config=e2e/playwright.human.config.ts --grep @core",
     "test:e2e:ui": "npx playwright test --config=e2e/playwright.config.ts --ui",
+    "test:coverage": "node scripts/check-coverage.mjs",
     "test:e2e:chromium": "npx playwright test --config=e2e/playwright.config.ts --project=chromium",
     "test:e2e:webkit": "npx playwright test --config=e2e/playwright.config.ts --project=webkit",
     "typecheck": "tsgo --noEmit",
