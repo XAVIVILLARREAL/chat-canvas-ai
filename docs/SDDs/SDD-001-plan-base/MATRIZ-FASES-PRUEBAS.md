@@ -29,6 +29,7 @@
 | A.7 | Modo ENCARGO (v1: tarea mínima; H.1 formaliza) | E2E HUMANA: crear encargo sin escribir prompt; agente mock lo completa; notificación de vuelta con evidencia |
 | A.8 | Resume inteligente (v1 sin rungs; D.1 enriquece) | Integration: sesión interrumpida → resume card correcta. E2E HUMANA: cerrar a mitad → reabrir → continuar fluido |
 | A.9 | Ramas visuales al editar (‹2/3›) | Unit tree-store. E2E HUMANA: edito mensaje 2× → flechas ‹› navegan alternativas sin perder ninguna |
+| A.10 | Comparador A/B de modelos ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F19) | E2E HUMANA: mismo prompt a 2 modelos lado a lado → elijo ganadora → rung DECISION guarda preferencia y el router la aprende |
 
 ## Etapa 2 · Sidepanels Lovable — `plan-b-sidepanels-lovable.md`
 | Fase | Nombre | Pruebas |
@@ -62,6 +63,8 @@
 | C.5 | Motor Contexto/Caché configurable (SDD-006 §1) | Unit hash/orden estable. Integration DeepSeek real: cache_hit>90% post warm-up; cambio de knob → aviso de caché fría. E2E HUMANA: aplicar preset de rol en un click |
 | C.6 | OllamaProvider local (ready-to-plug) | Unit: detección/parsing /api/tags + errores conexión. Integration Ollama real: chat streaming + embeddings; preset KV verificado por memoria consumida. E2E HUMANA: conectar Ollama desde cero con la guía in-app |
 | C.7 | Registro universal de proveedores (v1; OAuth/small_model → C.7b post-base) | Unit: parser/validador registro, merge catálogo, blacklist/whitelist, small_model routing. Integration: 3 proveedores REALES vía el mismo trait (streaming + precios correctos); OAuth device-flow mockeado. E2E: agregar proveedor desde JSON; selector muestra precio/contexto. HUMANA @core-ampliada: no-programador conecta OpenRouter pegando key <2 min y elige modelo viendo precio; whitelist esconde modelos |
+| C.8 | Tools web nativas: web_search + web_fetch ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F17) | Unit: parser + caché LRU + allowlist enforcement. Integration: fetch a fixture local; chaos: dominio bloqueado → error accionable. E2E HUMANA: "investiga X" → respuesta cita 2+ fuentes con links |
+| C.9 | Visión multimodal: imágenes/PDF ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F18) | Integration real: screenshot con bug plantado → agente lo corrige en código; PDF → extracción correcta; fallback claro si el provider no soporta visión |
 
 ## Etapa 4 · Memoria V3Code — `plan-d-memoria-v3code.md`
 | Fase | Nombre | Pruebas |
@@ -165,6 +168,7 @@
 | N.5 | Tracking de actividad | Unit tracking events. E2E: dashboard muestra datos reales (costo, agentes usados) |
 | N.6 | Plantillas de sesiones | E2E: crear desde plantilla → agentes configurados |
 | N.7 | Modo nube 24/7 (suscripción, ADR-006) | Integration: cola 20 tareas → consumo ordenado + corte por presupuesto. Chaos: provider cae → pausa limpia. E2E: cierro app → reabro en otro dispositivo → sesión siguió con evidencia |
+| N.8 | Puentes de mensajería: WhatsApp/Telegram/Discord ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F21, nube Pro) | Integration: mensaje desde Telegram → agente responde; auth 1:1 con cuenta + rate-limit; streaming resumido + link a evidencia |
 
 ## Etapa 15 · Marketplace + v1.0 — `plan-o-marketplace-v1.md`
 | Fase | Nombre | Pruebas |
@@ -172,6 +176,7 @@
 | O.1 | Bundles `.canvas-ai-bundle` | Cargo test roundtrip export→import idempotente; firma verificada; import malicioso rechazado (validación manifest) |
 | O.2 | MCP público del cerebro | Integration real: Claude Code conectado al MCP responde preguntas del workspace usando nuestro grafo. Snapshot tests de tools |
 | O.3 | Release v1.0 | Checklist DoD gigante: todas las suites humanas históricas re-corridas en las 3 vistas; builds CI verdes; demo documental final |
+| O.4 | Compartir entrega pública (link read-only) ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F20) | E2E HUMANA: genero link con expiración → se abre SIN cuenta → contenido correcto; revoco → 404; local exporta HTML estático |
 
 ## INTERMEDIO (INTERCALADO v3.8 — cada ventana tras su fase base habilitadora; NO después de la base) — `../SDD-005-plan-intermedio.md`
 > VI tras F/G · KR tras H · 3D tras J · K.1/K.2 con CR · CR al final (paralelo a N/O). Consejo de Expertos ADELANTADO: audita los gates de la propia base (dogfood).
@@ -273,4 +278,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 149 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 114** (A–P 92 incl. H.9a/H.9b, sin J.3/K.1/K.2 + V 5 + S/T/U 17) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8).
+**Total: 154 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 119** (A–P 97 incl. H.9a/H.9b, A.10/C.8/C.9, sin J.3/K.1/K.2 + V 5 + S/T/U 17) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8).

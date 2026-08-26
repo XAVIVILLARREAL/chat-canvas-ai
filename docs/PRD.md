@@ -73,7 +73,26 @@
 - Voz/3D/VR/dopamina/Consejo de Expertos → **post-v1** (Q6, permanecen en el plan marcados).
 - No cobramos por resultado en v1 (solo tras >70% success-rate medido, SDD-010).
 
-## 6 · Riesgos de producto (top 5)
+## 6 · Funciones añadidas tras revisión de producto (F17-F28)
+
+> Análisis completo con decisiones (agregar/post-v1/rechazadas): [FEATURE-BACKLOG](./FEATURE-BACKLOG.md). Resumen de lo que ENTRA al plan:
+
+| ID | Función | Resultado medible (Playwright humano) | Gate |
+|---|---|---|---|
+| F17 | Tools web nativas (`web_search`/`web_fetch`) | Pido "investiga X" → el agente cita 2+ fuentes con links | C.8 |
+| F18 | Visión multimodal | Adjunto screenshot con bug → el agente lo corrige en código | C.9 |
+| F19 | Comparador A/B de modelos | Mismo prompt → 2 respuestas lado a lado → elijo la mejor | A.10 |
+| F20 | Compartir entrega pública | Genero link read-only → se abre sin cuenta → revocable | O.4 |
+| F21 | Puentes WhatsApp/Telegram/Discord | Escribo por Telegram → mi agente responde (nube) | N.8 |
+| F22 | Captura rápida global (hotkey SO) | Hotkey → mini-ventana → tarea enviada → notificación al done | S.3 |
+| F23 | Dashboard personal uso/costos | Abro dashboard → costo por proyecto/día + top skills reales | N.5b |
+| F24 | Forecast de costo pre-envío | Antes de enviar veo "≈ tokens ≈ $" del modelo elegido | A.7b |
+| F25 | Importar desde ChatGPT/Claude | Importo JSON exportado → sesiones reconstruidas locales | A.0b |
+| F26 | Papelera + restaurar | Elimino sesión → papelera → restauro intacta | A.2b |
+| F27 | Perfiles BYOK (trabajo/personal) | Cambio perfil → providers y keys conmutan por proyecto | G.1b |
+| F28 | Export sesión a PDF/Markdown | Exporto sesión → reporte compartible con rungs + resultado | A.6b |
+
+## 7 · Riesgos de producto (top 5)
 
 1. **Costo LLM descontrolado** → guardrail por sesión/día desde MVP-1 + badge en vivo.
 2. **El sandbox no convence** (código del agente) → frontera documentada en el modelo de amenazas + demo de aislamiento.

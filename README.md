@@ -36,6 +36,7 @@ Canvas AI es un entorno de trabajo donde humanos y agentes de IA colaboran en un
 |---|---|
 | [`AGENTS.md`](./AGENTS.md) | Guía de trabajo para agentes IA |
 | [`docs/PRD.md`](./docs/PRD.md) | Producto: personas, JTBD, features → resultado medible |
+| [`docs/FEATURE-BACKLOG.md`](./docs/FEATURE-BACKLOG.md) | Funciones: agregadas, post-v1 y rechazadas |
 | [`docs/PRODUCT-DIFFERENTIATORS.md`](./docs/PRODUCT-DIFFERENTIATORS.md) | Los 7 diferenciadores "increíbles" |
 | [`docs/PRODUCT-METRICS.md`](./docs/PRODUCT-METRICS.md) | North-star, activación, retención, eventos |
 | [`docs/MVP-ROADMAP.md`](./docs/MVP-ROADMAP.md) | MVP-1/2/3 time-boxed |

@@ -27,6 +27,7 @@
 
 ## Optimización lógica del plan (2026-08-25)
 
+- **FEATURE-BACKLOG** (`docs/FEATURE-BACKLOG.md`) — análisis de funciones del producto: **12 funciones AGREGADAS** (F17-F28: tools web nativas, visión multimodal, comparador A/B, share público, puentes WhatsApp/Telegram/Discord, quick capture, dashboard de costos, forecast pre-envío, import ChatGPT/Claude, papelera, perfiles BYOK, export PDF), post-v1 marcado y **rechazadas con razón** (anti-scope). MATRIZ +5 fases (A.10/C.8/C.9/N.8/O.4) → **154 fases**; COVERAGE-GUI 64 elementos.
 - **GLOSARIO** (`docs/GLOSARIO.md`) — terminología canónica + anti-glosario ("empresa autónoma", "tenants en local", "compila").
 - **INDEX reestructurado en 6 niveles lógicos** (Producto → Arquitectura → Plan/Ejecución → Calidad → Lanzamiento → Estado).
 - **README maestro v3.1** — sección "Cómo usar este plan" (orden de lectura), **Definition of Ready/Done**, **Milestone M0**.

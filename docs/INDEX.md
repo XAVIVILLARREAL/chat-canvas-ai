@@ -8,6 +8,7 @@
 | Documento | Contenido |
 |---|---|
 | [PRD](./PRD.md) | Personas + JTBD + features → resultado medible Playwright humano |
+| [FEATURE-BACKLOG](./FEATURE-BACKLOG.md) | Análisis de funciones: agregadas F17-F28, post-v1 y rechazadas |
 | [PRODUCT-DIFFERENTIATORS](./PRODUCT-DIFFERENTIATORS.md) | Los 7 diferenciadores "increíbles" (brújula anti-scope) |
 | [PRODUCT-METRICS](./PRODUCT-METRICS.md) | North-star, activación, retención, eventos, telemetría |
 | [PRICING-TIERS](./PRICING-TIERS.md) | Free local $0 / Pro $29 / Teams $99 |

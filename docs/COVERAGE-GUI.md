@@ -72,6 +72,23 @@
 | Marketplace | Export/import bundle | firmar skill → importar en otra instalación | `marketplace.spec.ts` | ⬜ |
 | Backup nube | GDPR export/erasure | export completo / borrado por tenant | `gdpr.spec.ts` | ⬜ |
 
+## Funciones añadidas (F17-F28 — [FEATURE-BACKLOG](./FEATURE-BACKLOG.md))
+
+| Vista | Elemento interactivo | Acción (clicks+teclado) | Test | Estado |
+|---|---|---|---|---|
+| Chat | Botón comparador A/B | mismo prompt → 2 respuestas lado a lado → elegir ganadora | `comparador.spec.ts` | ⬜ |
+| Chat | Adjuntar imagen/PDF | screenshot con bug → agente corrige en código | `vision.spec.ts` | ⬜ |
+| Chat | Forecast de costo pre-envío | ver "≈ tokens ≈ $" antes de Enter | `chat.spec.ts` | ⬜ |
+| Chat | Importar historial ChatGPT/Claude | importar JSON → sesiones reconstruidas | `import.spec.ts` | ⬜ |
+| Chat | Export sesión a PDF/MD | exportar → reporte compartible con rungs | `export.spec.ts` | ⬜ |
+| Entrega | Compartir link público | generar link read-only + expiración + revocar | `share.spec.ts` | ⬜ |
+| Mensajería | Puente Telegram/WhatsApp/Discord | escribir por Telegram → agente responde (nube) | `mensajeria.spec.ts` | ⬜ |
+| Dashboard | Vista uso/costos personal | costo por proyecto/día, top skills, entregas | `dashboard.spec.ts` | ⬜ |
+| Desktop | Quick capture global (hotkey SO) | hotkey → mini-ventana → tarea → notificación done | `quickcapture.spec.ts` | ⬜ |
+| Papelera | Ver borrados + restaurar | eliminar sesión → papelera → restaurar intacta | `papelera.spec.ts` | ⬜ |
+| Providers | Perfiles BYOK (trabajo/personal) | cambiar perfil → providers conmutan por proyecto | `providers.spec.ts` | ⬜ |
+| Tools web | web_search/web_fetch del agente | "investiga X" → cita fuentes con links; dominio bloqueado → accionable | `webtools.spec.ts` | ⬜ |
+
 ## Reglas
 
 1. **Toda fila es obligatoria.** Un elemento interactivo nuevo añade su fila en el mismo PR.

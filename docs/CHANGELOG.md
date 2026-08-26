@@ -2,6 +2,15 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 28 — Análisis de funciones del producto: +12 funciones F17-F28)
+
+- **FEATURE-BACKLOG** (`docs/FEATURE-BACKLOG.md`): análisis completo de qué funciones agregar — contra competidores (Cursor/Cline/n8n/Lovable) y los 7 diferenciadores:
+  - **AGREGADAS (12)**: tools web nativas (web_search/fetch con allowlist) · visión multimodal (screenshot→fix, PDF) · comparador A/B de modelos · compartir entrega pública read-only (alimenta KPI growth SDD-010 — ¡no existía!) · puentes WhatsApp/Telegram/Discord (killer del tier Pro) · quick capture global · dashboard personal uso/costos · forecast costo pre-envío · import ChatGPT/Claude · papelera+restaurar · perfiles BYOK · export sesión PDF/MD
+  - **POST-V1**: extensión navegador, email/calendario nativo, multi-cursor, fine-tuning local
+  - **RECHAZADAS con razón**: chat social, cuenta obligatoria en local, cobrar por tokens, editor generativo, sync P2P blockchain
+- **MATRIZ** +5 fases: **A.10** (comparador), **C.8** (tools web), **C.9** (visión), **N.8** (puentes), **O.4** (share público) → total **154 fases**
+- **PRD §6**: tabla F17-F28 con resultado medible humano por función; **COVERAGE-GUI** +12 filas (64 elementos totales)
+
 ## 2026-08-25 (sesion 27 — Aumento + optimización lógica del plan)
 
 - **GLOSARIO** (`docs/GLOSARIO.md`): terminología canónica (sesión, skill, rung, entrega, gate, slice, BYOK, deploy-spec, DoR/DoD, north-star…) + **anti-glosario** (no usar "empresa autónoma", "tenants en local", "compila").
