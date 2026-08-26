@@ -1,8 +1,20 @@
-# Canvas AI — Plan Maestro v3.0
+# Canvas AI — Plan Maestro v3.1
 
 > **Herramienta de IA generalista** para trabajar con agentes de IA de forma organizada.
 > **Híbrido:** local-first gratis (BYOK, trae tu API key) + nube multi-tenant de pago para ejecución 24/7 (ADR-006).
 > Open-source, multi-agente, visual, VR-ready.
+
+---
+
+## Cómo usar este plan (orden de lectura)
+
+1. **Producto** → [`PRD`](../../PRD.md) (para quién, qué feature, cómo se mide) + [`GLOSARIO`](../../GLOSARIO.md) (términos).
+2. **Qué hace al producto increíble** → [`PRODUCT-DIFFERENTIATORS`](../../PRODUCT-DIFFERENTIATORS.md).
+3. **Qué construimos en qué orden** → [`EJECUCION-ORDEN`](../../EJECUCION-ORDEN.md) (fase por fase) + [`MVP-ROADMAP`](../../MVP-ROADMAP.md) (tiempos) + [`MATRIZ`](./MATRIZ-FASES-PRUEBAS.md) (fuente de verdad de fases).
+4. **Qué toca cada botón/función** → [`COVERAGE-GUI`](../../COVERAGE-GUI.md) (cobertura 100% humana).
+5. **Cómo trabajamos** → [`WORKFLOW-AGENTICO`](../../WORKFLOW-AGENTICO.md) (loop con sub-agentes en paralelo).
+6. **Contratos técnicos** → [`SCHEMA-MAESTRO`](../../SCHEMA-MAESTRO.md), [`API`](../../API.md), [`CONTRATO-SKILL`](../../CONTRATO-SKILL.md), [`THREAT-MODEL`](../../THREAT-MODEL.md).
+7. **Estado actual** → [`ESTADO`](../../ESTADO.md) · **Arrancar la Etapa 0** → [`ETAPA-0-IMPLEMENTACION`](../../ETAPA-0-IMPLEMENTACION.md).
 
 ---
 
@@ -170,6 +182,23 @@ interface SpatialMeta {
 ## Plan de construcción (Etapas)
 
 > **Orden de ejecución = [MVP-ROADMAP](../../MVP-ROADMAP.md) + [MATRIZ](./MATRIZ-FASES-PRUEBAS.md)** (chat-first: Etapa 2 primero). Las etapas 1-10 son **capacidades**; se construyen en el orden del roadmap, no en su numeración aquí. El **Control Room (Etapa 1) se construye al final** como vista que consume todo (post-v1, Q6) — alineado con ARQUITECTURA y la MATRIZ.
+
+### Definition of Ready (DoR) — antes de INICIAR una fase
+- [ ] mini-SDD con contrato claro (comportamiento observable + criterios) o slice del plan
+- [ ] fila en la **MATRIZ** (fase sin fila NO se construye)
+- [ ] fila(s) en **COVERAGE-GUI** (cada botón/función → su test humano)
+- [ ] análisis **ANALYZE** con 5 sub-agentes en paralelo (spec/tests/riesgo/seguridad/UX) → síntesis
+- [ ] contrato de pruebas definido (unit/integration/e2e/humana + chaos si toca I/O)
+- [ ] slice ≤ ~1 sesión IA (si no, partir en X.1a/X.1b con mini-gates)
+
+### Definition of Done (DoD) — para CERRAR una fase
+- [ ] suite humana Playwright **verde** (clicks+teclado, móvil 375 + desktop 1440) + **video** en `evidence/`
+- [ ] resultado funcional operado por el humano (no "compila") · filas COVERAGE-GUI en ✅
+- [ ] `pnpm check:all` + `pnpm test` + `cargo test` verdes · sin deuda nueva (biome/0 TODOs)
+- [ ] CHANGELOG + ESTADO actualizados · commit semántico
+
+### Milestone M0 — Demo de la Fundación (primera entrega verificable)
+Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENTACION.md)): server persistente (SQLite+Postgres), event_stream inmutable, BYOK cifrado, sandbox Linux provable, OpenAPI generado, i18n infra. **Gate 0** = video del server operando con datos que sobreviven reinicios + ledger append-only verificado + key cifrada/descifrable. Es el primer hito que demuestra que la base técnica es real.
 
 ### Etapa 0: Fundación — schema maestro + eventos + secretos
 **Objetivo:** Base de datos y contratos desde el día 1 (antes de cualquier UI). Sin esto, todo lo demás exige retrofit.

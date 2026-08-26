@@ -56,6 +56,8 @@ Canvas AI es un entorno de trabajo donde humanos y agentes de IA colaboran en un
 | [`docs/EJECUCION-ORDEN.md`](./docs/EJECUCION-ORDEN.md) | Qué construir en qué orden |
 | [`docs/COVERAGE-GUI.md`](./docs/COVERAGE-GUI.md) | Cobertura 100% botón→test humano |
 | [`docs/WORKFLOW-AGENTICO.md`](./docs/WORKFLOW-AGENTICO.md) | Loop: sub-agentes en paralelo + debug |
+| [`docs/ETAPA-0-IMPLEMENTACION.md`](./docs/ETAPA-0-IMPLEMENTACION.md) | Plan accionable de la Etapa 0 (slices) |
+| [`docs/GLOSARIO.md`](./docs/GLOSARIO.md) | Terminología canónica |
 | [`docs/INDEX.md`](./docs/INDEX.md) | Mapa completo de docs |
 | [`docs/SDDs/SDD-001-plan-base/README.md`](./docs/SDDs/SDD-001-plan-base/README.md) | Plan maestro |
 | [`docs/ARQUITECTURA.md`](./docs/ARQUITECTURA.md) | Arquitectura |

@@ -1,0 +1,64 @@
+# ETAPA-0-IMPLEMENTACION — Plan accionable de la Fundación (slices + tests)
+
+> **Producto:** Canvas AI · **Estado:** v1.0 · 2026-08-25 · Contrato: [SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md) · Orden: [EJECUCION-ORDEN](./EJECUCION-ORDEN.md) · Loop: [WORKFLOW-AGENTICO](./WORKFLOW-AGENTICO.md)
+> **Objetivo:** llevar el server de `HashMap` en memoria a **persistencia real** (SQLite local + Postgres nube), con eventos, secretos, sandbox y OpenAPI. Cada slice = mini-gate (suite humana cuando toca UI; aquí es mayormente backend → cargo tests + integration).
+
+## Contexto del estado actual
+
+- El server (`crates/server`) guarda todo en `Arc<RwLock<HashMap>>` — se pierde al reiniciar.
+- `crates/core` ya es dominio puro (tipos + reglas), `packages/shared-types` expone tipos TS manuales.
+- `cargo check -p core -p server -p worker` compila (warnings preexistentes).
+- No hay migraciones, no hay DB conectada, no hay secretos reales, no hay sandbox provisionado.
+
+## Slices de implementación (orden estricto)
+
+### 0.0 — Fundamento del slice (cada slice arranca con esto)
+1. **ANALYZE** (5 sub-agentes en paralelo): spec del slice / tests a crear / riesgo de romper lo verde / seguridad (secretos, path) / UX si aplica.
+2. **DoR**: contrato de pruebas definido (qué cargo/vitest/test humano exige) + fila en la MATRIZ.
+3. Implementar TDD (test que falla → código → verde).
+
+### 0.1 — Migraciones + repos SQLite (a)
+- **Qué:** `crates/core/migrations/0001_*.sql` (sessions, messages, event_stream, skills, providers, settings, documents, executions) con up+down; `sqlx` connectado a SQLite; repos CRUD.
+- **Tests:** cargo test repos (CRUD por project_id) en SQLite + migración up/down/up idempotente.
+- **Mini-gate:** `cargo test -p canvas-ai-core` verde; la data sobrevive a reinicio del server.
+
+### 0.2 — Postgres (nube) + RLS fail-closed (b)
+- **Qué:** mismas migraciones a Postgres; `pre_request` RLS fail-closed (sin tenant → 0 filas); script de seed.
+- **Tests:** cargo test contra Postgres (Compose); 2 tenants → datos aislados (SQL directo, no solo UI).
+- **Mini-gate:** integración Postgres verde; RLS verificado.
+
+### 0.3 — event_stream + eventos de producto (c)
+- **Qué:** taxonomía de rungs (PROMPT/PHASE/DIFF/TEST_RESULT/DECISION/ESCALATION/DELIVERY); trigger append-only (UPDATE/DELETE rechazados); helper `emitEvent()`; eventos de producto ([PRODUCT-METRICS](./PRODUCT-METRICS.md)).
+- **Tests:** cargo test: append-only rechazado; seed project→session→message→rung; cada evento de producto emitido al crear datos.
+- **Mini-gate:** ledger inmutable verificado.
+
+### 0.4 — Secretos BYOK + vault (d)
+- **Qué:** crate `keyring` (local) + envelope AES-GCM por tenant (nube) con KEK/DEK; `providers.key_ref`; validación del proveedor al pegar la key (roundtrip mínimo); scanner de secretos antes de enviar contexto.
+- **Tests:** cargo test: key cifra/descifra con la correcta; nunca en claro al webview; dump de SQLite no revela la key.
+- **Mini-gate:** flujo BYOK verificado + threat-model checkbox.
+
+### 0.5 — Frontera del sandbox Linux (e)
+- **Qué:** contrato del contenedor Ubuntu (CPU 1 · RAM 512MB · disco 1GB · pids 128 · timeout 60s · red off · mounts read-only · non-root · seccomp) vía docker API en el worker; spawn/kill/timeout.
+- **Tests:** cargo test spawn/kill/timeout con fixture; chaos: matar contenedor a mitad → agente se recupera; red denegada verificada.
+- **Mini-gate:** sandbox provable (H.9a adelantado a Etapa 0).
+
+### 0.6 — OpenAPI del gateway + tipos generados (f)
+- **Qué:** specta → JSON schema → OpenAPI (`docs/openapi.yml`); frontend consume tipos generados (openapi-typescript), se elimina el mantenimiento manual de `packages/shared-types` como fuente.
+- **Tests:** OpenAPI generado sin errores; frontend compila contra tipos generados.
+- **Mini-gate:** artefacto OpenAPI + build TS verde.
+
+### 0.7 — i18n infraestructura (g)
+- **Qué:** diccionarios JSON (es/en/pt/de/fr/it), hook `useI18n`, detección, fallback `en`, script CI de claves faltantes ([plan-i18n](./SDDs/SDD-001-plan-base/plan-i18n.md)).
+- **Tests:** unit del hook + snapshot diccionario + fallback.
+- **Mini-gate:** `useI18n` unit verde.
+
+### 0.8 — Cierre de Etapa 0 (h)
+- **GATE 0:** `cargo test` SQLite+Postgres verde · migración idempotente · append-only verificado · key cifrada/descifrable · sandbox provable · OpenAPI generado · i18n infra lista. `pnpm check:all` verde. Evidencia en `evidence/`.
+
+## Reglas
+
+1. Cada slice es **un commit semántico**; el siguiente no arranca sin el mini-gate del anterior.
+2. Las migraciones **nunca se editan** tras aplicarse; se agregan nuevas.
+3. Presupuesto de APIs reales: **$0 en Etapa 0** (todo mock/local; Ollama opcional).
+4. Sin deuda nueva: biome limpio en lo tocado, 0 TODOs sin responsable.
+5. El loop agéntico (5 sub-agentes en paralelo) corre en CADA slice antes de codificar.

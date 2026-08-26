@@ -16,13 +16,22 @@
 - Build completo exitoso
 - Residuo "empresa autónoma" eliminado del código (core, server, shared-types, frontend) ✅
 
-## Próximo paso (Etapa 0 — ya concretada)
+## Próximo paso (Etapa 0 — ya concretada y con plan de implementación)
 
-- [ ] **Implementar schema maestro + migraciones** — el server aún vive en `HashMap` en memoria; conectar sqlx/sqlite + Postgres ([SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md))
-- [ ] **Contrato `event_stream`** (ledger append-only) + eventos de producto ([PRODUCT-METRICS](./PRODUCT-METRICS.md))
-- [ ] **Módulo de secretos BYOK** (keychain OS / cifrado por tenant) ([THREAT-MODEL](./THREAT-MODEL.md))
-- [ ] **Frontera del sandbox Linux** (números) ([THREAT-MODEL](./THREAT-MODEL.md))
-- [ ] **OpenAPI del gateway** (specta) ([SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md))
+- [ ] **Implementar la Etapa 0 por slices** ([ETAPA-0-IMPLEMENTACION](./ETAPA-0-IMPLEMENTACION.md)): 0.1 migraciones+repos SQLite → 0.2 Postgres+RLS → 0.3 event_stream → 0.4 secretos BYOK → 0.5 sandbox → 0.6 OpenAPI → 0.7 i18n → **M0 (Gate 0)**.
+- El server aún vive en `HashMap` en memoria; conectar sqlx/sqlite + Postgres ([SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md))
+- Contrato `event_stream` (ledger append-only) + eventos de producto ([PRODUCT-METRICS](./PRODUCT-METRICS.md))
+- Módulo de secretos BYOK (keychain OS / cifrado por tenant) ([THREAT-MODEL](./THREAT-MODEL.md))
+- Frontera del sandbox Linux (números) ([THREAT-MODEL](./THREAT-MODEL.md))
+- OpenAPI del gateway (specta) ([SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md))
+
+## Optimización lógica del plan (2026-08-25)
+
+- **GLOSARIO** (`docs/GLOSARIO.md`) — terminología canónica + anti-glosario ("empresa autónoma", "tenants en local", "compila").
+- **INDEX reestructurado en 6 niveles lógicos** (Producto → Arquitectura → Plan/Ejecución → Calidad → Lanzamiento → Estado).
+- **README maestro v3.1** — sección "Cómo usar este plan" (orden de lectura), **Definition of Ready/Done**, **Milestone M0**.
+- **ETAPA-0-IMPLEMENTACION** (`docs/ETAPA-0-IMPLEMENTACION.md`) — Etapa 0 en 9 slices accionables (0.0-0.8) con tests y mini-gates, listos para arrancar con el loop agéntico.
+- **MVP-ROADMAP** — estimación de esfuerzo por MVP (horas orientativas) + regla de slices si una fase tarda 2×.
 
 ## Nueva capa de producto (2026-08-25)
 

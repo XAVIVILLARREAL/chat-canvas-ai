@@ -2,6 +2,15 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 27 — Aumento + optimización lógica del plan)
+
+- **GLOSARIO** (`docs/GLOSARIO.md`): terminología canónica (sesión, skill, rung, entrega, gate, slice, BYOK, deploy-spec, DoR/DoD, north-star…) + **anti-glosario** (no usar "empresa autónoma", "tenants en local", "compila").
+- **INDEX reestructurado en 6 niveles lógicos**: 1 Producto → 2 Arquitectura → 3 Plan/Ejecución → 4 Calidad/Ops → 5 Lanzamiento/Contribución → 6 Estado/Meta.
+- **README maestro v3.1**: sección **"Cómo usar este plan"** (orden de lectura en 7 pasos), **Definition of Ready/Done** como checklists, **Milestone M0** (primera entrega verificable: Etapa 0 completa).
+- **ETAPA-0-IMPLEMENTACION** (`docs/ETAPA-0-IMPLEMENTACION.md`): la Etapa 0 en **9 slices accionables** (0.0-0.8) con tests por slice, mini-gates y presupuesto $0 — listo para arrancar con el loop agéntico.
+- **MVP-ROADMAP**: tabla de **estimación de esfuerzo** por MVP (horas orientativas) + regla de slices si una fase tarda 2× su estimación.
+- **EJECUCION-ORDEN**: DoR (antes de empezar) y DoD (para cerrar) formalizados + milestone M0.
+
 ## 2026-08-25 (sesion 26 — Cobertura GUI 100% + loop agéntico con sub-agentes en paralelo)
 
 - **REGLA DURA COBERTURA GUI 100%** (AGENTS.md + SDD-002 + MATRIZ): todo botón, función y feature tiene su prueba **Playwright humano (clicks+teclado)** — sin prueba = la feature NO existe; un botón nuevo sin su prueba = PR rechazado.

@@ -66,3 +66,13 @@
 
 - APIs reales: **máx $20/gate** (regla de la MATRIZ). Resto mock-first.
 - Costos de hosting: [plan-s](./SDDs/SDD-001-plan-base/plan-s-despliegue-costos.md#s1) (~$16-26/mes MVP).
+
+## Estimación de esfuerzo (orientativa, sesiones de IA con loop agéntico)
+
+| MVP | Semanas | Esfuerzo estimado | Bloques grandes |
+|---|---|---|---|
+| MVP-1 | 1-6 | ~60-90 h | Etapa 0 (15-20 h) · Chat A (20-25 h) · Runtime C (20-25 h) · Editor B minimal (10 h) |
+| MVP-2 | 7-14 | ~100-140 h | Memoria D (30 h) · Skills G (30 h) · Pruebas H (35 h) · Kanban KR (15 h) · Oficina F.0-F.6 (20 h) |
+| MVP-3 | 15-24 | ~120-180 h | Automatización F (35 h) · Nube N.7+S (30 h) · Sync L (15 h) · GitHub M (15 h) · Marketplace O (20 h) · Targets MP (15 h) |
+
+> Horas = estimación de trabajo de un solo dev/agente con el loop de [WORKFLOW-AGENTICO](./WORKFLOW-AGENTICO.md). Cada fase se valida por **resultado funcional** (gate humano), no por horas — si una fase tarda 2× su estimación, se parte en slices (SDD-002).
