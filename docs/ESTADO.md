@@ -52,6 +52,8 @@
 
 ## Calidad visual Liquid Glass → VR (2026-08-25)
 
+- **Provider de pruebas GRATIS** (regla free-first): OpenRouter `:free` (**ox-alpha free**) como provider por defecto de TODOS los tests con LLM real — $0 ilimitado desde C.1; setup en [DEV-ENVIRONMENT](./DEV-ENVIRONMENT.md) + `.env.example`. APIs de pago solo para capacidades específicas (≤$20/gate).
+
 - **SDD-013 §8** — Escalera visual: **L1 Liquid Glass 2D (hoy) → L2 Espacial (SpatialMeta, post-v1) → L3 VR/AR gafas**; reglas por componente (SpatialMeta obligatoria, tokens oklch solo, transform/opacity, renderer-agnóstico, Z planificada, contraste progresivo AA→AAA) + camino a VR por hitos (F.0 → 3D.1 → J.3 → 3D.2 → WebXR).
 - **Enforcement en CI**: `pnpm test:visual` (`scripts/check-visual.mjs`) con baseline — hex hardcodeado y `position:absolute` en canvas NO pueden crecer (49 violaciones heredadas registradas; la deuda solo baja).
 - AGENTS.md / README maestro / MATRIZ alineados a SDD-013 §8 como fuente canónica visual.

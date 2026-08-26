@@ -83,6 +83,8 @@
 
 Para quien use APIs de cualquier empresa: **75+ proveedores sin escribir código**, copiando el sistema verificado de OpenCode.
 
+**Provider de pruebas GRATIS (regla del plan):** OpenRouter (`https://openrouter.ai/api/v1`) con modelo **`:free`** — p. ej. **ox-alpha free** de opencode, el mismo que OpenCode/Hermes Agent usan gratis — es el provider por defecto para TODOS los tests E2E/humanos con LLM real a **$0** desde C.1 en adelante ([setup en DEV-ENVIRONMENT](../../DEV-ENVIRONMENT.md)). Las APIs de pago solo entran cuando la fase exige capacidades específicas (visión/reasoner) y dentro del presupuesto $20/gate.
+
 - **Alcance por etapas (anti sobre-complicación)**: **v1 en Etapa 3** = a) registro declarativo + drivers genéricos `OpenAICompatProvider`/`AnthropicProvider` + catálogo models.dev con precios + blacklist/whitelist + picker con datos visibles (cubre DeepSeek/OpenRouter/Anthropic/Azure). **Post-base (C.7b)** = b) OAuth a suscripciones + d) `small_model` + lista verificada curada + actualización de catálogo sin tocar la app.
 
 **a) Registro declarativo + catálogo models.dev**

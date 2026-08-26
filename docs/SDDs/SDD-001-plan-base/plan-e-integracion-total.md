@@ -7,10 +7,11 @@
 
 ## Fases
 
-### E.1 — E2E punta a punta REAL (key DeepSeek de prueba)
+### E.1 — E2E punta a punta REAL
 Flujo completo como humano, un solo test largo:
 crear proyecto → pedir feature → ver streaming + archivos aparecer + preview vivo → dar feedback en diff → agente corrige → aprobar → **reiniciar app** → verificar memoria (Ledger + cita de decisión) → costo final visible
 
+- **Provider:** **OpenRouter `:free` (ox-alpha free) a $0** por defecto ([DEV-ENVIRONMENT](../../DEV-ENVIRONMENT.md)); DeepSeek real solo si el recorrido exige capacidades que el free no cubra (≤$20 gate)
 - **Pruebas:** Playwright browser-mode completo + video evidencia en `evidence/`
 
 ### E.2 — Chaos / robustez transversal

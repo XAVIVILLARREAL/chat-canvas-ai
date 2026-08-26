@@ -10,6 +10,7 @@
 - [ ] `node scripts/check-coverage.mjs` OK · `pnpm check:all` + `pnpm test` + `cargo test` verdes
 - [ ] Builds desktop (3 SO) + Android + server Linux desplegado (staging)
 - [ ] Datos reales de prueba cargados (proyecto demo + skills + historial importado)
+- [ ] **Provider LLM real a $0**: OpenRouter `:free` (ox-alpha free) configurado — los recorridos con LLM corren REALES sin costo ([DEV-ENVIRONMENT](./DEV-ENVIRONMENT.md))
 
 ## 1 · Walkthrough continuo (una sola sesión humana, en este orden)
 

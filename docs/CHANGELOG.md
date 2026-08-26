@@ -2,6 +2,12 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 31 — Provider de pruebas GRATIS: OpenRouter ox-alpha free $0)
+
+- **Regla free-first en pruebas**: los tests E2E/humanos con LLM REAL corren por defecto contra **OpenRouter `:free`** (p.ej. **ox-alpha free** de opencode — el mismo que OpenCode/Hermes Agent usan gratis) a **$0 ilimitado**; APIs de pago solo para capacidades específicas dentro del presupuesto $20/gate.
+- Actualizado: MATRIZ header (regla free-first), plan-c C.7 (provider free por defecto desde C.1), plan-e E.1 (E2E real $0), ACEPTACIÓN-FINAL §0 (DoR incluye provider free), DEV-ENVIRONMENT (setup 5 min + gotchas rate-limit + CI secret opcional).
+- **`.env.example`** nuevo: OPENROUTER_API_KEY · CANVAS_TEST_MODEL · VITE_API_BASE · DATABASE_URL/KEK_MASTER (nube).
+
 ## 2026-08-25 (sesion 30 — Calidad visual Liquid Glass → VR transversal)
 
 - **SDD-013 §8 — Escalera visual**: L1 Liquid Glass 2D (hoy, MVPs) → L2 Espacial con SpatialMeta (post-v1) → L3 gafas VR/AR. Reglas no negociables por componente (SpatialMeta en unidades-metro, tokens oklch solo, transform/opacity, renderer-agnóstico, Z planificada, contraste AA→AAA) + camino a VR por hitos (F.0 → 3D.1 → J.3 → 3D.2 → WebXR exploratorio).

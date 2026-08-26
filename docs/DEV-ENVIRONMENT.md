@@ -35,6 +35,29 @@ VITE_API_BASE=https://api.example.com pnpm dev:frontend
 - **Local-first:** SQLite local (Tauri) — sin infra.
 - **Nube (de pago):** `docker-compose.yml` con Postgres + gateway + workers Linux (plan-s). Postgres en Compose desde el día 1 para probar RLS real ([ARQUITECTURA](./ARQUITECTURA.md)).
 
+## Provider de pruebas GRATIS (OpenRouter — ox-alpha free)
+
+> Para hacer los tests **REALES** (no mocks) desde las primeras fases a **costo $0**: OpenRouter ofrece modelos gratuitos (sufijo `:free`), entre ellos **ox-alpha free** de opencode — el mismo que usan OpenCode y Hermes Agent gratis ([opencode.ai](https://opencode.ai)).
+
+### Setup (5 minutos)
+1. Cuenta gratis en [openrouter.ai](https://openrouter.ai) → **Keys** → crear key (empieza con `sk-or-`).
+2. Exportar la key:
+```bash
+export OPENROUTER_API_KEY=sk-or-v1-...
+```
+3. Registrar el provider en la app (BYOK, pantalla Providers):
+   - Provider: `openrouter` · Base URL: `https://openrouter.ai/api/v1`
+   - Modelo de pruebas: **`opencode/x-preview-f-free`** (ox-alpha, `:free`)
+4. Los tests E2E/humanos con LLM real corren contra este provider — **$0 ilimitado para desarrollo**.
+
+### En CI (opcional)
+- Guardar `OPENROUTER_API_KEY` como secret de GitHub → el job de humo puede correr 1 mensaje real por build sin costo.
+- Regla del plan: **free-first** — tests reales con el provider free; APIs de pago (DeepSeek etc.) solo cuando la fase exija capacidades específicas (visión, razón profunda) y dentro del presupuesto de $20/gate.
+
+### Gotchas
+- Los modelos `:free` tienen rate-limit por minuto — la suite humana ya simula pausas humanas, encaja natural.
+- Si un día el slug cambia, se actualiza SOLO el registro del provider (BYOK = cero código).
+
 ## Comandos útiles
 
 ```bash
