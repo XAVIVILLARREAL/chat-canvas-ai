@@ -45,9 +45,10 @@
 | Sync | L (multi-device) | Mismo estado en desktop+móvil |
 | GitHub | M | feature→commit→push→PR sin terminal |
 | Marketplace | O | Bundles firmados export/import 1-click |
+| **Targets de entrega** | **Etapa 10 (MP.1-MP.6)** | **Servidor Linux desplegado + Windows/macOS/Linux instalables + Android en tienda + iOS (gen/apple) + Web/PWA** ([PLATAFORMAS-TARGETS](./PLATAFORMAS-TARGETS.md)) |
 | Post-v1 (park) | CR completo, 3D/VR, voz K.1/K.2, dopamina U, Consejo VI | — (marcados en la MATRIZ) |
 
-**Gate MVP-3:** F12+F13+F14+F15+F16 (PRD §3). **Exit: v1.0 publicable (T.BIZ: legal + pricing flags).**
+**Gate MVP-3:** F12+F13+F14+F15+F16 (PRD §3) + **servidor Linux desplegado** + **instalables Windows/macOS/Linux/Android/iOS/web** ([PLATAFORMAS-TARGETS](./PLATAFORMAS-TARGETS.md)). **Exit: v1.0 publicable (T.BIZ: legal + pricing flags).**
 
 ---
 

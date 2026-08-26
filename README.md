@@ -47,6 +47,7 @@ Canvas AI es un entorno de trabajo donde humanos y agentes de IA colaboran en un
 | [`docs/PRICING-TIERS.md`](./docs/PRICING-TIERS.md) | Free/Pro/Teams |
 | [`docs/LAUNCH-CHECKLIST.md`](./docs/LAUNCH-CHECKLIST.md) | Lanzamiento profesional |
 | [`docs/DEV-ENVIRONMENT.md`](./docs/DEV-ENVIRONMENT.md) | Cómo correr el stack |
+| [`docs/PLATAFORMAS-TARGETS.md`](./docs/PLATAFORMAS-TARGETS.md) | Qué se instala dónde (servidor + 6 clientes) |
 | [`docs/INDEX.md`](./docs/INDEX.md) | Mapa completo de docs |
 | [`docs/SDDs/SDD-001-plan-base/README.md`](./docs/SDDs/SDD-001-plan-base/README.md) | Plan maestro |
 | [`docs/ARQUITECTURA.md`](./docs/ARQUITECTURA.md) | Arquitectura |

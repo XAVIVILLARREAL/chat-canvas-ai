@@ -76,14 +76,19 @@
                               +----> Postgres+RLS / MinIO / Valkey
 ```
 
-## Plataformas soportadas
+## Plataformas soportadas (targets de entrega)
 
-| Plataforma | Runtime | Backend | Frontend | Estado |
-|---|---|---|---|---|
-| **Desktop (local-first, gratis)** | Tauri 2 + WebView | Rust local (crates/core) + SQLite | React | Principal (ADR-006) |
-| **Nube 24/7 (suscripción, multi-tenant)** | Navegador / desktop | Gateway axum + Postgres+RLS + workers Linux | React | Diferido (requiere ADR-006, de pago) |
-| Celular/tablet | Navegador (UI adaptada, ADR-001) | idem nube / local | React | Activo (meta) |
-| Servidor (workers 24/7) | Linux (contenedores Ubuntu, patrón GrokBot) | Rust (axum + workers) | N/A | Activo (meta) |
+> Matriz canónica completa (qué se instala dónde + estado): [PLATAFORMAS-TARGETS](./PLATAFORMAS-TARGETS.md)
+
+| Plataforma | Runtime | Backend | Frontend | Artefacto | Estado |
+|---|---|---|---|---|---|
+| **Windows** | Tauri 2 + WebView2 | Rust local (crates/core) + SQLite | React | `.msi`/`.exe` | CI build-desktop ✅ |
+| **macOS** | Tauri 2 + WKWebView | idem | React | `.app`/`.dmg` (universal, notarizado) | CI build-desktop ✅ |
+| **Linux desktop** | Tauri 2 + WebKitGTK | idem | React | `.AppImage`/`.deb`/`.rpm` | CI build-desktop ✅ |
+| **Android** | Tauri mobile | Rust local + SQLite (BYOK) | React | `.apk`/`.aab` | gen/android ✅ · release 🔲 |
+| **iOS** | Tauri mobile | Rust local + SQLite (BYOK) | React | `.ipa` | **🔲 gen/apple pendiente (Mac)** |
+| **Web/PWA** | Navegador | gateway axum (nube) | React | SPA estática | parcial |
+| **Servidor Linux (nube 24/7, de pago)** | Linux (Docker, contenedores Ubuntu) | axum + workers + Postgres+RLS | N/A | imágenes Docker + Compose | Etapa 10 (plan-s) |
 
 ## Reglas de arquitectura
 

@@ -1,27 +1,27 @@
 name: release
 
-# Publica instaladores desktop en GitHub Releases al crear un tag v*
+# Publica instaladores en GitHub Releases al crear un tag v*
+# Targets: Linux (.AppImage/.deb/.rpm) · Windows (.msi/.exe) · macOS (.app/.dmg)
+# Android: ver android-build.yml (APK debug); release .aab a Play Store en MP.3
+# iOS: requiere Mac con certs Apple (MP.2) — se publica vía App Store Connect
 on:
   push:
     tags: ["v*"]
 
 jobs:
-  publish:
+  publish-linux:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
         with:
           version: 9
-
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "pnpm"
-
       - uses: dtolnay/rust-toolchain@stable
 
       - name: Instalar dependencias
@@ -29,12 +29,6 @@ jobs:
 
       - name: Typecheck + tests
         run: pnpm check:all && pnpm test
-
-      - name: Generar SBOM (cyclonedx)
-        run: |
-          # Cargo SBOM (si cargo-cyclonedx está disponible en CI) — ver plan-t T.SEC
-          cargo install cargo-cyclonedx --locked 2>/dev/null || echo "cargo-cyclonedx opcional"
-          # Documentar el tag en CHANGELOG (ya versionado por el autor)
 
       - name: Build Tauri (Linux)
         run: pnpm build
@@ -48,6 +42,53 @@ jobs:
             src-tauri/target/release/bundle/**/*.AppImage
           generate_release_notes: true
 
-  # Windows/macOS requieren runners propios; habilitar cuando existan credenciales de firma
-  # build-windows: runs-on: windows-latest ...
-  # build-macos: runs-on: macos-latest ...
+  publish-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+      - name: Build Tauri (Windows)
+        run: pnpm build
+      - name: Subir artefactos
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/nsis/*.exe
+          generate_release_notes: true
+
+  publish-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+      - name: Build Tauri (macOS universal)
+        run: pnpm tauri build --target universal-apple-darwin
+      - name: Subir artefactos
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+            src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app
+          generate_release_notes: true
+      # Notarización Apple: requiere AC_USERNAME/AC_PASSWORD + cert — habilitar en MP.2

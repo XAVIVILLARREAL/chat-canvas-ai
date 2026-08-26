@@ -51,7 +51,7 @@ WebSocket 10k conexiones: KBs por conexión (no MBs) — sobrado en un contenedo
 4. **Linux = degradación gráfica planificada**: WebKitGTK es el punto débil declarado (DMABUF freezes NVIDIA, animaciones pobres) → menos partículas, DPR cap 1.5, WEBKIT_DISABLE_DMABUF_RENDERER=1 documentado
 5. Auto-updater: firma minisignv2 OBLIGATORIA (perder la private key = imposible actualizar) · **no hay delta updates** → sidecars/modelos pesados NUNCA bundled: descarga lazy post-install a $APPDATA con reanudación propia
 6. Sidecar worker local (si aplica): spawn + health-check propio (NO hay lifecycle manager oficial, issue #3062); socket Unix para datos, invoke() solo control-plane
-7. Móvil fase 2: push vía plugin comunitario (no oficial, issue #11651); deep-link requiere single-instance PRIMERO + parseo argv (bug getCurrent null Win/Linux)
+7. **Móvil (iOS/Android) es parte de la familia local-first** — misma app Tauri, BYOK en el teléfono, sync solo para suscriptores ([PLATAFORMAS-TARGETS](../../PLATAFORMAS-TARGETS.md)). Push llega en fase 2 vía plugin comunitario (no oficial, issue #11651); deep-link requiere single-instance PRIMERO + parseo argv (bug getCurrent null Win/Linux). **iOS**: generar `src-tauri/gen/apple/` en un Mac (`tauri ios init`) — único entregable pendiente de generar; versionarlo.
 8. Preview iframe: WKWebView ITP rompe cookies cross-origin → contexto por postMessage, no cookies/localStorage
 
 <a id="s4"></a>

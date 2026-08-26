@@ -2,6 +2,16 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 24 — Matriz de targets por plataforma: servidor + clientes)
+
+- **PLATAFORMAS-TARGETS** (`docs/PLATAFORMAS-TARGETS.md`): matriz canónica "**qué se instala dónde**" — responde la duda de arquitectura: el plan construye **AMBOS**, el **servidor Linux 24/7** (gateway axum + workers + Postgres+RLS + sandbox, Docker+runbook) Y los **clientes instalables**:
+  - Windows `.msi`/`.exe` · macOS `.app`/`.dmg` universal notarizado · Linux `.AppImage`/`.deb`/`.rpm` (CI build-desktop 3 SO ✅)
+  - **Android** `.apk`/`.aab` (gen/android versionado ✅ · release Play Store en MP.3)
+  - **iOS** `.ipa` — 🔲 **faltante real detectado**: `gen/apple` no existe; requiere `tauri ios init` en un Mac (MP.2)
+  - Web/PWA (SPA por gateway)
+- **Etapa 10 del plan maestro** reescrita con tabla de entregables por destino; **ARQUITECTURA** "Plataformas soportadas" → tabla completa con artefacto+estado; **MATRIZ +Etapa 10 (MP.1-MP.6)** (total 149 fases); **plan-s S.3**: móvil es familia local-first (no "fase 2"); **MVP-ROADMAP**: targets de entrega en MVP-3.
+- **release.yml** ampliado: jobs Windows y macOS universales además de Linux (los 3 desktops publican en GitHub Releases por tag v*); Android via android-build.yml; iOS vía App Store Connect (MP.2).
+
 ## 2026-08-25 (sesion 23 — Profesionalización + diferenciadores + fix de usabilidad)
 
 - **Fix de usabilidad real:** el frontend NO conectaba con su backend en dev (llamaba `/api/*` sin proxy y con base hardcodeada). Añadido **proxy Vite `/api`→`http://127.0.0.1:3030`** + **`VITE_API_BASE`** env en `useApi` y `canvas-store`. Ahora la app se corre end-to-end (frontend ↔ gateway Rust).

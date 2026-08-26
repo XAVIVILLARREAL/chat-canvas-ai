@@ -237,8 +237,18 @@
 |---|---|---|
 | S.1 | Hosting por etapas con costos reales | E2E: despliegue Compose desde cero con IaC en VPS limpio ≤15 min |
 | S.2 | Stack servidor Rust eficiente | Integration: restore completo desde backup B2 en máquina limpia ≤30 min (drill trimestral automatizado). HUMANA: operador cambia preset KV/hardware en un click y ve el efecto en memoria real |
-| S.3 | Cliente Tauri eficiente (solo con demanda demostrada) | Cuando se construya: E2E HUMANA del shell — streaming sobrevive background (iOS), auto-update firmado verificado, degradación gráfica planificada (WebKitGTK) documentada |
+| S.3 | Cliente Tauri eficiente (**producto base, ADR-006**) | E2E HUMANA del shell — streaming sobrevive background (iOS), auto-update firmado verificado, degradación gráfica planificada (WebKitGTK) documentada |
 | S.4 | Presupuesto de costos proyectado | Unit: cálculo costos por scope ([C·C.2]) contra tabla de precios del registro ([C·C.7]) |
+
+## Etapa 10 · Multi-plataforma + Nube — `PLATAFORMAS-TARGETS.md` (clientes instalables + servidor Linux 24/7)
+| Fase | Nombre | Pruebas |
+|---|---|---|
+| MP.1 | Desktop Windows/macOS/Linux (CI) | CI `build-desktop` verde en 3 SO por push; `.msi`/`.dmg`/`.AppImage` generados en release |
+| MP.2 | **iOS**: generar `gen/apple` en un Mac | `tauri ios init` 1 vez → versionar `src-tauri/gen/apple/`; build en CI macOS; `.ipa` firmado (App Store) |
+| MP.3 | Android release | `android-build.yml` → APK debug ✅; release: `.aab` firmado + publicación Play Store; E2E móvil 375 |
+| MP.4 | Web/PWA | Build estático servido por gateway; accesible en navegador (misma SPA) |
+| MP.5 | Servidor Linux 24/7 (nube de pago) | Deploy Compose desde cero ≤15 min; workers Linux; Postgres+RLS; RTO ≤1h / RPO ≤15min (drill) ([S·S.1] y [THREAT-MODEL](../../THREAT-MODEL.md)) |
+| MP.6 | Sync multi-dispositivo (suscriptores) | Misma sesión desktop↔móvil converge; conflicto LWW resuelto ([L·L.1/L·L.2]) |
 
 ## Transversal T · Excelencia — `plan-t-excelencia.md` (T.SEC/T.QA desde Etapa 1)
 | Fase | Nombre | Pruebas |
@@ -262,4 +272,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 143 fases** — **Etapa 0 6** + **base 114** (A–P 92 incl. H.9a/H.9b, sin J.3/K.1/K.2 + V 5 + S/T/U 17) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8).
+**Total: 149 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 114** (A–P 92 incl. H.9a/H.9b, sin J.3/K.1/K.2 + V 5 + S/T/U 17) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8).

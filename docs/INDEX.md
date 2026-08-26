@@ -22,6 +22,7 @@
 | **PRICING-TIERS.md** | **Free/Pro/Teams (límites concretos)** | `./docs/PRICING-TIERS.md` |
 | **LAUNCH-CHECKLIST.md** | **Checklist de lanzamiento profesional** | `./docs/LAUNCH-CHECKLIST.md` |
 | **DEV-ENVIRONMENT.md** | **Cómo correr el stack hoy + objetivo** | `./docs/DEV-ENVIRONMENT.md` |
+| **PLATAFORMAS-TARGETS.md** | **Qué se instala dónde: servidor Linux + clientes Win/mac/Linux/Android/iOS/web** | `./docs/PLATAFORMAS-TARGETS.md` |
 | SECURITY.md | Política de seguridad | `./SECURITY.md` |
 | CONTRIBUTING.md | Guía de contribución | `./CONTRIBUTING.md` |
 

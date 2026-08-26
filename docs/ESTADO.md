@@ -38,6 +38,7 @@
 - **PRICING-TIERS** (`docs/PRICING-TIERS.md`) — Free local gratis / Pro $29 / Teams $99, BYOK en todos
 - **LAUNCH-CHECKLIST** (`docs/LAUNCH-CHECKLIST.md`) — distribución, feedback loop, legal, growth
 - **DEV-ENVIRONMENT** (`docs/DEV-ENVIRONMENT.md`) — 3 comandos para correr el stack
+- **PLATAFORMAS-TARGETS** (`docs/PLATAFORMAS-TARGETS.md`) — matriz canónica "qué se instala dónde": servidor Linux 24/7 + clientes Windows/macOS/Linux/Android/iOS/web. **Cierra la duda "¿el plan construye el servidor o los clientes?": construye AMBOS.** iOS es el único entregable pendiente de generar (`tauri ios init` en un Mac → `src-tauri/gen/apple/`); Etapa 10 y MATRIZ MP.1-MP.6 lo hacen explícito; release.yml ahora builda los 3 desktops.
 - **plan-i18n** (`docs/SDDs/SDD-001-plan-base/plan-i18n.md`) — multilenguaje simple desde el día 1 (es/en/pt/de/fr/it)
 - **Fix de usabilidad:** frontend ya conecta con el gateway (proxy Vite `/api`→:3030 + `VITE_API_BASE`) — antes el frontend no podía hablar con su backend en dev
 - **Repo profesionalizado:** SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, plantillas de issue/PR, release workflow, .editorconfig

@@ -388,14 +388,27 @@ interface SpatialMeta {
 ---
 
 ### Etapa 10: Multi-plataforma + Nube
-**Objetivo:** Desktop (Windows/Mac/Linux) gratis, y nube multi-tenant de pago para ejecución 24/7.
+**Objetivo:** clientes instalables en todas las plataformas (local-first gratis) + servidor Linux 24/7 (nube de pago). Matriz canónica de entregables: [PLATAFORMAS-TARGETS](../../PLATAFORMAS-TARGETS.md).
 
-- [ ] Tauri builds para las 3 plataformas desktop
-- [ ] Build web (WASM) para acceso via navegador (misma SPA, modo ligero)
+| Destino | Entregable | Estado en la etapa |
+|---|---|---|
+| **Servidor Linux (nube 24/7)** | Gateway axum + workers + Postgres+RLS + sandbox; Docker Compose + runbook; RTO ≤1h / RPO ≤15min | Etapa 10 (plan-s) |
+| **Windows** | `.msi` / `.exe` (NSIS), auto-update firmado | Tauri (CI build-desktop) |
+| **macOS** | `.app` / `.dmg` universal notarizado | Tauri (CI build-desktop) |
+| **Linux desktop** | `.AppImage` / `.deb` / `.rpm` | Tauri (CI build-desktop) |
+| **Android** | `.apk` / `.aab` (Play Store) — gen/android versionado | Tauri mobile |
+| **iOS** | `.ipa` (App Store) — **generar `gen/apple` en un Mac** | Tauri mobile |
+| **Web / PWA** | SPA servida por el gateway (acceso ligero) | gateway axum |
+
+- [ ] Tauri builds para las 3 plataformas desktop (CI 3 SO)
+- [ ] **iOS**: `tauri ios init` en un Mac + versionar `src-tauri/gen/apple/` + build+CI
+- [ ] **Android**: release `.aab` a Play Store (hoy APK debug)
+- [ ] Build web (WASM/PWA) para acceso via navegador (misma SPA, modo ligero)
 - [ ] API REST completa para clientes externos
 - [ ] **Modo nube (suscripción, ADR-006)**: gateway axum → Postgres+RLS → workers Linux 24/7; los agentes corren aunque cierres la app; **BYOK** (la key del usuario, cifrada por tenant)
 - [ ] **Sandbox Linux** en el worker (contenedores Ubuntu provisionados, patrón GrokBot)
 - [ ] **Sync multi-dispositivo** (sesiones/canvas/skills) para suscriptores
+- [ ] **Auto-update firmado** en los 3 desktops (minisignv2, S.3); móvil vía tiendas
 - [ ] Preparación VR (coordenadas 3D, rendering por capas) — post-v1
 
 **Dependencias:** Etapas 1-8 completas; nube requiere Etapa 0 (RLS/migraciones) + ADR-006
