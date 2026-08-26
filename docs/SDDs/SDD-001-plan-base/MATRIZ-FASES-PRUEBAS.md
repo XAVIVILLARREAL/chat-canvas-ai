@@ -182,7 +182,7 @@
 |---|---|---|
 | O.1 | Bundles `.canvas-ai-bundle` | Cargo test roundtrip export→import idempotente; firma verificada; import malicioso rechazado (validación manifest) |
 | O.2 | MCP público del cerebro | Integration real: Claude Code conectado al MCP responde preguntas del workspace usando nuestro grafo. Snapshot tests de tools |
-| O.3 | Release v1.0 | Checklist DoD gigante: todas las suites humanas históricas re-corridas en las 3 vistas; builds CI verdes; demo documental final |
+| O.3 | Release v1.0 | Checklist DoD gigante: **[ACEPTACIÓN FINAL](../../ACEPTACION-FINAL.md) 20/20 recorridos humanos verdes** (móvil+desktop, video); todas las suites humanas históricas re-corridas; builds CI verdes; demo documental final |
 | O.4 | Compartir entrega pública (link read-only) ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F20) | E2E HUMANA: genero link con expiración → se abre SIN cuenta → contenido correcto; revoco → 404; local exporta HTML estático |
 
 ## INTERMEDIO (INTERCALADO v3.8 — cada ventana tras su fase base habilitadora; NO después de la base) — `../SDD-005-plan-intermedio.md`

@@ -202,6 +202,7 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 
 ### Etapa 0: Fundación — schema maestro + eventos + secretos
 **Objetivo:** Base de datos y contratos desde el día 1 (antes de cualquier UI). Sin esto, todo lo demás exige retrofit.
+**Fases MATRIZ:** 0.1–0.6 · Gate **0 (Milestone M0)** · [ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENTACION.md) (slices accionables)
 
 - [ ] **Schema maestro** — modelo canónico (sesiones, mensajes, skills, canvases, event_stream, ledger) con migraciones versionadas; `tenant_id`/`project_id` en toda tabla
 - [ ] **Contrato del `event_stream`** — taxonomía de rungs (PROMPT, PHASE, DIFF, TEST_RESULT, DECISION, ESCALATION) append-only; todos los componentes emiten eventos desde v0
@@ -217,6 +218,7 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 
 ### Etapa 1: Control Room Canvas *(se construye al final — post-v1, Q6)*
 **Objetivo:** Canvas visual infinito donde ves TODAS las sesiones de agentes como nodos vivos — con estado en tiempo real, conexiones, métricas y acciones rápidas.
+**Fases MATRIZ:** CR.1–CR.5 (post-v1) · Gate **CR** · consume K.1/K.2 (voz) y todo lo anterior
 
 **CR.1 — Canvas de sesiones:**
 - [ ] Canvas ReactFlow con pan/zoom infinito
@@ -271,12 +273,18 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] Reanudación de sesiones (cargar historial completo)
 - [ ] Widget de costo por sesión (tokens, USD, cache hits)
 
-**Dependencias:** Etapa 1 (canvas para mostrar sesiones)
+**Fases MATRIZ:** A.0–A.10 · Gate **A** · [plan-a](./plan-a-chat-codex.md)
+**Cierre:** DoD + filas COVERAGE-GUI (appshell/chat/config/providers/backup/i18n) en ✅.
+**Gate A:** abro la app → creo proyecto y sesión → escribo prompt → streaming aparece → slash commands funcionan → medidor refleja el request real → cierro y reabro → todo persiste → costo visible por mensaje y sesión → importo historial ChatGPT → backup export/import sin pérdida → papelera restaura. Suite humana verde (móvil+desktop).
+
+**Dependencias:** Etapa 0 (persistencia/secretos). En ejecución va ANTES que Etapa 1 (orden chat-first).
 
 ---
 
 ### Etapa 3: Runtime de agentes (Plan C revisado)
 **Objetivo:** Conectar con agentes reales con **BYOK (trae tu API key)**, como Hermes Agent.
+**Fases MATRIZ:** C.0–C.9 + H.9a · Gate **C** · [plan-c](./plan-c-reasonix-deepseek.md)
+**Cierre:** DoD + filas COVERAGE-GUI (providers/vision/webtools) en ✅ + chaos de proveedores.
 
 - [ ] **Registro universal de proveedores (BYOK)** — cualquier API compatible (OpenAI, Anthropic, OpenRouter, DeepSeek…) se conecta pegando key/URL; selector muestra precio y contexto
 - [ ] ReasonixProvider: spawn serve, health check, SSE streaming, stop graceful
@@ -291,11 +299,14 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] **Sandbox Linux**: skills/agentes que ejecutan código corren en contenedor Ubuntu (patrón GrokBot) — red denegada por defecto
 
 **Dependencias:** Etapa 2 (chat funcional), Etapa 0 (secretos BYOK)
+**Gate C:** pego mi key BYOK en <2 min → mensaje real con streaming → badge de costo sube → mato el provider → circuit breaker hace fallback sin perder la sesión → Ollama offline responde → comparador A/B elijo ganadora → "investiga X" cita fuentes con links → screenshot con bug lo corrige en código. Suite humana verde.
 
 ---
 
 ### Etapa 4: Memoria y conocimiento (Plan D revisado)
 **Objetivo:** El agente recuerda entre sesiones. Knowledge base del proyecto.
+**Fases MATRIZ:** D.1–D.8 · Gate **D** · [plan-d](./plan-d-memoria-v3code.md)
+**Cierre:** DoD + filas COVERAGE-GUI (memoria) en ✅.
 
 - [ ] Decision Ledger: tabla append-only con eventos de sesión
 - [ ] Workspace Knowledge: ADRs, convenciones, hechos del proyecto (FTS5)
@@ -306,11 +317,14 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] Índice semántico dual (símbolos + significado)
 
 **Dependencias:** Etapa 3 (runtime funcionando)
+**Gate D:** en sesión nueva pregunto "¿cómo manejamos auth?" → la decisión guardada aparece citada; edito una línea a mano → candado y el agente no la sobreescribe; scrubber rebobina a un turno anterior; blame-rung explica por qué existe una línea; leakage test entre proyectos pasa. Suite humana verde.
 
 ---
 
 ### Etapa 5: Panel de Skills (Plan G revisado)
 **Objetivo:** Crear, probar y usar skills visualmente. **Un skill es un documento `.md`** (receta) con personalidad, nombre y cara animada.
+**Fases MATRIZ:** G.1–G.7 + G.1b · Gate **E/G** · [plan-g](./plan-g-skills-lab.md) + [CONTRATO-SKILL](../../CONTRATO-SKILL.md)
+**Cierre:** DoD + filas COVERAGE-GUI (skills/perfiles) en ✅.
 
 - [ ] **Modelo de skill = `.md` canónico** — frontmatter (nombre, rol, tools permitidos, presupuesto) + instrucciones; el editor visual compila a `.md`, sin YAML manual
 - [ ] CRUD de skills (tabla SQLite, store Zustand, React Query)
@@ -327,11 +341,13 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] Rutinas por demostración ("follow along" — grabar y re-ejecutar)
 
 **Dependencias:** Etapa 3 (runtime), Etapa 4 (memoria para knowledge), Etapa 0 (contrato de skill)
+**Gate E:** creo un skill desde cero **solo con clicks y tecleo** → nace con avatar/emoji/bio → lo pruebo en el laboratorio con costo visible → tool-gating bloquea escritura al QA → grabo una rutina y se re-ejecuta → perfiles BYOK conmutan por proyecto. Suite humana verde.
 
 ---
 
 ### Etapa 5.5: Segundo Cerebro — Grafo de archivos (Plan VI)
 **Objetivo:** Vista estilo Obsidian en el sidepanel — el "segundo cerebro" donde navegas, editas y planeas con IA los archivos del proyecto.
+**Fases MATRIZ:** VI.1–VI.8 (intermedio) · Gate **VI** · [plan-vi](./plan-vi-second-brain.md)
 
 - [ ] Modelo de documentos: tabla `documents` (path, title, summary, tags, embeddings SQLiteVec)
 - [ ] Watcher de archivos: detecta .md nuevos/cambiados del workspace
@@ -369,12 +385,16 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] **KR.5 — Filtros y salud del board**: filtrar por agente/etapa/estado, indicador de estancamiento, cuarentena de tests flaky
 
 **Dependencias:** Etapa 1 (canvas base), Etapa 3 (runtime para ejecutar), Etapa 7 (motor de pruebas para evidencia)
+**Fases MATRIZ:** F.0–F.7 + KR.1–KR.5 · Gate **F/KR** · [plan-f](./plan-f-canva-oficina.md)
+**Cierre:** DoD + filas COVERAGE-GUI (oficina/kanban/automatización) en ✅ + perf 60fps (F.6).
 **Gate kanban:** activo "trabaja 4 horas" con 15 tareas → me alejo → vuelvo: tablero muestra bloques verdes animados, 12 entregadas, 2 en revisión, 1 bloqueada. Abro evidencia y todo está ahí. Suite humana verde.
 
 ---
 
 ### Etapa 7: Motor de pruebas (Plan H revisado)
 **Objetivo:** Agentes trabajan por resultados verificables.
+**Fases MATRIZ:** H.1–H.9b · Gate **H** · [plan-h](./plan-h-motor-pruebas.md)
+**Cierre:** DoD + filas COVERAGE-GUI (pruebas) en ✅ + chaos del sandbox.
 
 - [ ] Tareas con criterios de aceptación estructurados
 - [ ] TestRunner **sandbox Linux** (contenedor Ubuntu, ejecución aislada, allowlist, timeout) — patrón GrokBot
@@ -384,11 +404,14 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] Escalado inteligente (fallo → reintento → escala a modelo mejor)
 
 **Dependencias:** Etapa 3 (runtime), Etapa 5 (skills definen el cómo)
+**Gate H:** doy criterios de aceptación → agente implementa en shadow workspace (pre-valida silencioso) → tests corren en sandbox Linux → verde animado en canvas → doble fallo escala a modelo mejor automáticamente → apruebo la entrega con evidencia completa. Suite humana verde.
 
 ---
 
 ### Etapa 8: Editor de código integrado (Plan B revisado)
 **Objetivo:** Editor completo dentro de la app, sin necesidad de VS Code.
+**Fases MATRIZ:** B.1–B.9 · Gate **B** · [plan-b](./plan-b-sidepanels-lovable.md)
+**Cierre:** DoD + filas COVERAGE-GUI (editor) en ✅.
 
 - [ ] Monaco Editor o CodeMirror 6 embebido
 - [ ] Syntax highlight multi-lenguaje
@@ -400,11 +423,14 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] Integración con el chat (selección de código → preguntar al agente)
 
 **Dependencias:** Etapa 2 (chat), Etapa 4 (workspace knowledge)
+**Gate B:** el agente crea un archivo → aparece en el árbol → lo abro, edito y persiste → live preview actualizado <2s → fast apply fluido en archivo grande → la consola envía un error al agente → corrige y el error desaparece → versiones de artefactos navegables. Suite humana verde.
 
 ---
 
 ### Etapa 9: Marketplace de Skills
 **Objetivo:** Compartir y descubrir skills de la comunidad.
+**Fases MATRIZ:** O.1–O.4 · Gate **O** · [plan-o](./plan-o-marketplace-v1.md)
+**Cierre:** DoD + filas COVERAGE-GUI (marketplace/share) en ✅.
 
 - [ ] Publicación de skills (manifest + código)
 - [ ] Búsqueda y descarga
@@ -413,11 +439,14 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] Trial/preview antes de instalar
 
 **Dependencias:** Etapa 5 (skills funcionando)
+**Gate O:** exporto un skill a bundle firmado → lo importo en otra instalación → corre 1-click; genero link público read-only de una entrega → se abre SIN cuenta con expiración → revoco → 404. Suite humana verde.
 
 ---
 
 ### Etapa 10: Multi-plataforma + Nube
 **Objetivo:** clientes instalables en todas las plataformas (local-first gratis) + servidor Linux 24/7 (nube de pago). Matriz canónica de entregables: [PLATAFORMAS-TARGETS](../../PLATAFORMAS-TARGETS.md).
+**Fases MATRIZ:** MP.1–MP.6 + N.5b/N.7–N.9 + S.1–S.5 · Gate **Nube/MVP-3** · [plan-s](./plan-s-despliegue-costos.md) + [AUTH](../../AUTH.md) + [SLO-RELIABILITY](../../SLO-RELIABILITY.md)
+**Cierre:** DoD + filas COVERAGE-GUI (nube/sync/supervisor/dashboard) en ✅ + [LAUNCH-CHECKLIST](../../LAUNCH-CHECKLIST.md) + ACEPTACIÓN FINAL ([ACEPTACION-FINAL](../../ACEPTACION-FINAL.md)).
 
 | Destino | Entregable | Estado en la etapa |
 |---|---|---|
@@ -441,6 +470,7 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] Preparación VR (coordenadas 3D, rendering por capas) — post-v1
 
 **Dependencias:** Etapas 1-8 completas; nube requiere Etapa 0 (RLS/migraciones) + ADR-006
+**Gate Nube/MVP-3:** despliego el server en un Linux limpio ≤15 min → cierro mi laptop → reabro en otro dispositivo → los agentes trabajaron 24/7 con evidencia nueva → sync converge entre desktop y móvil → hablo al **Supervisor** por Telegram: "¿en qué anda la sesión auth?" responde estado real, "pausa la de scraping" pide confirmación numerada y pausa. Instaladores Win/mac/Linux generados por el tag + Android .aab + iOS .ipa. Suite humana verde en todos los targets.
 
 ---
 

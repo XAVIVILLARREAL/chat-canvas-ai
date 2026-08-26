@@ -6,9 +6,10 @@
 ## 1 · Producto (cerrado en MVP-3)
 
 - [ ] Gates humanos de los 3 MVPs verdes con video en `evidence/`
-- [ ] [PRD](./PRD.md) F1-F16 operadas como humano en los 3 tamaños (375/768/1440)
+- [ ] **[ACEPTACIÓN FINAL](./ACEPTACION-FINAL.md) completa**: 20/20 recorridos humanos verdes (móvil+desktop) con video — TODAS las features operadas como persona antes del tag
+- [ ] [PRD](./PRD.md) F1-F28 operadas como humano en los 3 tamaños (375/768/1440)
 - [ ] **Métrica norte instrumentada** ("sesiones que terminan en ENTREGA") y activación visible
-- [ ] Onboarding < 5 min cronometrado ([T.ONB](./SDDs/SDD-001-plan-base/plan-t-excelencia.md))
+- [ ] Onboarding <5 min cronometrado ([T.ONB](./SDDs/SDD-001-plan-base/plan-t-excelencia.md))
 - [ ] Empty-states y ayuda en las 4 vistas · error boundaries sin pantallas muertas
 
 ## 2 · Distribución y actualizaciones
