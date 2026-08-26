@@ -90,7 +90,11 @@
 | Desktop | Quick capture global (hotkey SO) | hotkey → mini-ventana → tarea → notificación done | `quickcapture.spec.ts` | ⬜ |
 | Papelera | Ver borrados + restaurar | eliminar sesión → papelera → restaurar intacta | `papelera.spec.ts` | ⬜ |
 | Providers | Perfiles BYOK (trabajo/personal) | cambiar perfil → providers conmutan por proyecto | `providers.spec.ts` | ⬜ |
-| Tools web | web_search/web_fetch del agente | "investiga X" → cita fuentes con links; dominio bloqueado → accionable | `webtools.spec.ts` | ⬜ |
+| Rutinas | Rutinas programadas visibles | "cada lunes 9am ejecuta X" visible/gestionable + historial de corridas | `rutinas.spec.ts` | ⬜ |
+| Chat | Cola de mensajes durante streaming | escribo 2 mientras responde → cola editable/reordenable → auto-envío FIFO; pausa y reanudo | `cola.spec.ts` | ⬜ |
+| Chat | Presencia e indicadores en vivo | typing/working del agente <1s tras evento; presencia de humanos en sesión | `presencia.spec.ts` | ⬜ |
+| Chat | Reacciones 👍/❌ en mensajes | reaccionar → rung en event_stream → dashboard refleja feedback | `reacciones.spec.ts` | ⬜ |
+| Config | Hooks de ciclo de vida | configuro PreToolUse bloqueo + PostToolUse format en 1 pantalla; se ejecutan solos | `hooks.spec.ts` | ⬜ |
 | Browser tool | Navegación del agente (sandbox) | "entra al staging y dime qué está roto" → navega/click/captura y reporta | `browsertool.spec.ts` | ⬜ |
 | Editor | Diagnósticos LSP al agente | error de tipos real llega solo al agente → corrige → desaparece | `lsp.spec.ts` | ⬜ |
 | Skills | Import de rules files (.cursorrules/CLAUDE.md) | pego CLAUDE.md real → skill nativo funciona; inválido → accionable | `import-rules.spec.ts` | ⬜ |

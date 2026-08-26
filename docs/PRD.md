@@ -91,6 +91,10 @@
 | F26 | Papelera + restaurar | Elimino sesión → papelera → restauro intacta | A.2b |
 | F27 | Perfiles BYOK (trabajo/personal) | Cambio perfil → providers y keys conmutan por proyecto | G.1b |
 | F28 | Export sesión a PDF/Markdown | Exporto sesión → reporte compartible con rungs + resultado | A.6b |
+| F37 | Cola de mensajes durante streaming | Escribo 2 mensajes mientras responde → cola editable → auto-envío FIFO al quedar libre | A.4b |
+| F38 | Hooks de ciclo de vida (PreToolUse/PostToolUse/Stop) | Configuro hook que bloquea `rm -rf` → el agente lo intenta → bloqueado ANTES de ejecutar | C.11 |
+| F39 | Presencia e indicadores en vivo | Agente trabajando → typing/working visible <1s; veo qué humanos están en la sesión | A.12 |
+| F40 | Reacciones 👍/❌ en mensajes | Reacciono a una respuesta → rung en event_stream → dashboard refleja el feedback | A.12 |
 
 ## 7 · Riesgos de producto (top 5)
 

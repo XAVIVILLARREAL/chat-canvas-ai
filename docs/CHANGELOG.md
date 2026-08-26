@@ -2,6 +2,17 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 33 — Ronda 2 de mercado: Buzz local + Claude Code hooks + cola de mensajes)
+
+- **Repos locales analizados**: `/workspace/buzz` (workspace humano+agente sobre relay Nostr, Block) y `/workspace/grok` (= pesos Grok-1, modelo — no agente).
+- **Nuevas funciones (F37-F40)**:
+  - **F37 Cola de mensajes durante streaming** → A.4b (ya shippeada por Augment/Dyad/Onyx; issue abierto en VS Code)
+  - **F38 Hooks de ciclo de vida** (PreToolUse bloquea `rm -rf` ANTES de ejecutar, PostToolUse format, Stop gatea tests — patrón Claude Code "enforcement sin alucinación") → C.11
+  - **F39 Presencia e indicadores en vivo** (typing/working, presencia en sala — patrón Buzz Redis presence) → A.12
+  - **F40 Reacciones 👍/❌ como rungs del event_stream** (patrón Buzz reacciones-firmadas) → A.12
+- Validaciones: memorias por agente, auto-resumen, process-group kill (Buzz) ya cubiertos en D.8/A.8/H.9a.
+- MATRIZ → **168 fases** · COVERAGE-GUI → **79 elementos**.
+
 ## 2026-08-25 (sesion 32 — Investigación de mercado: F33-F36 + validación del plan)
 
 - **MERCADO-ANALISIS** (`docs/MERCADO-ANALISIS.md`): investigación 2026 (Cursor/Windsurf/Cline/Roo/Devin/Copilot/OpenCode) — tabla de table-stakes vs nuestro estado:

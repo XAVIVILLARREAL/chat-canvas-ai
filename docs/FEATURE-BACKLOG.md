@@ -29,6 +29,16 @@
 | F34 | **LSP integration** al contexto | Diagnósticos reales del lenguaje (tsc/rustc vía LSP) llegan solos al agente | OpenCode lo hace automático; errores reales > adivinación | Evidence-first | **B.10** |
 | F35 | **Importar rules files** (.cursorrules/.clinerules/CLAUDE.md → skill) | Migración sin fricción: los usuarios ya tienen sus reglas escritas | Hook de adquisición como F25 | Skills-personaje | **G.3b** |
 | F36 | **Slack** en puentes de mensajería | Task intake desde donde trabaja el equipo (Devin lo cobra en su $500/mo) | Amplía el alcance Pro | Humano en el centro | **N.8** (canal +) |
+| F37 | **Cola de mensajes durante streaming** | Escribes mientras el agente trabaja → cola editable/reordenable/pausable → auto-envío al quedar libre | Ya la shippearon Augment, Dyad y Onyx — los usuarios la esperan | Humano en el centro | **A.4b** |
+| F38 | **Hooks de ciclo de vida** del usuario | Scripts deterministas en puntos clave: `PreToolUse` bloquea comandos peligrosos, `PostToolUse` formatea/lint, `Stop` no libera hasta que pasen los tests | Patrón Claude Code: "enforcement sin alucinación" — el hook corre aunque el modelo decida otra cosa | Humano en el centro + seguridad | **C.11** |
+| F39 | **Presencia e indicadores en vivo** | Typing/working del agente en tiempo real, presencia de quién está en cada sesión (patrón Buzz: Redis presence) | La sala se siente viva; sabes si el agente te escuchó | Equipo humano+IA | **A.12** |
+| F40 | **Reacciones rápidas en mensajes** | 👍/❌ sobre respuestas del agente → rung en el event_stream (feedback que alimenta ranking y north-star) | Patrón Buzz: reacciones como eventos firmados del mismo log | Evidence-first | **A.12** |
+
+### Ronda 2 — hallazgos de repos locales (Buzz) y Claude Code
+
+- **Buzz** (`/workspace/buzz`, Apache-2.0 de Block): workspace humano+agente sobre relay Nostr con event-log firmado único (mensajes, aprobaciones, git, workflows = un solo log). Validó nuestras decisiones: ledger append-only único, auditoría total, agentes con identidad propia. Extraído: **memorias por agente** (ya cubierto en D.8), **jobs** (cubierto G.6/N.7), **auto-resumen de sesión** (cubierto A.8), presencia+reacciones (**F39/F40 nuevas**).
+- **Claude Code**: hooks deterministas de ciclo de vida (**F38 nueva**), subagentes con contexto propio (✅ N.3), skills con frontmatter (✅ nuestro CONTRATO-SKILL es compatible mentalmente), plugins como bundles (✅ O.1).
+- **Grok** (`/workspace/grok`) = pesos de Grok-1 (modelo xAI), no el agente — nada extraíble para funciones.
 
 ### Detalle de implementación (resumen)
 
@@ -75,7 +85,7 @@
 
 ## 6 · Impacto en el plan
 
-- **MATRIZ:** +12 fases (A.10, C.8, C.9, N.8, O.4 + A.0b, A.2b, A.7b, A.11, G.1b, N.5b, S.5) → total **161 fases** — **las 12 funciones tienen fila con sus pruebas** (regla: fase sin fila NO se construye).
-- **COVERAGE-GUI:** +12 filas (una por función con UI) → 64 elementos.
-- **PRD:** funciones F17-F28 añadidas a la tabla de features por MVP.
+- **MATRIZ:** +12 fases (A.10, C.8, C.9, C.10, C.11, B.10, G.3b, A.0b, A.2b, A.7b, A.11, G.1b, N.5b, S.5, A.4b, A.12) → total **168 fases** — **todas las funciones tienen fila con sus pruebas** (regla: fase sin fila NO se construye).
+- **COVERAGE-GUI:** filas para cada función con UI → 79 elementos.
+- **PRD:** funciones F17-F40 añadidas a las tablas de features.
 - **Loop:** cada función se implementa con el [WORKFLOW-AGENTICO](./WORKFLOW-AGENTICO.md) (ANALYZE 5 sub-agentes → TDD humano → debug en vivo → iterar) y su "done" = resultado funcional en video.

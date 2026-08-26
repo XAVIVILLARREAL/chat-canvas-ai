@@ -25,6 +25,8 @@
 | A.2 | Persistencia SQLite (settings CIFRADA) | Cargo test repositorios. Integration: roundtrip mensaje con project_id |
 | A.3 | Trait AgentProvider + DeepSeekDirect | Unit con mock-server SSE. Integration: orden de chunks |
 | A.4 | UX Codex (2 perillas, tool-calls, diff, slash) | E2E browser-mode con provider MOCK scriptado: prompt→streaming→tool-call→aprobar→diff visible→/fork duplica sesión. HUMANA (Gate A): cambiar perilla cambia comportamiento observado |
+| A.4b | Cola de mensajes durante streaming (F37) | E2E HUMANA: escribo 2 mensajes mientras el agente responde → cola visible/editable/reordenable → auto-envío FIFO al quedar libre; pausa de cola funciona; error en envío → cola se pausa para revisión |
+| A.12 | Presencia e indicadores en vivo + reacciones (F39/F40) | E2E: agente trabajando → indicador typing/working <1s tras evento; reacción 👍/❌ sobre mensaje → rung en event_stream; 2 humanos en la sesión → presencia de ambos visible |
 | A.5 | Medidor y debug de contexto (torneo) | Unit: desglose de tokens por fuente con fixtures. Integration: request capturado = lo que muestra el medidor. E2E HUMANA: abrir medidor en sesión real; ajustar límite → siguiente request lo refleja |
 | A.6 | Centro de Configuración (2 públicos, 5 scopes) | Unit store settings + herencia global/proyecto. E2E HUMANA: no-programador cambia ajuste con clicks; programador edita JSON validado; override por proyecto visible |
 | A.7 | Modo ENCARGO (v1: tarea mínima; H.1 formaliza) | E2E HUMANA: crear encargo sin escribir prompt; agente mock lo completa; notificación de vuelta con evidencia |
@@ -72,6 +74,7 @@
 | C.8 | Tools web nativas: web_search + web_fetch ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F17) | Unit: parser + caché LRU + allowlist enforcement. Integration: fetch a fixture local; chaos: dominio bloqueado → error accionable. E2E HUMANA: "investiga X" → respuesta cita 2+ fuentes con links |
 | C.9 | Visión multimodal: imágenes/PDF ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F18) | Integration real: screenshot con bug plantado → agente lo corrige en código; PDF → extracción correcta; fallback claro si el provider no soporta visión |
 | C.10 | **Browser automation del agente** ([MERCADO-ANALISIS](../../MERCADO-ANALISIS.md) F33) | Integration: agente navega fixture local, click, screenshot → describe lo que ve; sandbox: red SOLO a dominios allowlisted; chaos: sitio caído → error accionable. E2E HUMANA: "entra al staging y dime qué está roto" → reporta con captura |
+| C.11 | **Hooks de ciclo de vida del usuario** (F38, patrón Claude Code): PreToolUse/PostToolUse/Stop | Cargo test: PreToolUse bloquea comando `rm -rf` (exit non-zero → bloqueado ANTES de ejecutar); PostToolUse formatea archivo editado; Stop no libera hasta tests verdes; hook malicioso → aislado en sandbox, sin credenciales. E2E HUMANA: configuro hook format-on-save en 1 pantalla |
 
 ## Etapa 4 · Memoria V3Code — `plan-d-memoria-v3code.md`
 | Fase | Nombre | Pruebas |
@@ -290,4 +293,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 165 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 130** (A–P 107 incl. H.9a/H.9b, A.10/C.8/C.9/C.10/B.10/G.3b/A.0b/A.2b/A.7b/A.11/G.1b/N.5b/N.8/N.9/O.4, sin J.3/K.1/K.2 + V 5 + S/T/U 18 incl. S.5) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8), tab-FIM ([MERCADO-ANALISIS](../../MERCADO-ANALISIS.md)).
+**Total: 168 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 133** (A–P 110 incl. H.9a/H.9b, A.4b/A.12/A.10/C.8/C.9/C.10/C.11/B.10/G.3b/A.0b/A.2b/A.7b/A.11/G.1b/N.5b/N.8/N.9/O.4, sin J.3/K.1/K.2 + V 5 + S/T/U 18 incl. S.5) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8), tab-FIM ([MERCADO-ANALISIS](../../MERCADO-ANALISIS.md)).
