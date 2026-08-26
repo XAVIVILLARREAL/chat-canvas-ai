@@ -1,0 +1,43 @@
+name: Bug report
+description: Algo no funciona como debería
+title: "[bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Gracias por reportar. Llena lo mínimo para reproducir — la suite humana Playwright necesita pasos exactos."
+  - type: textarea
+    id: repro
+    attributes:
+      label: Pasos para reproducir
+      description: "Clicks + teclado exactos (mejor si es en móvil 375 y desktop 1440)."
+      placeholder: "1. Abro app\n2. Creo sesión\n3. Escribo X\n4. Esperado: … / Real: …"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versión / build
+      description: "Tag, commit o `vX.Y.Z`"
+      placeholder: "v0.1.0 (commit abc123)"
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Plataforma
+      options: [Linux, macOS, Windows, Web, Nube]
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Modo
+      options: [Local (BYOK), Nube (suscripción)]
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Logs / diagnóstico
+      description: "¿Ves errores en consola? ¿Es reproducible con /compact? Adjunta el diagnóstico exportable (sin secrets)."

@@ -28,12 +28,20 @@
 
 - **PRD** (`docs/PRD.md`) — personas + JTBD + features→resultado medible Playwright humano
 - **PRODUCT-METRICS** (`docs/PRODUCT-METRICS.md`) — north-star "sesiones que terminan en ENTREGA", activación, retención, eventos, telemetría opt-in
+- **PRODUCT-DIFFERENTIATORS** (`docs/PRODUCT-DIFFERENTIATORS.md`) — los 7 diferenciadores que hacen el producto "increíble"
 - **MVP-ROADMAP** (`docs/MVP-ROADMAP.md`) — MVP-1 (base) / MVP-2 (memoria+skills+resultados) / MVP-3 (automatización+nube+mercado)
 - **SCHEMA-MAESTRO** (`docs/SCHEMA-MAESTRO.md`) — Etapa 0 concreta (sessions/messages/event_stream/skills/providers/settings + DDL)
 - **CONTRATO-SKILL** (`docs/CONTRATO-SKILL.md`) — frontmatter `.md` exacto + ejemplo + roles
 - **THREAT-MODEL** (`docs/THREAT-MODEL.md`) — amenazas por capa + frontera sandbox + flujo BYOK
+- **SLO-RELIABILITY** (`docs/SLO-RELIABILITY.md`) — TTFT <1s, uptime 99.9%, RTO ≤1h / RPO ≤15min, error budget
+- **PERFORMANCE-BUDGETS** (`docs/PERFORMANCE-BUDGETS.md`) — arranque <2s, bundle <250KB, 60fps, streaming
+- **PRICING-TIERS** (`docs/PRICING-TIERS.md`) — Free local gratis / Pro $29 / Teams $99, BYOK en todos
+- **LAUNCH-CHECKLIST** (`docs/LAUNCH-CHECKLIST.md`) — distribución, feedback loop, legal, growth
+- **DEV-ENVIRONMENT** (`docs/DEV-ENVIRONMENT.md`) — 3 comandos para correr el stack
 - **plan-i18n** (`docs/SDDs/SDD-001-plan-base/plan-i18n.md`) — multilenguaje simple desde el día 1 (es/en/pt/de/fr/it)
-- Plan A realineado a A.0-A.9 (BYOK, projects como scope) · Plan S realineado a ADR-006 (Tauri = producto base) · Circuit breaker + backup integral añadidos
+- **Fix de usabilidad:** frontend ya conecta con el gateway (proxy Vite `/api`→:3030 + `VITE_API_BASE`) — antes el frontend no podía hablar con su backend en dev
+- **Repo profesionalizado:** SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, plantillas de issue/PR, release workflow, .editorconfig
+- **Consistencia:** INFRA.md y ADR-002 realineados a ADR-006 (local-first, adiós "web-first"); scope "Equipo" → "Sesión"; Plan A realineado A.0-A.9 (BYOK, projects como scope); circuit breaker + backup integral
 
 ## Gates pendientes
 

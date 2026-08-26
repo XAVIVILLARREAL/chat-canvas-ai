@@ -62,41 +62,43 @@
 - **Paquete:** `@tanstack/react-query` v5.101.4
 - **Beneficio:** Caching, reintentos, loading states automaticos para datos del gateway Rust
 
-## Arquitectura hibrida
+## Arquitectura hibrida (ADR-006)
 
-### Un solo codebase (web-first)
-- **Navegador v1 (WEB-FIRST):** la SPA React la sirve el gateway axum (`crates/server`) — cero instalación
-- **Tauri (DIFERIDO):** envoltorio de la misma web + superpoderes nativos, solo con demanda demostrada
-- **Frontend:** React compartido en `src/`
+### Un solo codebase (local-first + nube de pago)
+- **Local-first (PRODUCTO BASE):** Tauri 2 (`src-tauri`) empaqueta la SPA React + Rust local + SQLite; gratis, BYOK, offline. Ver [ADR-006](./ADRs/ADR-006-vision-hibrida-local-nube.md)
+- **Nube (DE PAGO):** la misma SPA la sirve el gateway axum (`crates/server`) + Postgres+RLS + workers Linux 24/7; solo quien paga
+- **Frontend:** React compartido en `src/` (un solo frontend, `useResponsive()`)
 - **Dominio Rust:** `crates/core` (compartido por server y tauri-shell)
 
 ### Estructura de carpetas
 ```
-src/                    # React (compartido, web-first)
+src/                    # React (compartido, local + nube)
 crates/core             # Dominio Rust (agentes, tareas, skills, sesiones)
-crates/server           # Gateway axum (sirve SPA + REST + SSE/WS)
-src-tauri/              # Rust (Tauri — shell diferido)
+crates/server           # Gateway axum (sirve SPA + REST + SSE/WS; nube)
+crates/worker           # Workers stateless (nube 24/7, sandbox Linux)
+src-tauri/              # Rust (Tauri — producto base local-first)
 packages/shared-types/  # Tipos TypeScript compartidos
 e2e/                    # Playwright tests
 docs/                   # Documentacion
 ```
-> ⚠️ NO existe `services/python/`: el backend server es **Rust** (ADR-005 + SDD-008 + Plan Base v3.4). Corregido 2026-08-24.
+> ⚠️ NO existe `services/python/`: el backend server es **Rust** (ADR-006). Corregido 2026-08-25.
 
 ### Capas
 | Capa | Carpeta | Tecnologia |
 |---|---|---|
-| Frontend | `src/` | React + TypeScript |
+| Frontend | `src/` | React + TypeScript (local-first + nube) |
 | Gateway Server | `crates/server` | Rust (axum) — sirve la SPA + API + SSE/WS |
 | Dominio | `crates/core` | Rust — agentes, tareas, skills, sesiones |
+| Workers | `crates/worker` | Rust stateless — nube 24/7, sandbox Linux (GrokBot) |
 | Shared Types | `packages/shared-types/` | TypeScript |
 
 ### Comunicacion
-- Frontend <-> Gateway axum: HTTP/WS/SSE (web-first)
+- Frontend <-> Gateway axum: HTTP/WS/SSE (local: Tauri IPC; nube: HTTP)
 - Gateway <-> Workers: cola Postgres `FOR UPDATE SKIP LOCKED` + eventos
-- Workers <-> Postgres+RLS: datos multi-tenant (proyectos como tenants)
+- Workers <-> Postgres+RLS: datos multi-tenant (proyectos como scope, ADR-006)
 
 ### Documentacion
-- **ADR-002:** `docs/ADRs/ADR-002-arquitectura-hibrida.md`
+- **ADR-006:** `docs/ADRs/ADR-006-vision-hibrida-local-nube.md` (local-first + nube de pago)
 - **ARQUITECTURA.md:** `docs/ARQUITECTURA.md`
 
 ## Integracion Rust-TypeScript

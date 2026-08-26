@@ -1,0 +1,44 @@
+name: Feature request
+description: Sugiere una capacidad nueva o mejora
+title: "[feature]: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: "Toda feature nace de un mini-SDD. Antes de pedirla, revisa [PRODUCT-DIFFERENTIATORS](../PRODUCT-DIFFERENTIATORS.md): si no alimenta uno de los 7, es backlog."
+  - type: textarea
+    id: jtbd
+    attributes:
+      label: ¿Qué trabajo del usuario resuelve? (JTBD)
+      description: "Formato: 'Cuando …, quiero …, para poder …'"
+      placeholder: "Cuando cierro mi laptop, quiero que mi agente siga, para encontrar la evidencia al volver."
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Resultado medible (cómo lo probaría un humano con Playwright)
+      description: "Criterios de aceptación operados como persona (clicks + teclado)."
+    validations:
+      required: true
+  - type: dropdown
+    id: differentiator
+    attributes:
+      label: Alimenta el diferenciador…
+      multiple: true
+      options:
+        - Evidence-first delivery
+        - Memory Rail + Time-Scrubber
+        - Local-first + BYOK
+        - Skills como personajes
+        - Canvas multi-runtime
+        - Shadow workspace
+        - Humano en el centro
+        - Ninguno (backlog)
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notas / referencias
+      description: "SDD/MATRIZ relacionados, mockups, URLs."

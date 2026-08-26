@@ -42,7 +42,7 @@
 | Indexación AST / repo-map | Cliente (**web-tree-sitter WASM**); servidor solo cuando un agente la necesita | 🟡 [J·J.1](./SDDs/SDD-001-plan-base/plan-j-grafo3d-repomap.md#j1) |
 | Canva 3D / oficina | Cliente (**Three.js WebGPU renderer**, 2026) | 🟡 [F·F.6](./SDDs/SDD-001-plan-base/plan-f-canva-oficina.md#f6) |
 | LLM local (Ollama/llama.cpp en la máquina del usuario) | Cliente (modo todo-local; el servidor solo si el usuario elige nube) | 🟡 [C·C.6](./SDDs/SDD-001-plan-base/plan-c-reasonix-deepseek.md#c6) |
-| Ejecución de agentes (24/7), sandboxes, cola durable, git compartido | **Servidor** (imposible en cliente en web-first) | 🔴 server-only |
+| Ejecución de agentes (24/7), sandboxes, cola durable, git compartido | **Servidor** (modo nube de pago, ADR-006) | 🔴 server-only |
 | Sync hub, auth, secretos, RLS multi-tenant | **Servidor** | 🔴 server-only |
 
 ✅ = ya en planes · 🟡 = plan con nota client-side añadida · 🔴 = server-only por diseño ([SDD-008](./SDDs/SDD-008-analisis-cliente-servidor-k8s.md))

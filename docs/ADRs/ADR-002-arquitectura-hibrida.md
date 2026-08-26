@@ -1,7 +1,7 @@
 # ADR-002: Arquitectura Hibrida — Un solo codebase, multiplataforma
 
 > Fecha: 2026-08-21 . Estado: **Superado en parte** (2026-08-24) . Contexto: Desktop + Mobile + Server
-> ⚠️ **Nota de supercesión**: la decisión de "backend server Python (CrewAI/LangGraph)" y el modelo Tauri-first de este ADR quedan **SUPERADOS** por [ADR-005](./ADR-005-modelo-despliegue-dual.md) + [SDD-008](../SDDs/SDD-008-analisis-cliente-servidor-k8s.md) + Plan Base v3.4 (README): **WEB-FIRST** (el gateway axum sirve la web; Tauri diferido) y **servidor Rust** (crates/core + axum + workers Everruns, cero Python). Se conserva de este ADR: un solo codebase React, `useResponsive()`, estructura src/ y shared-types.
+> ⚠️ **Nota de supercesión**: la decisión de "backend server Python (CrewAI/LangGraph)" y el modelo Tauri-first de este ADR quedan **SUPERADOS** por [ADR-006](./ADR-006-vision-hibrida-local-nube.md) + Plan Base v3.0 (README): **LOCAL-FIRST (Tauri = producto base)** + nube de pago (Postgres+RLS + workers Linux 24/7), **servidor Rust** (crates/core + axum + workers Everruns, cero Python). Se conserva de este ADR: un solo codebase React, `useResponsive()`, estructura src/ y shared-types.
 
 ## Contexto
 

@@ -14,6 +14,8 @@ import type {
 } from '../types';
 import { NODE_TYPE_CONFIG } from '../types';
 
+const API_BASE = (import.meta.env.VITE_API_BASE as string) ?? '/api';
+
 interface CanvasState {
   currentCanvas: Canvas | null;
   canvases: Canvas[];
@@ -307,11 +309,11 @@ export const useCanvasStore = create<CanvasState>()(
     setLoading: (loading: boolean) => set((state: CanvasState) => { state.loading = loading; }),
     setSaving: (saving: boolean) => set((state: CanvasState) => { state.saving = saving; }),
 
-    fetchCanvases: async () => { try { const response = await fetch('/api/canvases'); if (response.ok) { const canvases = await response.json(); get().setCanvases(canvases); } } catch (error) { console.error('Failed to fetch canvases:', error); } },
-    fetchSkills: async () => { try { const response = await fetch('/api/skills'); if (response.ok) { const skills = await response.json(); get().setSkills(skills); } } catch (error) { console.error('Failed to fetch skills:', error); } },
-    fetchAgents: async () => { try { const response = await fetch('/api/agents'); if (response.ok) { const agents = await response.json(); get().setAgents(agents); } } catch (error) { console.error('Failed to fetch agents:', error); } },
-    fetchMcpServers: async () => { try { const response = await fetch('/api/mcp/servers'); if (response.ok) { const servers = await response.json(); get().setMcpServers(servers); } } catch (error) { console.error('Failed to fetch MCP servers:', error); } },
-    fetchExecutions: async () => { try { const response = await fetch('/api/executions'); if (response.ok) { const executions = await response.json(); get().setExecutions(executions); } } catch (error) { console.error('Failed to fetch executions:', error); } },
+    fetchCanvases: async () => { try { const response = await fetch(`${API_BASE}/canvases`); if (response.ok) { const canvases = await response.json(); get().setCanvases(canvases); } } catch (error) { console.error('Failed to fetch canvases:', error); } },
+    fetchSkills: async () => { try { const response = await fetch(`${API_BASE}/skills`); if (response.ok) { const skills = await response.json(); get().setSkills(skills); } } catch (error) { console.error('Failed to fetch skills:', error); } },
+    fetchAgents: async () => { try { const response = await fetch(`${API_BASE}/agents`); if (response.ok) { const agents = await response.json(); get().setAgents(agents); } } catch (error) { console.error('Failed to fetch agents:', error); } },
+    fetchMcpServers: async () => { try { const response = await fetch(`${API_BASE}/mcp/servers`); if (response.ok) { const servers = await response.json(); get().setMcpServers(servers); } } catch (error) { console.error('Failed to fetch MCP servers:', error); } },
+    fetchExecutions: async () => { try { const response = await fetch(`${API_BASE}/executions`); if (response.ok) { const executions = await response.json(); get().setExecutions(executions); } } catch (error) { console.error('Failed to fetch executions:', error); } },
 
     addSkill: (skill: Skill) => set((state: CanvasState) => { state.skills.push(skill); }),
     updateSkill: (skill: Skill) => set((state: CanvasState) => { const idx = state.skills.findIndex((s: Skill) => s.id === skill.id); if (idx >= 0) state.skills[idx] = skill; }),

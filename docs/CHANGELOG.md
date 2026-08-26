@@ -2,6 +2,18 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 23 — Profesionalización + diferenciadores + fix de usabilidad)
+
+- **Fix de usabilidad real:** el frontend NO conectaba con su backend en dev (llamaba `/api/*` sin proxy y con base hardcodeada). Añadido **proxy Vite `/api`→`http://127.0.0.1:3030`** + **`VITE_API_BASE`** env en `useApi` y `canvas-store`. Ahora la app se corre end-to-end (frontend ↔ gateway Rust).
+- **PRODUCT-DIFFERENTIATORS** (`docs/PRODUCT-DIFFERENTIATORS.md`): los **7 diferenciadores** que hacen el producto "increíble" (evidence-first, memory rail+time-scrubber, local-first+BYOK, skills-personaje, canvas multi-runtime, shadow workspace, humano en el centro) + regla "si no alimenta uno de los 7 → backlog".
+- **SLO-RELIABILITY** (`docs/SLO-RELIABILITY.md`): TTFT <1s, streaming ≥30 tok/s, arranque <2s, uptime nube 99.9%, RTO ≤1h / RPO ≤15min, error budget, post-mortems.
+- **PERFORMANCE-BUDGETS** (`docs/PERFORMANCE-BUDGETS.md`): bundle <250KB, Monaco/ReactFlow lazy, 60fps canvas 100 nodos, reglas anti-lag, CI de budgets.
+- **PRICING-TIERS** (`docs/PRICING-TIERS.md`): Free local $0 (BYOK) / Pro $29 (nube 24/7) / Teams $99 (5 usuarios); BYOK en todos; flags desde v1; free-tier de nube 10h.
+- **LAUNCH-CHECKLIST** (`docs/LAUNCH-CHECKLIST.md`): distribución (Releases + auto-update firmado + brew/winget), feedback loop (botón in-app + NPS + triage), legal, growth, post-launch 30d.
+- **DEV-ENVIRONMENT** (`docs/DEV-ENVIRONMENT.md`): 3 comandos para correr el stack (gateway :3030 + vite :1420 proxy) + stack objetivo + gotchas.
+- **Repo profesionalizado:** `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `.editorconfig`, plantillas GitHub (bug/feature y PR), workflow `release.yml` (Releases por tag v*).
+- **Consistencia:** INFRA.md y ADR-002 realineados a ADR-006 (local-first, adiós "web-first"); ARQUITECTURA "web-first"→"nube de pago"; scope "Equipo"→"Sesión" en plan-c.
+
 ## 2026-08-25 (sesion 22 — Capa de producto profesional)
 
 - **PRD v1.0** (`docs/PRD.md`): producto primero — 4 personas + JTBD por vista + 16 features (MVP-1/2/3) cada una con **resultado medible Playwright humano** (clicks+teclado) · anti-scope explícito · riesgos top 5

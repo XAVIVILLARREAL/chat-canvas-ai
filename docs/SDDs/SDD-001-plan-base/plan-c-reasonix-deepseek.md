@@ -58,7 +58,7 @@
 > **C.4 (reservada)**: el hueco es intencional — el "contexto/caché" que ocuparía se integró en C.5 (SDD-006 §1) y el registro de proveedores en C.7 (SDD-007). Los IDs de fase son estables y no se reutilizan.
 
 ### C.5 — Motor de Contexto y Caché configurable (SDD-006 §1)
-- **Configurable en 5 scopes** ([A·A.6](./plan-a-chat-codex.md#a6)): Global → Proyecto → Equipo → Agente → Subagente, con vista de valor efectivo y origen ("definido en: Global")
+- **Configurable en 5 scopes** ([A·A.6](./plan-a-chat-codex.md#a6)): Global → Proyecto → Sesión → Agente → Subagente, con vista de valor efectivo y origen ("definido en: Global")
 - Knobs: `prefijo_estable` + warm-up al abrir proyecto · perfil cuantización KV (`fp16/fp8/int4/int2` + ventana residual 128) · eviction (`query-aware / sinks+recientes / H2O%`) · compresión tramo medio (`ninguna / ligera 2× / agresiva 5×`, reservar dígitos, umbral mínimo 2K tokens) · compacción (`aviso 70% / flush 100% / expulsar 50%`) · alerta si hash del system prompt cambia (caché inválida)
 - **Presets por ROL**: PM (contexto amplio, compresión ligera) · QA (evidencia íntegra sin comprimir) · Dev (historial comprimido agresivo, código íntegro)
 - Dashboard cache_hit + semáforo coste POR SCOPE; persistido en settings

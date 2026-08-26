@@ -12,10 +12,18 @@
 | ARQUITECTURA.md | Arquitectura del proyecto | `./docs/ARQUITECTURA.md` |
 | **PRD.md** | **Producto: personas, JTBD, features→resultado humano** | `./docs/PRD.md` |
 | **PRODUCT-METRICS.md** | **North-star, activación, eventos, telemetría** | `./docs/PRODUCT-METRICS.md` |
+| **PRODUCT-DIFFERENTIATORS.md** | **Los 7 diferenciadores que hacen el producto "increíble"** | `./docs/PRODUCT-DIFFERENTIATORS.md` |
 | **MVP-ROADMAP.md** | **MVP-1/2/3 time-boxed** | `./docs/MVP-ROADMAP.md` |
 | **SCHEMA-MAESTRO.md** | **Modelo canónico de datos (Etapa 0)** | `./docs/SCHEMA-MAESTRO.md` |
 | **CONTRATO-SKILL.md** | **Formato `.md` de skills** | `./docs/CONTRATO-SKILL.md` |
 | **THREAT-MODEL.md** | **Amenazas, sandbox Linux, BYOK** | `./docs/THREAT-MODEL.md` |
+| **SLO-RELIABILITY.md** | **SLOs medibles (TTFT, uptime, RTO/RPO)** | `./docs/SLO-RELIABILITY.md` |
+| **PERFORMANCE-BUDGETS.md** | **Presupuestos de rendimiento (números)** | `./docs/PERFORMANCE-BUDGETS.md` |
+| **PRICING-TIERS.md** | **Free/Pro/Teams (límites concretos)** | `./docs/PRICING-TIERS.md` |
+| **LAUNCH-CHECKLIST.md** | **Checklist de lanzamiento profesional** | `./docs/LAUNCH-CHECKLIST.md` |
+| **DEV-ENVIRONMENT.md** | **Cómo correr el stack hoy + objetivo** | `./docs/DEV-ENVIRONMENT.md` |
+| SECURITY.md | Política de seguridad | `./SECURITY.md` |
+| CONTRIBUTING.md | Guía de contribución | `./CONTRIBUTING.md` |
 
 ## Plan Base (SDD-001) — v2.0
 

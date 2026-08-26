@@ -36,16 +36,27 @@ Canvas AI es un entorno de trabajo donde humanos y agentes de IA colaboran en un
 |---|---|
 | [`AGENTS.md`](./AGENTS.md) | Guía de trabajo para agentes IA |
 | [`docs/PRD.md`](./docs/PRD.md) | Producto: personas, JTBD, features → resultado medible |
+| [`docs/PRODUCT-DIFFERENTIATORS.md`](./docs/PRODUCT-DIFFERENTIATORS.md) | Los 7 diferenciadores "increíbles" |
 | [`docs/PRODUCT-METRICS.md`](./docs/PRODUCT-METRICS.md) | North-star, activación, retención, eventos |
 | [`docs/MVP-ROADMAP.md`](./docs/MVP-ROADMAP.md) | MVP-1/2/3 time-boxed |
 | [`docs/SCHEMA-MAESTRO.md`](./docs/SCHEMA-MAESTRO.md) | Modelo canónico de datos (Etapa 0) |
 | [`docs/CONTRATO-SKILL.md`](./docs/CONTRATO-SKILL.md) | Formato `.md` de skills |
 | [`docs/THREAT-MODEL.md`](./docs/THREAT-MODEL.md) | Amenazas, sandbox, BYOK |
+| [`docs/SLO-RELIABILITY.md`](./docs/SLO-RELIABILITY.md) | SLOs medibles |
+| [`docs/PERFORMANCE-BUDGETS.md`](./docs/PERFORMANCE-BUDGETS.md) | Presupuestos de rendimiento |
+| [`docs/PRICING-TIERS.md`](./docs/PRICING-TIERS.md) | Free/Pro/Teams |
+| [`docs/LAUNCH-CHECKLIST.md`](./docs/LAUNCH-CHECKLIST.md) | Lanzamiento profesional |
+| [`docs/DEV-ENVIRONMENT.md`](./docs/DEV-ENVIRONMENT.md) | Cómo correr el stack |
 | [`docs/INDEX.md`](./docs/INDEX.md) | Mapa completo de docs |
 | [`docs/SDDs/SDD-001-plan-base/README.md`](./docs/SDDs/SDD-001-plan-base/README.md) | Plan maestro |
 | [`docs/ARQUITECTURA.md`](./docs/ARQUITECTURA.md) | Arquitectura |
 | [`docs/ESTADO.md`](./docs/ESTADO.md) | Estado actual |
 | [`docs/SDDs/SDD-001-plan-base/MATRIZ-FASES-PRUEBAS.md`](./docs/SDDs/SDD-001-plan-base/MATRIZ-FASES-PRUEBAS.md) | Matriz de fases y pruebas |
+
+## Contribuir y seguridad
+
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md) — guía de contribución (spec-driven + TDD + gate humano)
+- [`SECURITY.md`](./SECURITY.md) — reportar vulnerabilidades · [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)
 
 ## Desarrollo
 
