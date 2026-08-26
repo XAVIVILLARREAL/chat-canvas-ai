@@ -3,6 +3,9 @@ import {
   FilePlus, Save, Download, Upload, Play, Settings, 
   ChevronDown, RotateCcw, Command, Menu,
 } from 'lucide-react';
+import { Sun, Moon, Languages } from 'lucide-react';
+import { useTheme } from '../theme';
+import { useI18n, setLocale, SUPPORTED_LOCALES } from '../i18n';
 import { useCanvasStore } from '../stores/canvas-store';
 import type { Canvas } from '../types';
 import './Header.css';
@@ -22,6 +25,8 @@ export const Header: React.FC<HeaderProps> = ({
   onSwitchCanvas,
   loading,
 }) => {
+  const { resolved, toggle: toggleTheme } = useTheme();
+  const { t, locale } = useI18n();
   const [showCanvasMenu, setShowCanvasMenu] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const canvasMenuRef = useRef<HTMLDivElement>(null);
@@ -67,8 +72,8 @@ export const Header: React.FC<HeaderProps> = ({
     reader.onload = (event) => {
       const json = event.target?.result as string;
       const success = useCanvasStore.getState().importCanvas(json);
-      if (success) useCanvasStore.getState().addToast({ type: 'success', message: 'Canvas importado correctamente' });
-      else useCanvasStore.getState().addToast({ type: 'error', message: 'Error al importar canvas' });
+      if (success) useCanvasStore.getState().addToast({ type: 'success', message: t('toast.importOk') });
+      else useCanvasStore.getState().addToast({ type: 'error', message: t('toast.importError') });
     };
     reader.readAsText(file);
     e.target.value = '';
@@ -87,39 +92,39 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const commandPaletteItems = [
-    { id: 'new-canvas', label: 'Nuevo Canvas', shortcut: '⌘N', icon: FilePlus, action: onCreateCanvas },
-    { id: 'save-canvas', label: 'Guardar Canvas', shortcut: '⌘S', icon: Save, action: () => {} },
-    { id: 'export-canvas', label: 'Exportar Canvas', shortcut: '⌘E', icon: Download, action: handleExportCanvas },
-    { id: 'import-canvas', label: 'Importar Canvas', shortcut: '⌘I', icon: Upload, action: () => {} },
-    { id: 'execute-canvas', label: 'Ejecutar Canvas', shortcut: '⌘Enter', icon: Play, action: () => {} },
-    { id: 'fit-view', label: 'Ajustar Vista', shortcut: 'F', icon: RotateCcw, action: fitView },
-    { id: 'undo', label: 'Deshacer', shortcut: '⌘Z', icon: RotateCcw, action: undo, disabled: !canUndo() },
-    { id: 'redo', label: 'Rehacer', shortcut: '⌘⇧Z', icon: RotateCcw, action: redo, disabled: !canRedo() },
-    { id: 'toggle-sidebar', label: 'Toggle Sidebar', shortcut: '⌘B', icon: Menu, action: toggleSidebar },
+    { id: 'new-canvas', label: t('palette.newCanvas'), shortcut: '⌘N', icon: FilePlus, action: onCreateCanvas },
+    { id: 'save-canvas', label: t('palette.saveCanvas'), shortcut: '⌘S', icon: Save, action: () => {} },
+    { id: 'export-canvas', label: t('palette.exportCanvas'), shortcut: '⌘E', icon: Download, action: handleExportCanvas },
+    { id: 'import-canvas', label: t('palette.importCanvas'), shortcut: '⌘I', icon: Upload, action: () => {} },
+    { id: 'execute-canvas', label: t('palette.executeCanvas'), shortcut: '⌘Enter', icon: Play, action: () => {} },
+    { id: 'fit-view', label: t('palette.fitView'), shortcut: 'F', icon: RotateCcw, action: fitView },
+    { id: 'undo', label: t('palette.undo'), shortcut: '⌘Z', icon: RotateCcw, action: undo, disabled: !canUndo() },
+    { id: 'redo', label: t('palette.redo'), shortcut: '⌘⇧Z', icon: RotateCcw, action: redo, disabled: !canRedo() },
+    { id: 'toggle-sidebar', label: t('palette.toggleSidebar'), shortcut: '⌘B', icon: Menu, action: toggleSidebar },
   ];
 
   return (
     <header className="app-header">
       <div className="header-left">
-        <button className="header-btn" onClick={toggleSidebar} title="Toggle Sidebar (⌘B)"><Menu width={20} height={20} /></button>
+        <button className="header-btn" onClick={toggleSidebar} title={t("header.toggleSidebar")}><Menu width={20} height={20} /></button>
         <div className="canvas-menu" ref={canvasMenuRef}>
-          <button className="canvas-selector" onClick={() => setShowCanvasMenu(!showCanvasMenu)} title="Cambiar Canvas">
+          <button className="canvas-selector" onClick={() => setShowCanvasMenu(!showCanvasMenu)} title={t("header.changeCanvas")}>
             <FilePlus width={16} height={16} />
-            <span className="canvas-name">{currentCanvas?.name || 'Sin canvas'}</span>
+            <span className="canvas-name">{currentCanvas?.name || t('header.noCanvas')}</span>
             <ChevronDown width={14} height={14} />
           </button>
           {showCanvasMenu && (
             <div className="canvas-dropdown">
               <div className="dropdown-header">
-                <span>Canvases ({canvases.length})</span>
-                <button className="dropdown-action" onClick={onCreateCanvas}><FilePlus width={12} height={12} /> Nuevo</button>
+                <span>{t("header.canvases", { n: canvases.length })}</span>
+                <button className="dropdown-action" onClick={onCreateCanvas}><FilePlus width={12} height={12} /> {t("header.new")}</button>
               </div>
               <div className="dropdown-list">
                 {canvases.map(canvas => (
                   <button key={canvas.id} className={`dropdown-item ${currentCanvas?.id === canvas.id ? 'active' : ''}`} onClick={() => { onSwitchCanvas(canvas); setShowCanvasMenu(false); }}>
                     <span className="item-name">{canvas.name}</span>
                     <span className="item-meta">{canvas.nodes.length} nodos · v{canvas.version}</span>
-                    {currentCanvas?.id === canvas.id && <span className="active-badge">Actual</span>}
+                    {currentCanvas?.id === canvas.id && <span className="active-badge">{t("header.current")}</span>}
                   </button>
                 ))}
               </div>
@@ -129,34 +134,47 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="header-center">
-        <h1>AI Canvas</h1>
-        <span className="subtitle">Automatizaciones con IA nativa</span>
+        <h1>{t("app.title")}</h1>
+        <span className="subtitle">{t("app.subtitle")}</span>
       </div>
 
       <div className="header-right">
-        <button className="header-btn command-palette-trigger" onClick={() => setShowCommandPalette(!showCommandPalette)} title="Command Palette (⌘K)"><Command width={18} height={18} /></button>
+        <button className="header-btn command-palette-trigger" onClick={() => setShowCommandPalette(!showCommandPalette)} title={t("header.commandPalette")}><Command width={18} height={18} /></button>
         <div className="header-divider" />
-        <button className="header-btn" onClick={undo} disabled={!canUndo()} title="Deshacer (⌘Z)"><RotateCcw width={16} height={16} /></button>
-        <button className="header-btn" onClick={redo} disabled={!canRedo()} title="Rehacer (⌘⇧Z)"><RotateCcw width={16} height={16} style={{ transform: 'rotate(180deg)' }} /></button>
+        <button className="header-btn" onClick={undo} disabled={!canUndo()} title={t("header.undo")}><RotateCcw width={16} height={16} /></button>
+        <button className="header-btn" onClick={redo} disabled={!canRedo()} title={t("header.redo")}><RotateCcw width={16} height={16} style={{ transform: 'rotate(180deg)' }} /></button>
         <div className="header-divider" />
         <div className="header-dropdown">
-          <button className="header-btn" title="Archivo"><FilePlus width={18} height={18} /></button>
+          <button className="header-btn" title={t("header.file")}><FilePlus width={18} height={18} /></button>
           <div className="dropdown-menu">
-            <button className="dropdown-item" onClick={onCreateCanvas}><FilePlus width={14} height={14} /> Nuevo Canvas</button>
-            <button className="dropdown-item" onClick={handleExportCanvas}><Download width={14} height={14} /> Exportar</button>
-            <label className="dropdown-item"><Upload width={14} height={14} /> Importar<input type="file" accept=".json" onChange={handleImportCanvas} hidden /></label>
+            <button className="dropdown-item" onClick={onCreateCanvas}><FilePlus width={14} height={14} /> {t("header.newCanvas")}</button>
+            <button className="dropdown-item" onClick={handleExportCanvas}><Download width={14} height={14} /> {t("header.export")}</button>
+            <label className="dropdown-item"><Upload width={14} height={14} /> {t("header.import")}<input type="file" accept=".json" onChange={handleImportCanvas} hidden /></label>
           </div>
         </div>
         <div className="header-divider" />
-        <button className="header-btn execute-btn" disabled={loading || !currentCanvas?.nodes.length} title="Ejecutar Canvas (⌘Enter)"><Play width={18} height={18} /><span>Ejecutar</span></button>
+        <button className="header-btn execute-btn" disabled={loading || !currentCanvas?.nodes.length} title={t("header.executeTitle")}><Play width={18} height={18} /><span>{t("header.execute")}</span></button>
         <div className="header-divider" />
-        <button className="header-btn" title="Configuración"><Settings width={18} height={18} /></button>
+        <button className="header-btn" onClick={toggleTheme} title={t("header.theme")} aria-label={t("header.theme")}>
+          {resolved === 'dark' ? <Sun width={18} height={18} /> : <Moon width={18} height={18} />}
+        </button>
+        <div className="header-dropdown">
+          <button className="header-btn" title={t("header.language")} aria-label={t("header.language")}><Languages width={18} height={18} /></button>
+          <div className="dropdown-menu">
+            {SUPPORTED_LOCALES.map((l) => (
+              <button key={l} className={`dropdown-item ${locale === l ? 'active' : ''}`} onClick={() => setLocale(l)}>
+                {l.toUpperCase()}{locale === l && <span className="active-badge">✓</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+        <button className="header-btn" title={t("header.settings")}><Settings width={18} height={18} /></button>
       </div>
 
       {showCommandPalette && (
         <div className="command-palette-overlay" onClick={() => setShowCommandPalette(false)}>
           <div className="command-palette" ref={commandPaletteRef} onClick={(e) => e.stopPropagation()}>
-            <div className="palette-header"><Command width={18} height={18} /><input type="text" placeholder="Escribe un comando o busca..." autoFocus className="palette-input" /><kbd>⌘K</kbd></div>
+            <div className="palette-header"><Command width={18} height={18} /><input type="text" placeholder={t("palette.placeholder")} autoFocus className="palette-input" /><kbd>⌘K</kbd></div>
             <div className="palette-list">
               {commandPaletteItems.map(item => (
                 <button key={item.id} className={`palette-item ${item.disabled ? 'disabled' : ''}`} onClick={() => { item.action(); setShowCommandPalette(false); }} disabled={item.disabled}>

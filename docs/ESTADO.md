@@ -50,6 +50,13 @@
 - **DEV-ENVIRONMENT** (`docs/DEV-ENVIRONMENT.md`) — 3 comandos para correr el stack
 - **PLATAFORMAS-TARGETS** (`docs/PLATAFORMAS-TARGETS.md`) — matriz canónica "qué se instala dónde": servidor Linux 24/7 + clientes Windows/macOS/Linux/Android/iOS/web. **Cierra la duda "¿el plan construye el servidor o los clientes?": construye AMBOS.** iOS es el único entregable pendiente de generar (`tauri ios init` en un Mac → `src-tauri/gen/apple/`); Etapa 10 y MATRIZ MP.1-MP.6 lo hacen explícito; release.yml ahora builda los 3 desktops.
 
+## Temas + i18n + responsive FUNCIONALES (2026-08-25)
+
+- **Temas**: dark/light reales con persistencia y modo system (`src/theme.ts` + tokens light)
+- **i18n**: es/en implementados (`src/i18n/`), selector en Header/Config
+- **Responsive**: móvil 375 operativo (drawer sidebar, header compacto, targets 44px) — evidencia en capturas Playwright
+- Fixes: ReactFlowProvider faltante (crash negro), dropdowns siempre visibles, title stale
+
 ## Calidad visual Liquid Glass → VR (2026-08-25)
 
 - **Provider de pruebas GRATIS** (regla free-first): OpenRouter `:free` (**ox-alpha free**) como provider por defecto de TODOS los tests con LLM real — $0 ilimitado desde C.1; setup en [DEV-ENVIRONMENT](./DEV-ENVIRONMENT.md) + `.env.example`. APIs de pago solo para capacidades específicas (≤$20/gate).

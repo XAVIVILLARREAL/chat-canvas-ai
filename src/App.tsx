@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { ReactFlowProvider } from '@xyflow/react';
 import { Canvas } from './components/Canvas';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -70,8 +71,8 @@ function App() {
           loading={loading}
         />
         <main className="app-main">
-          <section className="canvas-section mesh-bg"><Canvas /></section>
-          <aside className={`sidebar ${sidebarOpen ? 'open' : 'collapsed'}`} style={{ width: sidebarOpen ? 320 : 0 }}>
+          <section className="canvas-section mesh-bg"><ReactFlowProvider><Canvas /></ReactFlowProvider></section>
+          <aside className={`app-sidebar sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
             <Sidebar 
               activeTab={sidebarTab}
               onTabChange={setSidebarTab}

@@ -2,6 +2,14 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 34 — Temas dark/light + i18n es/en + responsive móvil FUNCIONALES)
+
+- **Temas dark/light REALES**: tokens light completos (`[data-theme="light"]`, oklch, AA) · toggle sol/luna en Header + select en Config (`src/theme.ts`, persistencia localStorage, modo system sigue al OS) · v2 juice tokenizado (glow/ring/selection/scrollbar/mesh) para que el claro funcione.
+- **i18n es/en implementada** (no solo plan): `src/i18n/` hook useI18n + locales JSON + fallback en + detección navigator · Header/Sidebar/Config traducidos · selector idioma en Header.
+- **Responsive móvil funcional**: sidebar → drawer superpuesto ≤900px (clase, no inline width) · header compacto · touch targets 44px · sin scroll horizontal (verificado en capturas 375/1440).
+- **Fixes funcionales encontrados al probar de verdad**: (1) faltaba ReactFlowProvider → app entera crasheaba en negro; (2) dropdowns del header visibles sin hover; (3) title 'Empresa Dev' stale en index.html; (4) zombie vite de carpeta vieja ocupaba el 1420 (matado).
+- **Evidencia**: capturas Playwright 375 dark/light + 1440 dark/light.
+
 ## 2026-08-25 (sesion 33 — Ronda 2 de mercado: Buzz local + Claude Code hooks + cola de mensajes)
 
 - **Repos locales analizados**: `/workspace/buzz` (workspace humano+agente sobre relay Nostr, Block) y `/workspace/grok` (= pesos Grok-1, modelo — no agente).

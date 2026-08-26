@@ -2,6 +2,7 @@
 
 > **Producto:** Canvas AI · **Estado:** aprobado (Q3) · 2026-08-25
 > **Decisión:** soporte **multilenguaje simple** desde el primer componente. No es solo es/en: el mecanismo hace trivial añadir cualquier idioma.
+> **✅ IMPLEMENTADO (infra, 2026-08-25):** `src/i18n/` (hook `useI18n` + locales es/en JSON + fallback en + detección navigator) + selector en Header/Config. Fases I.1/I.2 restantes: cobertura completa de strings y script CI de claves.
 
 ---
 

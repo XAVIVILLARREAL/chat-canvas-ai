@@ -19,6 +19,12 @@
 
 **Concepto:** Un mundo de obsidiana oscura con capas de vidrio translúcido que revelan profundidad. Minimalista pero con vida — cada elemento tiene peso, cada animación comunica. No es "dark mode", es un **entorno espacial** donde los datos flotan en capas de vidrio sobre fondo profundo.
 
+### 1.0 Temas (Dark por defecto · Light incluido)
+
+- Dark = identidad Obsidian (default). Light = `[data-theme="light"]` con overrides de TODOS los tokens (mismo oklch, contraste AA verificado).
+- Toggle en Header (sol/luna) + select en Config; persiste en localStorage; modo `system` sigue al OS.
+- Regla: NUNCA hex fuera de tokens — el tema claro funciona porque todo fluye por `var()`.
+
 ### 1.1 Paleta de color (oklch — perceptivamente uniforme)
 
 ```css
