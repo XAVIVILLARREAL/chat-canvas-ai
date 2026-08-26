@@ -2,6 +2,24 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 35 — Loop humano exhaustivo: 17/17 verdes en temas+i18n+responsive)
+
+- **Pruebas humanas REALES escritas y verdes** (Playwright CLI modo persona, móvil 375 + desktop 1440, video+screenshots por paso):
+  - `temas.spec.ts` (✅×2): toggle header, persistencia tras reload, select de Config
+  - `idioma.spec.ts` (✅×2): EN sin recargar → persiste → vuelta a ES → select de Config
+  - `movil-drawer.spec.ts` (✅ móvil): drawer abre/cierra con toggle, sin desborde
+  - Scaffold reescritos al producto actual (obsoletos de la era 'Empresa Dev'): `boot` (✅×2) · `create-agent` (✅×2, con modal NUEVO) · `keyboard-nav` (✅×2, destapó bug a11y real) · `responsive-human` (✅×2)
+- **Bugs reales cazados por el loop** (iteraciones con debug en vivo):
+  1. React Compiler memoizaba textos i18n (t estable de módulo) → t se crea POR LOCALE en useI18n
+  2. Doble drawer: media query apuntaba a .sidebar interno además del aside → scope a .app-sidebar
+  3. Tabs del drawer desbordaban (Config en x=569 fuera de pantalla) → flex-wrap en móvil
+  4. Lista de agentes no enfocable por teclado → tabIndex=0 (bug a11y real)
+  5. Carrera: sidebar arrancaba abierto en móvil → store inicial responsive (innerWidth>=900)
+  6. Header bajo toolbar del canvas en móvil → z 1100/1200 coherentes (drawer>header>toolbar)
+  7. Dropdown dejaba foco abierto tras seleccionar → blur al elegir
+- **Feature nueva funcional**: modal Crear Agente (nombre+rol→store, Enter/Escape, glass-deep)
+- **Suite humana completa: 17 passed / 0 failed / 1 skipped (drawer=mobile-only)** · COVERAGE-GUI 82 elementos (8 ✅)
+
 ## 2026-08-25 (sesion 34 — Temas dark/light + i18n es/en + responsive móvil FUNCIONALES)
 
 - **Temas dark/light REALES**: tokens light completos (`[data-theme="light"]`, oklch, AA) · toggle sol/luna en Header + select en Config (`src/theme.ts`, persistencia localStorage, modo system sigue al OS) · v2 juice tokenizado (glow/ring/selection/scrollbar/mesh) para que el claro funcione.

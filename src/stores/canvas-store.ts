@@ -73,6 +73,7 @@ interface CanvasState {
   zoomViewport: (zoom: number, centerX?: number, centerY?: number) => void;
   fitView: () => void;
   toggleSidebar: () => void;
+  setSidebarOpen: (open: boolean) => void;
   setSidebarTab: (tab: CanvasState['sidebarTab']) => void;
   openNodePanel: (nodeId: string) => void;
   closeNodePanel: () => void;
@@ -145,7 +146,7 @@ export const useCanvasStore = create<CanvasState>()(
     selectedNodeIds: [],
     selectedEdgeIds: [],
     viewport: DEFAULT_VIEWPORT,
-    sidebarOpen: true,
+    sidebarOpen: typeof window !== 'undefined' ? window.innerWidth >= 900 : true,
     sidebarTab: 'nodes',
     nodePanelOpen: false,
     nodePanelNodeId: null,
@@ -297,6 +298,7 @@ export const useCanvasStore = create<CanvasState>()(
     fitView: () => set((state: CanvasState) => { if (!state.currentCanvas || state.currentCanvas.nodes.length === 0) return; const nodes = state.currentCanvas.nodes; let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity; nodes.forEach((node: CanvasNode) => { minX = Math.min(minX, node.position.x); minY = Math.min(minY, node.position.y); maxX = Math.max(maxX, node.position.x + 200); maxY = Math.max(maxY, node.position.y + 100); }); const padding = 100; const canvasWidth = window.innerWidth - 320; const canvasHeight = window.innerHeight - 100; const contentWidth = maxX - minX + padding * 2; const contentHeight = maxY - minY + padding * 2; const zoomVal = Math.min(canvasWidth / contentWidth, canvasHeight / contentHeight, 1); state.viewport = { x: minX - padding, y: minY - padding, zoom: zoomVal }; if (state.currentCanvas) state.currentCanvas.viewport = state.viewport; }),
 
     toggleSidebar: () => set((state: CanvasState) => { state.sidebarOpen = !state.sidebarOpen; }),
+    setSidebarOpen: (open: boolean) => set((state: CanvasState) => { state.sidebarOpen = open; }),
     setSidebarTab: (tab: CanvasState['sidebarTab']) => set((state: CanvasState) => { state.sidebarTab = tab; }),
     openNodePanel: (nodeId: string) => set((state: CanvasState) => { state.nodePanelOpen = true; state.nodePanelNodeId = nodeId; }),
     closeNodePanel: () => set((state: CanvasState) => { state.nodePanelOpen = false; state.nodePanelNodeId = null; }),

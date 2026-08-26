@@ -1,0 +1,12 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const ctx = await b.newContext({ locale: 'es-MX' });
+const p = await ctx.newPage();
+await p.goto('http://localhost:1420');
+await p.waitForTimeout(400);
+const antes = await p.evaluate(() => document.documentElement.dataset.theme);
+await p.getByRole('button', { name: /Cambiar tema/i }).click();
+await p.waitForTimeout(300);
+console.log('tema:', antes, '→', await p.evaluate(() => document.documentElement.dataset.theme));
+console.log('aria-label del botón ahora:', await p.evaluate(() => document.querySelector('.header-right button[aria-label]')?.getAttribute('aria-label')));
+await b.close();

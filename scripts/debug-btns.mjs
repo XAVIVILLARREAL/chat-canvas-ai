@@ -1,0 +1,11 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const ctx = await b.newContext({ locale: 'es-MX' });
+const p = await ctx.newPage();
+await p.goto('http://localhost:1420', { waitUntil: 'networkidle' });
+await p.waitForTimeout(800);
+const btns = await p.evaluate(() => [...document.querySelectorAll('.header-right button')].map(b => b.getAttribute('aria-label') || b.title || b.textContent?.trim().slice(0,20)));
+console.log(JSON.stringify(btns));
+console.log('lang:', await p.evaluate(() => document.documentElement.lang));
+console.log('subtitle:', await p.evaluate(() => document.querySelector('.subtitle')?.textContent));
+await b.close();

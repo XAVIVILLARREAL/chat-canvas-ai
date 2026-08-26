@@ -114,12 +114,14 @@
 
 | Vista | Elemento interactivo | Acción (clicks+teclado) | Test | Estado |
 |---|---|---|---|---|
-| Temas | Toggle dark/light (header + Config) | cambio instantáneo sin recargar; persiste tras reinicio; modo system sigue al OS | `temas.spec.ts` | 🟡 |
-| i18n | Selector de idioma (header + Config) | es↔en sin recargar; fallback a en; persiste | `idioma.spec.ts` | 🟡 |
-| Boot | Arranque de la app | abrir app → título visible, layout sin roturas | `boot.spec.ts` | 🟡 |
-| Agentes | Card de agente | crear agente → card → click → detalle → seleccionar/deseleccionar | `create-agent.spec.ts` | 🟡 |
-| Teclado | Navegación 100% teclado | Tab/Enter/Escape, foco visible | `keyboard-nav.spec.ts` | 🟡 |
-| Responsive | Misma app en 375/1440 | navegación humana en móvil y desktop | `responsive-human.spec.ts` | 🟡 |
+| Agentes | Modal Crear Agente (nombre+rol) | crear con clicks → aparece en lista y queda seleccionado | `create-agent.spec.ts` | ✅ |
+| Temas | Toggle dark/light (header + Config) | cambio instantáneo sin recargar; persiste tras reinicio; modo system sigue al OS | `temas.spec.ts` | ✅ |
+| i18n | Selector de idioma (header + Config) | es↔en sin recargar; fallback a en; persiste | `idioma.spec.ts` | ✅ |
+| Boot | Arranque de la app | abrir app → título visible, layout sin roturas | `boot.spec.ts` | ✅ |
+| Agentes | Card de agente | crear agente → card → click → detalle → seleccionar/deseleccionar | `create-agent.spec.ts` | ✅ |
+| Teclado | Navegación 100% teclado | Tab/Enter/Escape, foco visible | `keyboard-nav.spec.ts` | ✅ |
+| Responsive | Misma app en 375/1440 | navegación humana en móvil y desktop | `responsive-human.spec.ts` | ✅ |
+| Móvil | Drawer del sidebar | abrir/cerrar con toggle, no desborda pantalla | `movil-drawer.spec.ts` | ✅ |
 
 ## Generar una fila nueva
 

@@ -1,0 +1,14 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const ctx = await b.newContext({ locale: 'es-MX' });
+const p = await ctx.newPage();
+await p.goto('http://localhost:1420');
+await p.waitForTimeout(400);
+await p.getByRole('button', { name: /^Idioma$/i }).click();
+await p.locator('.header-dropdown .dropdown-menu .dropdown-item', { hasText: 'EN' }).last().click();
+await p.waitForTimeout(400);
+console.log('en vivo:', await p.evaluate(() => document.querySelector('.subtitle')?.textContent));
+await p.reload();
+await p.waitForTimeout(400);
+console.log('tras reload:', await p.evaluate(() => document.querySelector('.subtitle')?.textContent));
+await b.close();

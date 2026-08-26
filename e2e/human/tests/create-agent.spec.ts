@@ -2,60 +2,98 @@ import { expect } from "../human-fixture";
 import { test } from "../human-fixture";
 
 test.describe("@core Crear agente — flujo humano completo", () => {
-  test("creo mi primer agente y reviso su detalle", async ({ h }) => {
-    await h.step("entro a la app", () => h.page.goto("/"));
+  test("creo mi primer agente y lo selecciono", async ({ h, page }, testInfo) => {
+    const esMovil = testInfo.project.name.includes("mobile");
+    const { page: _p, step, humanClick, humanFill, humanThink } = h;
+    // En móvil el sidebar es drawer: abrirlo para operar el panel
+    const abrirPanelSiCerrado = async () => {
+      const abierta = await h.page.locator(".app-sidebar").evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        return r.left < window.innerWidth && r.width > 50;
+      });
+      if (!abierta) {
+        await humanClick(h.page.locator(".header-left button").first());
+        await h.page.waitForTimeout(700); // transición del drawer
+      }
+    };
 
-    await h.step("leo que no hay agentes todavía", async () => {
-      await expect(h.page.getByText("No hay agentes creados")).toBeVisible();
+
+    await step("entro a la app y voy a la pestaña Agentes", async () => {
+      await h.page.goto("/");
+      await abrirPanelSiCerrado();
+      await humanClick(h.page.getByRole("button", { name: "Agentes" }).first());
     });
 
-    await h.humanThink();
-
-    await h.step("decido crear el primer agente (click en el botón)", async () => {
-      await h.humanClick(h.page.getByRole("button", { name: "Crear primer agente" }));
+    await step("leo que no hay agentes todavía", async () => {
+      await expect(h.page.getByText("No hay agentes")).toBeVisible();
     });
 
-    await h.step("el agente aparece como tarjeta en la oficina", async () => {
-      await expect(h.page.getByRole("button", { name: /Agente 1/ })).toBeVisible();
-      await expect(h.page.getByText("No hay agentes creados")).not.toBeVisible();
+    await humanThink();
+
+    await step("decido crear el primer agente (abre el modal)", async () => {
+      await humanClick(h.page.getByRole("button", { name: /Crear Agente|Nuevo Agente/ }).first());
+      await expect(page.getByRole("dialog")).toBeVisible();
     });
 
-    await h.step("lo creo otro más por si quiero un equipo", async () => {
-      // nota: el botón inicial desapareció al haber agentes; el estado vacío era solo el arranque
-      await expect(h.page.getByRole("button", { name: /Agente 2/ })).toHaveCount(0);
+    await step("le pongo nombre y lo guardo", async () => {
+      await humanFill(h.page.getByRole("textbox", { name: "Nombre" }), "Mi Primer Agente");
+      await h.page.getByRole("button", { name: "Guardar" }).click();
     });
 
-    await h.humanThink();
-
-    await h.step("hago click en la tarjeta del agente para ver su detalle", async () => {
-      await h.humanClick(h.page.getByRole("button", { name: /Agente 1/ }));
+    await step("el agente aparece en la lista y queda seleccionado", async () => {
+      await expect(h.page.getByText("Mi Primer Agente")).toBeVisible();
+      await expect(h.page.locator(".item.selected")).toHaveCount(1);
+      await expect(h.page.getByText("No hay agentes")).not.toBeVisible();
     });
 
-    await h.step("el panel derecho muestra nombre, rol y estado", async () => {
-      await expect(h.page.locator(".agent-detail")).toBeVisible();
-      await expect(h.page.getByText("Rol: dev")).toBeVisible();
-      await expect(h.page.getByText("Estado: idle")).toBeVisible();
-    });
+    await humanThink();
 
-    await h.step("la tarjeta queda marcada como seleccionada", async () => {
-      await expect(h.page.locator(".agent-card.selected")).toHaveCount(1);
+    await step("su detalle está accesible en la lista (item seleccionado)", async () => {
+      await expect(h.page.locator(".item.selected .item-name")).toHaveText("Mi Primer Agente");
     });
   });
 
-  test("reviso el detalle de cada agente de mi equipo", async ({ h }) => {
-    await h.step("entro con agentes ya creados via store (setup rápido)", () =>
-      h.page.goto("/"),
-    );
+  test("reviso el detalle de cada agente de mi equipo", async ({ h, page }, testInfo) => {
+    const esMovil = testInfo.project.name.includes("mobile");
+    const { step, humanClick, humanFill, humanThink } = h;
+    // En móvil el sidebar es drawer: abrirlo para operar el panel
+    const abrirPanelSiCerrado = async () => {
+      const abierta = await h.page.locator(".app-sidebar").evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        return r.left < window.innerWidth && r.width > 50;
+      });
+      if (!abierta) {
+        await humanClick(h.page.locator(".header-left button").first());
+        await h.page.waitForTimeout(700); // transición del drawer
+      }
+    };
 
-    await h.step("creo el primero", async () => {
-      await h.humanClick(h.page.getByRole("button", { name: "Crear primer agente" }));
+
+    await step("entro y creo el primero", async () => {
+      await h.page.goto("/");
+      await abrirPanelSiCerrado();
+      await humanClick(h.page.getByRole("button", { name: "Agentes" }).first());
+      await humanClick(h.page.getByRole("button", { name: /Crear Agente|Nuevo Agente/ }).first());
+      await humanFill(h.page.getByRole("textbox", { name: "Nombre" }), "Agente Uno");
+      await h.page.getByRole("button", { name: "Guardar" }).click();
     });
 
-    await h.humanThink(200, 400);
+    await humanThink(200, 400);
 
-    await h.step("selecciono el agente y verifico que el panel reacciona", async () => {
-      await h.humanClick(h.page.getByRole("button", { name: /Agente 1/ }));
-      await expect(h.page.locator(".agent-detail h3")).toHaveText(/Agente 1/);
+    await step("creo el segundo", async () => {
+      await humanClick(h.page.getByRole("button", { name: /Crear Agente|Nuevo Agente/ }).first());
+      await humanFill(h.page.getByRole("textbox", { name: "Nombre" }), "Agente Dos");
+      await h.page.getByRole("button", { name: "Guardar" }).click();
+    });
+
+    await step("selecciono el primero y el panel reacciona", async () => {
+      await humanClick(h.page.locator(".item", { hasText: "Agente Uno" }));
+      await expect(h.page.locator(".item.selected .item-name")).toHaveText("Agente Uno");
+    });
+
+    await step("selecciono el segundo y la selección cambia", async () => {
+      await humanClick(h.page.locator(".item", { hasText: "Agente Dos" }));
+      await expect(h.page.locator(".item.selected .item-name")).toHaveText("Agente Dos");
     });
   });
 });

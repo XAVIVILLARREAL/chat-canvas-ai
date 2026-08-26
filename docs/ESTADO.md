@@ -50,6 +50,12 @@
 - **DEV-ENVIRONMENT** (`docs/DEV-ENVIRONMENT.md`) — 3 comandos para correr el stack
 - **PLATAFORMAS-TARGETS** (`docs/PLATAFORMAS-TARGETS.md`) — matriz canónica "qué se instala dónde": servidor Linux 24/7 + clientes Windows/macOS/Linux/Android/iOS/web. **Cierra la duda "¿el plan construye el servidor o los clientes?": construye AMBOS.** iOS es el único entregable pendiente de generar (`tauri ios init` en un Mac → `src-tauri/gen/apple/`); Etapa 10 y MATRIZ MP.1-MP.6 lo hacen explícito; release.yml ahora builda los 3 desktops.
 
+## Loop humano exhaustivo (2026-08-25)
+
+- **Suite humana: 17/17 verdes** (móvil 375 + desktop 1440, video por paso) — temas, idioma, drawer, boot, create-agent (con modal NUEVO), keyboard-nav, responsive
+- **7 bugs reales cazados y arreglados por el loop** (React Compiler vs i18n, doble drawer, tabs desbordadas, a11y de listas, carrera de sidebar, z-index móvil, foco de dropdown)
+- COVERAGE-GUI: 82 elementos (8 ✅ verificados, 74 ⬜ de fases futuras)
+
 ## Temas + i18n + responsive FUNCIONALES (2026-08-25)
 
 - **Temas**: dark/light reales con persistencia y modo system (`src/theme.ts` + tokens light)

@@ -1,50 +1,54 @@
-import { useSyncExternalStore } from 'react';
+import { create } from 'zustand';
 
 export type Theme = 'dark' | 'light' | 'system';
 
 const STORAGE_KEY = 'canvas-theme';
-let current: Theme = (localStorage.getItem(STORAGE_KEY) as Theme) || 'system';
-
-const listeners = new Set<() => void>();
-function emit() { listeners.forEach((l) => l()); }
 
 function systemPrefersLight(): boolean {
   return window.matchMedia('(prefers-color-scheme: light)').matches;
 }
 
-function resolved(t: Theme): 'dark' | 'light' {
+function resolve(t: Theme): 'dark' | 'light' {
   return t === 'system' ? (systemPrefersLight() ? 'light' : 'dark') : t;
 }
 
-function apply() {
-  document.documentElement.dataset.theme = resolved(current);
+function apply(t: Theme) {
+  document.documentElement.dataset.theme = resolve(t);
 }
 
-// Listener del sistema para modo "system"
+const initial = (): Theme => {
+  const saved = (localStorage.getItem(STORAGE_KEY) as Theme) || 'system';
+  apply(saved);
+  return saved;
+};
+
+interface ThemeState {
+  theme: Theme;
+  setTheme: (t: Theme) => void;
+  toggle: () => void;
+}
+
+export const useThemeStore = create<ThemeState>((set, get) => ({
+  theme: initial(),
+  setTheme: (t) => {
+    localStorage.setItem(STORAGE_KEY, t);
+    apply(t);
+    set({ theme: t });
+  },
+  toggle: () => {
+    const next = resolve(get().theme) === 'dark' ? 'light' : 'dark';
+    get().setTheme(next);
+  },
+}));
+
+// El modo "system" sigue al OS en vivo
 window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
-  if (current === 'system') apply();
+  apply(useThemeStore.getState().theme);
 });
 
-apply();
-
-export function getTheme(): Theme { return current; }
-export function getResolvedTheme(): 'dark' | 'light' { return resolved(current); }
-
-export function setTheme(t: Theme) {
-  current = t;
-  localStorage.setItem(STORAGE_KEY, t);
-  apply();
-  emit();
-}
-
-export function toggleTheme() {
-  setTheme(resolved(current) === 'dark' ? 'light' : 'dark');
-}
-
-export function useTheme(): { theme: Theme; resolved: 'dark' | 'light'; setTheme: typeof setTheme; toggle: typeof toggleTheme } {
-  useSyncExternalStore(
-    (cb) => { listeners.add(cb); return () => listeners.delete(cb); },
-    () => current
-  );
-  return { theme: current, resolved: resolved(current), setTheme, toggle: toggleTheme };
+export function useTheme() {
+  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
+  const toggle = useThemeStore((s) => s.toggle);
+  return { theme, resolved: resolve(theme), setTheme, toggle };
 }

@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { Sun, Moon, Languages } from 'lucide-react';
 import { useTheme } from '../theme';
-import { useI18n, setLocale, SUPPORTED_LOCALES } from '../i18n';
+import { useI18n, useI18nStore, SUPPORTED_LOCALES } from '../i18n';
 import { useCanvasStore } from '../stores/canvas-store';
 import type { Canvas } from '../types';
 import './Header.css';
@@ -162,7 +162,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button className="header-btn" title={t("header.language")} aria-label={t("header.language")}><Languages width={18} height={18} /></button>
           <div className="dropdown-menu">
             {SUPPORTED_LOCALES.map((l) => (
-              <button key={l} className={`dropdown-item ${locale === l ? 'active' : ''}`} onClick={() => setLocale(l)}>
+              <button key={l} className={`dropdown-item ${locale === l ? 'active' : ''}`} onClick={(e) => { useI18nStore.getState().setLocale(l); (e.currentTarget as HTMLElement).blur(); }}>
                 {l.toUpperCase()}{locale === l && <span className="active-badge">✓</span>}
               </button>
             ))}

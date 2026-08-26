@@ -1115,15 +1115,14 @@ button:not(:disabled):active { transform: scale(0.97); }
   .app-main {
     grid-template-columns: 1fr;
   }
-  .app-sidebar,
-  .sidebar {
+  .app-sidebar {
     position: fixed !important;
     top: 0;
     right: 0;
     bottom: 0;
     width: min(86vw, 340px) !important;
     height: 100dvh;
-    z-index: 50;
+    z-index: 1200; /* drawer sobre todo; el toggle queda libre a la izquierda */
     background: var(--bg-surface);
     box-shadow: var(--shadow-xl);
     transform: translateX(100%);
@@ -1144,6 +1143,12 @@ button:not(:disabled):active { transform: scale(0.97); }
     flex-wrap: wrap;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-3);
+    z-index: 1100; /* sobre la toolbar del canvas (z-1000) en móvil */
+    position: relative;
+  }
+  .app-main {
+    position: relative;
+    z-index: auto; /* sin contexto propio: drawer(1200) > header(1100) > toolbar(1000) */
   }
   .header-center h1 { font-size: var(--text-base); }
   .subtitle { display: none; }
@@ -1157,4 +1162,50 @@ button:not(:disabled):active { transform: scale(0.97); }
 .app-sidebar.closed { width: 0; }
 @media (max-width: 900px) {
   .app-sidebar.closed { transform: translateX(100%); width: min(86vw, 340px); }
+  /* Las tabs del sidebar envuelven dentro del drawer (no desbordan) */
+  .app-sidebar .sidebar-tabs { flex-wrap: wrap; }
+  .app-sidebar .sidebar-tab { flex: 1 1 40%; min-width: 0; justify-content: center; }
+  /* El .sidebar interno vuelve a flujo normal dentro del drawer */
+  .app-sidebar .sidebar { position: static !important; width: 100% !important; height: 100%; transform: none !important; }
+}
+
+/* Modal crear agente (glass profundo) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: oklch(0.05 0.02 260 / 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 600;
+  animation: float-in 0.25s var(--ease-out-expo);
+}
+.modal-agente {
+  width: min(92vw, 420px);
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+}
+.modal-agente h3 { font-family: var(--font-display); margin-bottom: var(--space-4); }
+.modal-agente input, .modal-agente select {
+  width: 100%;
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+}
+.modal-actions { display: flex; gap: var(--space-3); justify-content: flex-end; }
+.modal-actions button {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.modal-actions .btn-primary {
+  background: var(--gradient-brand);
+  border: none;
+  font-weight: 600;
 }
