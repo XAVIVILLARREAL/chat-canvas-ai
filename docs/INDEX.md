@@ -36,6 +36,7 @@
 | [ETAPA-0-IMPLEMENTACION](./ETAPA-0-IMPLEMENTACION.md) | Plan accionable de la Fundación (slices) |
 | [COVERAGE-GUI](./COVERAGE-GUI.md) | Cobertura 100%: botón/función → test humano |
 | [WORKFLOW-AGENTICO](./WORKFLOW-AGENTICO.md) | Loop: 5 sub-agentes en paralelo + debug en vivo |
+| [TARJETAS-ETAPA-0](./TARJETAS-ETAPA-0.md) | Fases de la Fundación en formato canónico (tarjetas) |
 | [SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md) | Modelo canónico de datos + migraciones |
 | [CONTRATO-SKILL](./CONTRATO-SKILL.md) | Formato `.md` de skills |
 | [API](./API.md) | Inventario REST del gateway |

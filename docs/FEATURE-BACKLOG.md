@@ -36,7 +36,18 @@
 - **F22 quick capture**: Tauri global-shortcut (plugin ya está en tauri.conf) → ventana flotante → cola local → notificación al terminar.
 - **F23/F24**: proyecciones del `event_stream` — cero tablas nuevas.
 
-## 3 · POST-V1 (backlog marcado, no bloquea)
+## 3 · Micro-mejoras aprobadas (F29-F32 — pequeñas, alto pulido)
+
+| # | Mejora | Qué es | Dónde cae |
+|---|---|---|---|
+| F29 | **Pin/favoritos** de sesiones y skills | Fijar arriba lo que más usas (icono pin, orden manual) | A.2 sidebar |
+| F30 | **Modo enfoque (zen)** | Ocultar paneles, solo chat/canvas a pantalla completa; Esc sale | A.1 AppShell |
+| F31 | **Acciones masivas** | Multi-selección en listas: archivar/borrar/mover varias a la vez | A.2 + papelera |
+| F32 | **Rutinas programadas visibles** | El cron del canvas se ve/gestiona desde UI ("cada lunes 9am ejecuta skill X") con historial | F.4 triggers + G.6 |
+
+> Todas viajan dentro de fases existentes (sin filas MATRIZ nuevas); sus elementos interactivos SÍ añaden fila en [COVERAGE-GUI](./COVERAGE-GUI.md).
+
+## 4 · POST-V1 (backlog marcado, no bloquea)
 
 | Función | Por qué espera |
 |---|---|
@@ -47,7 +58,7 @@
 | Plantillas de proyecto en marketplace | Skills + bundles ya cubren; ampliar después |
 | Modo presentación de entregas | Bonito, no core |
 
-## 4 · RECHAZADAS (con razón — anti-scope)
+## 5 · RECHAZADAS (con razón — anti-scope)
 
 | Función | Razón del rechazo |
 |---|---|
@@ -57,7 +68,7 @@
 | Editor de video/imagen generativa | Out of scope; los skills pueden invocar tools externas vía MCP |
 | Sincronización P2P blockchain | Complejidad sin beneficio demostrado; sync servidor cubre |
 
-## 5 · Impacto en el plan
+## 6 · Impacto en el plan
 
 - **MATRIZ:** +12 fases (A.10, C.8, C.9, N.8, O.4 + A.0b, A.2b, A.7b, A.11, G.1b, N.5b, S.5) → total **161 fases** — **las 12 funciones tienen fila con sus pruebas** (regla: fase sin fila NO se construye).
 - **COVERAGE-GUI:** +12 filas (una por función con UI) → 64 elementos.

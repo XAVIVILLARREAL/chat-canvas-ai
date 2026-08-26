@@ -116,6 +116,29 @@ Una fase que cierra con deuda nueva NO está cerrada.
 
 Cada fase corre el loop de [WORKFLOW-AGENTICO](../WORKFLOW-AGENTICO.md): **ANALYZE (5 sub-agentes en paralelo: spec/tests/riesgo/seguridad/UX) → DECIDE → MODIFY (TDD humano) → TEST (Playwright humano + debug en vivo) → ITERATE (máx 5) → DECIDE (gate o escalar)**. Análisis en paralelo en TODO el plan, no solo al inicio.
 
+## La Tarjeta de Fase (formato canónico v4.1)
+
+> Toda fase, antes de codificarse, se llena como **tarjeta** (en el plan correspondiente o `docs/TARJETAS-*.md`). Es lo que convierte una fila densa de la MATRIZ en un contrato claro de resultado + calidad.
+
+```markdown
+### Tarjeta <FASE> — <nombre>
+**Resultado esperado (observable):** <lo que un humano VE funcionando, 1-2 líneas>
+**Pruebas:**
+- [U] Unit: <qué lógica pura>
+- [I] Integration: <backend/DB/provider, con chaos si toca I/O>
+- [E] E2E funcional: <flujo con selectores estables>
+- [H] Humana: <clics+teclado exactos, móvil 375 + desktop 1440>
+**Gate:** <demo verificable que cierra la fase>
+**Riesgos:** <qué puede romperse / acoplamiento> · **Estimación:** <h>
+**Dependencias:** <fases previas> · **DoD:** checklist estándar + filas COVERAGE-GUI
+```
+
+Reglas:
+1. **El "Resultado esperado" es observable por un humano**, no técnico ("veo X cuando hago Y"), nunca "el endpoint responde 200".
+2. Si una capa no aplica se marca `N/A` **con razón** (no se omite).
+3. La tarjeta vive junto al plan (o en `docs/TARJETAS-*.md`) y es parte del **DoR** (ya exigido en [EJECUCION-ORDEN](../EJECUCION-ORDEN.md)).
+4. Ejemplos completos y vigentes: [`TARJETAS-ETAPA-0`](../TARJETAS-ETAPA-0.md).
+
 ## Anti-patrones prohibidos
 
 | Prohibido | Por qué |

@@ -91,6 +91,10 @@
 | Papelera | Ver borrados + restaurar | eliminar sesión → papelera → restaurar intacta | `papelera.spec.ts` | ⬜ |
 | Providers | Perfiles BYOK (trabajo/personal) | cambiar perfil → providers conmutan por proyecto | `providers.spec.ts` | ⬜ |
 | Tools web | web_search/web_fetch del agente | "investiga X" → cita fuentes con links; dominio bloqueado → accionable | `webtools.spec.ts` | ⬜ |
+| Sesiones/Skills | Pin/favoritos | fijar arriba, orden manual persiste tras reinicio | `pins.spec.ts` | ⬜ |
+| AppShell | Modo enfoque (zen) | ocultar paneles → solo chat/canvas; Esc sale; estado no se pierde | `zen.spec.ts` | ⬜ |
+| Listas | Acciones masivas | multi-selección → archivar/borrar/mover varias a la vez | `masivo.spec.ts` | ⬜ |
+| Rutinas | Rutinas programadas visibles | "cada lunes 9am ejecuta X" visible/gestionable + historial de corridas | `rutinas.spec.ts` | ⬜ |
 
 ## Reglas
 

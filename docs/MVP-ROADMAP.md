@@ -71,7 +71,7 @@
 
 | MVP | Semanas | Esfuerzo estimado | Bloques grandes |
 |---|---|---|---|
-| MVP-1 | 1-6 | ~60-90 h | Etapa 0 (15-20 h) · Chat A (20-25 h) · Runtime C (20-25 h) · Editor B minimal (10 h) |
+| MVP-1 | 1-6 | ~75-105 h | Etapa 0 (25-35 h, ver [TARJETAS-ETAPA-0](./TARJETAS-ETAPA-0.md)) · Chat A (20-25 h) · Runtime C (20-25 h) · Editor B minimal (10 h) |
 | MVP-2 | 7-14 | ~100-140 h | Memoria D (30 h) · Skills G (30 h) · Pruebas H (35 h) · Kanban KR (15 h) · Oficina F.0-F.6 (20 h) |
 | MVP-3 | 15-24 | ~120-180 h | Automatización F (35 h) · Nube N.7+S (30 h) · Sync L (15 h) · GitHub M (15 h) · Marketplace O (20 h) · Targets MP (15 h) |
 

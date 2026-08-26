@@ -2,6 +2,13 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 29 — Tarjeta de Fase canónica + micro-mejoras F29-F32)
+
+- **Tarjeta de Fase** (SDD-002 v4.1): formato canónico que separa **Resultado esperado (observable)** de las pruebas por capa [U/I/E/H] + gate + riesgos + estimación. Obligatoria en el DoR (MATRIZ header). Responde: "¿las fases aclaran los resultados esperados y las pruebas de calidad?" — ahora sí, con contrato explícito por fase.
+- **TARJETAS-ETAPA-0** (`docs/TARJETAS-ETAPA-0.md`): las 9 fases de la Fundación en tarjetas completas (0.1-0.8 + cierre M0), con capas N/A justificadas, riesgos y estimaciones reales.
+- **Hallazgo de estimación**: Etapa 0 era 15-20h → realista **25-35 h paralelo / 42-56 h secuencial**; MVP-ROADMAP corregido con regla "si tarda 2× se parte en slices".
+- **Micro-mejoras aprobadas (F29-F32)**: pin/favoritos · modo enfoque zen · acciones masivas · rutinas programadas visibles — viajan dentro de fases existentes; COVERAGE-GUI +4 filas (71 elementos).
+
 ## 2026-08-25 (sesion 28 — Análisis de funciones del producto: +12 funciones F17-F28)
 
 - **FEATURE-BACKLOG** (`docs/FEATURE-BACKLOG.md`): análisis completo de qué funciones agregar — contra competidores (Cursor/Cline/n8n/Lovable) y los 7 diferenciadores:
