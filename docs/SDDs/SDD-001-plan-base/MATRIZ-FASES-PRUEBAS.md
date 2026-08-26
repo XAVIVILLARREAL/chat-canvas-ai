@@ -30,6 +30,10 @@
 | A.8 | Resume inteligente (v1 sin rungs; D.1 enriquece) | Integration: sesión interrumpida → resume card correcta. E2E HUMANA: cerrar a mitad → reabrir → continuar fluido |
 | A.9 | Ramas visuales al editar (‹2/3›) | Unit tree-store. E2E HUMANA: edito mensaje 2× → flechas ‹› navegan alternativas sin perder ninguna |
 | A.10 | Comparador A/B de modelos ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F19) | E2E HUMANA: mismo prompt a 2 modelos lado a lado → elijo ganadora → rung DECISION guarda preferencia y el router la aprende |
+| A.0b | Importar historial ChatGPT/Claude (F25) | E2E HUMANA: importo JSON exportado de ChatGPT → sesiones reconstruidas con fechas/roles correctos; JSON corrupto → error accionable sin perder nada |
+| A.2b | Papelera + restaurar (F26) | E2E HUMANA: elimino sesión/skill → aparece en papelera → restauro intacto; vaciar papelera pide confirmación |
+| A.7b | Forecast de costo pre-envío (F24) | Unit: estimación tokens×precio del modelo. E2E HUMANA: antes de Enter veo "≈ tokens ≈ $" y coincide ±20% con el costo real del mensaje |
+| A.11 | Export sesión a PDF/Markdown (F28) | E2E HUMANA: exporto sesión → reporte con rungs + resultado final legible y compartible |
 
 ## Etapa 2 · Sidepanels Lovable — `plan-b-sidepanels-lovable.md`
 | Fase | Nombre | Pruebas |
@@ -102,6 +106,7 @@
 | Fase | Nombre | Pruebas |
 |---|---|---|
 | G.1 | Modelo de datos + CRUD | Cargo test repos. E2E HUMANA: crear/editar/duplicar/eliminar skill desde cero |
+| G.1b | Perfiles BYOK trabajo/personal (F27) | E2E HUMANA: creo 2 perfiles con keys distintas → cambio perfil en un proyecto → providers/keys conmutan; el proyecto recuerda su perfil |
 | G.2 | Editor visual + Tool-Gating | Unit validación + enforcement de gating (agente QA no invoca write). E2E HUMANA: crear skill completo solo con clicks y tecleo |
 | G.3 | Compilador a dialectos | Cargo test snapshot por dialecto. Roundtrip: compilar→ejecutar en reasonix real→respuesta esperada |
 | G.4 | Laboratorio sandbox | E2E: probar skill real con DeepSeek barato; costo del ensayo visible; resultado persistido |
@@ -169,6 +174,7 @@
 | N.6 | Plantillas de sesiones | E2E: crear desde plantilla → agentes configurados |
 | N.7 | Modo nube 24/7 (suscripción, ADR-006) | Integration: cola 20 tareas → consumo ordenado + corte por presupuesto. Chaos: provider cae → pausa limpia. E2E: cierro app → reabro en otro dispositivo → sesión siguió con evidencia |
 | N.8 | Puentes de mensajería: WhatsApp/Telegram/Discord ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F21, nube Pro) | Integration: mensaje desde Telegram → agente responde; auth 1:1 con cuenta + rate-limit; streaming resumido + link a evidencia |
+| N.5b | Dashboard personal de uso/costos (F23) | E2E HUMANA: abro dashboard → costo por proyecto/día, top skills y entregas REALES del event_stream; filtros por rango de fechas |
 
 ## Etapa 15 · Marketplace + v1.0 — `plan-o-marketplace-v1.md`
 | Fase | Nombre | Pruebas |
@@ -245,6 +251,7 @@
 | S.2 | Stack servidor Rust eficiente | Integration: restore completo desde backup B2 en máquina limpia ≤30 min (drill trimestral automatizado). HUMANA: operador cambia preset KV/hardware en un click y ve el efecto en memoria real |
 | S.3 | Cliente Tauri eficiente (**producto base, ADR-006**) | E2E HUMANA del shell — streaming sobrevive background (iOS), auto-update firmado verificado, degradación gráfica planificada (WebKitGTK) documentada |
 | S.4 | Presupuesto de costos proyectado | Unit: cálculo costos por scope ([C·C.2]) contra tabla de precios del registro ([C·C.7]) |
+| S.5 | Captura rápida global (hotkey del SO, F22) | E2E HUMANA desktop: hotkey global → mini-ventana → escribo tarea → envío → notificación al terminar con evidencia; sin foco en la app principal funciona |
 
 ## Etapa 10 · Multi-plataforma + Nube — `PLATAFORMAS-TARGETS.md` (clientes instalables + servidor Linux 24/7)
 | Fase | Nombre | Pruebas |
@@ -278,4 +285,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 154 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 119** (A–P 97 incl. H.9a/H.9b, A.10/C.8/C.9, sin J.3/K.1/K.2 + V 5 + S/T/U 17) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8).
+**Total: 161 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 126** (A–P 103 incl. H.9a/H.9b, A.10/C.8/C.9/A.0b/A.2b/A.7b/A.11/G.1b/N.5b/N.8/O.4, sin J.3/K.1/K.2 + V 5 + S/T/U 18 incl. S.5) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8).

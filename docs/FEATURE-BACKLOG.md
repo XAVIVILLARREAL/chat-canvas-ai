@@ -18,13 +18,13 @@
 | F19 | **Comparador A/B de modelos** | Mismo prompt → 2 modelos lado a lado → eliges la mejor respuesta (y el router aprende tu preferencia) | Confianza + ahorro: eliges modelo con evidencia, no por marketing | Evidence-first | **A.10** (Etapa 1) |
 | F20 | **Compartir entrega pública (link read-only)** | Link firmado con expiración a una entrega/artefacto — se abre sin cuenta | Alimenta el KPI de growth de SDD-010 ("% que comparten artefacto en sesión 1") — ¡hoy no existe la función de compartir! | Evidence-first (comparte evidencia) | **O.4** (Etapa 15) |
 | F21 | **Puentes de mensajería** (WhatsApp/Telegram/Discord) | Habla con tus agentes desde el chat que ya usas; nube 24/7 responde | Killer feature del tier Pro: tus agentes te alcanzan donde estás | Local-first+BYOK (tú decides el canal) | **N.8** (Etapa 14, nube) |
-| F22 | **Captura rápida global** (hotkey del SO) | Hotkey global → mini-ventana → tarea al agente → notificación al terminar | Capturar ideas/tareas sin cambiar de app | Humano en el centro | S.3 patrones (desktop) |
-| F23 | **Dashboard personal de uso/costos** | Vista usuario: costo por proyecto/día, top skills, entregas, tendencia | El costo visible genera confianza y control (BYOK) | Humano en el centro | N.5b (amplía tracking) |
-| F24 | **Forecast de costo pre-envío** | Antes de enviar: "≈ 3.4k tokens ≈ $0.011 con deepseek-chat" | Sorpresa-cero en la factura; refuerza BYOK | Humano en el centro | A.7b (amplía widget costo) |
-| F25 | **Importar desde ChatGPT/Claude** | Importar historial exportado (JSON) → sesiones locales | Hook de adquisición: migrar es 1 click, empezar de cero duele | Memory Rail (tu historia vive aquí) | A.0b (onboarding) |
-| F26 | **Papelera + restaurar** | UI sobre el soft-delete del schema: ver borrados, restaurar | "No pierdes nada" — profesional básico | Local-first (dueño de tus datos) | A.2b (persistencia) |
-| F27 | **Perfiles BYOK** (trabajo/personal) | Grupos de providers conmutables; cada proyecto usa su perfil | Separar contextos sin duplicar keys | BYOK seguro | G.1b (skills/providers) |
-| F28 | **Export sesión a PDF/Markdown** | Reporte compartible/imprimible de una sesión (rungs + resultado) | Entregables para clientes/jefes sin acceso a la app | Evidence-first | A.6b (persistencia) |
+| F22 | **Captura rápida global** (hotkey del SO) | Hotkey global → mini-ventana → tarea al agente → notificación al terminar | Capturar ideas/tareas sin cambiar de app | Humano en el centro | **S.5** (Transversal S, desktop) |
+| F23 | **Dashboard personal de uso/costos** | Vista usuario: costo por proyecto/día, top skills, entregas, tendencia | El costo visible genera confianza y control (BYOK) | Humano en el centro | **N.5b** (amplía tracking) |
+| F24 | **Forecast de costo pre-envío** | Antes de enviar: "≈ 3.4k tokens ≈ $0.011 con deepseek-chat" | Sorpresa-cero en la factura; refuerza BYOK | Humano en el centro | **A.7b** (amplía widget costo) |
+| F25 | **Importar desde ChatGPT/Claude** | Importar historial exportado (JSON) → sesiones locales | Hook de adquisición: migrar es 1 click, empezar de cero duele | Memory Rail (tu historia vive aquí) | **A.0b** (onboarding) |
+| F26 | **Papelera + restaurar** | UI sobre el soft-delete del schema: ver borrados, restaurar | "No pierdes nada" — profesional básico | Local-first (dueño de tus datos) | **A.2b** (persistencia) |
+| F27 | **Perfiles BYOK** (trabajo/personal) | Grupos de providers conmutables; cada proyecto usa su perfil | Separar contextos sin duplicar keys | BYOK seguro | **G.1b** (skills/providers) |
+| F28 | **Export sesión a PDF/Markdown** | Reporte compartible/imprimible de una sesión (rungs + resultado) | Entregables para clientes/jefes sin acceso a la app | Evidence-first | **A.11** (persistencia) |
 
 ### Detalle de implementación (resumen)
 
@@ -59,6 +59,7 @@
 
 ## 5 · Impacto en el plan
 
-- **MATRIZ:** +5 fases (A.10, C.8, C.9, N.8, O.4) → total **154 fases**.
-- **COVERAGE-GUI:** +12 filas (una por función con UI).
+- **MATRIZ:** +12 fases (A.10, C.8, C.9, N.8, O.4 + A.0b, A.2b, A.7b, A.11, G.1b, N.5b, S.5) → total **161 fases** — **las 12 funciones tienen fila con sus pruebas** (regla: fase sin fila NO se construye).
+- **COVERAGE-GUI:** +12 filas (una por función con UI) → 64 elementos.
 - **PRD:** funciones F17-F28 añadidas a la tabla de features por MVP.
+- **Loop:** cada función se implementa con el [WORKFLOW-AGENTICO](./WORKFLOW-AGENTICO.md) (ANALYZE 5 sub-agentes → TDD humano → debug en vivo → iterar) y su "done" = resultado funcional en video.
