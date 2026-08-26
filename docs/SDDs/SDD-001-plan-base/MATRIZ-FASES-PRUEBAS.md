@@ -67,7 +67,7 @@
 | C.1 | ReasonixProvider | Cargo test parser con fixtures reales de C.0 |
 | C.2 | Enrutamiento por costo + telemetría | Unit router + cálculo costos. E2E: badge costo sube durante sesión real barata |
 | C.3 | Robustez | Chaos integration: kill -9 → recuperación automática; estado consistente post-cancel |
-| **H.9a** | **Aislamiento contenedor mínimo (plan-h, se ejecuta AQUÍ)** | Cargo test: spawn/kill/timeout con fixture. Chaos: matar contenedor a mitad → agente se recupera en uno nuevo con estado consistente; red denegada por defecto verificada |
+| H.9a | Aislamiento contenedor mínimo (plan-h, se ejecuta AQUÍ) | Cargo test: spawn/kill/timeout con fixture. Chaos: matar contenedor a mitad → agente se recupera en uno nuevo con estado consistente; red denegada por defecto verificada |
 | C.5 | Motor Contexto/Caché configurable (SDD-006 §1) | Unit hash/orden estable. Integration DeepSeek real: cache_hit>90% post warm-up; cambio de knob → aviso de caché fría. E2E HUMANA: aplicar preset de rol en un click |
 | C.6 | OllamaProvider local (ready-to-plug) | Unit: detección/parsing /api/tags + errores conexión. Integration Ollama real: chat streaming + embeddings; preset KV verificado por memoria consumida. E2E HUMANA: conectar Ollama desde cero con la guía in-app |
 | C.7 | Registro universal de proveedores (v1; OAuth/small_model → C.7b post-base) | Unit: parser/validador registro, merge catálogo, blacklist/whitelist, small_model routing. Integration: 3 proveedores REALES vía el mismo trait (streaming + precios correctos); OAuth device-flow mockeado. E2E: agregar proveedor desde JSON; selector muestra precio/contexto. HUMANA @core-ampliada: no-programador conecta OpenRouter pegando key <2 min y elige modelo viendo precio; whitelist esconde modelos |

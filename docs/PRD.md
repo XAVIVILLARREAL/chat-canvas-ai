@@ -76,6 +76,7 @@
 ## 6 · Funciones añadidas tras revisión de producto (F17-F28)
 
 > Análisis completo con decisiones (agregar/post-v1/rechazadas): [FEATURE-BACKLOG](./FEATURE-BACKLOG.md). Resumen de lo que ENTRA al plan:
+> **F29-F40** (micro-mejoras + ronda Buzz/Claude Code/mercado) están detalladas en el [FEATURE-BACKLOG](./FEATURE-BACKLOG.md) con sus fases MATRIZ — mismo contrato: toda función con su resultado medible humano.
 
 | ID | Función | Resultado medible (Playwright humano) | Gate |
 |---|---|---|---|

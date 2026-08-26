@@ -274,6 +274,7 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] Persistencia de sesiones en SQLite (mensajes, contexto, metadata)
 - [ ] Reanudación de sesiones (cargar historial completo)
 - [ ] Widget de costo por sesión (tokens, USD, cache hits)
+- [ ] **Ronda producto:** comparador A/B (A.10) · forecast pre-envío (A.7b) · import ChatGPT/Claude (A.0b) · papelera+restaurar (A.2b) · export PDF/MD (A.11) · cola de streaming (A.4b) · presencia/reacciones (A.12) — [FEATURE-BACKLOG](../../FEATURE-BACKLOG.md)
 
 **Fases MATRIZ:** A.0–A.10 · Gate **A** · [plan-a](./plan-a-chat-codex.md)
 **Cierre:** DoD + filas COVERAGE-GUI (appshell/chat/config/providers/backup/i18n) en ✅.
@@ -299,6 +300,10 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] ACP Protocol: comunicación entre agentes via JSON-RPC
 - [ ] Subagent Delegation: un skill puede delegar a sub-agentes
 - [ ] **Sandbox Linux**: skills/agentes que ejecutan código corren en contenedor Ubuntu (patrón GrokBot) — red denegada por defecto
+- [ ] **Tools web nativas** web_search/web_fetch con allowlist (C.8)
+- [ ] **Visión multimodal**: screenshots/PDF → el agente los entiende (C.9)
+- [ ] **Browser automation** en sandbox: navegar/click/capturar (C.10)
+- [ ] **Hooks de ciclo de vida**: PreToolUse/PostToolUse/Stop configurables por el usuario (C.11)
 
 **Dependencias:** Etapa 2 (chat funcional), Etapa 0 (secretos BYOK)
 **Gate C:** pego mi key BYOK en <2 min → mensaje real con streaming → badge de costo sube → mato el provider → circuit breaker hace fallback sin perder la sesión → Ollama offline responde → comparador A/B elijo ganadora → "investiga X" cita fuentes con links → screenshot con bug lo corrige en código. Suite humana verde.
@@ -341,6 +346,7 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] Skills globales vs locales (por proyecto)
 - [ ] Multi-agent loops (skill orquesta múltiples agentes)
 - [ ] Rutinas por demostración ("follow along" — grabar y re-ejecutar)
+- [ ] **Perfiles BYOK** trabajo/personal (G.1b) · **Importar rules files** .cursorrules/.clinerules/CLAUDE.md → skill (G.3b)
 
 **Dependencias:** Etapa 3 (runtime), Etapa 4 (memoria para knowledge), Etapa 0 (contrato de skill)
 **Gate E:** creo un skill desde cero **solo con clicks y tecleo** → nace con avatar/emoji/bio → lo pruebo en el laboratorio con costo visible → tool-gating bloquea escritura al QA → grabo una rutina y se re-ejecuta → perfiles BYOK conmutan por proyecto. Suite humana verde.
@@ -423,6 +429,7 @@ Cerrar la **Etapa 0** completa ([ETAPA-0-IMPLEMENTACION](../../ETAPA-0-IMPLEMENT
 - [ ] Git integration (diff, commit, push)
 - [ ] Live preview alongside (split view)
 - [ ] Integración con el chat (selección de código → preguntar al agente)
+- [ ] **LSP integration**: diagnósticos reales del lenguaje alimentan al agente automáticamente (B.10)
 
 **Dependencias:** Etapa 2 (chat), Etapa 4 (workspace knowledge)
 **Gate B:** el agente crea un archivo → aparece en el árbol → lo abro, edito y persiste → live preview actualizado <2s → fast apply fluido en archivo grande → la consola envía un error al agente → corrige y el error desaparece → versiones de artefactos navegables. Suite humana verde.
