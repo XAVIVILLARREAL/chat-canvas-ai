@@ -83,7 +83,7 @@
 | F18 | Visión multimodal | Adjunto screenshot con bug → el agente lo corrige en código | C.9 |
 | F19 | Comparador A/B de modelos | Mismo prompt → 2 respuestas lado a lado → elijo la mejor | A.10 |
 | F20 | Compartir entrega pública | Genero link read-only → se abre sin cuenta → revocable | O.4 |
-| F21 | Puentes WhatsApp/Telegram/Discord | Escribo por Telegram → mi agente responde (nube) | N.8 |
+| F21 | Puentes WhatsApp/Telegram/Discord + **Agente Supervisor** | Escribo por Telegram al Supervisor → "¿en qué anda la sesión auth?" responde estado REAL; "pausa la de scraping" → confirmo → pausada | N.8+N.9 |
 | F22 | Captura rápida global (hotkey SO) | Hotkey → mini-ventana → tarea enviada → notificación al done | S.3 |
 | F23 | Dashboard personal uso/costos | Abro dashboard → costo por proyecto/día + top skills reales | N.5b |
 | F24 | Forecast de costo pre-envío | Antes de enviar veo "≈ tokens ≈ $" del modelo elegido | A.7b |

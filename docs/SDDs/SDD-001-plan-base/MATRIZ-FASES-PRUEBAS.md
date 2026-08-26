@@ -174,6 +174,7 @@
 | N.6 | Plantillas de sesiones | E2E: crear desde plantilla → agentes configurados |
 | N.7 | Modo nube 24/7 (suscripción, ADR-006) | Integration: cola 20 tareas → consumo ordenado + corte por presupuesto. Chaos: provider cae → pausa limpia. E2E: cierro app → reabro en otro dispositivo → sesión siguió con evidencia |
 | N.8 | Puentes de mensajería: WhatsApp/Telegram/Discord ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F21, nube Pro) | Integration: mensaje desde Telegram → agente responde; auth 1:1 con cuenta + rate-limit; streaming resumido + link a evidencia |
+| N.9 | **AGENTE SUPERVISOR** del Control Room (chief-of-staff GrokBot/Hermes; atiende los puentes N.8) | Integration: "pausa sesión X" → pausa real + rung DECISION; presupuesto del supervisor agotado → avisa y se detiene. E2E HUMANA vía Telegram: estado REAL de cualquier sesión, pausa con confirmación numerada ([V·V.2]), crear sesión por orden — todo auditado en event_stream |
 | N.5b | Dashboard personal de uso/costos (F23) | E2E HUMANA: abro dashboard → costo por proyecto/día, top skills y entregas REALES del event_stream; filtros por rango de fechas |
 
 ## Etapa 15 · Marketplace + v1.0 — `plan-o-marketplace-v1.md`
@@ -285,4 +286,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 161 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 126** (A–P 103 incl. H.9a/H.9b, A.10/C.8/C.9/A.0b/A.2b/A.7b/A.11/G.1b/N.5b/N.8/O.4, sin J.3/K.1/K.2 + V 5 + S/T/U 18 incl. S.5) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8).
+**Total: 162 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 127** (A–P 104 incl. H.9a/H.9b, A.10/C.8/C.9/A.0b/A.2b/A.7b/A.11/G.1b/N.5b/N.8/N.9/O.4, sin J.3/K.1/K.2 + V 5 + S/T/U 18 incl. S.5) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8).

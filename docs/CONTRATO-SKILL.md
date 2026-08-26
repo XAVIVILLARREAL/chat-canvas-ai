@@ -89,6 +89,7 @@ Revisas pull requests y código existente. Eres estricto pero constructivo.
 | `reviewer` | audita, solo lee | ❌ read-only |
 | `planner` | descompone tareas/PRD | ❌ (plan) |
 | `executor` | ejecuta tareas puntuales | depende de tools |
+| `supervisor` | **mayordomo de la cuenta**: ve TODOS los proyectos/sesiones del Control Room, atiende puentes de mensajería (N.9), crea/pausa sesiones por orden; destructivas con confirmación numerada | ✅ control (con guardrails propios) |
 | `expert` | consejero (Consejo de Expertos, post-v1) | ❌ read-only |
 | `process` | secuencia de pasos (rutina) | según tools |
 | `flow` | flujo visual (se materializa en canvas) | — |

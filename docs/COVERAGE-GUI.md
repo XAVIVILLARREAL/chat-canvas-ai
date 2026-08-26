@@ -83,6 +83,9 @@
 | Chat | Export sesión a PDF/MD | exportar → reporte compartible con rungs | `export.spec.ts` | ⬜ |
 | Entrega | Compartir link público | generar link read-only + expiración + revocar | `share.spec.ts` | ⬜ |
 | Mensajería | Puente Telegram/WhatsApp/Discord | escribir por Telegram → agente responde (nube) | `mensajeria.spec.ts` | ⬜ |
+| Supervisor | Configurar Agente Supervisor | elegir skill supervisor + canal + presupuesto por canal | `supervisor.spec.ts` | ⬜ |
+| Supervisor | Órdenes maestras vía chat | "¿en qué anda la sesión X?" → estado real; "pausa Y" → confirmación numerada → pausada | `supervisor.spec.ts` | ⬜ |
+| Supervisor | Crear sesión por orden | "crea sesión para el login fix" → creada y visible en Control Room | `supervisor.spec.ts` | ⬜ |
 | Dashboard | Vista uso/costos personal | costo por proyecto/día, top skills, entregas | `dashboard.spec.ts` | ⬜ |
 | Desktop | Quick capture global (hotkey SO) | hotkey → mini-ventana → tarea → notificación done | `quickcapture.spec.ts` | ⬜ |
 | Papelera | Ver borrados + restaurar | eliminar sesión → papelera → restaurar intacta | `papelera.spec.ts` | ⬜ |

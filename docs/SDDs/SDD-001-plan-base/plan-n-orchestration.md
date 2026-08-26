@@ -151,6 +151,26 @@ Para quien pague la nube, la orquestación corre 24/7:
 
 ---
 
+### N.9 — Agente Supervisor del Control Room ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F21, patrón chief-of-staff de GrokBot/Hermes)
+
+Un agente especial —**el Supervisor**— con visibilidad de TODOS los proyectos y TODAS las sesiones de la cuenta. Es quien atiende los puentes de mensajería (WhatsApp/Telegram/Discord) y el Control Room:
+
+- **Es un skill especial** (`role: supervisor` en [CONTRATO-SKILL](../../CONTRATO-SKILL.md)): personalidad/nombre/avatar propios del usuario.
+- **Tools exclusivas (tool-gating estricto):**
+  - `list_projects` / `list_sessions(status)` — ver todo el estado real (del event_stream, no inventado)
+  - `control_session(id, pause|resume|cancel|prompt)` — actuar sobre cualquier sesión
+  - `create_session(project_id, template?)` — abrir trabajo nuevo por orden
+  - `query_costs(range)` / `report_deliveries(range)` — métricas y entregas
+  - `notify(channel, msg)` — responder por el puente de mensajería
+- **Órdenes por voz/texto desde el chat que sea:** "¿en qué anda la sesión auth?" · "pausa la de scraping" · "¿cuánto gastamos hoy?" · "crea una sesión para el fix del login" → ejecuta y **confirma con evidencia**.
+- **Juicio humano:** acciones destructivas (cancelar, borrar, gastar >umbral) requieren **confirmación con opciones numeradas** (primitiva [V·V.2](./plan-v-visual-grokbot.md)) — el Supervisor pregunta, no decide solo.
+- **Guardrails:** presupuesto propio por canal, rate-limit, kill-switch; TODO comando queda como rung en el event_stream (auditable).
+- **Alcance:** 1 Supervisor por cuenta (local) / por tenant (nube). NO es jerarquía de empleados: es el mayordomo del usuario sobre SU trabajo.
+
+**Pruebas:** Integration: orden "pausa sesión X" → pausa real + rung DECISION del supervisor. Chaos: presupuesto del supervisor agotado → avisa y deja de actuar (no rompe sesiones). E2E HUMANA (vía Telegram mock): "¿en qué anda la sesión auth?" → responde estado REAL del event_stream; "pausa la de scraping" → pide confirmación numerada → confirmo → pausada; "crea sesión para el login fix" → creada y visible en el Control Room.
+
+---
+
 ## 🚪 GATE N (demo verificable)
 
 Abro Canvas AI → creo una sesión "Mi Proyecto" → invoco el skill "Coder" → el agente aparece con su avatar → le pido crear un archivo → lo crea → invoco "Tester" en la misma sesión → Tester escribe tests → ambos agentes aparecen en el Control Room → verifico el costo acumulado → archivo la sesión → aparece en el historial. Suite humana verde.
