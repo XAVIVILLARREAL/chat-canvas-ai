@@ -2,6 +2,14 @@
 
 > Append-only. Cada sesion deja rastro. Nunca editar dias anteriores.
 
+## 2026-08-25 (sesion 32 — Investigación de mercado: F33-F36 + validación del plan)
+
+- **MERCADO-ANALISIS** (`docs/MERCADO-ANALISIS.md`): investigación 2026 (Cursor/Windsurf/Cline/Roo/Devin/Copilot/OpenCode) — tabla de table-stakes vs nuestro estado:
+  - **AGREGADAS**: **F33 browser automation** del agente en sandbox (EL diferenciador de Cline) → C.10 · **F34 LSP integration** (diagnósticos reales al contexto, patrón OpenCode) → B.10 · **F35 importar rules files** (.cursorrules/.clinerules/CLAUDE.md→skill) → G.3b · **F36 Slack** en puentes N.8
+  - **POST-V1 honesto**: tab-autocomplete FIM (requiere infra propia; patrón Cline = pair con extensión)
+  - **VALIDACIONES de mercado**: BYOK total, human-in-the-loop, sandbox por defecto y skills .md son exactamente las tendencias ganadoras 2026
+- **MATRIZ** +3 fases (C.10/B.10/G.3b) → **165 fases**; N.8 ampliado con Slack; COVERAGE-GUI +4 filas (75 elementos)
+
 ## 2026-08-25 (sesion 31 — Provider de pruebas GRATIS: OpenRouter ox-alpha free $0)
 
 - **Regla free-first en pruebas**: los tests E2E/humanos con LLM REAL corren por defecto contra **OpenRouter `:free`** (p.ej. **ox-alpha free** de opencode — el mismo que OpenCode/Hermes Agent usan gratis) a **$0 ilimitado**; APIs de pago solo para capacidades específicas dentro del presupuesto $20/gate.

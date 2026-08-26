@@ -25,6 +25,10 @@
 | F26 | **Papelera + restaurar** | UI sobre el soft-delete del schema: ver borrados, restaurar | "No pierdes nada" — profesional básico | Local-first (dueño de tus datos) | **A.2b** (persistencia) |
 | F27 | **Perfiles BYOK** (trabajo/personal) | Grupos de providers conmutables; cada proyecto usa su perfil | Separar contextos sin duplicar keys | BYOK seguro | **G.1b** (skills/providers) |
 | F28 | **Export sesión a PDF/Markdown** | Reporte compartible/imprimible de una sesión (rungs + resultado) | Entregables para clientes/jefes sin acceso a la app | Evidence-first | **A.11** (persistencia) |
+| F33 | **Browser automation del agente** | Navegar/click/screenshot en sandbox con allowlist — "entra al staging y dime qué está roto" | Es EL diferenciador de Cline; devops/web sin tools extra | Evidence-first (reporta con captura) | **C.10** |
+| F34 | **LSP integration** al contexto | Diagnósticos reales del lenguaje (tsc/rustc vía LSP) llegan solos al agente | OpenCode lo hace automático; errores reales > adivinación | Evidence-first | **B.10** |
+| F35 | **Importar rules files** (.cursorrules/.clinerules/CLAUDE.md → skill) | Migración sin fricción: los usuarios ya tienen sus reglas escritas | Hook de adquisición como F25 | Skills-personaje | **G.3b** |
+| F36 | **Slack** en puentes de mensajería | Task intake desde donde trabaja el equipo (Devin lo cobra en su $500/mo) | Amplía el alcance Pro | Humano en el centro | **N.8** (canal +) |
 
 ### Detalle de implementación (resumen)
 
@@ -51,6 +55,7 @@
 
 | Función | Por qué espera |
 |---|---|
+| Tab-autocomplete inline (FIM) | POST-V1: requiere infra FIM propia (patrón Cline: pair con extensión externa si se desea)
 | Extensión de navegador (enviar selección/página al agente) | Esfuerzo alto, canal aparte; el quick capture cubre el 80% |
 | Integraciones email/calendario/Notion nativas | Cubierto parcialmente vía MCP (P.4 plantillas 1-click) |
 | Colaboración multi-cursor tiempo real | L.3 Co-Work ya cubre la parte CRDT |

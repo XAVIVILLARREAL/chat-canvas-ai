@@ -48,6 +48,7 @@
 | B.7 | Revisión por HUNKS | E2E HUMANA: diff de 3 hunks → aprueba 2, rechaza 1 con nota → solo aprobados se aplican; rechazo citado en el siguiente turno |
 | B.8 | Consola → "enviar error al agente" | E2E: mock TypeError en preview → badge → click envía contexto completo → respuesta corrige y error desaparece |
 | B.9 | Artefactos versionados (‹v2/v5›) | Integration versionado por escritura relevante. E2E HUMANA: navegar 3 versiones, comparar side-by-side, restaurar antigua |
+| B.10 | **LSP integration**: diagnósticos reales al contexto del agente ([MERCADO-ANALISIS](../../MERCADO-ANALISIS.md) F34) | Integration: error de tipos real (tsc/rustc vía LSP) llega al agente sin que el humano lo pegue; agente corrige → diagnóstico desaparece; LSP caído → degradación limpia |
 
 ## Etapa P · Centro MCP — `plan-p-centro-mcp.md` (tras Gate B, en paralelo con C/D)
 | Fase | Nombre | Pruebas |
@@ -70,6 +71,7 @@
 | C.7 | Registro universal de proveedores (v1; OAuth/small_model → C.7b post-base) | Unit: parser/validador registro, merge catálogo, blacklist/whitelist, small_model routing. Integration: 3 proveedores REALES vía el mismo trait (streaming + precios correctos); OAuth device-flow mockeado. E2E: agregar proveedor desde JSON; selector muestra precio/contexto. HUMANA @core-ampliada: no-programador conecta OpenRouter pegando key <2 min y elige modelo viendo precio; whitelist esconde modelos |
 | C.8 | Tools web nativas: web_search + web_fetch ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F17) | Unit: parser + caché LRU + allowlist enforcement. Integration: fetch a fixture local; chaos: dominio bloqueado → error accionable. E2E HUMANA: "investiga X" → respuesta cita 2+ fuentes con links |
 | C.9 | Visión multimodal: imágenes/PDF ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F18) | Integration real: screenshot con bug plantado → agente lo corrige en código; PDF → extracción correcta; fallback claro si el provider no soporta visión |
+| C.10 | **Browser automation del agente** ([MERCADO-ANALISIS](../../MERCADO-ANALISIS.md) F33) | Integration: agente navega fixture local, click, screenshot → describe lo que ve; sandbox: red SOLO a dominios allowlisted; chaos: sitio caído → error accionable. E2E HUMANA: "entra al staging y dime qué está roto" → reporta con captura |
 
 ## Etapa 4 · Memoria V3Code — `plan-d-memoria-v3code.md`
 | Fase | Nombre | Pruebas |
@@ -110,6 +112,7 @@
 | G.1b | Perfiles BYOK trabajo/personal (F27) | E2E HUMANA: creo 2 perfiles con keys distintas → cambio perfil en un proyecto → providers/keys conmutan; el proyecto recuerda su perfil |
 | G.2 | Editor visual + Tool-Gating | Unit validación + enforcement de gating (agente QA no invoca write). E2E HUMANA: crear skill completo solo con clicks y tecleo |
 | G.3 | Compilador a dialectos | Cargo test snapshot por dialecto. Roundtrip: compilar→ejecutar en reasonix real→respuesta esperada |
+| G.3b | **Importar rules files del mercado** ([MERCADO-ANALISIS](../../MERCADO-ANALISIS.md) F35): `.cursorrules`/`.clinerules`/`CLAUDE.md`/`.windsurfrules` → skill | E2E HUMANA: pego un CLAUDE.md real → skill importado válido (frontmatter generado) → funciona igual que uno nativo; archivo inválido → error accionable |
 | G.4 | Laboratorio sandbox | E2E: probar skill real con DeepSeek barato; costo del ensayo visible; resultado persistido |
 | G.6 | Rutinas por demostración "follow along" | Integration: sesión grabada de N pasos → skill propuesto con N pasos correctos; corrección humana se persiste. E2E HUMANA: grabo "preparar release" → skill creado → lo ejecuto programado |
 | G.7 | Identidad viva de Skills/Agentes (Gems) | E2E HUMANA completo: crear skill → 3 avatares generados → ceremonia de nacimiento → personaje en Oficina/Sesiones con su emoji · laboratorio responde con avatar · editar bio actualiza en todas las ventanas · caída de IA → avatar procedural sin romper flujo (voz se completa en K.1) |
@@ -174,7 +177,7 @@
 | N.5 | Tracking de actividad | Unit tracking events. E2E: dashboard muestra datos reales (costo, agentes usados) |
 | N.6 | Plantillas de sesiones | E2E: crear desde plantilla → agentes configurados |
 | N.7 | Modo nube 24/7 (suscripción, ADR-006) | Integration: cola 20 tareas → consumo ordenado + corte por presupuesto. Chaos: provider cae → pausa limpia. E2E: cierro app → reabro en otro dispositivo → sesión siguió con evidencia |
-| N.8 | Puentes de mensajería: WhatsApp/Telegram/Discord ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F21, nube Pro) | Integration: mensaje desde Telegram → agente responde; auth 1:1 con cuenta + rate-limit; streaming resumido + link a evidencia |
+| N.8 | Puentes de mensajería: WhatsApp/Telegram/Discord/**Slack** ([FEATURE-BACKLOG](../../FEATURE-BACKLOG.md) F21+F36, nube Pro) | Integration: mensaje desde Telegram → agente responde; auth 1:1 con cuenta + rate-limit; streaming resumido + link a evidencia |
 | N.9 | **AGENTE SUPERVISOR** del Control Room (chief-of-staff GrokBot/Hermes; atiende los puentes N.8) | Integration: "pausa sesión X" → pausa real + rung DECISION; presupuesto del supervisor agotado → avisa y se detiene. E2E HUMANA vía Telegram: estado REAL de cualquier sesión, pausa con confirmación numerada ([V·V.2]), crear sesión por orden — todo auditado en event_stream |
 | N.5b | Dashboard personal de uso/costos (F23) | E2E HUMANA: abro dashboard → costo por proyecto/día, top skills y entregas REALES del event_stream; filtros por rango de fechas |
 
@@ -287,4 +290,4 @@
 | U.8 | Anti-dark-patterns | Verificación en cada release: lista de prohibidos (logros falsos, culpa de rachas, urgencia artificial, comparación pública) + métrica norte "sesiones que terminan en ENTREGA" |
 
 ---
-**Total: 162 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 127** (A–P 104 incl. H.9a/H.9b, A.10/C.8/C.9/A.0b/A.2b/A.7b/A.11/G.1b/N.5b/N.8/N.9/O.4, sin J.3/K.1/K.2 + V 5 + S/T/U 18 incl. S.5) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8).
+**Total: 165 fases** — **Etapa 0 6** + **Etapa 10 (MP) 6** + **base 130** (A–P 107 incl. H.9a/H.9b, A.10/C.8/C.9/C.10/B.10/G.3b/A.0b/A.2b/A.7b/A.11/G.1b/N.5b/N.8/N.9/O.4, sin J.3/K.1/K.2 + V 5 + S/T/U 18 incl. S.5) + **intermedio 23** (VI 8 + KR 5 + CR 5 + 3D 3 + K.1/K.2 2). Regenerar tras CADA cambio de fases. Post-v1 marcado (Q6): Consejo (VI.5+), Voz (K.1/K.2), 3D (J.3/3D.*), CR, Dopamina (U.2-U.8), tab-FIM ([MERCADO-ANALISIS](../../MERCADO-ANALISIS.md)).

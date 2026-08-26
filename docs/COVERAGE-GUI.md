@@ -91,6 +91,9 @@
 | Papelera | Ver borrados + restaurar | eliminar sesión → papelera → restaurar intacta | `papelera.spec.ts` | ⬜ |
 | Providers | Perfiles BYOK (trabajo/personal) | cambiar perfil → providers conmutan por proyecto | `providers.spec.ts` | ⬜ |
 | Tools web | web_search/web_fetch del agente | "investiga X" → cita fuentes con links; dominio bloqueado → accionable | `webtools.spec.ts` | ⬜ |
+| Browser tool | Navegación del agente (sandbox) | "entra al staging y dime qué está roto" → navega/click/captura y reporta | `browsertool.spec.ts` | ⬜ |
+| Editor | Diagnósticos LSP al agente | error de tipos real llega solo al agente → corrige → desaparece | `lsp.spec.ts` | ⬜ |
+| Skills | Import de rules files (.cursorrules/CLAUDE.md) | pego CLAUDE.md real → skill nativo funciona; inválido → accionable | `import-rules.spec.ts` | ⬜ |
 | Sesiones/Skills | Pin/favoritos | fijar arriba, orden manual persiste tras reinicio | `pins.spec.ts` | ⬜ |
 | AppShell | Modo enfoque (zen) | ocultar paneles → solo chat/canvas; Esc sale; estado no se pierde | `zen.spec.ts` | ⬜ |
 | Listas | Acciones masivas | multi-selección → archivar/borrar/mover varias a la vez | `masivo.spec.ts` | ⬜ |
