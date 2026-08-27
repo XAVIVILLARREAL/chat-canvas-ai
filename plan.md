@@ -125,6 +125,8 @@ scripts/
 
 **Total estimado**: ~6 semanas (1 persona)
 
+**Integración con Etapa 0:** I.1+I.2 van en slice 0.7 de ETAPA-0-IMPLEMENTACION. Todo el resto (I.3-I.5) corre transversalmente desde Etapa 1 en adelante — cada feature nueva DEBE incluir sus strings i18n en el mismo PR (regla en COVERAGE-GUI §5 + EJECUCION-ORDEN DoD).
+
 ---
 
 ## §8 · Features del producto (ligadas a fases)
@@ -234,8 +236,8 @@ scripts/
 |-----|-------|-------------|-----|
 | 🔴 | Crear `scripts/translate.ts` (pipeline AI) | IA | plan-i18n.md §4 |
 | 🔴 | Generar zh-CN, pt-BR, de, fr, it con translate.ts | IA | plan-i18n.md §3 |
-| 🟡 | Reemplazar strings hardcodeadas por `t()` | IA | F-i18n-3 |
-| 🟡 | Crear `scripts/i18n-check.mjs` CI | IA | plan-i18n.md §2.3 |
+| 🔴 | Crear `scripts/i18n-check.mjs` (CI missing keys) | IA | ETAPA-0 0.7 |
+| 🟡 | Reemplazar strings hardcodeadas por `t()` en vistas existentes | IA | F-i18n-3 |
 | 🟢 | +5 idiomas: ja, ko, hi, ru, ar | IA | F-i18n-4 |
 | 🟢 | RTL ar + Tailwind logical | IA | F-i18n-5 |
 

@@ -109,6 +109,7 @@
 2. **El gate de fase exige sus filas `✅`.** (Regla MATRIZ + EJECUCION-ORDEN).
 3. Los tests se escriben **antes/igual que** el código (TDD humano): fallan → implementar → verdes.
 4. **Debug en tiempo real:** si un test falla, correr en vivo y capturar consola/red, no adivinar.
+5. **i18n obligatorio:** toda feature nueva DEBE incluir strings en `en.json` + locale activo. Sin strings i18n = PR rechazado. El gate de fase verifica `i18n-check.mjs` verde.
 
 ## Suites existentes del scaffold (mantener/expandir — ya en `e2e/human/tests/`)
 

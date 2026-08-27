@@ -47,10 +47,11 @@
 - **Tests:** OpenAPI generado sin errores; frontend compila contra tipos generados.
 - **Mini-gate:** artefacto OpenAPI + build TS verde.
 
-### 0.7 — i18n infraestructura (g)
-- **Qué:** diccionarios JSON (es/en/pt/de/fr/it), hook `useI18n`, detección, fallback `en`, script CI de claves faltantes ([plan-i18n](./SDDs/SDD-001-plan-base/plan-i18n.md)).
-- **Tests:** unit del hook + snapshot diccionario + fallback.
-- **Mini-gate:** `useI18n` unit verde.
+### 0.7 — i18n infraestructura + pipeline de traducción (g)
+- **Qué:** diccionarios JSON (en/es/zh-CN/pt-BR/de/fr/it), hook `useI18n`, detección, fallback `en`, `scripts/translate.ts` (pipeline AI: OpenAI/Ollama, batch 50 keys), `scripts/i18n-check.mjs` (CI: falla si hay claves faltantes), selector idioma en Settings ([plan-i18n](./SDDs/SDD-001-plan-base/plan-i18n.md)).
+- **Tests:** unit del hook + snapshot diccionario + fallback + translate.ts genera locale válido + i18n-check detecta missing keys.
+- **Mini-gate:** `useI18n` unit verde · 7 locales generados · i18n-check CI verde.
+- **Regla transversal:** toda feature nueva (Etapa 1+) DEBE incluir sus strings en en.json + locale objetivo en el mismo PR. El gate de fase rechaza PR sin strings i18n.
 
 ### 0.8 — Cierre de Etapa 0 (h)
 - **GATE 0:** `cargo test` SQLite+Postgres verde · migración idempotente · append-only verificado · key cifrada/descifrable · sandbox provable · OpenAPI generado · i18n infra lista. `pnpm check:all` verde. Evidencia en `evidence/`.

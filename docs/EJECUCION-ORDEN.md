@@ -40,6 +40,6 @@ Control Room completo (CR.1-5) · Segundo Cerebro profundo (VI) · Voz (K) · 3D
 
 **DoR (antes de empezar):** mini-SDD o slice · fila en MATRIZ · filas en [COVERAGE-GUI](./COVERAGE-GUI.md) · ANALYZE con 5 sub-agentes en paralelo · contrato de pruebas.
 
-**DoD (para cerrar):** SDD ✓ (si es feature) → fila en MATRIZ ✓ → tests unit/integration verdes → E2E humano (móvil+desktop, es+en) con video en `evidence/` → `pnpm check:all`+`cargo test` → CHANGELOG+ESTADO actualizados → commit semántico. **Resultado funcional operado por el humano (no "compila").**
+**DoD (para cerrar):** SDD ✓ (si es feature) → fila en MATRIZ ✓ → tests unit/integration verdes → E2E humano (móvil+desktop, **es+en** con `idioma.spec.ts`) con video en `evidence/` → `pnpm check:all`+`cargo test` → **`i18n-check.mjs` verde** (strings presentes en todos los locales activos) → CHANGELOG+ESTADO actualizados → commit semántico. **Resultado funcional operado por el humano (no "compila").**
 
 **Milestone M0** (primera entrega): cerrar la [Etapa 0](./ETAPA-0-IMPLEMENTACION.md) — server persistente, ledger inmutable, BYOK, sandbox, OpenAPI, i18n infra. Es el primer hito que demuestra que la base técnica es real.
