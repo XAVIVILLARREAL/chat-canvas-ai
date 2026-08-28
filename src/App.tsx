@@ -6,6 +6,7 @@ import { Header } from './components/Header';
 import { ToastContainer } from './components/ToastContainer';
 import { ModalProvider } from './components/Modal';
 import { useCanvasStore } from './stores/canvas-store';
+import type { Canvas as CanvasDomain } from "./types";
 import './styles.css';
 
 function App() {
@@ -58,7 +59,7 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [createCanvas]);
 
-  const handleSwitchCanvas = (canvas: any) => setCurrentCanvas(canvas);
+  const handleSwitchCanvas = (canvas: CanvasDomain) => setCurrentCanvas(canvas);
 
   return (
     <ModalProvider>

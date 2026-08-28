@@ -194,10 +194,10 @@ scripts/
 
 ### §15.0 Quick Resume
 
-- **Última sesión**: 2026-08-27 — i18n CERRADO (I.1–I.5) + **Etapa 0 slices 0.1–0.4 y 0.5 COMPLETOS** (SQLite + Postgres/RLS + ledger + BYOK vault + sandbox Linux)
+- **Última sesión**: 2026-08-27 — **ETAPA 0 CERRADA (GATE 0 ✅)**: slices 0.1–0.7 completos y verificados (25/25 Rust + Docker real + PG real + typecheck/build)
 - **Fase actual**: Etapa 0 de [ETAPA-0-IMPLEMENTACION](docs/ETAPA-0-IMPLEMENTACION.md) — orden estricto 0.1→0.8
-- - **Próxima acción**: **slice 0.8 GATE 0** — cierre formal de Etapa 0 (verificaciones completas + evidencia)
-- **Progreso Etapa 0**: 0.1 ✅ · 0.2 ✅ · 0.3 ✅ · 0.4 ✅ · 0.5 ✅ · 0.6 ✅ · 0.7 ✅ — TODOS los slices completos · solo falta 0.8 (GATE 0, cierre)
+- - **Próxima acción**: **Etapa 1** — A.0 "Proyectos como SCOPE" ([plan-a-chat-codex](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md)); regla transversal: toda feature nueva incluye strings i18n en el mismo PR
+- **Progreso Etapa 0**: 0.1–0.8 ✅ COMPLETA (evidencia: [evidence/gate-0/GATE-0.md](evidence/gate-0/GATE-0.md))
 - **Bloqueos activos**: Ninguno
 
 ### §15.1 Estado global

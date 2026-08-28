@@ -7,7 +7,7 @@
 > **Docs operativos que rigen fases (consultar al tocar):** [AUTH](../../AUTH.md) (auth local/nube) · [API](../../API.md) (inventario REST) · [DATA-LIFECYCLE](../../DATA-LIFECYCLE.md) (migraciones/GDPR) · [FEATURE-FLAGS](../../FEATURE-FLAGS.md) (tiers/dark-launch) · [UX-STANDARDS](../../UX-STANDARDS.md) (atajos/estados UI) · [THREAT-MODEL](../../THREAT-MODEL.md) (seguridad) · [SLO-RELIABILITY](../../SLO-RELIABILITY.md) (objetivos) · [PERFORMANCE-BUDGETS](../../PERFORMANCE-BUDGETS.md) (perf) · orden de construcción: [EJECUCION-ORDEN](../../EJECUCION-ORDEN.md).
 > **Tarjeta de Fase obligatoria en el DoR** ([SDD-002](../SDD-002-testing-spec-driven.md)): al iniciar una fase se llena su tarjeta — resultado esperado observable, pruebas por capa [U/I/E/H], gate, riesgos y estimación. Ejemplos vigentes: [TARJETAS-ETAPA-0](../../TARJETAS-ETAPA-0.md).
 
-## Etapa 0 · Fundación (schema maestro + eventos + secretos) — `SCHEMA-MAESTRO.md` + `THREAT-MODEL.md`
+## Etapa 0 · Fundación ✅ CERRADA 2026-08-27 (GATE 0 — evidencia en `evidence/gate-0/GATE-0.md`) — `SCHEMA-MAESTRO.md` + `THREAT-MODEL.md`
 | Fase | Nombre | Pruebas |
 |---|---|---|
 | 0.1 | Schema maestro + migraciones ✅ 2026-08-27 | Cargo test repos en SQLite y Postgres; migración idempotente up/down/up; `project_id` en toda tabla ([SCHEMA-MAESTRO](../../SCHEMA-MAESTRO.md)) — **SQLite + Postgres verdes**: migraciones por dialecto (`migrations/{sqlite,postgres}/`), 0001 (11 tablas) + 0002_workspace + up/down/up idempotente en AMBOS · repos CRUD · server wired ([ADR-007](../../ADRs/ADR-007-mapping-dominio-sqlite.md)) · commits `ad46ac8`, `aaf4486` |
