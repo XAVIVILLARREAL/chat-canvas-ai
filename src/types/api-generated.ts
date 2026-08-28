@@ -301,6 +301,12 @@ export type RetryPolicy = {
   retry_on: string[];
 };
 
+export type SettingEntry = {
+  key: string;
+  origin: string;
+  value: Record<string, unknown>;
+};
+
 export type SkillCategory = "automation" | "data_processing" | "communication" | "analysis" | "generation" | "integration" | "custom";
 
 export type SkillImplementation = {
@@ -573,6 +579,11 @@ export type CreateSkillRequest = {
   name: string;
 };
 
+export type EffectiveSettingsResponse = {
+  items: SettingEntry[];
+  resolved: Record<string, never>;
+};
+
 export type ExecuteCanvasRequest = {
   canvas_id: string;
   trigger: ExecutionTrigger;
@@ -619,6 +630,11 @@ export type Provider = {
 export type ProviderTestResponse = {
   connected: boolean;
   error?: Record<string, unknown>;
+};
+
+export type PutSettingRequest = {
+  key: string;
+  value: Record<string, unknown>;
 };
 
 export type SecretSettingRequest = {

@@ -411,6 +411,117 @@ pub async fn setting_get(db: &Db, project_id: &str, key: &str) -> Result<Option<
     Ok(row.map(|(v,)| serde_json::from_str(&v).expect("settings value es JSON válido")))
 }
 
+// ─── Settings por SCOPE (A.6): Global → Proyecto → Sesión → Agente ─────────
+
+/// Orígenes de configuración (el más específico gana al resolver).
+pub const ORIGIN_GLOBAL: &str = "global";
+pub const ORIGIN_PROJECT: &str = "project";
+pub const ORIGIN_SESSION: &str = "session";
+pub const ORIGIN_AGENT: &str = "agent";
+
+#[derive(Debug, Clone, serde::Serialize, schemars::JsonSchema, specta::Type)]
+pub struct SettingEntry {
+    pub key: String,
+    pub value: serde_json::Value,
+    /// Capa que define el valor efectivo: global|project|session|agent.
+    pub origin: String,
+}
+
+/// Merge puro con precedencia: el MÁS específico gana (agente > sesión >
+/// proyecto > global). `layers` va de menos a más específico.
+pub fn merge_settings(layers: &[(&str, serde_json::Map<String, serde_json::Value>)]) -> Vec<SettingEntry> {
+    let mut keys: Vec<String> = Vec::new();
+    for (_, m) in layers {
+        for k in m.keys() {
+            if !keys.contains(k) {
+                keys.push(k.clone());
+            }
+        }
+    }
+    keys.into_iter()
+        .map(|k| {
+            let (origin, value) = layers
+                .iter()
+                .rev()
+                .find_map(|(o, m)| m.get(&k).map(|v| (o.to_string(), v.clone())))
+                .expect("la clave salió de alguna capa");
+            SettingEntry { key: k, value, origin }
+        })
+        .collect()
+}
+
+/// Capa cruda de settings (sin herencia) para un scope_id (global o proyecto).
+async fn settings_layer(db: &Db, scope_id: &str) -> Result<serde_json::Map<String, serde_json::Value>, sqlx::Error> {
+    let mut out = serde_json::Map::new();
+    let rows: Vec<(String, String)> =
+        sqlx::query_as("SELECT key, value FROM settings WHERE project_id = ?1")
+            .bind(scope_id)
+            .fetch_all(db)
+            .await?;
+    for (k, v) in rows {
+        out.insert(k, serde_json::from_str(&v).expect("settings JSON válido"));
+    }
+    Ok(out)
+}
+
+/// Mapa de settings de SESIÓN (vive en `sessions.agent_config` como JSON plano).
+/// Fail-open: config corrupta o sesión inexistente → mapa vacío.
+pub async fn session_settings_map(db: &Db, session_id: &str) -> Result<serde_json::Map<String, serde_json::Value>, sqlx::Error> {
+    match session_get(db, session_id).await? {
+        None => Ok(serde_json::Map::new()),
+        Some(s) => Ok(serde_json::from_str(&s.agent_config).unwrap_or_default()),
+    }
+}
+
+/// Escribe un override a nivel sesión (no muta otras capas — A.0).
+pub async fn session_settings_set(db: &Db, session_id: &str, key: &str, value: &serde_json::Value) -> Result<(), sqlx::Error> {
+    let mut m = session_settings_map(db, session_id).await?;
+    m.insert(key.into(), value.clone());
+    let v = serde_json::to_string(&m).expect("map serializable");
+    sqlx::query("UPDATE sessions SET agent_config = ?2, updated_at = ?3 WHERE id = ?1")
+        .bind(session_id)
+        .bind(v)
+        .bind(now_ms())
+        .execute(db)
+        .await?;
+    Ok(())
+}
+
+/// Quita el override de sesión (vuelve a heredar).
+pub async fn session_settings_clear(db: &Db, session_id: &str, key: &str) -> Result<(), sqlx::Error> {
+    let mut m = session_settings_map(db, session_id).await?;
+    if m.remove(key).is_none() {
+        return Ok(());
+    }
+    let v = serde_json::to_string(&m).expect("map serializable");
+    sqlx::query("UPDATE sessions SET agent_config = ?2, updated_at = ?3 WHERE id = ?1")
+        .bind(session_id)
+        .bind(v)
+        .bind(now_ms())
+        .execute(db)
+        .await?;
+    Ok(())
+}
+
+/// Vista de VALOR EFECTIVO con origen por clave. Las capas agente/sesión son
+/// opcionales (solo cuando hay sesión/agente activo); global y proyecto siempre.
+pub async fn settings_effective(
+    db: &Db,
+    project_id: &str,
+    session_map: Option<serde_json::Map<String, serde_json::Value>>,
+    agent_map: Option<serde_json::Map<String, serde_json::Value>>,
+) -> Result<Vec<SettingEntry>, sqlx::Error> {
+    let global = settings_layer(db, GLOBAL_PROJECT_ID).await?;
+    let project = settings_layer(db, project_id).await?;
+    let layers = vec![
+        (ORIGIN_GLOBAL, global),
+        (ORIGIN_PROJECT, project),
+        (ORIGIN_SESSION, session_map.unwrap_or_default()),
+        (ORIGIN_AGENT, agent_map.unwrap_or_default()),
+    ];
+    Ok(merge_settings(&layers))
+}
+
 // ─── Event stream (ledger append-only, slice 0.3) ───────────────────────────
 
 /// Taxonomía de rungs (SCHEMA-MAESTRO §4). La taxonomía vive aquí, NO en un
@@ -852,4 +963,63 @@ pub async fn skill_copy_to_project(
     let manifest = serde_json::to_value(&copy).expect("skill serializable");
     skill_create(db, &copy.id, target_project, &copy.id, &manifest, "").await?;
     Ok(Some(copy))
+}
+
+#[cfg(test)]
+mod settings_scope_tests {
+    use super::*;
+    use serde_json::json;
+    use super::*;
+
+    /// Herencia A.6: el scope MÁS específico gana (agente > sesión > proyecto > global)
+    /// y las claves solo presentes en capas profundas también aparecen.
+    #[test]
+    fn herencia_mas_especifico_gana() {
+        let mut global = serde_json::Map::new();
+        global.insert("model".into(), json!("auto"));
+        global.insert("temperature".into(), json!(0.7));
+        let mut project = serde_json::Map::new();
+        project.insert("temperature".into(), json!(0.3));
+        let mut session = serde_json::Map::new();
+        session.insert("context_max_tokens".into(), json!(4096));
+        let mut agent = serde_json::Map::new();
+        agent.insert("temperature".into(), json!(0.1));
+        agent.insert("model".into(), json!("deepseek-chat"));
+
+        let layers = vec![
+            (ORIGIN_GLOBAL, global),
+            (ORIGIN_PROJECT, project),
+            (ORIGIN_SESSION, session),
+            (ORIGIN_AGENT, agent),
+        ];
+        let entries = merge_settings(&layers);
+        let get = |k: &str| entries.iter().find(|e| e.key == k).unwrap();
+
+        assert_eq!(get("temperature").value, json!(0.1), "agente gana");
+        assert_eq!(get("temperature").origin, ORIGIN_AGENT);
+        assert_eq!(get("model").origin, ORIGIN_AGENT);
+        assert_eq!(get("context_max_tokens").origin, ORIGIN_SESSION, "capa profunda aparece");
+        assert_eq!(entries.len(), 3, "unión de claves, sin duplicados");
+    }
+
+    /// Sin capas específicas: todo cae a global.
+    #[test]
+    fn herencia_solo_global() {
+        let mut global = serde_json::Map::new();
+        global.insert("model".into(), json!("auto"));
+        let layers = vec![(ORIGIN_GLOBAL, global)];
+        let entries = merge_settings(&layers);
+        assert_eq!(entries[0].origin, ORIGIN_GLOBAL);
+        assert_eq!(entries[0].value, json!("auto"));
+    }
+
+    /// Capas vacías → vista vacía (contrato completo, sin pánico).
+    #[test]
+    fn herencia_vacia() {
+        let layers = vec![
+            (ORIGIN_GLOBAL, serde_json::Map::new()),
+            (ORIGIN_PROJECT, serde_json::Map::new()),
+        ];
+        assert!(merge_settings(&layers).is_empty());
+    }
 }

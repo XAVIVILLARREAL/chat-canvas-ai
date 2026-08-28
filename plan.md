@@ -188,6 +188,7 @@ scripts/
 | 2026-08-25 | plan.md creado siguiendo template pla |
 | 2026-08-27 | Fase I.2 completada: translate.ts + i18n-check.mjs + 5 locales (zh-CN, pt-BR, de, fr, it) + Locale type extendido a 7 idiomas |
 | 2026-08-28 | A.5 completada: medidor de contexto (core/context.rs + GET /api/sessions/:id/context + truncado en chat + ContextMeter en memory rail + 13 keys × 12 locales + OpenAPI 47 paths) |
+| 2026-08-28 | A.6 completada: Centro de Configuración (settings por scope Agente>Sesión>Proyecto>Global con valor efectivo+origen, /api/settings/:pid/effective, overrides de sesión en agent_config, chat usa temperature/model, ConfigCenter 2 públicos, 19 keys × 12 locales, OpenAPI 50 paths) |
 
 ---
 
@@ -197,13 +198,13 @@ scripts/
 
 > **📌 PUNTO DE CONTINUIDAD — leer esto primero en una sesión nueva**
 
-- **Última sesión (2026-08-28)**: **ETAPA 0 CERRADA (GATE 0 ✅)** + **Etapa 1: A.0 ✅ A.1 ✅ A.2 ✅ A.3 ✅ A.4 ✅ A.5 ✅**
-- **Próxima acción**: **Etapa 1 A.6 — Centro de Configuración** (2 públicos, 5 scopes Global→Proyecto→Sesión→Agente→Subagente con vista de valor efectivo y origen). Spec: [plan-a-chat-codex §A.6](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md). Luego A.7 (modo ENCARGO), A.8 (resume), A.9 (ramas) → **GATE A**.
+- **Última sesión (2026-08-28)**: **ETAPA 0 CERRADA (GATE 0 ✅)** + **Etapa 1: A.0 ✅ A.1 ✅ A.2 ✅ A.3 ✅ A.4 ✅ A.5 ✅ A.6 ✅**
+- **Próxima acción**: **Etapa 1 A.7 — Modo ENCARGO (v1)** ("Haz X" sin escribir prompt: tarea mínima con criterios, el agente la completa, notificación con evidencia; formalizado en H.1). Spec: [plan-a-chat-codex §A.7](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md). Luego A.8 (resume), A.9 (ramas) → **GATE A**.
 
 **Estado del código (todo en main, verificado):**
-- Rust **42/42** (SQLite + PG 16 real + Docker real + context A.5) · vitest 7/7 · typecheck (tsgo) ✅ · build ✅ · i18n 12/12 (137 keys) · humana: A.0 6/6, A.1/A.4 8/8, A.5 6/6, móvil 3/3
+- Rust **50/50** (SQLite + PG 16 real + Docker real + context A.5 + scopes A.6) · vitest 7/7 · typecheck (tsgo) ✅ · build ✅ · i18n 12/12 (156 keys) · humana: A.0 6/6, A.1/A.4 8/8, A.5 6/6, A.6 6/6, móvil 3/3
 - Etapa 0: migraciones {sqlite,postgres}/0001-0005 · repos sqlx · server axum persistido (ADR-007) · RLS fail-closed 13 tablas · event_stream append-only · vault BYOK AES-256-GCM · sandbox Linux (bollard) · OpenAPI 43 paths + `src/types/api-generated.ts` · i18n 12 locales + RTL
-- Etapa 1: A.0 proyectos+settings scopes+switcher/grid+skills global/copia · A.1 /api/sessions+messages + ChatPanel + SessionsList + BottomNav · A.2 settings cifradas (`{__secret: key_ref}`) · A.3 `AgentProvider` + OpenAICompatProvider universal + `/chat` · A.4 streaming SSE + slash honestos + usage · A.5 medidor de contexto (desglose por fuentes en vivo + límite `context_max_tokens` con truncado real del request)
+- Etapa 1: A.0 proyectos+settings scopes+switcher/grid+skills global/copia · A.1 /api/sessions+messages + ChatPanel + SessionsList + BottomNav · A.2 settings cifradas (`{__secret: key_ref}`) · A.3 `AgentProvider` + OpenAICompatProvider universal + `/chat` · A.4 streaming SSE + slash honestos + usage · A.5 medidor de contexto (desglose por fuentes en vivo + límite `context_max_tokens` con truncado real del request) · A.6 Centro de Configuración (4 scopes Agente>Sesión>Proyecto>Global con valor efectivo+origen, 2 públicos, chat usa temperature/model reales)
 
 **Cómo correr las verificaciones (comandos exactos):**
 ```bash
@@ -280,6 +281,12 @@ cargo test -p canvas-ai-core --test providers_byok openrouter_free_real -- --noc
 | Archivos | `crates/core/src/context.rs` · `crates/server/src/api.rs` · `src/components/ContextMeter.tsx` · `src/components/ChatPanel.tsx` · `src/lib/chatApi.ts` · `src/hooks/useSessions.ts` · `src/i18n/locales/*.json` · `crates/server/tests/context_meter.rs` · `e2e/human/tests/context-meter.spec.ts` |
 | Tests | unit core 5/5 (fixtures: sin truncado, truncado, mensaje único excedido, vacío, estimación) · integration server 2/2 (**request capturado por mock provider == sent_tokens del medidor** + 404 + límite heredado) · E2E humana @core desktop 6/6 pasos · workspace cargo completo 0 failed · typecheck/build/vitest/i18n-check ✅ |
 | Lecciones | (1) el `useEffect` que sincroniza el input del límite PISA lo tecleado si llega una refetch a mitad de edición → flag `editing` + `onFocus select()` (escribir reemplaza, además UX real) · (2) barra con width 0% no es "visible" para Playwright → asertar la fila con testid, no la barra · (3) tras `page.reload()` la sesión activa NO se restaura (Zustand en memoria) — el spec humano debe re-seleccionarla; el límite persiste porque vive en settings · (4) el fixture `humanFill` usa `pressSequentially` que NO limpia el valor previo · (5) el log de `h.step` sale al TERMINAR el paso — un paso que falla nunca imprime su nombre (costó localizar que el fallo real era el paso 6, no el 5) |
+| **A.6 — Centro de Configuración** | ✅ Cerrada 2026-08-28 |
+| Deliverables | `repo.rs`: `merge_settings` (puro, precedencia Agente>Sesión>Proyecto>Global) + `session_settings_{map,set,clear}` (overrides de sesión en `sessions.agent_config`) + `settings_effective` · `GET /api/settings/:pid/effective` (items con origen + resolved) · `PUT/DELETE /api/sessions/:id/settings` · chat consume settings reales (temperature/model por request; context_limit con capa sesión) · `ConfigCenter.tsx` (scope selector, modo simple con knobs + badge de origen, modo JSON validado) · `configApi.ts` + `useConfig.ts` (React Query) · 19 keys i18n × 12 locales · OpenAPI 50 paths + TS regenerado |
+| Decisiones | Scope **Subagente diferido a Etapa C** (no hay infra de subagentes aún — no se inventa storage especulativo) · overrides de sesión viven en `agent_config` (columna existente sin uso, sin migración) · capa agente = `AgentConfig` del dominio (model/temperature/max_tokens ya existían) · perillas v1 = `model`, `temperature`, `context_max_tokens` (todas con efecto real en el gateway) |
+| Archivos | `crates/core/src/repo.rs` · `crates/server/src/api.rs` · `crates/server/tests/config_scopes.rs` · `src/components/ConfigCenter.tsx` · `src/components/Sidebar.tsx` · `src/lib/configApi.ts` · `src/hooks/useConfig.ts` · `src/i18n/locales/*.json` · `e2e/human/tests/config-center.spec.ts` |
+| Tests | unit herencia 3/3 (más específico gana, solo global, vacío) · integration 3/3 (herencia por capa HTTP, capa agente gana, **chat capturado usa temperature/model de settings**) · E2E humana @core desktop 6/6 (clicks + JSON válido/inválido + override de proyecto persiste) · workspace cargo 50/0 · suite @core 8 passed |
+| Lecciones | (1) `AgentConfig.temperature` es f32 → al comparar en tests usar tolerancia (0.7 ≠ 0.699999988079071 en f64) · (2) `PutSettingRequest` usado en un Op nuevo pero no registrado en `schemas` → el gate de OpenAPI detecta `$ref` roto (buen gate) · (3) el tab del sidebar se llama "Config" (es) pero el botón del header "Configuración" — regex del spec debe distinguir |
 
 ### §15.3 Pausas y reanudaciones
 

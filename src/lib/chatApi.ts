@@ -102,7 +102,7 @@ export async function streamChat(
   return true;
 }
 
-const API = (import.meta.env.VITE_API_BASE ?? '').replace(/\/api\/?$/, '');
+export const API = (import.meta.env.VITE_API_BASE ?? '').replace(/\/api\/?$/, '');
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T | null> {
   try {

@@ -160,9 +160,13 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/projects", get(list_projects).post(create_project))
         .route("/api/projects/:id", get(get_project).patch(rename_project).delete(delete_project))
         .route("/api/settings/:project_id", get(get_settings).put(put_setting).delete(clear_setting))
+        .route("/api/settings/:project_id/effective", get(effective_settings))
         .route("/api/settings/:project_id/secret", put(put_secret_setting))
         .route("/api/settings/:project_id/reveal", post(reveal_setting))
         .route("/api/settings", get(get_global_settings).put(put_global_setting))
+
+        // Settings por scope de sesión (A.6 — vive en sessions.agent_config)
+        .route("/api/sessions/:id/settings", put(put_session_setting).delete(clear_session_setting))
         
         // Providers BYOK (la key NUNCA en respuestas — solo key_ref)
         .route("/api/providers", get(list_providers).post(create_provider))
@@ -675,9 +679,16 @@ async fn chat_via_any_provider(
     Err(last)
 }
 
-/// Límite de contexto efectivo (A.5): setting `context_max_tokens` con herencia
-/// Global→Proyecto; default 8192, piso 256 (límites ridículos no rompen el chat).
-async fn context_limit(state: &AppState, project_id: &str) -> usize {
+/// Límite de contexto efectivo (A.5/A.6): sesión → setting `context_max_tokens`
+/// (proyecto con herencia global) → default 8192; piso 256.
+async fn context_limit(
+    state: &AppState,
+    project_id: &str,
+    session_map: &serde_json::Map<String, serde_json::Value>,
+) -> usize {
+    if let Some(v) = session_map.get("context_max_tokens").and_then(|v| v.as_u64()) {
+        return (v as usize).max(256);
+    }
     let val = repo::setting_resolve(&state.db, project_id, "context_max_tokens")
         .await
         .ok()
@@ -685,6 +696,20 @@ async fn context_limit(state: &AppState, project_id: &str) -> usize {
         .and_then(|v| v.as_u64())
         .unwrap_or(context::DEFAULT_CONTEXT_LIMIT as u64) as usize;
     val.max(256)
+}
+
+/// Resuelve un setting buscando en sesión → proyecto/global (A.6).
+/// El scope agente se une cuando exista binding agente↔sesión (Etapa C).
+async fn resolve_setting(
+    state: &AppState,
+    project_id: &str,
+    session_map: &serde_json::Map<String, serde_json::Value>,
+    key: &str,
+) -> Option<serde_json::Value> {
+    if let Some(v) = session_map.get(key) {
+        return Some(v.clone());
+    }
+    repo::setting_resolve(&state.db, project_id, key).await.ok().flatten()
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
@@ -713,7 +738,8 @@ async fn session_context(
         .iter()
         .map(|m| context::ContextMessage::new(&m.role, &m.content))
         .collect();
-    let limit = context_limit(&state, &session.project_id).await;
+    let session_map = repo::session_settings_map(&state.db, &id).await.unwrap_or_default();
+    let limit = context_limit(&state, &session.project_id, &session_map).await;
     let (_, b) = context::build_context(&msgs, limit);
     Ok(Json(SessionContextResponse {
         session_id: id,
@@ -736,7 +762,18 @@ async fn chat_in_session(
         .await
         .map_err(|e| db_err(e))?
         .ok_or_else(|| not_found("Session"))?;
-    let model = req.model.clone().unwrap_or_else(|| "auto".to_string());
+    let session_map = repo::session_settings_map(&state.db, &id).await.unwrap_or_default();
+    let model = match req.model.clone() {
+        Some(m) if m != "auto" => m,
+        _ => resolve_setting(&state, &session.project_id, &session_map, "model")
+            .await
+            .and_then(|v| v.as_str().map(String::from))
+            .unwrap_or_else(|| "auto".to_string()),
+    };
+    let temperature =
+        resolve_setting(&state, &session.project_id, &session_map, "temperature")
+            .await
+            .and_then(|v| v.as_f64());
 
     // 1) user message persistida
     let user_msg = repo::message_create(
@@ -750,7 +787,7 @@ async fn chat_in_session(
         .iter()
         .map(|m| context::ContextMessage::new(&m.role, &m.content))
         .collect();
-    let limit = context_limit(&state, &session.project_id).await;
+    let limit = context_limit(&state, &session.project_id, &session_map).await;
     let (kept, _ctx) = context::build_context(&ctx_msgs, limit);
     let messages: Vec<providers::ChatMessage> = kept
         .into_iter()
@@ -760,7 +797,7 @@ async fn chat_in_session(
         model,
         messages,
         max_tokens: None,
-        temperature: None,
+        temperature,
         stream: false,
     };
     let (resp, provider_name) = chat_via_any_provider(&state, &completion_req).await?;
@@ -807,7 +844,21 @@ async fn chat_in_session_stream(
         Ok(c) => c,
         Err((st, msg)) => return (st, msg).into_response(),
     };
-    let model = req.model.clone().unwrap_or_else(|| "auto".to_string());
+    // project_id + settings de sesión (A.6) — fail-open a default
+    let (project_id, session_map) = match repo::session_get(&state.db, &id).await {
+        Ok(Some(s)) => (s.project_id, repo::session_settings_map(&state.db, &id).await.unwrap_or_default()),
+        _ => (state.project_id.clone(), serde_json::Map::new()),
+    };
+    let model = match req.model.clone() {
+        Some(m) if m != "auto" => m,
+        _ => resolve_setting(&state, &project_id, &session_map, "model")
+            .await
+            .and_then(|v| v.as_str().map(String::from))
+            .unwrap_or_else(|| "auto".to_string()),
+    };
+    let temperature = resolve_setting(&state, &project_id, &session_map, "temperature")
+        .await
+        .and_then(|v| v.as_f64());
 
     // 1) persistir user message
     let user_msg = match repo::message_create(
@@ -838,13 +889,7 @@ async fn chat_in_session_stream(
         .map(|m| context::ContextMessage::new(&m.role, &m.content))
         .collect();
     // project_id de la sesión (para resolver el límite) — fail-open a default
-    let project_id = repo::session_get(&state.db, &id)
-        .await
-        .ok()
-        .flatten()
-        .map(|s| s.project_id)
-        .unwrap_or(state.project_id.clone());
-    let limit = context_limit(&state, &project_id).await;
+    let limit = context_limit(&state, &project_id, &session_map).await;
     let (kept, ctx_breakdown) = context::build_context(&ctx_msgs, limit);
     let messages: Vec<providers::ChatMessage> = kept
         .into_iter()
@@ -854,7 +899,7 @@ async fn chat_in_session_stream(
         model,
         messages,
         max_tokens: None,
-        temperature: None,
+        temperature,
         stream: true,
     };
     let model_used = candidates.first().map(|p| p.name().to_string()).unwrap_or_default();
@@ -1046,6 +1091,83 @@ async fn put_global_setting(
 ) -> ApiResult<serde_json::Value> {
     repo::global_setting_set(&state.db, &req.key, &req.value).await.map_err(|e| db_err(e))?;
     Ok(Json(serde_json::json!({ "ok": true, "scope": "global", "key": req.key })))
+}
+
+// ─── Centro de Configuración (A.6) — 4 scopes, valor efectivo + origen ──────
+
+#[derive(Debug, Deserialize)]
+pub struct EffectiveQuery {
+    pub session_id: Option<String>,
+    pub agent_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, JsonSchema, specta::Type)]
+pub struct EffectiveSettingsResponse {
+    /// Una entrada por clave (unión de capas) con la capa que define su valor.
+    pub items: Vec<repo::SettingEntry>,
+    /// Mapa clave→valor listo para consumir (valor efectivo).
+    pub resolved: HashMap<String, serde_json::Value>,
+}
+
+/// Valor efectivo de cada setting: Agente > Sesión > Proyecto > Global.
+/// La capa agente se construye desde `AgentConfig` (model/temperature/max_tokens).
+async fn effective_settings(
+    State(state): State<AppState>,
+    Path(project_id): Path<String>,
+    Query(q): Query<EffectiveQuery>,
+) -> ApiResult<EffectiveSettingsResponse> {
+    let session_map = match &q.session_id {
+        Some(sid) => Some(repo::session_settings_map(&state.db, sid).await.map_err(|e| db_err(e))?),
+        None => None,
+    };
+    let agent_map = match &q.agent_id {
+        Some(aid) => repo::agent_get(&state.db, aid)
+            .await
+            .map_err(|e| db_err(e))?
+            .map(|a| {
+                serde_json::json!({
+                    "model": a.config.model,
+                    "temperature": a.config.temperature,
+                    "max_tokens": a.config.max_tokens,
+                })
+                .as_object()
+                .cloned()
+                .unwrap_or_default()
+            }),
+        None => None,
+    };
+    let items = repo::settings_effective(&state.db, &project_id, session_map, agent_map)
+        .await
+        .map_err(|e| db_err(e))?;
+    let resolved: HashMap<String, serde_json::Value> =
+        items.iter().map(|e| (e.key.clone(), e.value.clone())).collect();
+    Ok(Json(EffectiveSettingsResponse { items, resolved }))
+}
+
+async fn put_session_setting(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Json(req): Json<PutSettingRequest>,
+) -> ApiResult<serde_json::Value> {
+    if repo::session_get(&state.db, &id).await.map_err(|e| db_err(e))?.is_none() {
+        return Err(not_found("Session"));
+    }
+    repo::session_settings_set(&state.db, &id, &req.key, &req.value)
+        .await
+        .map_err(|e| db_err(e))?;
+    Ok(Json(serde_json::json!({ "ok": true, "scope": "session", "key": req.key })))
+}
+
+async fn clear_session_setting(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Query(req): Query<ClearSettingQuery>,
+) -> ApiResult<serde_json::Value> {
+    if repo::session_get(&state.db, &id).await.map_err(|e| db_err(e))?.is_none() {
+        return Err(not_found("Session"));
+    }
+    repo::session_settings_clear(&state.db, &id, &req.key).await.map_err(|e| db_err(e))?;
+    Ok(Json(serde_json::json!({ "ok": true, "cleared": req.key })))
 }
 
 // ============================================================================
@@ -2056,7 +2178,12 @@ const OPS: &[Op] = &[
     Op { method: "post", path: "/api/sessions/{id}/chat", summary: "Chat con provider BYOK (persiste user+assistant)", tag: "sessions", request: Some("ChatInSessionRequest"), response: Some("ChatInSessionResponse") },
     Op { method: "get", path: "/api/sessions/{id}/context", summary: "Medidor de contexto: desglose por fuente + límite (A.5)", tag: "sessions", request: None, response: Some("SessionContextResponse") },
 
+    Op { method: "get", path: "/api/settings", summary: "Settings globales resueltas", tag: "settings", request: None, response: None },
+    Op { method: "put", path: "/api/settings", summary: "Escribe setting GLOBAL", tag: "settings", request: Some("PutSettingRequest"), response: None },
+    Op { method: "get", path: "/api/settings/{project_id}/effective", summary: "Valor efectivo + origen por clave (A.6: Agente>Sesión>Proyecto>Global)", tag: "settings", request: None, response: Some("EffectiveSettingsResponse") },
     Op { method: "put", path: "/api/settings/{project_id}/secret", summary: "Setting sensible CIFRADO (T.SEC)", tag: "settings", request: Some("SecretSettingRequest"), response: None },
+    Op { method: "put", path: "/api/sessions/{id}/settings", summary: "Escribe override de SESIÓN (A.6, vive en agent_config)", tag: "sessions", request: Some("PutSettingRequest"), response: None },
+    Op { method: "delete", path: "/api/sessions/{id}/settings", summary: "Quita override de sesión (vuelve a heredar)", tag: "sessions", request: None, response: None },
     Op { method: "post", path: "/api/settings/{project_id}/reveal", summary: "Descifra un setting (server-side)", tag: "settings", request: Some("SecretSettingRequest"), response: None },
 
     Op { method: "get", path: "/api/providers", summary: "Lista providers BYOK", tag: "providers", request: None, response: Some("Provider") },
@@ -2140,6 +2267,9 @@ pub fn build_openapi() -> serde_json::Value {
         ("ChatInSessionRequest", schema_for!(ChatInSessionRequest)),
         ("ChatInSessionResponse", schema_for!(ChatInSessionResponse)),
         ("SessionContextResponse", schema_for!(SessionContextResponse)),
+        ("EffectiveSettingsResponse", schema_for!(EffectiveSettingsResponse)),
+        ("SettingEntry", schema_for!(repo::SettingEntry)),
+        ("PutSettingRequest", schema_for!(PutSettingRequest)),
         ("StreamEvent", schema_for!(repo::StreamEvent)),
         ("A2AAgentCard", schema_for!(A2AAgentCard)),
         ("A2ATask", schema_for!(A2ATask)),

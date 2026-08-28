@@ -8,6 +8,7 @@ import {
 } from '../stores/canvas-store';
 import { useI18n, SUPPORTED_LOCALES, type Locale } from '../i18n';
 import { SessionsList } from './SessionsList';
+import { ConfigCenter } from './ConfigCenter';
 import { useTheme } from '../theme';
 import type { 
   Skill, Agent, MCPServer, ExecutionContext,
@@ -218,6 +219,7 @@ const SettingsPanel: React.FC = () => {
   return (
     <div className="sidebar-list">
       <div className="list-header"><h3>{t("sidebar.settings")}</h3></div>
+      <div className="settings-section"><ConfigCenter /></div>
       <div className="settings-section"><h4>Canvas</h4><div className="setting-item"><label><input type="checkbox" defaultChecked /> {t("sidebar.autoSave")}</label></div><div className="setting-item"><label>{t("sidebar.executionMode")}<select defaultValue="dag"><option value="dag">DAG</option><option value="sequential">{t("sidebar.sequential")}</option><option value="parallel">{t("sidebar.parallel")}</option></select></label></div></div>
       <div className="settings-section"><h4>Apariencia</h4><div className="setting-item"><label>{t("header.theme")}: <ThemeSelect /></label></div><div className="setting-item"><label>{t("header.language")}: <LangSelect /></label></div></div>
     </div>

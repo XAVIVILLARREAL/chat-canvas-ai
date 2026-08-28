@@ -2927,6 +2927,49 @@
         "title": "CreateSkillRequest",
         "type": "object"
       },
+      "EffectiveSettingsResponse": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "SettingEntry": {
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "origin": {
+                "description": "Capa que define el valor efectivo: global|project|session|agent.",
+                "type": "string"
+              },
+              "value": true
+            },
+            "required": [
+              "key",
+              "origin",
+              "value"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "items": {
+            "description": "Una entrada por clave (unión de capas) con la capa que define su valor.",
+            "items": {
+              "$ref": "#/definitions/SettingEntry"
+            },
+            "type": "array"
+          },
+          "resolved": {
+            "additionalProperties": true,
+            "description": "Mapa clave→valor listo para consumir (valor efectivo).",
+            "type": "object"
+          }
+        },
+        "required": [
+          "items",
+          "resolved"
+        ],
+        "title": "EffectiveSettingsResponse",
+        "type": "object"
+      },
       "ExecuteCanvasRequest": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "definitions": {
@@ -3822,6 +3865,21 @@
         "title": "ProviderTestResponse",
         "type": "object"
       },
+      "PutSettingRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": true
+        },
+        "required": [
+          "key",
+          "value"
+        ],
+        "title": "PutSettingRequest",
+        "type": "object"
+      },
       "SecretSettingRequest": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "properties": {
@@ -3954,6 +4012,26 @@
           "total_tokens"
         ],
         "title": "SessionContextResponse",
+        "type": "object"
+      },
+      "SettingEntry": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "origin": {
+            "description": "Capa que define el valor efectivo: global|project|session|agent.",
+            "type": "string"
+          },
+          "value": true
+        },
+        "required": [
+          "key",
+          "origin",
+          "value"
+        ],
+        "title": "SettingEntry",
         "type": "object"
       },
       "Skill": {
@@ -7451,6 +7529,124 @@
         "summary": "Agrega mensaje",
         "tags": [
           "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{id}/settings": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Quita override de sesión (vuelve a heredar)",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSettingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Escribe override de SESIÓN (A.6, vive en agent_config)",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/settings": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Settings globales resueltas",
+        "tags": [
+          "settings"
+        ]
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSettingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Escribe setting GLOBAL",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/{project_id}/effective": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EffectiveSettingsResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Valor efectivo + origen por clave (A.6: Agente>Sesión>Proyecto>Global)",
+        "tags": [
+          "settings"
         ]
       }
     },
