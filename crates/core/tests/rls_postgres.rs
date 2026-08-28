@@ -148,7 +148,7 @@ async fn rls_postgres_aislamiento_y_fail_closed() {
     assert_eq!(affected, 1, "el tenant SÍ puede editar lo suyo");
 
     drop(c1); drop(c2); drop(c3); // soltar ANTES del close (ver ADR del test)
-    pool.close().await;
+    drop(pool); // NO close(): los closes han colgado bajo fallos paralelos; las conexiones idle mueren con el proceso
 }
 
 /// up/down/up idempotente en Postgres (la fila de la MATRIZ lo exige junto a SQLite).
@@ -197,9 +197,9 @@ async fn migracion_postgres_up_down_up() {
     set_tenant(&mut c, "px").await;
     let ya_no: Option<(String,)> = sqlx::query_as("SELECT name FROM projects WHERE id = 'px'")
         .fetch_optional(&mut *c).await.unwrap();
-    drop(c); // soltar ANTES del close: pool.close() espera conexiones checked-out
     assert!(ya_no.is_none(), "tras down/up la data vieja no existe");
-    pool.close().await;
+    drop(c);
+    drop(pool); // NO close(): los closes han colgado bajo fallos paralelos; las conexiones idle mueren con el proceso
 }
 
 /// smoke: el pool responde y las políticas existen (evidencia SQL directa).
@@ -219,7 +219,7 @@ async fn politicas_rls_instaladas() {
     .unwrap();
     // 1 (projects) + 8 directas + 4 vía EXISTS + 1 (executions) = 14 políticas tenant_*
     assert_eq!(n, 14, "se esperaban 14 políticas tenant_*, hay {n}");
-    pool.close().await;
+    drop(pool); // NO close(): los closes han colgado bajo fallos paralelos; las conexiones idle mueren con el proceso
 }
 
 // silencia el warning si Row no se usa en alguna cfg
@@ -272,5 +272,5 @@ async fn ledger_append_only_postgres() {
         .fetch_one(&mut *c).await.unwrap();
     assert_eq!(n, 1, "ledger intacto");
     drop(c);
-    pool.close().await;
+    drop(pool); // NO close(): los closes han colgado bajo fallos paralelos; las conexiones idle mueren con el proceso
 }

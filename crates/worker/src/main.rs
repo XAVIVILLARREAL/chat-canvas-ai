@@ -5,8 +5,8 @@
 //! acotado (o gRPC del control-plane) y reporta heartbeat; nunca escribe fuera
 //! de su propio job.
 //!
-//! v1: heartbeat únicamente — el claim de tareas y el sandbox Docker por agente
-//! llegan con C.3 (robustez) y H.9a (aislamiento contenedor mínimo, Etapa 3/8).
+//! v1: heartbeat únicamente — el claim de tareas llega con C.3; el sandbox
+//! Docker por agente vive en `canvas_ai_worker::sandbox` (slice 0.5, H.9a).
 
 use std::time::Duration;
 
@@ -19,6 +19,7 @@ async fn main() {
         .unwrap_or(30);
 
     println!("[canvas-ai-worker] {worker_id} arrancando (stateless, sin credenciales DB)");
+    println!("[canvas-ai-worker] sandbox disponible: canvas_ai_worker::sandbox (contrato CPU/RAM/pids/red-ro)");
 
     // Bucle de vida: heartbeat + (futuro) claim de tareas SKIP LOCKED.
     let mut tick = tokio::time::interval(Duration::from_secs(heartbeat_secs));
@@ -29,9 +30,6 @@ async fn main() {
     }
 }
 
-/// Identidad EFÍMERA del worker (hostname + pid) — el control-plane la registra
-/// en cada heartbeat; aquí nunca se persiste nada sensible.
 fn worker_id() -> String {
-    let host = std::env::var("HOSTNAME").unwrap_or_else(|_| "local".into());
-    format!("{host}-{}", std::process::id())
+    std::env::var("WORKER_ID").unwrap_or_else(|_| format!("worker-{}", uuid::Uuid::new_v4().simple()))
 }

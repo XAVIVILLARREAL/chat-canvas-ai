@@ -8,3 +8,12 @@ edition = "2021"
 canvas-ai-core = { path = "../core" }
 tokio.workspace = true
 serde_json.workspace = true
+bollard.workspace = true
+futures.workspace = true
+uuid.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tempfile = "3"
+bollard.workspace = true

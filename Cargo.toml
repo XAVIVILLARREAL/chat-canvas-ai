@@ -27,4 +27,5 @@ schemars = "0.8"
 rmcp = { version = "0.1", features = ["server", "client"] }  # MCP SDK
 sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "postgres", "migrate", "json", "chrono"] }
 aes-gcm = "0.10"
+bollard = "0.17"
 base64 = "0.22"

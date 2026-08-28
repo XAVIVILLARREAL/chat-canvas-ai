@@ -43,7 +43,8 @@
 - **Tests:** cargo test: key cifra/descifra con la correcta; nunca en claro al webview; dump de SQLite no revela la key.
 - **Mini-gate:** flujo BYOK verificado + threat-model checkbox.
 
-### 0.5 — Frontera del sandbox Linux (e)
+### 0.5 — Frontera del sandbox Linux (e) — ✅ COMPLETADO 2026-08-27
+> **Estado:** ✅ `crates/worker/src/sandbox.rs` con bollard — contrato de contenedor aplicado en HostConfig (nano_cpus=1, memory=512MB, pids_limit=128, network_mode=none, readonly_rootfs, user 1000:1000, no-new-privileges, cap_drop ALL, tmpfs /tmp 64MB; disk 1GB best-effort por storage driver, `SANDBOX_DISK_OPT`) · `run_sandboxed` con timeout duro + cleanup garantizado · tests 5/5 contra Docker real (eco/timeout-137/red-denegada/contrato-provable/chaos-recovery+fork-bomb). Worker refactor a lib+main delgado. Nota bollard: exits ≠0 llegan como DockerContainerWaitError{code}.
 - **Qué:** contrato del contenedor Ubuntu (CPU 1 · RAM 512MB · disco 1GB · pids 128 · timeout 60s · red off · mounts read-only · non-root · seccomp) vía docker API en el worker; spawn/kill/timeout.
 - **Tests:** cargo test spawn/kill/timeout con fixture; chaos: matar contenedor a mitad → agente se recupera; red denegada verificada.
 - **Mini-gate:** sandbox provable (H.9a adelantado a Etapa 0).
