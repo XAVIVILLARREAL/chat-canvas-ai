@@ -545,6 +545,13 @@ export type CreateCanvasRequest = {
   name: string;
 };
 
+export type CreateEncargoRequest = {
+  agent_id?: Record<string, unknown>;
+  criteria: string;
+  session_id?: Record<string, unknown>;
+  title: string;
+};
+
 export type CreateMCPServerRequest = {
   description: string;
   name: string;
@@ -582,6 +589,24 @@ export type CreateSkillRequest = {
 export type EffectiveSettingsResponse = {
   items: SettingEntry[];
   resolved: Record<string, never>;
+};
+
+export type Encargo = {
+  agent_id?: Record<string, unknown>;
+  completed_at?: Record<string, unknown>;
+  created_at: number;
+  criteria: string;
+  duration_ms?: Record<string, unknown>;
+  error?: Record<string, unknown>;
+  id: string;
+  model?: Record<string, unknown>;
+  project_id: string;
+  result?: Record<string, unknown>;
+  session_id?: Record<string, unknown>;
+  status: string;
+  title: string;
+  tokens: number;
+  updated_at: number;
 };
 
 export type ExecuteCanvasRequest = {

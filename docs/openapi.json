@@ -2768,6 +2768,36 @@
         "title": "CreateCanvasRequest",
         "type": "object"
       },
+      "CreateEncargoRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "agent_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "criteria": {
+            "description": "Criterios de aceptación (texto libre, una línea por criterio).",
+            "type": "string"
+          },
+          "session_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "criteria",
+          "title"
+        ],
+        "title": "CreateEncargoRequest",
+        "type": "object"
+      },
       "CreateMCPServerRequest": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "definitions": {
@@ -2968,6 +2998,94 @@
           "resolved"
         ],
         "title": "EffectiveSettingsResponse",
+        "type": "object"
+      },
+      "Encargo": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "agent_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "completed_at": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "created_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "criteria": {
+            "type": "string"
+          },
+          "duration_ms": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "result": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "session_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "tokens": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "created_at",
+          "criteria",
+          "id",
+          "project_id",
+          "status",
+          "title",
+          "tokens",
+          "updated_at"
+        ],
+        "title": "Encargo",
         "type": "object"
       },
       "ExecuteCanvasRequest": {
@@ -6820,6 +6938,92 @@
         "summary": "Valida canvas",
         "tags": [
           "canvases"
+        ]
+      }
+    },
+    "/api/encargos": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Encargo"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Lista encargos del proyecto (A.7)",
+        "tags": [
+          "encargos"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEncargoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Encargo"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Crea encargo y lanza el runner en background (A.7)",
+        "tags": [
+          "encargos"
+        ]
+      }
+    },
+    "/api/encargos/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Encargo"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Obtiene encargo con evidencia",
+        "tags": [
+          "encargos"
         ]
       }
     },

@@ -177,5 +177,16 @@
   "config.jsonHint": "Overrides des gewählten Scopes (JSON-Objekt)",
   "config.jsonInvalid": "Ungültiges JSON: {err}",
   "config.jsonNotObject": "Muss ein JSON-Objekt {\"schlüssel\": wert} sein",
-  "config.targetMissing": "Für diesen Scope ein gültiges Ziel wählen"
+  "config.targetMissing": "Für diesen Scope ein gültiges Ziel wählen",
+  "encargo.title": "Aufträge",
+  "encargo.new": "Neuer Auftrag",
+  "encargo.titlePlaceholder": "Was ist zu tun?",
+  "encargo.criteriaPlaceholder": "Abnahmekriterien (einer pro Zeile)",
+  "encargo.create": "Vergeben",
+  "encargo.empty": "Noch keine Aufträge — vergebe einen ohne Prompts zu schreiben",
+  "encargo.inFlight": "In Arbeit…",
+  "encargo.toastStarted": "Auftrag in Bearbeitung",
+  "encargo.toastCompleted": "Auftrag abgeschlossen — Belege bereit",
+  "encargo.toastFailed": "Auftrag fehlgeschlagen",
+  "encargo.gatewayOff": "Gateway offline — Auftrag nicht erstellt"
 }

@@ -1264,3 +1264,11 @@ button:not(:disabled):active { transform: scale(0.97); }
 @media (max-width: 480px) {
   .header-right .execute-btn { display: none; }
 }
+
+/* A.7 — indicador de encargo en curso */
+.spin {
+  animation: encargo-spin 1s linear infinite;
+}
+@keyframes encargo-spin {
+  to { transform: rotate(360deg); }
+}

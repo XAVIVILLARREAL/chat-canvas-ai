@@ -177,5 +177,16 @@
   "config.jsonHint": "선택한 범위의 재정의 (JSON 객체)",
   "config.jsonInvalid": "잘못된 JSON: {err}",
   "config.jsonNotObject": "JSON 객체 {\"키\": 값} 이어야 합니다",
-  "config.targetMissing": "이 범위의 유효한 대상을 선택하세요"
+  "config.targetMissing": "이 범위의 유효한 대상을 선택하세요",
+  "encargo.title": "위임 작업",
+  "encargo.new": "새 위임 작업",
+  "encargo.titlePlaceholder": "무엇을 해야 하나요?",
+  "encargo.criteriaPlaceholder": "수용 기준 (한 줄에 하나)",
+  "encargo.create": "위임",
+  "encargo.empty": "위임 작업이 없습니다 — 프롬프트 없이 위임하세요",
+  "encargo.inFlight": "작업 중…",
+  "encargo.toastStarted": "위임 작업 시작됨",
+  "encargo.toastCompleted": "위임 작업 완료 — 증거 준비됨",
+  "encargo.toastFailed": "위임 작업 실패",
+  "encargo.gatewayOff": "게이트웨이 오프라인 — 생성되지 않았습니다"
 }

@@ -167,6 +167,10 @@ pub fn create_router(state: AppState) -> Router {
 
         // Settings por scope de sesión (A.6 — vive en sessions.agent_config)
         .route("/api/sessions/:id/settings", put(put_session_setting).delete(clear_session_setting))
+
+        // Modo ENCARGO (A.7 — "haz X" sin escribir prompt)
+        .route("/api/encargos", get(list_encargos).post(create_encargo))
+        .route("/api/encargos/:id", get(get_encargo))
         
         // Providers BYOK (la key NUNCA en respuestas — solo key_ref)
         .route("/api/providers", get(list_providers).post(create_provider))
@@ -1091,6 +1095,205 @@ async fn put_global_setting(
 ) -> ApiResult<serde_json::Value> {
     repo::global_setting_set(&state.db, &req.key, &req.value).await.map_err(|e| db_err(e))?;
     Ok(Json(serde_json::json!({ "ok": true, "scope": "global", "key": req.key })))
+}
+
+// ─── Modo ENCARGO (A.7) — "haz X" sin escribir prompt ───────────────────────
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct CreateEncargoRequest {
+    pub title: String,
+    /// Criterios de aceptación (texto libre, una línea por criterio).
+    pub criteria: String,
+    pub session_id: Option<String>,
+    pub agent_id: Option<String>,
+}
+
+async fn list_encargos(State(state): State<AppState>) -> ApiResult<Vec<repo::Encargo>> {
+    Ok(Json(
+        repo::encargo_list_by_project(&state.db, &state.project_id, 50)
+            .await
+            .map_err(|e| db_err(e))?,
+    ))
+}
+
+async fn get_encargo(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<repo::Encargo> {
+    repo::encargo_get(&state.db, &id)
+        .await
+        .map_err(|e| db_err(e))?
+        .map(Json)
+        .ok_or_else(|| not_found("Encargo"))
+}
+
+/// Crea el encargo y lanza el runner en background. El USUARIO no escribe
+/// prompt: el sistema compone el prompt a partir de título + criterios.
+async fn create_encargo(
+    State(state): State<AppState>,
+    Json(req): Json<CreateEncargoRequest>,
+) -> ApiResult<repo::Encargo> {
+    let title = req.title.trim();
+    let criteria = req.criteria.trim();
+    if title.is_empty() || criteria.is_empty() {
+        return Err((StatusCode::BAD_REQUEST, "título y criterios son obligatorios".into()));
+    }
+    // sesión de evidencia: la dada o una nueva "Encargo: {title}"
+    let session_id = match req.session_id {
+        Some(sid) => {
+            if repo::session_get(&state.db, &sid).await.map_err(|e| db_err(e))?.is_none() {
+                return Err(not_found("Session"));
+            }
+            sid
+        }
+        None => {
+            let sid = Uuid::new_v4().to_string();
+            repo::session_create(&state.db, &sid, &state.project_id, &format!("Encargo: {title}"))
+                .await
+                .map_err(|e| db_err(e))?;
+            sid
+        }
+    };
+    let encargo = repo::encargo_create(
+        &state.db, &Uuid::new_v4().to_string(), &state.project_id,
+        title, criteria, Some(&session_id), req.agent_id.as_deref(),
+    )
+    .await
+    .map_err(|e| db_err(e))?;
+    repo::event_append(
+        &state.db, &session_id, repo::product_events::TASK_CREATED,
+        &format!("encargo '{title}' creado"), Some(&serde_json::json!({"encargo_id": encargo.id})),
+        None, 0, 0.0, Some("user"), None,
+    )
+    .await
+    .ok(); // auditoría best-effort, no bloquea
+    info!("Encargo creado: '{}' ({})", title, encargo.id);
+
+    // runner en background: el encargo sobrevive a la respuesta HTTP
+    let st = state.clone();
+    let encargo_id = encargo.id.clone();
+    tokio::spawn(async move { run_encargo(st, encargo_id).await });
+
+    Ok(Json(encargo))
+}
+
+/// Compone el prompt del encargo (título + criterios) y lo ejecuta con el
+/// primer provider disponible; deja la evidencia en el encargo y en la sesión.
+async fn run_encargo(state: AppState, encargo_id: String) {
+    let encargo = match repo::encargo_get(&state.db, &encargo_id).await {
+        Ok(Some(e)) => e,
+        _ => return,
+    };
+    repo::encargo_set_running(&state.db, &encargo_id).await.ok();
+    let start = std::time::Instant::now();
+
+    let criteria_lines: String = encargo
+        .criteria
+        .lines()
+        .map(|l| format!("- {l}\n"))
+        .collect();
+    let system = "Eres un agente que completa encargos de principio a fin. \
+                  Cumple TODOS los criterios de aceptación y entrega el resultado \
+                  final con la evidencia de lo hecho (qué hiciste y cómo lo verificaste)."
+        .to_string();
+    let content = format!(
+        "Encargo: {}\n\nCriterios de aceptación:\n{criteria_lines}\nCompleta el encargo y entrega la evidencia.",
+        encargo.title
+    );
+
+    let session_id = encargo.session_id.clone().unwrap_or_default();
+    // el prompt compuesto se persiste como mensaje user (evidencia en la sesión)
+    let _user_msg = repo::message_create(
+        &state.db, &Uuid::new_v4().to_string(), &session_id, "user", &content,
+        None, None, None, None, &serde_json::json!({"encargo_id": encargo_id}),
+    )
+    .await;
+
+    let ctx_msgs = vec![
+        context::ContextMessage::new("system", &system),
+        context::ContextMessage::new("user", &content),
+    ];
+    let session_map = repo::session_settings_map(&state.db, &session_id)
+        .await
+        .unwrap_or_default();
+    let limit = context_limit(&state, &state.project_id, &session_map).await;
+    let (kept, _) = context::build_context(&ctx_msgs, limit);
+    let model = resolve_setting(&state, &state.project_id, &session_map, "model")
+        .await
+        .and_then(|v| v.as_str().map(String::from))
+        .unwrap_or_else(|| "auto".to_string());
+    let temperature = resolve_setting(&state, &state.project_id, &session_map, "temperature")
+        .await
+        .and_then(|v| v.as_f64());
+    let completion_req = providers::ChatCompletionRequest {
+        model,
+        messages: kept
+            .into_iter()
+            .map(|m| providers::ChatMessage { role: m.role, content: m.content })
+            .collect(),
+        max_tokens: None,
+        temperature,
+        stream: false,
+    };
+
+    let finished = match chat_via_any_provider(&state, &completion_req).await {
+        Ok((resp, provider_name)) => {
+            let answer = resp
+                .choices
+                .first()
+                .and_then(|c| c.message.content.clone())
+                .unwrap_or_default();
+            let (pt, ct) = resp
+                .usage
+                .as_ref()
+                .map(|u| (u.prompt_tokens, u.completion_tokens))
+                .unwrap_or((0, 0));
+            // evidencia también como mensaje assistant en la sesión
+            repo::message_create(
+                &state.db, &Uuid::new_v4().to_string(), &session_id, "assistant", &answer,
+                Some(&provider_name), Some(pt), Some(ct), None,
+                &serde_json::json!({"encargo_id": encargo_id}),
+            )
+            .await
+            .ok();
+            repo::session_add_usage(&state.db, &session_id, pt + ct, 0.0).await.ok();
+            repo::event_append(
+                &state.db, &session_id, repo::product_events::TASK_COMPLETED,
+                &format!("encargo '{}' completado", encargo.title),
+                Some(&serde_json::json!({"encargo_id": encargo_id})),
+                Some(&provider_name), (pt + ct) as i64, 0.0, Some("agent"), None,
+            )
+            .await
+            .ok();
+            repo::EncargoCompletion {
+                result: Some(answer),
+                error: None,
+                model: Some(provider_name),
+                tokens: (pt + ct) as i64,
+                duration_ms: Some(start.elapsed().as_millis() as i64),
+            }
+        }
+        Err((_, err)) => {
+            error!("encargo {} falló: {err}", encargo_id);
+            repo::event_append(
+                &state.db, &session_id, repo::product_events::PROVIDER_ERROR,
+                &format!("encargo '{}' falló", encargo.title),
+                Some(&serde_json::json!({"encargo_id": encargo_id, "error": err})),
+                None, 0, 0.0, Some("agent"), None,
+            )
+            .await
+            .ok();
+            repo::EncargoCompletion {
+                result: None,
+                error: Some(err),
+                model: None,
+                tokens: 0,
+                duration_ms: Some(start.elapsed().as_millis() as i64),
+            }
+        }
+    };
+    let status = if finished.error.is_none() { "completed" } else { "failed" };
+    repo::encargo_finish(&state.db, &encargo_id, status, &finished).await.ok();
 }
 
 // ─── Centro de Configuración (A.6) — 4 scopes, valor efectivo + origen ──────
@@ -2177,6 +2380,9 @@ const OPS: &[Op] = &[
     Op { method: "post", path: "/api/sessions/{id}/messages", summary: "Agrega mensaje", tag: "sessions", request: Some("CreateMessageRequest"), response: Some("Message") },
     Op { method: "post", path: "/api/sessions/{id}/chat", summary: "Chat con provider BYOK (persiste user+assistant)", tag: "sessions", request: Some("ChatInSessionRequest"), response: Some("ChatInSessionResponse") },
     Op { method: "get", path: "/api/sessions/{id}/context", summary: "Medidor de contexto: desglose por fuente + límite (A.5)", tag: "sessions", request: None, response: Some("SessionContextResponse") },
+    Op { method: "get", path: "/api/encargos", summary: "Lista encargos del proyecto (A.7)", tag: "encargos", request: None, response: Some("Encargo") },
+    Op { method: "post", path: "/api/encargos", summary: "Crea encargo y lanza el runner en background (A.7)", tag: "encargos", request: Some("CreateEncargoRequest"), response: Some("Encargo") },
+    Op { method: "get", path: "/api/encargos/{id}", summary: "Obtiene encargo con evidencia", tag: "encargos", request: None, response: Some("Encargo") },
 
     Op { method: "get", path: "/api/settings", summary: "Settings globales resueltas", tag: "settings", request: None, response: None },
     Op { method: "put", path: "/api/settings", summary: "Escribe setting GLOBAL", tag: "settings", request: Some("PutSettingRequest"), response: None },
@@ -2270,6 +2476,8 @@ pub fn build_openapi() -> serde_json::Value {
         ("EffectiveSettingsResponse", schema_for!(EffectiveSettingsResponse)),
         ("SettingEntry", schema_for!(repo::SettingEntry)),
         ("PutSettingRequest", schema_for!(PutSettingRequest)),
+        ("Encargo", schema_for!(repo::Encargo)),
+        ("CreateEncargoRequest", schema_for!(CreateEncargoRequest)),
         ("StreamEvent", schema_for!(repo::StreamEvent)),
         ("A2AAgentCard", schema_for!(A2AAgentCard)),
         ("A2ATask", schema_for!(A2ATask)),

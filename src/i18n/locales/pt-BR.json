@@ -177,5 +177,16 @@
   "config.jsonHint": "Overrides do escopo escolhido (objeto JSON)",
   "config.jsonInvalid": "JSON inválido: {err}",
   "config.jsonNotObject": "Deve ser um objeto JSON {\"chave\": valor}",
-  "config.targetMissing": "Escolha um destino válido para este escopo"
+  "config.targetMissing": "Escolha um destino válido para este escopo",
+  "encargo.title": "Encomendas",
+  "encargo.new": "Nova encomenda",
+  "encargo.titlePlaceholder": "O que precisa ser feito?",
+  "encargo.criteriaPlaceholder": "Critérios de aceitação (um por linha)",
+  "encargo.create": "Encomendar",
+  "encargo.empty": "Sem encomendas — encomende uma sem escrever prompts",
+  "encargo.inFlight": "Trabalhando…",
+  "encargo.toastStarted": "Encomenda em andamento",
+  "encargo.toastCompleted": "Encomenda concluída — evidência pronta",
+  "encargo.toastFailed": "Encomenda falhou",
+  "encargo.gatewayOff": "Gateway offline — encomenda não criada"
 }

@@ -177,5 +177,16 @@
   "config.jsonHint": "Overrides del scope elegido (objeto JSON)",
   "config.jsonInvalid": "JSON inválido: {err}",
   "config.jsonNotObject": "Debe ser un objeto JSON {\"clave\": valor}",
-  "config.targetMissing": "Elige un destino válido para este scope"
+  "config.targetMissing": "Elige un destino válido para este scope",
+  "encargo.title": "Encargos",
+  "encargo.new": "Nuevo encargo",
+  "encargo.titlePlaceholder": "¿Qué hay que hacer?",
+  "encargo.criteriaPlaceholder": "Criterios de aceptación (uno por línea)",
+  "encargo.create": "Encargar",
+  "encargo.empty": "Sin encargos aún — encarga uno sin escribir prompts",
+  "encargo.inFlight": "Trabajando…",
+  "encargo.toastStarted": "Encargo en curso",
+  "encargo.toastCompleted": "Encargo completado — evidencia lista",
+  "encargo.toastFailed": "Encargo falló",
+  "encargo.gatewayOff": "Gateway fuera de línea — encargo no creado"
 }

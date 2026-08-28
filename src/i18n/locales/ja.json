@@ -177,5 +177,16 @@
   "config.jsonHint": "選択したスコープの上書き（JSON オブジェクト）",
   "config.jsonInvalid": "無効な JSON: {err}",
   "config.jsonNotObject": "JSON オブジェクト {\"キー\": 値} を指定してください",
-  "config.targetMissing": "このスコープの有効な対象を選んでください"
+  "config.targetMissing": "このスコープの有効な対象を選んでください",
+  "encargo.title": "依頼",
+  "encargo.new": "新しい依頼",
+  "encargo.titlePlaceholder": "何をすべきですか？",
+  "encargo.criteriaPlaceholder": "受け入れ基準（1 行に 1 つ）",
+  "encargo.create": "依頼する",
+  "encargo.empty": "依頼はまだありません — プロンプトを書かずに依頼できます",
+  "encargo.inFlight": "作業中…",
+  "encargo.toastStarted": "依頼を開始しました",
+  "encargo.toastCompleted": "依頼が完了 — 証跡が準備できました",
+  "encargo.toastFailed": "依頼が失敗しました",
+  "encargo.gatewayOff": "ゲートウェイがオフライン — 依頼は作成されませんでした"
 }

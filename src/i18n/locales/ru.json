@@ -177,5 +177,16 @@
   "config.jsonHint": "Переопределения выбранной области (JSON-объект)",
   "config.jsonInvalid": "Неверный JSON: {err}",
   "config.jsonNotObject": "Должен быть JSON-объект {\"ключ\": значение}",
-  "config.targetMissing": "Выберите корректную цель для этой области"
+  "config.targetMissing": "Выберите корректную цель для этой области",
+  "encargo.title": "Поручения",
+  "encargo.new": "Новое поручение",
+  "encargo.titlePlaceholder": "Что нужно сделать?",
+  "encargo.criteriaPlaceholder": "Критерии приёмки (по одному в строке)",
+  "encargo.create": "Поручить",
+  "encargo.empty": "Поручений пока нет — поручите без написания промптов",
+  "encargo.inFlight": "Выполняется…",
+  "encargo.toastStarted": "Поручение выполняется",
+  "encargo.toastCompleted": "Поручение выполнено — доказательства готовы",
+  "encargo.toastFailed": "Поручение провалено",
+  "encargo.gatewayOff": "Шлюз офлайн — поручение не создано"
 }

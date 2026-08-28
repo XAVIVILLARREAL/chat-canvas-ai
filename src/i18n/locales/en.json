@@ -177,5 +177,16 @@
   "config.jsonHint": "Overrides of the selected scope (JSON object)",
   "config.jsonInvalid": "Invalid JSON: {err}",
   "config.jsonNotObject": "Must be a JSON object {\"key\": value}",
-  "config.targetMissing": "Pick a valid target for this scope"
+  "config.targetMissing": "Pick a valid target for this scope",
+  "encargo.title": "Encargos",
+  "encargo.new": "New encargo",
+  "encargo.titlePlaceholder": "What needs to be done?",
+  "encargo.criteriaPlaceholder": "Acceptance criteria (one per line)",
+  "encargo.create": "Delegate",
+  "encargo.empty": "No encargos yet — delegate one without writing prompts",
+  "encargo.inFlight": "Working…",
+  "encargo.toastStarted": "Encargo in progress",
+  "encargo.toastCompleted": "Encargo completed — evidence ready",
+  "encargo.toastFailed": "Encargo failed",
+  "encargo.gatewayOff": "Gateway offline — encargo not created"
 }

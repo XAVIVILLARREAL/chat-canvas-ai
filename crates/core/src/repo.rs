@@ -391,6 +391,92 @@ pub async fn execution_list_by_canvas(db: &Db, canvas_id: &str) -> Result<Vec<Ex
         .bind(canvas_id).fetch_all(db).await
 }
 
+// ─── Encargos (A.7 — modo ENCARGO: "haz X" sin escribir prompt) ────────────
+
+#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow, schemars::JsonSchema, specta::Type)]
+pub struct Encargo {
+    pub id: String,
+    pub project_id: String,
+    pub title: String,
+    pub criteria: String,
+    pub status: String, // pending|running|completed|failed
+    pub session_id: Option<String>,
+    pub agent_id: Option<String>,
+    pub result: Option<String>,
+    pub error: Option<String>,
+    pub model: Option<String>,
+    pub tokens: i64,
+    pub duration_ms: Option<i64>,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub completed_at: Option<i64>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct EncargoCompletion {
+    pub result: Option<String>,
+    pub error: Option<String>,
+    pub model: Option<String>,
+    pub tokens: i64,
+    pub duration_ms: Option<i64>,
+}
+
+pub async fn encargo_create(
+    db: &Db, id: &str, project_id: &str, title: &str, criteria: &str,
+    session_id: Option<&str>, agent_id: Option<&str>,
+) -> Result<Encargo, sqlx::Error> {
+    let now = now_ms();
+    sqlx::query(
+        "INSERT INTO encargos (id, project_id, title, criteria, status, session_id, agent_id, created_at, updated_at)
+         VALUES (?1, ?2, ?3, ?4, 'pending', ?5, ?6, ?7, ?7)",
+    )
+    .bind(id).bind(project_id).bind(title).bind(criteria)
+    .bind(session_id).bind(agent_id).bind(now)
+    .execute(db).await?;
+    encargo_get(db, id).await.map(|o| o.expect("just inserted"))
+}
+
+pub async fn encargo_get(db: &Db, id: &str) -> Result<Option<Encargo>, sqlx::Error> {
+    sqlx::query_as::<_, Encargo>("SELECT * FROM encargos WHERE id = ?1")
+        .bind(id)
+        .fetch_optional(db)
+        .await
+}
+
+pub async fn encargo_list_by_project(db: &Db, project_id: &str, limit: i64) -> Result<Vec<Encargo>, sqlx::Error> {
+    sqlx::query_as::<_, Encargo>(
+        "SELECT * FROM encargos WHERE project_id = ?1 ORDER BY created_at DESC LIMIT ?2",
+    )
+    .bind(project_id)
+    .bind(limit)
+    .fetch_all(db)
+    .await
+}
+
+/// Transición de estado + evidencia (result/error/tokens/duración).
+pub async fn encargo_finish(
+    db: &Db, id: &str, status: &str, c: &EncargoCompletion,
+) -> Result<(), sqlx::Error> {
+    let now = now_ms();
+    sqlx::query(
+        "UPDATE encargos SET status = ?2, result = ?3, error = ?4, model = ?5, tokens = ?6,
+         duration_ms = ?7, updated_at = ?8, completed_at = ?9 WHERE id = ?1",
+    )
+    .bind(id).bind(status)
+    .bind(&c.result).bind(&c.error).bind(&c.model)
+    .bind(c.tokens).bind(c.duration_ms)
+    .bind(now).bind(now)
+    .execute(db).await?;
+    Ok(())
+}
+
+pub async fn encargo_set_running(db: &Db, id: &str) -> Result<(), sqlx::Error> {
+    sqlx::query("UPDATE encargos SET status = 'running', updated_at = ?2 WHERE id = ?1")
+        .bind(id).bind(now_ms())
+        .execute(db).await?;
+    Ok(())
+}
+
 // ─── Settings (clave/valor JSON por proyecto) ───────────────────────────────
 
 pub async fn setting_set(db: &Db, project_id: &str, key: &str, value: &serde_json::Value) -> Result<(), sqlx::Error> {

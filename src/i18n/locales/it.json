@@ -177,5 +177,16 @@
   "config.jsonHint": "Override dell'ambito scelto (oggetto JSON)",
   "config.jsonInvalid": "JSON non valido: {err}",
   "config.jsonNotObject": "Deve essere un oggetto JSON {\"chiave\": valore}",
-  "config.targetMissing": "Scegli una destinazione valida per questo ambito"
+  "config.targetMissing": "Scegli una destinazione valida per questo ambito",
+  "encargo.title": "Incarichi",
+  "encargo.new": "Nuovo incarico",
+  "encargo.titlePlaceholder": "Cosa va fatto?",
+  "encargo.criteriaPlaceholder": "Criteri di accettazione (uno per riga)",
+  "encargo.create": "Affida",
+  "encargo.empty": "Nessun incarico — affidane uno senza scrivere prompt",
+  "encargo.inFlight": "Al lavoro…",
+  "encargo.toastStarted": "Incarico in corso",
+  "encargo.toastCompleted": "Incarico completato — evidenza pronta",
+  "encargo.toastFailed": "Incarico fallito",
+  "encargo.gatewayOff": "Gateway offline — incarico non creato"
 }

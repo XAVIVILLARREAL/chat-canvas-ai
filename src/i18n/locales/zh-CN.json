@@ -177,5 +177,16 @@
   "config.jsonHint": "所选作用域的覆盖项（JSON 对象）",
   "config.jsonInvalid": "JSON 无效：{err}",
   "config.jsonNotObject": "必须是 JSON 对象 {\"键\": 值}",
-  "config.targetMissing": "为该作用域选择有效目标"
+  "config.targetMissing": "为该作用域选择有效目标",
+  "encargo.title": "委托任务",
+  "encargo.new": "新建委托",
+  "encargo.titlePlaceholder": "需要做什么？",
+  "encargo.criteriaPlaceholder": "验收标准（每行一条）",
+  "encargo.create": "委托",
+  "encargo.empty": "还没有委托——无需写提示词即可委托",
+  "encargo.inFlight": "进行中…",
+  "encargo.toastStarted": "委托已开始",
+  "encargo.toastCompleted": "委托完成——证据已就绪",
+  "encargo.toastFailed": "委托失败",
+  "encargo.gatewayOff": "网关离线——委托未创建"
 }

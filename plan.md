@@ -189,6 +189,7 @@ scripts/
 | 2026-08-27 | Fase I.2 completada: translate.ts + i18n-check.mjs + 5 locales (zh-CN, pt-BR, de, fr, it) + Locale type extendido a 7 idiomas |
 | 2026-08-28 | A.5 completada: medidor de contexto (core/context.rs + GET /api/sessions/:id/context + truncado en chat + ContextMeter en memory rail + 13 keys × 12 locales + OpenAPI 47 paths) |
 | 2026-08-28 | A.6 completada: Centro de Configuración (settings por scope Agente>Sesión>Proyecto>Global con valor efectivo+origen, /api/settings/:pid/effective, overrides de sesión en agent_config, chat usa temperature/model, ConfigCenter 2 públicos, 19 keys × 12 locales, OpenAPI 50 paths) |
+| 2026-08-28 | A.7 completada: Modo ENCARGO (migración 0006 encargos sqlite+postgres+RLS, POST/GET /api/encargos con runner en background que compone el prompt de título+criterios, evidencia en encargo+sesión+event_stream, EncargosPanel en memory rail con toasts, 11 keys × 12 locales, OpenAPI 52 paths) |
 
 ---
 
@@ -198,13 +199,13 @@ scripts/
 
 > **📌 PUNTO DE CONTINUIDAD — leer esto primero en una sesión nueva**
 
-- **Última sesión (2026-08-28)**: **ETAPA 0 CERRADA (GATE 0 ✅)** + **Etapa 1: A.0 ✅ A.1 ✅ A.2 ✅ A.3 ✅ A.4 ✅ A.5 ✅ A.6 ✅**
-- **Próxima acción**: **Etapa 1 A.7 — Modo ENCARGO (v1)** ("Haz X" sin escribir prompt: tarea mínima con criterios, el agente la completa, notificación con evidencia; formalizado en H.1). Spec: [plan-a-chat-codex §A.7](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md). Luego A.8 (resume), A.9 (ramas) → **GATE A**.
+- **Última sesión (2026-08-28)**: **ETAPA 0 CERRADA (GATE 0 ✅)** + **Etapa 1: A.0 ✅ A.1 ✅ A.2 ✅ A.3 ✅ A.4 ✅ A.5 ✅ A.6 ✅ A.7 ✅**
+- **Próxima acción**: **Etapa 1 A.8 — Resume inteligente (v1)** (reanudar sesión interrumpida: card de resumen; `/compact` comprime historial viejo). Spec: [plan-a-chat-codex §A.8](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md). Luego A.9 (ramas) → **GATE A**.
 
 **Estado del código (todo en main, verificado):**
-- Rust **50/50** (SQLite + PG 16 real + Docker real + context A.5 + scopes A.6) · vitest 7/7 · typecheck (tsgo) ✅ · build ✅ · i18n 12/12 (156 keys) · humana: A.0 6/6, A.1/A.4 8/8, A.5 6/6, A.6 6/6, móvil 3/3
+- Rust **53/53** (SQLite + PG 16 real + Docker real + context A.5 + scopes A.6 + encargos A.7) · vitest 7/7 · typecheck (tsgo) ✅ · build ✅ · i18n 12/12 (167 keys) · humana: A.0 6/6, A.1/A.4 8/8, A.5 6/6, A.6 6/6, A.7 7/7, móvil 3/3
 - Etapa 0: migraciones {sqlite,postgres}/0001-0005 · repos sqlx · server axum persistido (ADR-007) · RLS fail-closed 13 tablas · event_stream append-only · vault BYOK AES-256-GCM · sandbox Linux (bollard) · OpenAPI 43 paths + `src/types/api-generated.ts` · i18n 12 locales + RTL
-- Etapa 1: A.0 proyectos+settings scopes+switcher/grid+skills global/copia · A.1 /api/sessions+messages + ChatPanel + SessionsList + BottomNav · A.2 settings cifradas (`{__secret: key_ref}`) · A.3 `AgentProvider` + OpenAICompatProvider universal + `/chat` · A.4 streaming SSE + slash honestos + usage · A.5 medidor de contexto (desglose por fuentes en vivo + límite `context_max_tokens` con truncado real del request) · A.6 Centro de Configuración (4 scopes Agente>Sesión>Proyecto>Global con valor efectivo+origen, 2 públicos, chat usa temperature/model reales)
+- Etapa 1: A.0 proyectos+settings scopes+switcher/grid+skills global/copia · A.1 /api/sessions+messages + ChatPanel + SessionsList + BottomNav · A.2 settings cifradas (`{__secret: key_ref}`) · A.3 `AgentProvider` + OpenAICompatProvider universal + `/chat` · A.4 streaming SSE + slash honestos + usage · A.5 medidor de contexto (desglose por fuentes en vivo + límite `context_max_tokens` con truncado real del request) · A.6 Centro de Configuración (4 scopes Agente>Sesión>Proyecto>Global con valor efectivo+origen, 2 públicos, chat usa temperature/model reales) · A.7 Modo ENCARGO (título+criterios sin prompt, runner en background, evidencia en encargo+sesión, toast de vuelta)
 
 **Cómo correr las verificaciones (comandos exactos):**
 ```bash
@@ -287,6 +288,11 @@ cargo test -p canvas-ai-core --test providers_byok openrouter_free_real -- --noc
 | Archivos | `crates/core/src/repo.rs` · `crates/server/src/api.rs` · `crates/server/tests/config_scopes.rs` · `src/components/ConfigCenter.tsx` · `src/components/Sidebar.tsx` · `src/lib/configApi.ts` · `src/hooks/useConfig.ts` · `src/i18n/locales/*.json` · `e2e/human/tests/config-center.spec.ts` |
 | Tests | unit herencia 3/3 (más específico gana, solo global, vacío) · integration 3/3 (herencia por capa HTTP, capa agente gana, **chat capturado usa temperature/model de settings**) · E2E humana @core desktop 6/6 (clicks + JSON válido/inválido + override de proyecto persiste) · workspace cargo 50/0 · suite @core 8 passed |
 | Lecciones | (1) `AgentConfig.temperature` es f32 → al comparar en tests usar tolerancia (0.7 ≠ 0.699999988079071 en f64) · (2) `PutSettingRequest` usado en un Op nuevo pero no registrado en `schemas` → el gate de OpenAPI detecta `$ref` roto (buen gate) · (3) el tab del sidebar se llama "Config" (es) pero el botón del header "Configuración" — regex del spec debe distinguir |
+| **A.7 — Modo ENCARGO (v1)** | ✅ Cerrada 2026-08-28 |
+| Deliverables | migración `0006_encargos` (sqlite+postgres, RLS fail-closed pg, down en ambos) · `repo.rs`: `Encargo` + `encargo_{create,get,list_by_project,finish,set_running}` · API: `POST /api/encargos` (valida título+criterios, auto-crea sesión "Encargo: {título}", lanza runner `tokio::spawn`) + `GET /api/encargos[/:id]` · runner compone el prompt (system agente + user título+criterios — el usuario NO escribe prompt), reusa context A.5 + settings A.6, persiste evidencia como mensajes y en `event_stream` (task.created/task.completed/provider.error) · `EncargosPanel` en memory rail (mini-form, lista con estado, evidencia expandible, toasts de vuelta) · polling React Query solo mientras hay encargos en curso · 11 keys × 12 locales · OpenAPI 52 paths |
+| Archivos | `crates/core/migrations/{sqlite,postgres}/0006_encargos.sql` (+down) · `crates/core/src/repo.rs` · `crates/server/src/api.rs` · `crates/server/tests/encargos.rs` · `src/components/EncargosPanel.tsx` · `src/components/ChatPanel.tsx` · `src/lib/encargosApi.ts` · `src/hooks/useEncargos.ts` · `src/styles.css` · `e2e/human/tests/encargo.spec.ts` |
+| Tests | integration 3/3 (completado con mock: evidencia+tokens+mensajes en sesión auto-creada; sin provider → failed honesto; validación 400) · E2E humana @core desktop 7/7 (delegar con clicks → mock completa → toast → evidencia en panel y en su sesión) · workspace cargo 53/0 · suite @core 9 passed |
+| Lecciones | (1) el test de migraciones mantiene la reversa MANUAL en `repo_sqlite.rs` (DOWN_000X + run_all_down) — nueva tabla ⇒ sumar su DOWN ahí y actualizar el conteo de `_sqlx_migrations` · (2) los toasts son efímeros (4-6s): asertarlos con `toContainText` (reintenta) y locator simple, nunca `toBeVisible` con filtros complejos · (3) el encargo auto-crea SU propia sesión "Encargo: …" — para ver mensajes el spec debe navegar a ella desde el tab Sesiones |
 
 ### §15.3 Pausas y reanudaciones
 

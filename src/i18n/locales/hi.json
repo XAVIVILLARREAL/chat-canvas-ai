@@ -177,5 +177,16 @@
   "config.jsonHint": "चुने गए स्कोप के ओवरराइड (JSON ऑब्जेक्ट)",
   "config.jsonInvalid": "अमान्य JSON: {err}",
   "config.jsonNotObject": "JSON ऑब्जेक्ट {\"कुंजी\": मान} होना चाहिए",
-  "config.targetMissing": "इस स्कोप के लिए मान्य लक्ष्य चुनें"
+  "config.targetMissing": "इस स्कोप के लिए मान्य लक्ष्य चुनें",
+  "encargo.title": "सौंपे गए काम",
+  "encargo.new": "नया काम सौंपें",
+  "encargo.titlePlaceholder": "क्या करना है?",
+  "encargo.criteriaPlaceholder": "स्वीकृति मानदंड (एक पंक्ति में एक)",
+  "encargo.create": "सौंपें",
+  "encargo.empty": "अभी कोई काम नहीं — बिना प्रॉम्प्ट लिखे सौंपें",
+  "encargo.inFlight": "काम चल रहा है…",
+  "encargo.toastStarted": "काम शुरू हुआ",
+  "encargo.toastCompleted": "काम पूरा — सबूत तैयार",
+  "encargo.toastFailed": "काम विफल",
+  "encargo.gatewayOff": "गेटवे ऑफ़लाइन — काम नहीं बना"
 }

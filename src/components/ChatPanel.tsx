@@ -13,6 +13,7 @@ import {
 } from '../hooks/useSessions';
 import { streamChat } from '../lib/chatApi';
 import { ContextMeter } from './ContextMeter';
+import { EncargosPanel } from './EncargosPanel';
 
 export function ChatPanel() {
   const { t } = useI18n();
@@ -164,6 +165,9 @@ export function ChatPanel() {
         }}
       >
         <ContextMeter sessionId={activeSessionId} />
+        <div style={{ borderTop: '1px solid rgba(148,163,184,0.15)', paddingTop: 10 }}>
+          <EncargosPanel sessionId={activeSessionId} />
+        </div>
         <div style={{ borderTop: '1px solid rgba(148,163,184,0.15)', paddingTop: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
             <Brain width={16} height={16} /> {t('chat.memoryTitle')}

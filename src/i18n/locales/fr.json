@@ -177,5 +177,16 @@
   "config.jsonHint": "Overrides du périmètre choisi (objet JSON)",
   "config.jsonInvalid": "JSON invalide : {err}",
   "config.jsonNotObject": "Doit être un objet JSON {\"clé\": valeur}",
-  "config.targetMissing": "Choisissez une cible valide pour ce périmètre"
+  "config.targetMissing": "Choisissez une cible valide pour ce périmètre",
+  "encargo.title": "Missions",
+  "encargo.new": "Nouvelle mission",
+  "encargo.titlePlaceholder": "Qu'est-ce qu'il faut faire ?",
+  "encargo.criteriaPlaceholder": "Critères d'acceptation (un par ligne)",
+  "encargo.create": "Confier",
+  "encargo.empty": "Aucune mission — confiez-en une sans écrire de prompts",
+  "encargo.inFlight": "En cours…",
+  "encargo.toastStarted": "Mission en cours",
+  "encargo.toastCompleted": "Mission terminée — preuves disponibles",
+  "encargo.toastFailed": "Mission échouée",
+  "encargo.gatewayOff": "Passerelle hors ligne — mission non créée"
 }

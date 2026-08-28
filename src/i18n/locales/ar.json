@@ -177,5 +177,16 @@
   "config.jsonHint": "تجاوزات النطاق المختار (كائن JSON)",
   "config.jsonInvalid": "JSON غير صالح: {err}",
   "config.jsonNotObject": "يجب أن يكون كائن JSON {\"مفتاح\": قيمة}",
-  "config.targetMissing": "اختر هدفًا صالحًا لهذا النطاق"
+  "config.targetMissing": "اختر هدفًا صالحًا لهذا النطاق",
+  "encargo.title": "المهام المفوَّضة",
+  "encargo.new": "مهمة مفوَّضة جديدة",
+  "encargo.titlePlaceholder": "ما المطلوب عمله؟",
+  "encargo.criteriaPlaceholder": "معايير القبول (واحد في كل سطر)",
+  "encargo.create": "تفويض",
+  "encargo.empty": "لا مهام بعد — فوِّض واحدة دون كتابة مطالبات",
+  "encargo.inFlight": "قيد العمل…",
+  "encargo.toastStarted": "المهمة قيد التنفيذ",
+  "encargo.toastCompleted": "اكتملت المهمة — الأدلة جاهزة",
+  "encargo.toastFailed": "فشلت المهمة",
+  "encargo.gatewayOff": "البوابة غير متصلة — لم تُنشأ المهمة"
 }

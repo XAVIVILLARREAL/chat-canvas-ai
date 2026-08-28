@@ -10,9 +10,13 @@ const DOWN_0001: &str = include_str!("../migrations/sqlite/down/0001_init.sql");
 const DOWN_0002: &str = include_str!("../migrations/sqlite/down/0002_workspace.sql");
 const DOWN_0004: &str = include_str!("../migrations/sqlite/down/0004_append_only.sql");
 const DOWN_0005: &str = include_str!("../migrations/sqlite/down/0005_vault.sql");
+const DOWN_0006: &str = include_str!("../migrations/sqlite/down/0006_encargos.sql");
 
-/// Ejecuta TODAS las reversas (0002 → 0001) y limpia el registro de sqlx.
+/// Ejecuta TODAS las reversas (0006 → 0002 → 0001) y limpia el registro de sqlx.
 async fn run_all_down(db: &repo::Db) {
+    for stmt in DOWN_0006.split(';').map(str::trim).filter(|s| !s.is_empty()) {
+        sqlx::query(stmt).execute(db).await.unwrap();
+    }
     for stmt in DOWN_0002.split(';').map(str::trim).filter(|s| !s.is_empty()) {
         sqlx::query(stmt).execute(db).await.unwrap();
     }
@@ -138,9 +142,9 @@ async fn data_sobrevive_reinicio_del_server() {
     let db = repo::connect(&url).await.unwrap();
     assert_eq!(repo::project_list(&db).await.unwrap().len(), 1);
     assert_eq!(repo::message_list_by_session(&db, "s1").await.unwrap().len(), 1);
-    // migraciones NO se reaplican (idempotente): 0001+0002+0004+0005
+    // migraciones NO se reaplican (idempotente): 0001+0002+0004+0005+0006
     let versiones: Vec<(i64,)> = sqlx::query_as("SELECT version FROM _sqlx_migrations").fetch_all(&db).await.unwrap();
-    assert_eq!(versiones.len(), 4);
+    assert_eq!(versiones.len(), 5);
 }
 
 // ─── A.0 — Settings con scopes: override local NO muta global ───────────────
