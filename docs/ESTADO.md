@@ -18,8 +18,9 @@
 
 ## Próximo paso (Etapa 0 — ya concretada y con plan de implementación)
 
-- [ ] **Implementar la Etapa 0 por slices** ([ETAPA-0-IMPLEMENTACION](./ETAPA-0-IMPLEMENTACION.md)): 0.1 migraciones+repos SQLite → 0.2 Postgres+RLS → 0.3 event_stream → 0.4 secretos BYOK → 0.5 sandbox → 0.6 OpenAPI → 0.7 i18n → **M0 (Gate 0)**.
-- El server aún vive en `HashMap` en memoria; conectar sqlx/sqlite + Postgres ([SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md))
+- [ ] **Implementar la Etapa 0 por slices** ([ETAPA-0-IMPLEMENTACION](./ETAPA-0-IMPLEMENTACION.md)): 0.1 migraciones+repos SQLite → 0.2 Postgres+RLS → 0.3 event_stream → 0.4 secretos BYOK → 0.5 sandbox → 0.6 OpenAPI → ~~0.7 i18n~~ → **M0 (Gate 0)**.
+  - ✅ **Slice 0.7 (i18n) COMPLETADO 2026-08-27** — más allá del scope del slice: I.1-I.5 completos (infra, pipeline AI + 10 locales, cobertura UI 100%, RTL árabe, Intl fechas/números, test fallback), suite humana 12 locales verde (desktop+mobile, video+screenshots). Commit `f87b26c`. Ver [plan.md](../plan.md) y [plan-i18n](./SDDs/SDD-001-plan-base/plan-i18n.md). Regla transversal activa: toda feature nueva incluye sus strings i18n en el mismo PR.
+- El server aún vive en `HashMap` en memoria; conectar sqlx/sqlite + Postgres ([SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md)) ← **SIGUIENTE EN ORDEN (slice 0.1)**
 - Contrato `event_stream` (ledger append-only) + eventos de producto ([PRODUCT-METRICS](./PRODUCT-METRICS.md))
 - Módulo de secretos BYOK (keychain OS / cifrado por tenant) ([THREAT-MODEL](./THREAT-MODEL.md))
 - Frontera del sandbox Linux (números) ([THREAT-MODEL](./THREAT-MODEL.md))
