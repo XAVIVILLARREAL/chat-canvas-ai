@@ -4,6 +4,7 @@ import {
   ChevronDown, RotateCcw, Command, Menu,
 } from 'lucide-react';
 import { Sun, Moon, Languages } from 'lucide-react';
+import { ProjectSwitcher } from './ProjectSwitcher';
 import { useTheme } from '../theme';
 import { useI18n, useI18nStore, SUPPORTED_LOCALES } from '../i18n';
 import { useCanvasStore } from '../stores/canvas-store';
@@ -154,6 +155,8 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
         <div className="header-divider" />
         <button className="header-btn execute-btn" disabled={loading || !currentCanvas?.nodes.length} title={t("header.executeTitle")}><Play width={18} height={18} /><span>{t("header.execute")}</span></button>
+        <div className="header-divider" />
+        <ProjectSwitcher />
         <div className="header-divider" />
         <button className="header-btn" onClick={toggleTheme} title={t("header.theme")} aria-label={t("header.theme")}>
           {resolved === 'dark' ? <Sun width={18} height={18} /> : <Moon width={18} height={18} />}

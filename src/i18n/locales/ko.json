@@ -123,5 +123,8 @@
   "canvas.cronExpression": "Cron 표현식",
   "theme.dark": "다크",
   "theme.light": "라이트",
-  "theme.system": "시스템"
+  "theme.system": "시스템",
+  "header.projects": "프로젝트",
+  "header.newProject": "새 프로젝트",
+  "project.newName": "프로젝트 이름"
 }

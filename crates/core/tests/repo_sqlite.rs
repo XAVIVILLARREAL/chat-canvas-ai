@@ -142,3 +142,33 @@ async fn data_sobrevive_reinicio_del_server() {
     let versiones: Vec<(i64,)> = sqlx::query_as("SELECT version FROM _sqlx_migrations").fetch_all(&db).await.unwrap();
     assert_eq!(versiones.len(), 4);
 }
+
+// ─── A.0 — Settings con scopes: override local NO muta global ───────────────
+
+#[tokio::test]
+async fn settings_scopes_override_no_muta_global() {
+    let db = repo::connect("sqlite::memory:").await.unwrap();
+    repo::ensure_global_project(&db).await.unwrap();
+    repo::project_create(&db, "p1", "Uno").await.unwrap();
+
+    // global primero
+    repo::global_setting_set(&db, "tema", &serde_json::json!("claro")).await.unwrap();
+    // p1 sin override → hereda
+    assert_eq!(repo::setting_resolve(&db, "p1", "tema").await.unwrap(), Some(serde_json::json!("claro")));
+    // override local en p1
+    repo::setting_set(&db, "p1", "tema", &serde_json::json!("oscuro")).await.unwrap();
+    assert_eq!(repo::setting_resolve(&db, "p1", "tema").await.unwrap(), Some(serde_json::json!("oscuro")));
+    // GATE: el global sigue intacto
+    assert_eq!(repo::setting_resolve(&db, repo::GLOBAL_PROJECT_ID, "tema").await.unwrap(), Some(serde_json::json!("claro")));
+
+    // merged: p2 hereda; keys distintas se combinan
+    repo::project_create(&db, "p2", "Dos").await.unwrap();
+    repo::global_setting_set(&db, "idioma", &serde_json::json!("es")).await.unwrap();
+    let merged = repo::settings_resolved(&db, "p2").await.unwrap();
+    assert_eq!(merged.get("tema"), Some(&serde_json::json!("claro")));
+    assert_eq!(merged.get("idioma"), Some(&serde_json::json!("es")));
+
+    // clear override → vuelve a heredar
+    repo::project_setting_clear(&db, "p1", "tema").await.unwrap();
+    assert_eq!(repo::setting_resolve(&db, "p1", "tema").await.unwrap(), Some(serde_json::json!("claro")));
+}

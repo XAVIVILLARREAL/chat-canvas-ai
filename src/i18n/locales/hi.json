@@ -123,5 +123,8 @@
   "canvas.cronExpression": "Cron अभिव्यक्ति",
   "theme.dark": "गहरा",
   "theme.light": "उजला",
-  "theme.system": "सिस्टम"
+  "theme.system": "सिस्टम",
+  "header.projects": "प्रोजेक्ट",
+  "header.newProject": "नया प्रोजेक्ट",
+  "project.newName": "प्रोजेक्ट नाम"
 }

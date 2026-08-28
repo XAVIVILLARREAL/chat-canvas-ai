@@ -123,5 +123,8 @@
   "canvas.cronExpression": "Cron Expression",
   "theme.dark": "Dark",
   "theme.light": "Light",
-  "theme.system": "System"
+  "theme.system": "System",
+  "header.projects": "Projects",
+  "header.newProject": "New project",
+  "project.newName": "Project name"
 }

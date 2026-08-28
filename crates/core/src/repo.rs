@@ -736,3 +736,79 @@ mod tests {
         assert!(project_get(&db, "p1").await.unwrap().is_some());
     }
 }
+
+// ─── Settings con scopes (A.0): Global → Proyecto → Sesión → Agente ─────────
+//
+// Convención A.0: el proyecto reservado `global` guarda la configuración global;
+// cada proyecto puede SOBREESCRIBIR claves en su propio (project_id, key).
+// `setting_resolve` lee proyecto primero y cae a global — el override local
+// JAMÁS muta el global (tablas separadas por clave primaria).
+
+/// Proyecto reservado para configuración global (no aparece en listados de UI).
+pub const GLOBAL_PROJECT_ID: &str = "global";
+
+/// Asegura que el proyecto global exista (llamar en el arranque del server).
+pub async fn ensure_global_project(db: &Db) -> Result<(), sqlx::Error> {
+    if project_get(db, GLOBAL_PROJECT_ID).await?.is_none() {
+        project_create(db, GLOBAL_PROJECT_ID, "Configuración global").await?;
+    }
+    Ok(())
+}
+
+/// Escribe una clave GLOBAL (scope global; los proyectos heredan).
+pub async fn global_setting_set(db: &Db, key: &str, value: &serde_json::Value) -> Result<(), sqlx::Error> {
+    setting_set(db, GLOBAL_PROJECT_ID, key, value).await
+}
+
+/// Lee una clave con resolución de scopes: proyecto → global → None.
+pub async fn setting_resolve(db: &Db, project_id: &str, key: &str) -> Result<Option<serde_json::Value>, sqlx::Error> {
+    if let Some(v) = setting_get(db, project_id, key).await? {
+        return Ok(Some(v));
+    }
+    if project_id != GLOBAL_PROJECT_ID {
+        if let Some(v) = setting_get(db, GLOBAL_PROJECT_ID, key).await? {
+            return Ok(Some(v));
+        }
+    }
+    Ok(None)
+}
+
+/// Lista de claves del proyecto + heredadas del global (merged; gana el proyecto).
+pub async fn settings_resolved(db: &Db, project_id: &str) -> Result<serde_json::Map<String, serde_json::Value>, sqlx::Error> {
+    let mut out = serde_json::Map::new();
+    if project_id != GLOBAL_PROJECT_ID {
+        if let Ok(rows) = sqlx::query_as::<_, (String, String)>(
+            "SELECT key, value FROM settings WHERE project_id = ?1",
+        )
+        .bind(GLOBAL_PROJECT_ID)
+        .fetch_all(db)
+        .await
+        {
+            for (k, v) in rows {
+                out.insert(k, serde_json::from_str(&v).expect("settings JSON válido"));
+            }
+        }
+    }
+    if let Ok(rows) = sqlx::query_as::<_, (String, String)>(
+        "SELECT key, value FROM settings WHERE project_id = ?1",
+    )
+    .bind(project_id)
+    .fetch_all(db)
+    .await
+    {
+        for (k, v) in rows {
+            out.insert(k, serde_json::from_str(&v).expect("settings JSON válido"));
+        }
+    }
+    Ok(out)
+}
+
+/// Quita el override local de un proyecto (vuelve a heredar del global).
+pub async fn project_setting_clear(db: &Db, project_id: &str, key: &str) -> Result<u64, sqlx::Error> {
+    let r = sqlx::query("DELETE FROM settings WHERE project_id = ?1 AND key = ?2")
+        .bind(project_id)
+        .bind(key)
+        .execute(db)
+        .await?;
+    Ok(r.rows_affected())
+}

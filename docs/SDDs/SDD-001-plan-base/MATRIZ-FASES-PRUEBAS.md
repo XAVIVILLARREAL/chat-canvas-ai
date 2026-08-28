@@ -20,7 +20,7 @@
 ## Etapa 1 · Chat núcleo + proyectos como scope — `plan-a-chat-codex.md` (ADR-006)
 | Fase | Nombre | Pruebas |
 |---|---|---|
-| A.0 | Proyectos como SCOPE (FUNDACIÓN) | Unit: repos filtran por project_id; scopes global→proyecto. Integration: cross-proyecto vacío; override local no muta global; tabs restauran tras reinicio. E2E: 2 proyectos alternando tabs, skill global vs copia local. HUMANA @core: entrar por card, cambiar tab, nada se mezcla |
+| A.0 | Proyectos como SCOPE (FUNDACIÓN) 🟡 backend+switcher 2026-08-27 | Unit: repos filtran por project_id ✅ (repo_sqlite+rls_postgres); scopes global→proyecto ✅ (`settings_scopes_override_no_muta_global`, `GLOBAL_PROJECT_ID` reservado). Integration: cross-proyecto vacío ✅; override local no muta global ✅ (HTTP + core); tabs restauran tras reinicio ✅ (`ui.tabs`/`ui.active_project` en settings, test `projects_scope::proyectos_scope_override_y_restore_tras_reinicio`). E2E: 2 proyectos alternando ✅ (humana projects.spec 5/5 pasos con gateway real en CANVAS_AI_PORT=3031, proxy Vite CANVAS_GATEWAY) · skill global vs copia local ⬜ (cuando skills tengan UI por proyecto). HUMANA @core: cambiar de proyecto, nada se mezcla ✅. Pendiente: card-grid de proyectos (hoy switcher en header) |
 | A.1 | AppShell + stores | Vitest stores+hook. E2E: layout mobile 375px (BottomNav) y desktop 1440px (sidebar) |
 | A.2 | Persistencia SQLite (settings CIFRADA) | Cargo test repositorios. Integration: roundtrip mensaje con project_id |
 | A.3 | Trait AgentProvider + DeepSeekDirect | Unit con mock-server SSE. Integration: orden de chunks |

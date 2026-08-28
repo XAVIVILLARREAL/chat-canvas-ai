@@ -20,7 +20,7 @@ export default defineConfig({
       // Dev: enruta /api al gateway Rust (crates/server, puerto 3030).
       // En producción, Tauri/nginx sirven /api en el mismo origen.
       "/api": {
-        target: "http://127.0.0.1:3030",
+        target: process.env.CANVAS_GATEWAY ?? "http://127.0.0.1:3030",
         changeOrigin: true,
       },
     },

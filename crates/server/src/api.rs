@@ -38,6 +38,7 @@ impl AppState {
     /// La KEK del vault se lee de `CANVAS_KEK` (tests la setean antes de llamar).
     pub async fn connect(url: &str) -> anyhow::Result<Self> {
         let db = repo::connect(url).await?;
+        repo::ensure_global_project(&db).await?;
         if repo::project_get(&db, DEFAULT_PROJECT_ID).await?.is_none() {
             repo::project_create(&db, DEFAULT_PROJECT_ID, "Canvas AI (local)").await?;
             info!("Proyecto default creado: {}", DEFAULT_PROJECT_ID);
@@ -144,6 +145,12 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/canvases/:id/execute", post(execute_canvas))
         .route("/api/canvases/:id/test", post(test_canvas))
         .route("/api/canvases/:id/validate", post(validate_canvas))
+        
+        // Projects como SCOPE (A.0) + settings con scopes Global→Proyecto
+        .route("/api/projects", get(list_projects).post(create_project))
+        .route("/api/projects/:id", get(get_project).patch(rename_project).delete(delete_project))
+        .route("/api/settings/:project_id", get(get_settings).put(put_setting).delete(clear_setting))
+        .route("/api/settings", get(get_global_settings).put(put_global_setting))
         
         // Providers BYOK (la key NUNCA en respuestas — solo key_ref)
         .route("/api/providers", get(list_providers).post(create_provider))
@@ -473,6 +480,127 @@ fn has_cycle(nodes: &[CanvasNode], edges: &[CanvasEdge]) -> bool {
     }
     
     visited != nodes.len()
+}
+
+// ============================================================================
+// HANDLERS - PROJECTS como SCOPE (A.0) + settings Global→Proyecto
+// ============================================================================
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct CreateProjectRequest {
+    pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct RenameProjectRequest {
+    pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct PutSettingRequest {
+    pub key: String,
+    pub value: serde_json::Value,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct ClearSettingQuery {
+    pub key: String,
+}
+
+async fn list_projects(State(state): State<AppState>) -> ApiResult<Vec<repo::Project>> {
+    Ok(Json(
+        repo::project_list(&state.db).await.map_err(|e| db_err(e))?
+            .into_iter()
+            .filter(|p| p.id != repo::GLOBAL_PROJECT_ID)
+            .collect(),
+    ))
+}
+
+async fn create_project(
+    State(state): State<AppState>,
+    Json(req): Json<CreateProjectRequest>,
+) -> ApiResult<repo::Project> {
+    let id = Uuid::new_v4().to_string();
+    let project = repo::project_create(&state.db, &id, &req.name).await.map_err(|e| db_err(e))?;
+    info!("Proyecto creado: {} ({})", req.name, id);
+    Ok(Json(project))
+}
+
+async fn get_project(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<repo::Project> {
+    repo::project_get(&state.db, &id).await
+        .map_err(|e| db_err(e))?
+        .map(Json)
+        .ok_or_else(|| not_found("Project"))
+}
+
+async fn rename_project(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Json(req): Json<RenameProjectRequest>,
+) -> ApiResult<repo::Project> {
+    let affected = repo::project_rename(&state.db, &id, &req.name).await.map_err(|e| db_err(e))?;
+    if affected == 0 { return Err(not_found("Project")); }
+    repo::project_get(&state.db, &id).await
+        .map_err(|e| db_err(e))?
+        .map(Json)
+        .ok_or_else(|| not_found("Project"))
+}
+
+async fn delete_project(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<StatusCode, (StatusCode, String)> {
+    if id == repo::GLOBAL_PROJECT_ID || id == state.project_id {
+        return Err((StatusCode::BAD_REQUEST, "no se puede borrar el proyecto global ni el default".into()));
+    }
+    let affected = repo::project_soft_delete(&state.db, &id).await.map_err(|e| db_err(e))?;
+    if affected == 0 { return Err(not_found("Project")); }
+    Ok(StatusCode::NO_CONTENT)
+}
+
+/// Settings resueltas del proyecto (override local + herencia global).
+async fn get_settings(
+    State(state): State<AppState>,
+    Path(project_id): Path<String>,
+) -> ApiResult<serde_json::Value> {
+    let resolved = repo::settings_resolved(&state.db, &project_id).await.map_err(|e| db_err(e))?;
+    Ok(Json(serde_json::Value::Object(resolved)))
+}
+
+/// Escribe OVERRIDE local de un proyecto (NO muta el global — A.0).
+async fn put_setting(
+    State(state): State<AppState>,
+    Path(project_id): Path<String>,
+    Json(req): Json<PutSettingRequest>,
+) -> ApiResult<serde_json::Value> {
+    repo::setting_set(&state.db, &project_id, &req.key, &req.value).await.map_err(|e| db_err(e))?;
+    Ok(Json(serde_json::json!({ "ok": true, "scope": "project", "key": req.key })))
+}
+
+/// Quita el override local (vuelve a heredar del global).
+async fn clear_setting(
+    State(state): State<AppState>,
+    Path(project_id): Path<String>,
+    Query(req): Query<ClearSettingQuery>,
+) -> ApiResult<serde_json::Value> {
+    repo::project_setting_clear(&state.db, &project_id, &req.key).await.map_err(|e| db_err(e))?;
+    Ok(Json(serde_json::json!({ "ok": true, "cleared": req.key })))
+}
+
+async fn get_global_settings(State(state): State<AppState>) -> ApiResult<serde_json::Value> {
+    let resolved = repo::settings_resolved(&state.db, repo::GLOBAL_PROJECT_ID).await.map_err(|e| db_err(e))?;
+    Ok(Json(serde_json::Value::Object(resolved)))
+}
+
+async fn put_global_setting(
+    State(state): State<AppState>,
+    Json(req): Json<PutSettingRequest>,
+) -> ApiResult<serde_json::Value> {
+    repo::global_setting_set(&state.db, &req.key, &req.value).await.map_err(|e| db_err(e))?;
+    Ok(Json(serde_json::json!({ "ok": true, "scope": "global", "key": req.key })))
 }
 
 // ============================================================================
@@ -1385,8 +1513,11 @@ pub async fn serve() -> anyhow::Result<()> {
     
     let app = create_router(state);
     
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3030").await?;
-    tracing::info!("AI Canvas Server listening on http://0.0.0.0:3030");
+    // Puerto configurable (CANVAS_AI_PORT, default 3030) — evita colisiones
+    // con otros servicios del host compartido.
+    let port: u16 = std::env::var("CANVAS_AI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(3030);
+    let listener = tokio::net::TcpListener::bind(("0.0.0.0", port)).await?;
+    tracing::info!("AI Canvas Server listening on http://0.0.0.0:{port}");
     
     axum::serve(listener, app).await?;
     Ok(())

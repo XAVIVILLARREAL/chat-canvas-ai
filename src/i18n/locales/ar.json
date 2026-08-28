@@ -123,5 +123,8 @@
   "canvas.cronExpression": "تعبير Cron",
   "theme.dark": "داكن",
   "theme.light": "فاتح",
-  "theme.system": "النظام"
+  "theme.system": "النظام",
+  "header.projects": "المشاريع",
+  "header.newProject": "مشروع جديد",
+  "project.newName": "اسم المشروع"
 }

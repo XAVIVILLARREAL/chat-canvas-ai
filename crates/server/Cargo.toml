@@ -1,4 +1,5 @@
 [package]
+default-run = "canvas-ai-server"
 name = "canvas-ai-server"
 version = "0.1.0"
 description = "Servidor central de Canvas AI — APIs para Canvas, Skills, Agents, MCP, Teams"

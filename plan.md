@@ -196,8 +196,8 @@ scripts/
 
 - **Última sesión**: 2026-08-27 — **ETAPA 0 CERRADA (GATE 0 ✅)**: slices 0.1–0.7 completos y verificados (25/25 Rust + Docker real + PG real + typecheck/build)
 - **Fase actual**: Etapa 0 de [ETAPA-0-IMPLEMENTACION](docs/ETAPA-0-IMPLEMENTACION.md) — orden estricto 0.1→0.8
-- - **Próxima acción**: **Etapa 1** — A.0 "Proyectos como SCOPE" ([plan-a-chat-codex](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md)); regla transversal: toda feature nueva incluye strings i18n en el mismo PR
-- **Progreso Etapa 0**: 0.1–0.8 ✅ COMPLETA (evidencia: [evidence/gate-0/GATE-0.md](evidence/gate-0/GATE-0.md))
+- - **Próxima acción**: **Etapa 1 A.0 cierre** — card-grid de proyectos + skill global vs copia local; luego A.1 AppShell+stores ([plan-a-chat-codex](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md))
+- **Progreso Etapa 0**: ✅ COMPLETA (GATE 0 — [evidencia](evidence/gate-0/GATE-0.md)) · **Etapa 1**: A.0 backend+switcher ✅ (pendiente card-grid + skill global/local)
 - **Bloqueos activos**: Ninguno
 
 ### §15.1 Estado global

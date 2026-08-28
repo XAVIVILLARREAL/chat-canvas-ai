@@ -123,5 +123,8 @@
   "canvas.cronExpression": "Cron 表达式",
   "theme.dark": "深色",
   "theme.light": "浅色",
-  "theme.system": "跟随系统"
+  "theme.system": "跟随系统",
+  "header.projects": "项目",
+  "header.newProject": "新建项目",
+  "project.newName": "项目名称"
 }

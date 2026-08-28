@@ -123,5 +123,8 @@
   "canvas.cronExpression": "Cron-выражение",
   "theme.dark": "Тёмная",
   "theme.light": "Светлая",
-  "theme.system": "Системная"
+  "theme.system": "Системная",
+  "header.projects": "Проекты",
+  "header.newProject": "Новый проект",
+  "project.newName": "Название проекта"
 }
