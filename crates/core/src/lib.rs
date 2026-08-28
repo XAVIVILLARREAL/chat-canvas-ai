@@ -4,6 +4,7 @@
 //! Aquí viven los tipos de dominio y las reglas de negocio puras que
 //! comparten el shell Tauri (local) y el binario servidor (nube).
 
+pub mod context;
 pub mod domain;
 pub mod providers;
 pub mod repo;

@@ -145,5 +145,18 @@
   "view.canvas": "Canvas",
   "view.chat": "Chat",
   "chat.help": "Befehle: /help. Weitere Slashes kommen in Stufe C.",
-  "chat.slashLater": "{cmd} kommt in einer späteren Stufe"
+  "chat.slashLater": "{cmd} kommt in einer späteren Stufe",
+  "context.title": "Kontext",
+  "context.noSession": "Sitzung öffnen, um die Nutzung zu sehen",
+  "context.total": "{total} Token",
+  "context.sentOf": "{sent} von {total} Token gesendet",
+  "context.limit": "Limit {limit}",
+  "context.truncated": "Verlauf gekürzt, damit er ins Limit passt",
+  "context.source.system": "System",
+  "context.source.historial": "Verlauf",
+  "context.source.knowledge": "Wissen",
+  "context.source.tools": "Werkzeuge",
+  "context.source.files": "Dateien",
+  "context.apply": "Anwenden",
+  "context.limitHint": "Limit anpassen — die nächste Anfrage berücksichtigt es"
 }

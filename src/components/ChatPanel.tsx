@@ -8,8 +8,11 @@ import { Send, Brain } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { useChatUiStore } from '../stores/chat-ui-store';
 import { useQueryClient } from '@tanstack/react-query';
-import { useSessions, useMessages, useSendMessage, sessionKeys } from '../hooks/useSessions';
+import {
+  useSessions, useMessages, useSendMessage, sessionKeys,
+} from '../hooks/useSessions';
 import { streamChat } from '../lib/chatApi';
+import { ContextMeter } from './ContextMeter';
 
 export function ChatPanel() {
   const { t } = useI18n();
@@ -52,6 +55,8 @@ export function ChatPanel() {
       onDone: () => {
         setStreaming(null);
         qc.invalidateQueries({ queryKey: sessionKeys.messages(activeSessionId) });
+        // A.5 — el medidor refleja el request recién enviado
+        qc.invalidateQueries({ queryKey: sessionKeys.context(activeSessionId) });
       },
     });
     if (!ok) {
@@ -145,7 +150,7 @@ export function ChatPanel() {
         <div style={{ fontSize: 11, opacity: 0.5, padding: '0 12px 8px' }}>{t('chat.providerNote')}</div>
       </div>
 
-      {/* memory rail — placeholder (Etapa D) */}
+      {/* memory rail: medidor de contexto (A.5) + memory (Etapa D) */}
       <aside
         className="memory-rail"
         data-testid="memory-rail"
@@ -155,13 +160,16 @@ export function ChatPanel() {
           padding: 14,
           display: 'flex',
           flexDirection: 'column',
-          gap: 8,
+          gap: 14,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
-          <Brain width={16} height={16} /> {t('chat.memoryTitle')}
+        <ContextMeter sessionId={activeSessionId} />
+        <div style={{ borderTop: '1px solid rgba(148,163,184,0.15)', paddingTop: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
+            <Brain width={16} height={16} /> {t('chat.memoryTitle')}
+          </div>
+          <p style={{ fontSize: 12, opacity: 0.6 }}>{t('chat.memorySoon')}</p>
         </div>
-        <p style={{ fontSize: 12, opacity: 0.6 }}>{t('chat.memorySoon')}</p>
       </aside>
     </div>
   );

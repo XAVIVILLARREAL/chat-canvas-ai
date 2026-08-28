@@ -110,6 +110,11 @@ export type CanvasSettings = {
 
 export type CodeLanguage = "typescript" | "python" | "rust" | "javascript";
 
+export type ContextSource = {
+  source: string;
+  tokens: number;
+};
+
 export type DataType = "string" | "number" | "boolean" | "object" | "array" | "any" | "agent" | "skill" | "m_c_p_tool" | "canvas" | "file" | "image" | "audio";
 
 export type Dependency = {
@@ -632,6 +637,15 @@ export type Session = {
   total_cost_usd: number;
   total_tokens: number;
   updated_at: number;
+};
+
+export type SessionContextResponse = {
+  limit_tokens: number;
+  project_id: string;
+  sent_tokens: number;
+  session_id: string;
+  sources: ContextSource[];
+  total_tokens: number;
 };
 
 export type Skill = {

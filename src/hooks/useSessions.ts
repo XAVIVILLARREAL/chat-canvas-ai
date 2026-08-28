@@ -3,11 +3,12 @@
  * invalidación tras mutaciones. Fail-open: error → listas vacías.
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { chatApi, type MessageInfo, type SessionInfo } from '../lib/chatApi';
+import { chatApi, type ContextInfo, type MessageInfo, type SessionInfo } from '../lib/chatApi';
 
 export const sessionKeys = {
   all: ['sessions'] as const,
   messages: (id: string | null) => ['sessions', id, 'messages'] as const,
+  context: (id: string | null) => ['sessions', id, 'context'] as const,
 };
 
 export function useSessions() {
@@ -24,6 +25,28 @@ export function useMessages(sessionId: string | null) {
     queryFn: async () => (sessionId ? (await chatApi.listMessages(sessionId)) ?? [] : []),
     enabled: !!sessionId,
     staleTime: 5_000,
+  });
+}
+
+/** Medidor de contexto de la sesión (A.5) — en vivo, refresco tras cada mensaje. */
+export function useContextInfo(sessionId: string | null) {
+  return useQuery<ContextInfo | null>({
+    queryKey: sessionKeys.context(sessionId),
+    queryFn: async () => (sessionId ? (await chatApi.context(sessionId)) ?? null : null),
+    enabled: !!sessionId,
+    staleTime: 5_000,
+  });
+}
+
+/** Ajusta el límite de contexto (override de proyecto) → el siguiente request lo refleja. */
+export function useSetContextLimit(sessionId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ projectId, limit }: { projectId: string; limit: number }) => {
+      const r = await chatApi.setContextLimit(projectId, limit);
+      if (!r) throw new Error('gateway');
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: sessionKeys.context(sessionId) }),
   });
 }
 

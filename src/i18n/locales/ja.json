@@ -145,5 +145,18 @@
   "view.canvas": "キャンバス",
   "view.chat": "チャット",
   "chat.help": "コマンド: /help。他のスラッシュはC段階で登場。",
-  "chat.slashLater": "{cmd}は後の段階で登場"
+  "chat.slashLater": "{cmd}は後の段階で登場",
+  "context.title": "コンテキスト",
+  "context.noSession": "使用状況を見るにはセッションを開いてください",
+  "context.total": "{total} トークン",
+  "context.sentOf": "{total} トークンのうち {sent} 送信",
+  "context.limit": "上限 {limit}",
+  "context.truncated": "上限に収めるため履歴を切り詰めました",
+  "context.source.system": "システム",
+  "context.source.historial": "履歴",
+  "context.source.knowledge": "ナレッジ",
+  "context.source.tools": "ツール",
+  "context.source.files": "ファイル",
+  "context.apply": "適用",
+  "context.limitHint": "上限を調整 — 次のリクエストに反映されます"
 }

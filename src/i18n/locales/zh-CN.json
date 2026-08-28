@@ -145,5 +145,18 @@
   "view.canvas": "画布",
   "view.chat": "聊天",
   "chat.help": "命令：/help。更多斜杠命令将在 C 阶段推出。",
-  "chat.slashLater": "{cmd} 将在后续阶段推出"
+  "chat.slashLater": "{cmd} 将在后续阶段推出",
+  "context.title": "上下文",
+  "context.noSession": "打开会话以查看用量",
+  "context.total": "{total} 个 token",
+  "context.sentOf": "已发送 {sent} / {total} 个 token",
+  "context.limit": "上限 {limit}",
+  "context.truncated": "历史记录已截断以符合上限",
+  "context.source.system": "系统",
+  "context.source.historial": "历史记录",
+  "context.source.knowledge": "知识",
+  "context.source.tools": "工具",
+  "context.source.files": "文件",
+  "context.apply": "应用",
+  "context.limitHint": "调整上限——下一个请求将生效"
 }

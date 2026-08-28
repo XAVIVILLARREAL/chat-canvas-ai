@@ -145,5 +145,18 @@
   "view.canvas": "कैनवास",
   "view.chat": "चैट",
   "chat.help": "कमांड: /help। अन्य स्लैश चरण C में।",
-  "chat.slashLater": "{cmd} बाद के चरण में आएगा"
+  "chat.slashLater": "{cmd} बाद के चरण में आएगा",
+  "context.title": "संदर्भ",
+  "context.noSession": "उपयोग देखने के लिए सेशन खोलें",
+  "context.total": "{total} टोकन",
+  "context.sentOf": "{total} में से {sent} टोकन भेजे गए",
+  "context.limit": "सीमा {limit}",
+  "context.truncated": "सीमा में रखने के लिए इतिहास छोटा किया गया",
+  "context.source.system": "सिस्टम",
+  "context.source.historial": "इतिहास",
+  "context.source.knowledge": "ज्ञान",
+  "context.source.tools": "उपकरण",
+  "context.source.files": "फ़ाइलें",
+  "context.apply": "लागू करें",
+  "context.limitHint": "सीमा समायोजित करें — अगला अनुरोध इसे दिखाएगा"
 }

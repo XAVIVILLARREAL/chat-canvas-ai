@@ -145,5 +145,18 @@
   "view.canvas": "Canvas",
   "view.chat": "Chat",
   "chat.help": "Comandos: /help. Más slash llegan con la Etapa C.",
-  "chat.slashLater": "{cmd} llega en una etapa posterior"
+  "chat.slashLater": "{cmd} llega en una etapa posterior",
+  "context.title": "Contexto",
+  "context.noSession": "Abre una sesión para ver el uso",
+  "context.total": "{total} tokens",
+  "context.sentOf": "{sent} de {total} tokens enviados",
+  "context.limit": "límite {limit}",
+  "context.truncated": "Historial recortado para caber en el límite",
+  "context.source.system": "Sistema",
+  "context.source.historial": "Historial",
+  "context.source.knowledge": "Conocimiento",
+  "context.source.tools": "Herramientas",
+  "context.source.files": "Archivos",
+  "context.apply": "Aplicar",
+  "context.limitHint": "Ajusta el límite — el siguiente request lo refleja"
 }

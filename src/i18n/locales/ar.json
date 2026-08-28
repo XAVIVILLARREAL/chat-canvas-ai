@@ -145,5 +145,18 @@
   "view.canvas": "اللوحة",
   "view.chat": "المحادثة",
   "chat.help": "الأوامر: /help. المزيد من الأوامر في المرحلة C.",
-  "chat.slashLater": "{cmd} سيصل في مرحلة لاحقة"
+  "chat.slashLater": "{cmd} سيصل في مرحلة لاحقة",
+  "context.title": "السياق",
+  "context.noSession": "افتح جلسة لعرض الاستخدام",
+  "context.total": "{total} رمزاً",
+  "context.sentOf": "تم إرسال {sent} من {total} رمزاً",
+  "context.limit": "الحد {limit}",
+  "context.truncated": "تم تقليص السجل ليلائم الحد",
+  "context.source.system": "النظام",
+  "context.source.historial": "السجل",
+  "context.source.knowledge": "المعرفة",
+  "context.source.tools": "الأدوات",
+  "context.source.files": "الملفات",
+  "context.apply": "تطبيق",
+  "context.limitHint": "عدّل الحد — سينعكس على الطلب التالي"
 }

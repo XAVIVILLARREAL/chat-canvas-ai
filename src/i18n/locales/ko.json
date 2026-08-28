@@ -145,5 +145,18 @@
   "view.canvas": "캔버스",
   "view.chat": "채팅",
   "chat.help": "명령어: /help. 다른 슬래시는 C 단계에서 제공.",
-  "chat.slashLater": "{cmd}는 이후 단계에서 제공"
+  "chat.slashLater": "{cmd}는 이후 단계에서 제공",
+  "context.title": "컨텍스트",
+  "context.noSession": "사용량을 보려면 세션을 여세요",
+  "context.total": "{total} 토큰",
+  "context.sentOf": "{total} 토큰 중 {sent} 전송됨",
+  "context.limit": "한도 {limit}",
+  "context.truncated": "한도에 맞추기 위해 기록을 잘랐습니다",
+  "context.source.system": "시스템",
+  "context.source.historial": "기록",
+  "context.source.knowledge": "지식",
+  "context.source.tools": "도구",
+  "context.source.files": "파일",
+  "context.apply": "적용",
+  "context.limitHint": "한도를 조정하면 다음 요청에 반영됩니다"
 }

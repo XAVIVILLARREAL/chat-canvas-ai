@@ -145,5 +145,18 @@
   "view.canvas": "Canvas",
   "view.chat": "Chat",
   "chat.help": "Comandi: /help. Altri slash arrivano nella Fase C.",
-  "chat.slashLater": "{cmd} arriva in una fase successiva"
+  "chat.slashLater": "{cmd} arriva in una fase successiva",
+  "context.title": "Contesto",
+  "context.noSession": "Apri una sessione per vedere l'utilizzo",
+  "context.total": "{total} token",
+  "context.sentOf": "{sent} di {total} token inviati",
+  "context.limit": "limite {limit}",
+  "context.truncated": "Cronologia ridotta per rientrare nel limite",
+  "context.source.system": "Sistema",
+  "context.source.historial": "Cronologia",
+  "context.source.knowledge": "Conoscenza",
+  "context.source.tools": "Strumenti",
+  "context.source.files": "File",
+  "context.apply": "Applica",
+  "context.limitHint": "Regola il limite — la prossima richiesta lo riflette"
 }

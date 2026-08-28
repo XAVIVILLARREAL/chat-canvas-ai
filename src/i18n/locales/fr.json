@@ -145,5 +145,18 @@
   "view.canvas": "Canvas",
   "view.chat": "Chat",
   "chat.help": "Commandes : /help. D'autres slash arrivent à l'Étape C.",
-  "chat.slashLater": "{cmd} arrive dans une étape ultérieure"
+  "chat.slashLater": "{cmd} arrive dans une étape ultérieure",
+  "context.title": "Contexte",
+  "context.noSession": "Ouvrez une session pour voir l'utilisation",
+  "context.total": "{total} jetons",
+  "context.sentOf": "{sent} sur {total} jetons envoyés",
+  "context.limit": "limite {limit}",
+  "context.truncated": "Historique réduit pour tenir dans la limite",
+  "context.source.system": "Système",
+  "context.source.historial": "Historique",
+  "context.source.knowledge": "Connaissances",
+  "context.source.tools": "Outils",
+  "context.source.files": "Fichiers",
+  "context.apply": "Appliquer",
+  "context.limitHint": "Ajustez la limite — la prochaine requête en tient compte"
 }

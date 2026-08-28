@@ -12,7 +12,7 @@ use axum::{
     Router,
 };
 use futures::StreamExt;
-use canvas_ai_core::{domain::*, providers, repo, vault};
+use canvas_ai_core::{context, domain::*, providers, repo, vault};
 use providers::AgentProvider;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -154,6 +154,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/sessions/:id/messages", get(list_messages).post(create_message))
         .route("/api/sessions/:id/chat", post(chat_in_session))
         .route("/api/sessions/:id/chat/stream", post(chat_in_session_stream))
+        .route("/api/sessions/:id/context", get(session_context))
         
         // Projects como SCOPE (A.0) + settings con scopes Global→Proyecto
         .route("/api/projects", get(list_projects).post(create_project))
@@ -674,6 +675,56 @@ async fn chat_via_any_provider(
     Err(last)
 }
 
+/// Límite de contexto efectivo (A.5): setting `context_max_tokens` con herencia
+/// Global→Proyecto; default 8192, piso 256 (límites ridículos no rompen el chat).
+async fn context_limit(state: &AppState, project_id: &str) -> usize {
+    let val = repo::setting_resolve(&state.db, project_id, "context_max_tokens")
+        .await
+        .ok()
+        .flatten()
+        .and_then(|v| v.as_u64())
+        .unwrap_or(context::DEFAULT_CONTEXT_LIMIT as u64) as usize;
+    val.max(256)
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct SessionContextResponse {
+    pub session_id: String,
+    pub project_id: String,
+    pub sources: Vec<context::ContextSource>,
+    pub total_tokens: usize,
+    pub limit_tokens: usize,
+    pub sent_tokens: usize,
+}
+
+/// Medidor de contexto (A.5): desglose de tokens por fuente de la sesión
+/// en vivo + límite efectivo + lo que se enviaría tras el truncado.
+/// Las fuentes knowledge/tools/archivos llegan en etapas C/D (hoy: 0).
+async fn session_context(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<SessionContextResponse> {
+    let session = repo::session_get(&state.db, &id)
+        .await
+        .map_err(|e| db_err(e))?
+        .ok_or_else(|| not_found("Session"))?;
+    let history = repo::message_list_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
+    let msgs: Vec<context::ContextMessage> = history
+        .iter()
+        .map(|m| context::ContextMessage::new(&m.role, &m.content))
+        .collect();
+    let limit = context_limit(&state, &session.project_id).await;
+    let (_, b) = context::build_context(&msgs, limit);
+    Ok(Json(SessionContextResponse {
+        session_id: id,
+        project_id: session.project_id,
+        sources: b.sources,
+        total_tokens: b.total_tokens,
+        limit_tokens: b.limit_tokens,
+        sent_tokens: b.sent_tokens,
+    }))
+}
+
 /// Chat en una sesión: persiste user → llama provider → persiste assistant.
 /// (Streaming UI llega en A.4; tool-calls → Reasonix en Etapa C.)
 async fn chat_in_session(
@@ -681,9 +732,10 @@ async fn chat_in_session(
     Path(id): Path<String>,
     Json(req): Json<ChatInSessionRequest>,
 ) -> ApiResult<ChatInSessionResponse> {
-    if repo::session_get(&state.db, &id).await.map_err(|e| db_err(e))?.is_none() {
-        return Err(not_found("Session"));
-    }
+    let session = repo::session_get(&state.db, &id)
+        .await
+        .map_err(|e| db_err(e))?
+        .ok_or_else(|| not_found("Session"))?;
     let model = req.model.clone().unwrap_or_else(|| "auto".to_string());
 
     // 1) user message persistida
@@ -692,11 +744,17 @@ async fn chat_in_session(
         None, None, None, None, &serde_json::json!({}),
     ).await.map_err(|e| db_err(e))?;
 
-    // 2) historial → provider
+    // 2) historial → provider (con límite de contexto A.5: recorta lo viejo)
     let history = repo::message_list_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
-    let messages: Vec<providers::ChatMessage> = history
+    let ctx_msgs: Vec<context::ContextMessage> = history
         .iter()
-        .map(|m| providers::ChatMessage { role: m.role.clone(), content: m.content.clone() })
+        .map(|m| context::ContextMessage::new(&m.role, &m.content))
+        .collect();
+    let limit = context_limit(&state, &session.project_id).await;
+    let (kept, _ctx) = context::build_context(&ctx_msgs, limit);
+    let messages: Vec<providers::ChatMessage> = kept
+        .into_iter()
+        .map(|m| providers::ChatMessage { role: m.role, content: m.content })
         .collect();
     let completion_req = providers::ChatCompletionRequest {
         model,
@@ -770,14 +828,27 @@ async fn chat_in_session_stream(
         Err(e) => return db_err(e).into_response(),
     };
 
-    // 2) historial → provider (streaming)
+    // 2) historial → provider (streaming, con límite de contexto A.5)
     let history = match repo::message_list_by_session(&state.db, &id).await {
         Ok(h) => h,
         Err(e) => return db_err(e).into_response(),
     };
-    let messages: Vec<providers::ChatMessage> = history
+    let ctx_msgs: Vec<context::ContextMessage> = history
         .iter()
-        .map(|m| providers::ChatMessage { role: m.role.clone(), content: m.content.clone() })
+        .map(|m| context::ContextMessage::new(&m.role, &m.content))
+        .collect();
+    // project_id de la sesión (para resolver el límite) — fail-open a default
+    let project_id = repo::session_get(&state.db, &id)
+        .await
+        .ok()
+        .flatten()
+        .map(|s| s.project_id)
+        .unwrap_or(state.project_id.clone());
+    let limit = context_limit(&state, &project_id).await;
+    let (kept, ctx_breakdown) = context::build_context(&ctx_msgs, limit);
+    let messages: Vec<providers::ChatMessage> = kept
+        .into_iter()
+        .map(|m| providers::ChatMessage { role: m.role, content: m.content })
         .collect();
     let completion_req = providers::ChatCompletionRequest {
         model,
@@ -840,6 +911,8 @@ async fn chat_in_session_stream(
                     "model": model_used,
                     "persisted": persist_ok,
                     "usage": { "prompt_tokens": pt, "completion_tokens": ct },
+                    // A.5 — desglose de lo que efectivamente se envió al provider
+                    "context": ctx_breakdown,
                 })
                 .to_string(),
             );
@@ -1981,6 +2054,7 @@ const OPS: &[Op] = &[
     Op { method: "get", path: "/api/sessions/{id}/messages", summary: "Mensajes de la sesión", tag: "sessions", request: None, response: Some("Message") },
     Op { method: "post", path: "/api/sessions/{id}/messages", summary: "Agrega mensaje", tag: "sessions", request: Some("CreateMessageRequest"), response: Some("Message") },
     Op { method: "post", path: "/api/sessions/{id}/chat", summary: "Chat con provider BYOK (persiste user+assistant)", tag: "sessions", request: Some("ChatInSessionRequest"), response: Some("ChatInSessionResponse") },
+    Op { method: "get", path: "/api/sessions/{id}/context", summary: "Medidor de contexto: desglose por fuente + límite (A.5)", tag: "sessions", request: None, response: Some("SessionContextResponse") },
 
     Op { method: "put", path: "/api/settings/{project_id}/secret", summary: "Setting sensible CIFRADO (T.SEC)", tag: "settings", request: Some("SecretSettingRequest"), response: None },
     Op { method: "post", path: "/api/settings/{project_id}/reveal", summary: "Descifra un setting (server-side)", tag: "settings", request: Some("SecretSettingRequest"), response: None },
@@ -2065,6 +2139,7 @@ pub fn build_openapi() -> serde_json::Value {
         ("SecretSettingRequest", schema_for!(SecretSettingRequest)),
         ("ChatInSessionRequest", schema_for!(ChatInSessionRequest)),
         ("ChatInSessionResponse", schema_for!(ChatInSessionResponse)),
+        ("SessionContextResponse", schema_for!(SessionContextResponse)),
         ("StreamEvent", schema_for!(repo::StreamEvent)),
         ("A2AAgentCard", schema_for!(A2AAgentCard)),
         ("A2ATask", schema_for!(A2ATask)),

@@ -187,6 +187,7 @@ scripts/
 | 2026-08-25 | plan-i18n.md expandido a v2: 12 idiomas + pipeline AI automático |
 | 2026-08-25 | plan.md creado siguiendo template pla |
 | 2026-08-27 | Fase I.2 completada: translate.ts + i18n-check.mjs + 5 locales (zh-CN, pt-BR, de, fr, it) + Locale type extendido a 7 idiomas |
+| 2026-08-28 | A.5 completada: medidor de contexto (core/context.rs + GET /api/sessions/:id/context + truncado en chat + ContextMeter en memory rail + 13 keys × 12 locales + OpenAPI 47 paths) |
 
 ---
 
@@ -196,13 +197,13 @@ scripts/
 
 > **📌 PUNTO DE CONTINUIDAD — leer esto primero en una sesión nueva**
 
-- **Última sesión (2026-08-27)**: **ETAPA 0 CERRADA (GATE 0 ✅)** + **Etapa 1: A.0 ✅ A.1 ✅ A.2 ✅ A.3 ✅ A.4 ✅**
-- **Próxima acción**: **Etapa 1 A.5 — Medidor y debug de contexto** (desglose de tokens por fuente — historial/system/knowledge/tools — en vivo; ajustar límite → siguiente request lo refleja). Spec: [plan-a-chat-codex §A.5](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md). Luego A.6 (centro de config), A.7 (modo ENCARGO), A.8 (resume), A.9 (ramas) → **GATE A**.
+- **Última sesión (2026-08-28)**: **ETAPA 0 CERRADA (GATE 0 ✅)** + **Etapa 1: A.0 ✅ A.1 ✅ A.2 ✅ A.3 ✅ A.4 ✅ A.5 ✅**
+- **Próxima acción**: **Etapa 1 A.6 — Centro de Configuración** (2 públicos, 5 scopes Global→Proyecto→Sesión→Agente→Subagente con vista de valor efectivo y origen). Spec: [plan-a-chat-codex §A.6](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md). Luego A.7 (modo ENCARGO), A.8 (resume), A.9 (ramas) → **GATE A**.
 
 **Estado del código (todo en main, verificado):**
-- Rust **37/37** (SQLite + PG 16 real + Docker real) · vitest 7/7 · typecheck (tsgo) ✅ · build ✅ · i18n 12/12 · humana: A.0 6/6, A.1/A.4 8/8, móvil 3/3
+- Rust **42/42** (SQLite + PG 16 real + Docker real + context A.5) · vitest 7/7 · typecheck (tsgo) ✅ · build ✅ · i18n 12/12 (137 keys) · humana: A.0 6/6, A.1/A.4 8/8, A.5 6/6, móvil 3/3
 - Etapa 0: migraciones {sqlite,postgres}/0001-0005 · repos sqlx · server axum persistido (ADR-007) · RLS fail-closed 13 tablas · event_stream append-only · vault BYOK AES-256-GCM · sandbox Linux (bollard) · OpenAPI 43 paths + `src/types/api-generated.ts` · i18n 12 locales + RTL
-- Etapa 1: A.0 proyectos+settings scopes+switcher/grid+skills global/copia · A.1 /api/sessions+messages + ChatPanel + SessionsList + BottomNav · A.2 settings cifradas (`{__secret: key_ref}`) · A.3 `AgentProvider` + OpenAICompatProvider universal + `/chat` · A.4 streaming SSE + slash honestos + usage
+- Etapa 1: A.0 proyectos+settings scopes+switcher/grid+skills global/copia · A.1 /api/sessions+messages + ChatPanel + SessionsList + BottomNav · A.2 settings cifradas (`{__secret: key_ref}`) · A.3 `AgentProvider` + OpenAICompatProvider universal + `/chat` · A.4 streaming SSE + slash honestos + usage · A.5 medidor de contexto (desglose por fuentes en vivo + límite `context_max_tokens` con truncado real del request)
 
 **Cómo correr las verificaciones (comandos exactos):**
 ```bash
@@ -274,6 +275,11 @@ cargo test -p canvas-ai-core --test providers_byok openrouter_free_real -- --noc
 | Archivos | `src/i18n/index.ts` · `src/components/Canvas.tsx` · `src/components/{Sidebar,Header,Canvas,Modal,ToastContainer}.css` · `src/styles.css` · `e2e/human/tests/idioma.spec.ts` · `src/i18n/index.test.ts` |
 | Tests | `typecheck` ✅ · `i18n-check.mjs` ✅ 11/11 · `vite build` ✅ · vitest `index.test.ts` 4/4 · verificación programática: AR dir=rtl/sidebar-izquierda (sidebarLeft:0/canvasLeft:321), LTR sidebar-derecha (sidebarLeft:960) ✅ |
 | Lecciones | El grid desktop `.app-main` (1fr 320px) se espeja solo en RTL (flujo inline) — sin cambio · `text-align:right` en `.node-ports.inputs .port-label` se mantiene físico (geometría del nodo, no flujo de documento) · selector de idioma fragile al cambiar locale (el aria-label se traduce → el test de re-check EN falla por selector, no por el app) · verificación visual humana pendiente (screenshot `/tmp/ar-arabic.png`) · Intl formatters creados per-locale (memoizados) y expuestos vía `useI18n()` — React Compiler los re-renderiza en cambio de idioma · fallback test cubre: key real → string no vacío; key missing → devuelve key; key en en pero no en locale → cae a en; vars no rompe sin placeholders |
+| **A.5 — Medidor y debug de contexto** | ✅ Cerrada 2026-08-28 |
+| Deliverables | `core/context.rs` (estimación chars/4 + desglose 5 fuentes + política: system y el más reciente siempre viajan, historial viejo se recorta primero) · `GET /api/sessions/:id/context` (SessionContextResponse + OpenAPI/schema/TS regenerados, 47 paths) · truncado real en `chat_in_session` y `chat_in_session_stream` (meta SSE `context` = lo que el medidor muestra) · setting `context_max_tokens` (herencia Global→Proyecto, default 8192, piso 256) · `ContextMeter.tsx` en el memory rail (barras por fuente, ajuste de límite, aviso de truncado) · 13 keys i18n × 12 locales |
+| Archivos | `crates/core/src/context.rs` · `crates/server/src/api.rs` · `src/components/ContextMeter.tsx` · `src/components/ChatPanel.tsx` · `src/lib/chatApi.ts` · `src/hooks/useSessions.ts` · `src/i18n/locales/*.json` · `crates/server/tests/context_meter.rs` · `e2e/human/tests/context-meter.spec.ts` |
+| Tests | unit core 5/5 (fixtures: sin truncado, truncado, mensaje único excedido, vacío, estimación) · integration server 2/2 (**request capturado por mock provider == sent_tokens del medidor** + 404 + límite heredado) · E2E humana @core desktop 6/6 pasos · workspace cargo completo 0 failed · typecheck/build/vitest/i18n-check ✅ |
+| Lecciones | (1) el `useEffect` que sincroniza el input del límite PISA lo tecleado si llega una refetch a mitad de edición → flag `editing` + `onFocus select()` (escribir reemplaza, además UX real) · (2) barra con width 0% no es "visible" para Playwright → asertar la fila con testid, no la barra · (3) tras `page.reload()` la sesión activa NO se restaura (Zustand en memoria) — el spec humano debe re-seleccionarla; el límite persiste porque vive en settings · (4) el fixture `humanFill` usa `pressSequentially` que NO limpia el valor previo · (5) el log de `h.step` sale al TERMINAR el paso — un paso que falla nunca imprime su nombre (costó localizar que el fallo real era el paso 6, no el 5) |
 
 ### §15.3 Pausas y reanudaciones
 

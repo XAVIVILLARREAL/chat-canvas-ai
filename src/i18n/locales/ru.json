@@ -145,5 +145,18 @@
   "view.canvas": "Канвас",
   "view.chat": "Чат",
   "chat.help": "Команды: /help. Остальные слэши — с этапа C.",
-  "chat.slashLater": "{cmd} появится на более позднем этапе"
+  "chat.slashLater": "{cmd} появится на более позднем этапе",
+  "context.title": "Контекст",
+  "context.noSession": "Откройте сессию, чтобы увидеть расход",
+  "context.total": "{total} токенов",
+  "context.sentOf": "Отправлено {sent} из {total} токенов",
+  "context.limit": "лимит {limit}",
+  "context.truncated": "История сокращена, чтобы уместиться в лимит",
+  "context.source.system": "Система",
+  "context.source.historial": "История",
+  "context.source.knowledge": "Знания",
+  "context.source.tools": "Инструменты",
+  "context.source.files": "Файлы",
+  "context.apply": "Применить",
+  "context.limitHint": "Измените лимит — следующий запрос это учтёт"
 }

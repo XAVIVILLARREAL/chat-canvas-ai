@@ -3895,6 +3895,67 @@
         "title": "Session",
         "type": "object"
       },
+      "SessionContextResponse": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "ContextSource": {
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "tokens": {
+                "format": "uint",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "source",
+              "tokens"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "limit_tokens": {
+            "format": "uint",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "sent_tokens": {
+            "format": "uint",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "session_id": {
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/definitions/ContextSource"
+            },
+            "type": "array"
+          },
+          "total_tokens": {
+            "format": "uint",
+            "minimum": 0.0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "limit_tokens",
+          "project_id",
+          "sent_tokens",
+          "session_id",
+          "sources",
+          "total_tokens"
+        ],
+        "title": "SessionContextResponse",
+        "type": "object"
+      },
       "Skill": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "definitions": {
@@ -7302,6 +7363,32 @@
           }
         },
         "summary": "Chat con provider BYOK (persiste user+assistant)",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{id}/context": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionContextResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Medidor de contexto: desglose por fuente + límite (A.5)",
         "tags": [
           "sessions"
         ]

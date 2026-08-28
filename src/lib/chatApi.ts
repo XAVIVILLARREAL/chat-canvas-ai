@@ -23,10 +23,30 @@ export interface MessageInfo {
   created_at: number;
 }
 
+export interface ContextSource {
+  source: string; // system|historial|knowledge|tools|archivos
+  tokens: number;
+}
+
+/** Medidor de contexto (A.5) — desglose por fuente + límite + truncado. */
+export interface ContextInfo {
+  session_id: string;
+  project_id: string;
+  sources: ContextSource[];
+  total_tokens: number;
+  limit_tokens: number;
+  sent_tokens: number;
+}
+
 /** Callback por evento SSE del stream de chat. */
 export interface StreamHandlers {
   onDelta: (delta: string) => void;
-  onDone: (meta: { message_id: string; model: string; usage?: { prompt_tokens: number; completion_tokens: number } }) => void;
+  onDone: (meta: {
+    message_id: string;
+    model: string;
+    usage?: { prompt_tokens: number; completion_tokens: number };
+    context?: ContextInfo;
+  }) => void;
 }
 
 /**
@@ -125,6 +145,14 @@ export const chatApi = {
   deleteSession: (id: string) =>
     apiFetch<SessionInfo>(`/api/sessions/${id}`, { method: 'DELETE' }),
   listMessages: (sessionId: string) => apiFetch<MessageInfo[]>(`/api/sessions/${sessionId}/messages`),
+  /** Medidor de contexto de la sesión (A.5). `null` si falla (fail-open). */
+  context: (sessionId: string) => apiFetch<ContextInfo>(`/api/sessions/${sessionId}/context`),
+  /** Escribe el límite de contexto como override de proyecto (hereda si se borra). */
+  setContextLimit: (projectId: string, limit: number) =>
+    apiFetch<{ ok: boolean }>(`/api/settings/${projectId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ key: 'context_max_tokens', value: limit }),
+    }),
   sendMessage: (sessionId: string, content: string) =>
     apiFetch<MessageInfo>(`/api/sessions/${sessionId}/messages`, {
       method: 'POST',
