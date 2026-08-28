@@ -8,10 +8,14 @@ use serde_json::json;
 
 const DOWN_0001: &str = include_str!("../migrations/sqlite/down/0001_init.sql");
 const DOWN_0002: &str = include_str!("../migrations/sqlite/down/0002_workspace.sql");
+const DOWN_0004: &str = include_str!("../migrations/sqlite/down/0004_append_only.sql");
 
 /// Ejecuta TODAS las reversas (0002 → 0001) y limpia el registro de sqlx.
 async fn run_all_down(db: &repo::Db) {
     for stmt in DOWN_0002.split(';').map(str::trim).filter(|s| !s.is_empty()) {
+        sqlx::query(stmt).execute(db).await.unwrap();
+    }
+    for stmt in DOWN_0004.split(';').map(str::trim).filter(|s| !s.is_empty()) {
         sqlx::query(stmt).execute(db).await.unwrap();
     }
     for stmt in DOWN_0001.split(';').map(str::trim).filter(|s| !s.is_empty()) {
@@ -95,10 +99,13 @@ async fn crud_por_proyecto_y_flujo_completo() {
     assert_eq!(e1.status, "completed");
     assert!(e1.completed_at.is_some());
 
-    // event_stream
+    // event_stream (slice 0.3): session.created(auto) + 2×message.streamed(auto) + PROMPT
     let ev = repo::event_append(&db, "s1", "PROMPT", "usuario preguntó", None, Some("test-model"), 10, 0.0001, Some("user"), Some("u1")).await.unwrap();
     assert!(ev > 0);
-    assert_eq!(repo::event_list_by_session(&db, "s1").await.unwrap().len(), 1);
+    let evs = repo::event_list_by_session(&db, "s1").await.unwrap();
+    assert_eq!(evs.len(), 4, "session.created + 2×message.streamed + PROMPT");
+    assert!(evs.iter().any(|e| e.event_type == repo::product_events::SESSION_CREATED));
+    assert_eq!(evs.iter().filter(|e| e.event_type == repo::product_events::MESSAGE_STREAMED).count(), 2);
 
     // soft delete de proyecto
     repo::project_soft_delete(&db, "p1").await.unwrap();
@@ -127,7 +134,7 @@ async fn data_sobrevive_reinicio_del_server() {
     let db = repo::connect(&url).await.unwrap();
     assert_eq!(repo::project_list(&db).await.unwrap().len(), 1);
     assert_eq!(repo::message_list_by_session(&db, "s1").await.unwrap().len(), 1);
-    // migraciones NO se reaplican (idempotente por _sqlx_migrations): 0001 + 0002
+    // migraciones NO se reaplican (idempotente por _sqlx_migrations): 0001+0002+0004
     let versiones: Vec<(i64,)> = sqlx::query_as("SELECT version FROM _sqlx_migrations").fetch_all(&db).await.unwrap();
-    assert_eq!(versiones.len(), 2);
+    assert_eq!(versiones.len(), 3);
 }

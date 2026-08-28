@@ -461,7 +461,7 @@ async fn create_skill(
     let id = Uuid::new_v4().to_string();
     let mut skill = Skill::new(id, req.name, req.category, req.created_by);
     skill.description = req.description;
-    repo::skill_domain_create(&state.db, &state.project_id, &skill).await.map_err(|e| db_err(e))?;
+    repo::skill_domain_create(&state.db, &state.project_id, &skill, None).await.map_err(|e| db_err(e))?;
     info!("Created skill: {}", skill.id);
     Ok(Json(skill))
 }
@@ -580,7 +580,7 @@ async fn improve_skill(
         is_auto_generated: req.is_auto_generated,
     };
     
-    repo::skill_domain_create(&state.db, &state.project_id, &improved_skill).await.map_err(|e| db_err(e))?;
+    repo::skill_domain_create(&state.db, &state.project_id, &improved_skill, None).await.map_err(|e| db_err(e))?;
     info!("Improved skill: {} -> {}", id, improved_skill.id);
     Ok(Json(improved_skill))
 }
@@ -1180,7 +1180,7 @@ async fn ai_generate_skill(
     let mut skill = Skill::new(id, req.name, req.category, req.created_by);
     skill.description = req.description;
     skill.is_auto_generated = true;
-    repo::skill_domain_create(&state.db, &state.project_id, &skill).await.map_err(|e| db_err(e))?;
+    repo::skill_domain_create(&state.db, &state.project_id, &skill, None).await.map_err(|e| db_err(e))?;
     Ok(Json(skill))
 }
 

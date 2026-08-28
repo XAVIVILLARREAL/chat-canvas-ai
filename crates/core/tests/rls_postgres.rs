@@ -49,9 +49,11 @@ async fn count_sessions(conn: &mut sqlx::PgConnection) -> i64 {
 }
 
 /// Limpia todo (TRUNCATE no pasa por RLS — es del harness, no del gateway).
+/// event_stream queda fuera: es append-only (trigger 0004 lo prohíbe) y los
+/// tests no asumen counts globales del ledger.
 async fn limpiar(pool: &sqlx::PgPool) {
     sqlx::query(
-        "TRUNCATE settings, document_links, documents, skill_versions, skills, messages, event_stream, sessions, providers, canvases, agents, mcp_servers, executions, projects CASCADE",
+        "TRUNCATE settings, document_links, documents, skill_versions, skills, messages, sessions, providers, canvases, agents, mcp_servers, executions, projects CASCADE",
     )
     .execute(pool)
     .await
@@ -224,4 +226,51 @@ async fn politicas_rls_instaladas() {
 #[allow(unused)]
 fn _row_used(r: &sqlx::postgres::PgRow) -> i64 {
     r.get(0)
+}
+
+// ─── Slice 0.3: ledger append-only bajo RLS ─────────────────────────────────
+
+/// append-only en PG: UPDATE/DELETE/TRUNCATE rechazados; seed project→session→message→rung.
+#[tokio::test]
+async fn ledger_append_only_postgres() {
+    let _serial = serial_lock().await;
+    let Some(url) = pg_url().await else {
+        eprintln!("SKIP ledger_append_only_pg: CANVAS_TEST_PG_URL no definida");
+        return;
+    };
+    let pool = canvas_ai_core::repo::connect_postgres(&url).await.unwrap();
+    limpiar(&pool).await;
+
+    let mut c = pool.acquire().await.unwrap();
+    set_guard(&mut c).await;
+    set_tenant(&mut c, "p1").await;
+    sqlx::query("INSERT INTO projects (id, name, created_at, updated_at) VALUES ('p1','uno',1,1)")
+        .execute(&mut *c).await.unwrap();
+    sqlx::query("INSERT INTO sessions (id, project_id, title, created_at, updated_at) VALUES ('s1','p1','ses',1,1)")
+        .execute(&mut *c).await.unwrap();
+    sqlx::query("INSERT INTO messages (id, session_id, role, content, created_at) VALUES ('m1','s1','user','hola',1)")
+        .execute(&mut *c).await.unwrap();
+    let rid: (i64,) = sqlx::query_as(
+        "INSERT INTO event_stream (session_id, event_type, summary, created_at) VALUES ('s1','PROMPT','primer rung',1) RETURNING id",
+    ).fetch_one(&mut *c).await.unwrap();
+
+    // UPDATE → rechazado
+    let err = sqlx::query("UPDATE event_stream SET summary='x' WHERE id=$1")
+        .bind(rid.0).execute(&mut *c).await;
+    assert!(err.is_err(), "UPDATE debe ser rechazado");
+    assert!(err.unwrap_err().to_string().contains("append-only"));
+    // DELETE → rechazado
+    let err = sqlx::query("DELETE FROM event_stream WHERE id=$1")
+        .bind(rid.0).execute(&mut *c).await;
+    assert!(err.is_err(), "DELETE debe ser rechazado");
+    // TRUNCATE → rechazado (statement trigger)
+    let err = sqlx::query("TRUNCATE event_stream").execute(&mut *c).await;
+    assert!(err.is_err(), "TRUNCATE debe ser rechazado");
+
+    // el rung sigue ahí (y visible solo para su tenant)
+    let (n,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM event_stream WHERE session_id='s1'")
+        .fetch_one(&mut *c).await.unwrap();
+    assert_eq!(n, 1, "ledger intacto");
+    drop(c);
+    pool.close().await;
 }

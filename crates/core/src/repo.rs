@@ -208,6 +208,8 @@ pub async fn session_create(db: &Db, id: &str, project_id: &str, title: &str) ->
     sqlx::query("INSERT INTO sessions (id, project_id, title, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?4)")
         .bind(id).bind(project_id).bind(title).bind(now)
         .execute(db).await?;
+    // evento de producto (PRODUCT-METRICS §2): crear dato → emitir evento
+    event_append(db, id, product_events::SESSION_CREATED, &format!("sesión '{title}' creada"), Some(&serde_json::json!({"mode": "local"})), None, 0, 0.0, Some("user"), None).await?;
     Ok(session_get(db, id).await?.expect("just inserted"))
 }
 
@@ -255,6 +257,9 @@ pub async fn message_create(
     .bind(model).bind(tokens_prompt).bind(tokens_completion).bind(cost_usd)
     .bind(meta).bind(now_ms())
     .execute(db).await?;
+    // evento de producto: tokens/costo del stream (PRODUCT-METRICS §2)
+    let tokens = tokens_completion.unwrap_or(0) + tokens_prompt.unwrap_or(0);
+    event_append(db, session_id, product_events::MESSAGE_STREAMED, &format!("mensaje {role}"), None, model, tokens, cost_usd.unwrap_or(0.0), Some("user"), None).await?;
     Ok(message_get(db, id).await?.expect("just inserted"))
 }
 
@@ -401,7 +406,50 @@ pub async fn setting_get(db: &Db, project_id: &str, key: &str) -> Result<Option<
     Ok(row.map(|(v,)| serde_json::from_str(&v).expect("settings value es JSON válido")))
 }
 
-// ─── Event stream (insert básico; taxonomía completa en slice 0.3) ──────────
+// ─── Event stream (ledger append-only, slice 0.3) ───────────────────────────
+
+/// Taxonomía de rungs (SCHEMA-MAESTRO §4). La taxonomía vive aquí, NO en un
+/// CHECK de SQL: al mismo ledger van también los eventos de producto
+/// dot-namespace (`session.created`, ...) según PRODUCT-METRICS §2.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Rung {
+    Prompt,
+    Phase,
+    Diff,
+    TestResult,
+    Decision,
+    Escalation,
+    Delivery,
+}
+
+impl Rung {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Rung::Prompt => "PROMPT",
+            Rung::Phase => "PHASE",
+            Rung::Diff => "DIFF",
+            Rung::TestResult => "TEST_RESULT",
+            Rung::Decision => "DECISION",
+            Rung::Escalation => "ESCALATION",
+            Rung::Delivery => "DELIVERY",
+        }
+    }
+}
+
+/// Eventos de producto (PRODUCT-METRICS §2) — mismos strings que emite el server.
+pub mod product_events {
+    pub const SESSION_CREATED: &str = "session.created";
+    pub const AGENT_INVOKED: &str = "agent.invoked";
+    pub const MESSAGE_STREAMED: &str = "message.streamed";
+    pub const TASK_CREATED: &str = "task.created";
+    pub const TASK_COMPLETED: &str = "task.completed";
+    pub const DELIVERY_ACCEPTED: &str = "delivery.accepted";
+    pub const SKILL_CREATED: &str = "skill.created";
+    pub const SKILL_RAN: &str = "skill.ran";
+    pub const PROVIDER_ERROR: &str = "provider.error";
+    pub const NUBE_SUBSCRIBED: &str = "nube.subscribed";
+    pub const SESSION_EXPORTED: &str = "session.exported";
+}
 
 #[allow(clippy::too_many_arguments)]
 pub async fn event_append(
@@ -419,6 +467,16 @@ pub async fn event_append(
     .bind(now_ms())
     .execute(db).await?;
     Ok(r.last_insert_rowid())
+}
+
+/// `emitEvent()` — helper tipado para rungs (SCHEMA-MAESTRO §4).
+#[allow(clippy::too_many_arguments)]
+pub async fn emit_event(
+    db: &Db, session_id: &str, rung: Rung, summary: &str,
+    payload: Option<&serde_json::Value>, model_used: Option<&str>,
+    tokens_used: i64, cost_usd: f64, actor_type: Option<&str>, actor_id: Option<&str>,
+) -> Result<i64, sqlx::Error> {
+    event_append(db, session_id, rung.as_str(), summary, payload, model_used, tokens_used, cost_usd, actor_type, actor_id).await
 }
 
 pub async fn event_list_by_session(db: &Db, session_id: &str) -> Result<Vec<StreamEvent>, sqlx::Error> {
@@ -542,9 +600,15 @@ pub async fn mcp_delete(db: &Db, id: &str) -> Result<u64, sqlx::Error> {
 
 // ── Skill (dominio) sobre tabla canónica ────────────────────────────────────
 
-pub async fn skill_domain_create(db: &Db, project_id: &str, skill: &DomainSkill) -> Result<(), sqlx::Error> {
+/// `session_anchor`: sesión activa del usuario al crear el skill — ancla el
+/// evento de producto `skill.created` en el ledger (event_stream exige
+/// session_id; Skills Lab lo pasa, los seeds del server pueden omitirlo).
+pub async fn skill_domain_create(db: &Db, project_id: &str, skill: &DomainSkill, session_anchor: Option<&str>) -> Result<(), sqlx::Error> {
     let manifest: serde_json::Value = serde_json::to_value(skill).expect("skill serializable");
     skill_create(db, &skill.id, project_id, &skill.id, &manifest, "").await?;
+    if let Some(sid) = session_anchor {
+        event_append(db, sid, product_events::SKILL_CREATED, &format!("skill '{}' creado", skill.name), Some(&serde_json::json!({"skill_id": skill.id})), None, 0, 0.0, Some("user"), None).await?;
+    }
     Ok(())
 }
 
