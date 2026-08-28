@@ -24,7 +24,9 @@
 - **Tests:** cargo test repos (CRUD por project_id) en SQLite + migración up/down/up idempotente.
 - **Mini-gate:** `cargo test -p canvas-ai-core` verde; la data sobrevive a reinicio del server.
 
-### 0.2 — Postgres (nube) + RLS fail-closed (b)
+### 0.2 — Postgres (nube) + RLS fail-closed (b) — ✅ COMPLETADO 2026-08-27
+> **Estado:** ✅ Migraciones por dialecto (`migrations/{sqlite,postgres}/`) · `0003_rls.sql` con RLS fail-closed (ENABLE + FORCE + `current_setting('app.project_id', true)` — sin tenant → 0 filas; superusers bypasean → producción jamás conecta como superuser) · `repo::connect_postgres` (migrador runtime) · tests `crates/core/tests/rls_postgres.rs` contra Postgres 16 real (`CANVAS_TEST_PG_URL`, skip silencioso en CI sin PG): aislamiento 2 tenants por SQL directo ✅ · cross-tenant UPDATE/DELETE → 0 filas ✅ · sin contexto → 0 filas ✅ · WITH CHECK bloquea INSERT de filas ajenas ✅ · up/down/up PG ✅ · 14 políticas `tenant_*` verificadas ✅. Nota: usuario PG de test NO-superuser/NO-bypassrls.
+
 - **Qué:** mismas migraciones a Postgres; `pre_request` RLS fail-closed (sin tenant → 0 filas); script de seed.
 - **Tests:** cargo test contra Postgres (Compose); 2 tenants → datos aislados (SQL directo, no solo UI).
 - **Mini-gate:** integración Postgres verde; RLS verificado.

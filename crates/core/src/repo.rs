@@ -14,6 +14,9 @@ use std::str::FromStr;
 
 pub type Db = SqlitePool;
 
+/// Pool Postgres (nube). Mismo contrato de queries que SQLite (SQL portable).
+pub type PgDb = sqlx::PgPool;
+
 /// Abre un pool SQLite con FKs activadas y migraciones aplicadas.
 /// `sqlite://ruta.db` o `sqlite::memory:` para tests.
 pub async fn connect(url: &str) -> Result<Db, sqlx::Error> {
@@ -27,7 +30,28 @@ pub async fn connect(url: &str) -> Result<Db, sqlx::Error> {
 
 /// Aplica migraciones embebidas (idempotente: sqlx guarda `_sqlx_migrations`).
 pub async fn migrate(pool: &Db) -> Result<(), sqlx::Error> {
-    let migrator = sqlx::migrate!("./migrations");
+    let migrator = sqlx::migrate!("./migrations/sqlite");
+    migrator.run(pool).await.map_err(sqlx::Error::from)
+}
+
+/// Abre un pool Postgres (nube, slice 0.2) y aplica migraciones + RLS.
+/// Requiere usuario NO-superuser (FORCE RLS no blindan a superusers).
+pub async fn connect_postgres(url: &str) -> Result<PgDb, sqlx::Error> {
+    let pool = sqlx::postgres::PgPoolOptions::new()
+        .max_connections(5)
+        .connect(url)
+        .await?;
+    migrate_postgres(&pool).await?;
+    Ok(pool)
+}
+
+/// Migrador Postgres cargado en runtime (mismos shapes, dialecto PG + RLS).
+pub async fn migrate_postgres(pool: &PgDb) -> Result<(), sqlx::Error> {
+    let migrator = sqlx::migrate::Migrator::new(std::path::Path::new(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/migrations/postgres"
+    )))
+    .await?;
     migrator.run(pool).await.map_err(sqlx::Error::from)
 }
 

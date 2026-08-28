@@ -6,8 +6,8 @@
 use canvas_ai_core::repo;
 use serde_json::json;
 
-const DOWN_0001: &str = include_str!("../migrations/down/0001_init.sql");
-const DOWN_0002: &str = include_str!("../migrations/down/0002_workspace.sql");
+const DOWN_0001: &str = include_str!("../migrations/sqlite/down/0001_init.sql");
+const DOWN_0002: &str = include_str!("../migrations/sqlite/down/0002_workspace.sql");
 
 /// Ejecuta TODAS las reversas (0002 → 0001) y limpia el registro de sqlx.
 async fn run_all_down(db: &repo::Db) {
