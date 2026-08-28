@@ -515,12 +515,25 @@ export type CreateMCPServerRequest = {
   transport: MCPTransport;
 };
 
+export type CreateMessageRequest = {
+  content: string;
+  cost_usd?: Record<string, unknown>;
+  model?: Record<string, unknown>;
+  role: string;
+  tokens_completion?: Record<string, unknown>;
+  tokens_prompt?: Record<string, unknown>;
+};
+
 export type CreateProviderRequest = {
   api_key: string;
   base_url: string;
   name: string;
   provider_type: string;
   validate?: Record<string, unknown>;
+};
+
+export type CreateSessionRequest = {
+  title: string;
 };
 
 export type CreateSkillRequest = {
@@ -560,6 +573,20 @@ export type MCPServer = {
   updated_at: number;
 };
 
+export type Message = {
+  cache_hits?: Record<string, unknown>;
+  content: string;
+  cost_usd?: Record<string, unknown>;
+  created_at: number;
+  id: string;
+  metadata: string;
+  model?: Record<string, unknown>;
+  role: string;
+  session_id: string;
+  tokens_completion?: Record<string, unknown>;
+  tokens_prompt?: Record<string, unknown>;
+};
+
 export type Provider = {
   base_url?: Record<string, unknown>;
   created_at: number;
@@ -576,6 +603,19 @@ export type Provider = {
 export type ProviderTestResponse = {
   connected: boolean;
   error?: Record<string, unknown>;
+};
+
+export type Session = {
+  agent_config: string;
+  created_at: number;
+  deleted_at?: Record<string, unknown>;
+  id: string;
+  project_id: string;
+  status: string;
+  title: string;
+  total_cost_usd: number;
+  total_tokens: number;
+  updated_at: number;
 };
 
 export type Skill = {

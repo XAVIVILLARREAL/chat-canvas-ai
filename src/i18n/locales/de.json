@@ -129,5 +129,19 @@
   "project.newName": "Projektname",
   "project.enter": "Betreten",
   "project.gatewayOff": "Gateway offline — einzelner lokaler Workspace",
-  "project.viewAll": "Alle Projekte anzeigen"
+  "project.viewAll": "Alle Projekte anzeigen",
+  "sidebar.sessions": "Sitzungen",
+  "sessions.new": "Neue Sitzung…",
+  "sessions.untitled": "Unbenannte Sitzung",
+  "sessions.empty": "Noch keine Sitzungen",
+  "sessions.none": "Sitzung wählen",
+  "sessions.pickFirst": "Erst Sitzung anlegen oder wählen",
+  "chat.placeholder": "Nachricht schreiben…",
+  "chat.send": "Senden",
+  "chat.empty": "Noch keine Nachrichten",
+  "chat.memoryTitle": "Gedächtnis",
+  "chat.memorySoon": "Speicherleiste — kommt in Stufe D",
+  "chat.providerNote": "BYOK-Anbieter kommen in A.3",
+  "view.canvas": "Canvas",
+  "view.chat": "Chat"
 }

@@ -129,5 +129,19 @@
   "project.newName": "Название проекта",
   "project.enter": "Открыть",
   "project.gatewayOff": "Шлюз отключён — единое локальное рабочее пространство",
-  "project.viewAll": "Все проекты"
+  "project.viewAll": "Все проекты",
+  "sidebar.sessions": "Сессии",
+  "sessions.new": "Новая сессия…",
+  "sessions.untitled": "Сессия без названия",
+  "sessions.empty": "Сессий пока нет",
+  "sessions.none": "Выберите сессию",
+  "sessions.pickFirst": "Сначала создайте или выберите сессию",
+  "chat.placeholder": "Напишите сообщение…",
+  "chat.send": "Отправить",
+  "chat.empty": "Сообщений пока нет",
+  "chat.memoryTitle": "Память",
+  "chat.memorySoon": "Память — появится на этапе D",
+  "chat.providerNote": "Провайдеры BYOK подключатся в A.3",
+  "view.canvas": "Канвас",
+  "view.chat": "Чат"
 }

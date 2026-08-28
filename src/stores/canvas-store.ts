@@ -23,7 +23,7 @@ interface CanvasState {
   selectedEdgeIds: string[];
   viewport: Viewport;
   sidebarOpen: boolean;
-  sidebarTab: 'nodes' | 'skills' | 'agents' | 'mcp' | 'settings' | 'execution';
+  sidebarTab: 'nodes' | 'skills' | 'agents' | 'mcp' | 'settings' | 'execution' | 'sesiones';
   nodePanelOpen: boolean;
   nodePanelNodeId: string | null;
   skills: Skill[];

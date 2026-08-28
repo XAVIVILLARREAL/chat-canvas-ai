@@ -165,3 +165,48 @@ async fn skill_global_vs_copia_local() {
     let (_, orig) = req_json(app.clone(), "GET", &format!("/api/skills/{skill_id}"), None).await;
     assert_eq!(orig["description"], "d", "editar la copia local NO toca el global");
 }
+
+// ─── A.1: sesiones + mensajes persistidos por proyecto ──────────────────────
+
+#[tokio::test]
+async fn sesiones_y_mensajes_roundtrip_tras_reinicio() {
+    let tmp = tempfile::tempdir().unwrap();
+    let url = format!("sqlite://{}/chat.db", tmp.path().display());
+
+    let state = AppState::connect(&url).await.unwrap();
+    let app = create_router(state);
+
+    // crear sesión
+    let (st, ses) = req_json(app.clone(), "POST", "/api/sessions", Some(json!({"title": "Mi chat"}))).await;
+    assert_eq!(st, StatusCode::OK, "{ses}");
+    let sid = ses["id"].as_str().unwrap().to_string();
+
+    // mensajes roundtrip (user + assistant con tokens/costo)
+    let (st, m1) = req_json(app.clone(), "POST", &format!("/api/sessions/{sid}/messages"),
+        Some(json!({"role": "user", "content": "hola"}))).await;
+    assert_eq!(st, StatusCode::OK, "{m1}");
+    let (st, m2) = req_json(app.clone(), "POST", &format!("/api/sessions/{sid}/messages"),
+        Some(json!({"role": "assistant", "content": "¡hola!", "model": "mock", "tokens_prompt": 5, "tokens_completion": 7, "cost_usd": 0.001}))).await;
+    assert_eq!(st, StatusCode::OK, "{m2}");
+
+    let (st, msgs) = req_json(app.clone(), "GET", &format!("/api/sessions/{sid}/messages"), None).await;
+    assert_eq!(st, StatusCode::OK);
+    assert_eq!(msgs.as_array().unwrap().len(), 2);
+    assert_eq!(msgs[1]["role"], "assistant");
+
+    // sesión desconocida → 404
+    let (st, _) = req_json(app.clone(), "GET", "/api/sessions/no-existe/messages", None).await;
+    assert_eq!(st, StatusCode::NOT_FOUND);
+
+    drop(app); // reinicio
+    let state = AppState::connect(&url).await.unwrap();
+    let app = create_router(state);
+
+    // la conversación restauró completa (persistencia del chat)
+    let (st, ses_r) = req_json(app.clone(), "GET", &format!("/api/sessions/{sid}"), None).await;
+    assert_eq!(st, StatusCode::OK);
+    assert_eq!(ses_r["title"], "Mi chat");
+    let (st, msgs_r) = req_json(app, "GET", &format!("/api/sessions/{sid}/messages"), None).await;
+    assert_eq!(st, StatusCode::OK);
+    assert_eq!(msgs_r.as_array().unwrap().len(), 2, "mensajes restauran tras reinicio");
+}

@@ -77,7 +77,7 @@ pub struct Project {
     pub deleted_at: Option<i64>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow)]
+#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow, schemars::JsonSchema, specta::Type)]
 pub struct Session {
     pub id: String,
     pub project_id: String,
@@ -91,7 +91,7 @@ pub struct Session {
     pub deleted_at: Option<i64>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow)]
+#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow, schemars::JsonSchema, specta::Type)]
 pub struct Message {
     pub id: String,
     pub session_id: String,

@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { 
   Bot, Zap, Plug, Play, Settings,
   Plus, Search, Edit, Trash2, Play as PlayIcon, Pause, RotateCcw,
-  ExternalLink, Eye,
-} from 'lucide-react';
+  ExternalLink, Eye, MessageSquare } from 'lucide-react';
 import { 
   useCanvasStore 
 } from '../stores/canvas-store';
 import { useI18n, SUPPORTED_LOCALES, type Locale } from '../i18n';
+import { SessionsList } from './SessionsList';
 import { useTheme } from '../theme';
 import type { 
   Skill, Agent, MCPServer, ExecutionContext,
@@ -17,7 +17,7 @@ import { AGENT_STATUS_COLORS, AGENT_ROLE_COLORS } from '../types';
 import './Sidebar.css';
 
 interface SidebarProps {
-  activeTab: 'nodes' | 'skills' | 'agents' | 'mcp' | 'settings' | 'execution';
+  activeTab: 'nodes' | 'skills' | 'agents' | 'mcp' | 'settings' | 'execution' | 'sesiones';
   onTabChange: (tab: SidebarProps['activeTab']) => void;
   skills: Skill[];
   agents: Agent[];
@@ -79,6 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const tabs = [
+    { id: 'sesiones', label: t('sidebar.sessions'), icon: MessageSquare, count: 0 },
     { id: 'skills', label: t('sidebar.skills'), icon: Zap, count: skills.length },
     { id: 'agents', label: t('sidebar.agents'), icon: Bot, count: agents.length },
     { id: 'mcp', label: t('sidebar.mcp'), icon: Plug, count: mcpServers.length },
@@ -109,6 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="sidebar-content">
+        {activeTab === 'sesiones' && <SessionsList />}
         {activeTab === 'skills' && <SkillList skills={filteredSkills} selectedId={selectedSkillId} onSelect={setSelectedSkill} onAdd={() => {}} onRemove={removeSkill} />}
         {activeTab === 'agents' && <AgentList agents={filteredAgents} selectedId={selectedAgentId} onSelect={setSelectedAgent} onAdd={() => setModalAgente(true)} onRemove={removeAgent} />}
         {activeTab === 'mcp' && <McpServerList servers={filteredMcpServers} selectedId={selectedMcpServerId} onSelect={setSelectedMcpServer} onAdd={() => {}} onRemove={removeMcpServer} />}

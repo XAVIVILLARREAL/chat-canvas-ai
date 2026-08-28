@@ -2692,6 +2692,50 @@
         "title": "CreateMCPServerRequest",
         "type": "object"
       },
+      "CreateMessageRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "cost_usd": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string"
+          },
+          "tokens_completion": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "tokens_prompt": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "content",
+          "role"
+        ],
+        "title": "CreateMessageRequest",
+        "type": "object"
+      },
       "CreateProviderRequest": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "properties": {
@@ -2721,6 +2765,19 @@
           "provider_type"
         ],
         "title": "CreateProviderRequest",
+        "type": "object"
+      },
+      "CreateSessionRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "CreateSessionRequest",
         "type": "object"
       },
       "CreateSkillRequest": {
@@ -3288,6 +3345,74 @@
         "title": "MCPTool",
         "type": "object"
       },
+      "Message": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "cache_hits": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "content": {
+            "type": "string"
+          },
+          "cost_usd": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "created_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "string"
+          },
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string"
+          },
+          "session_id": {
+            "type": "string"
+          },
+          "tokens_completion": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "tokens_prompt": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "content",
+          "created_at",
+          "id",
+          "metadata",
+          "role",
+          "session_id"
+        ],
+        "title": "Message",
+        "type": "object"
+      },
       "NodeConfig": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "definitions": {
@@ -3587,6 +3712,62 @@
           "connected"
         ],
         "title": "ProviderTestResponse",
+        "type": "object"
+      },
+      "Session": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "agent_config": {
+            "type": "string"
+          },
+          "created_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "deleted_at": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "total_cost_usd": {
+            "format": "double",
+            "type": "number"
+          },
+          "total_tokens": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "agent_config",
+          "created_at",
+          "id",
+          "project_id",
+          "status",
+          "title",
+          "total_cost_usd",
+          "total_tokens",
+          "updated_at"
+        ],
+        "title": "Session",
         "type": "object"
       },
       "Skill": {
@@ -6852,6 +7033,176 @@
         "summary": "Roundtrip de salud",
         "tags": [
           "providers"
+        ]
+      }
+    },
+    "/api/sessions": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Lista sesiones del proyecto",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Crea sesión",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{id}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Borra sesión (soft)",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Obtiene sesión",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{id}/messages": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Mensajes de la sesión",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMessageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Agrega mensaje",
+        "tags": [
+          "sessions"
         ]
       }
     },

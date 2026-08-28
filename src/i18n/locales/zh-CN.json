@@ -129,5 +129,19 @@
   "project.newName": "项目名称",
   "project.enter": "进入",
   "project.gatewayOff": "网关离线 — 单一本地工作区",
-  "project.viewAll": "查看所有项目"
+  "project.viewAll": "查看所有项目",
+  "sidebar.sessions": "会话",
+  "sessions.new": "新会话…",
+  "sessions.untitled": "未命名会话",
+  "sessions.empty": "暂无会话",
+  "sessions.none": "选择一个会话",
+  "sessions.pickFirst": "请先创建或选择会话",
+  "chat.placeholder": "输入消息…",
+  "chat.send": "发送",
+  "chat.empty": "暂无消息",
+  "chat.memoryTitle": "记忆",
+  "chat.memorySoon": "记忆栏 — D 阶段推出",
+  "chat.providerNote": "BYOK 提供商将在 A.3 接入",
+  "view.canvas": "画布",
+  "view.chat": "聊天"
 }

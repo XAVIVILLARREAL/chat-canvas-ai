@@ -129,5 +129,19 @@
   "project.newName": "プロジェクト名",
   "project.enter": "開く",
   "project.gatewayOff": "ゲートウェイオフライン — 単一ローカルワークスペース",
-  "project.viewAll": "すべてのプロジェクトを表示"
+  "project.viewAll": "すべてのプロジェクトを表示",
+  "sidebar.sessions": "セッション",
+  "sessions.new": "新規セッション…",
+  "sessions.untitled": "無題セッション",
+  "sessions.empty": "セッションはまだありません",
+  "sessions.none": "セッションを選択",
+  "sessions.pickFirst": "まずセッションを作成・選択",
+  "chat.placeholder": "メッセージを入力…",
+  "chat.send": "送信",
+  "chat.empty": "メッセージはまだありません",
+  "chat.memoryTitle": "メモリ",
+  "chat.memorySoon": "メモリレール — D段階で登場",
+  "chat.providerNote": "BYOKプロバイダはA.3で接続",
+  "view.canvas": "キャンバス",
+  "view.chat": "チャット"
 }

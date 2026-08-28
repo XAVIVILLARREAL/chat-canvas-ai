@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import { Sun, Moon, Languages } from 'lucide-react';
 import { ProjectSwitcher } from './ProjectSwitcher';
+import { LayoutGrid, MessageSquare } from 'lucide-react';
+import { useChatUiStore } from '../stores/chat-ui-store';
 import { useTheme } from '../theme';
 import { useI18n, useI18nStore, SUPPORTED_LOCALES } from '../i18n';
 import { useCanvasStore } from '../stores/canvas-store';
@@ -141,6 +143,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div className="header-right">
         <button className="header-btn command-palette-trigger" onClick={() => setShowCommandPalette(!showCommandPalette)} title={t("header.commandPalette")}><Command width={18} height={18} /></button>
+        <ViewToggle />
         <div className="header-divider" />
         <button className="header-btn" onClick={undo} disabled={!canUndo()} title={t("header.undo")}><RotateCcw width={16} height={16} /></button>
         <button className="header-btn" onClick={redo} disabled={!canRedo()} title={t("header.redo")}><RotateCcw width={16} height={16} style={{ transform: 'rotate(180deg)' }} /></button>
@@ -193,3 +196,34 @@ export const Header: React.FC<HeaderProps> = ({
 };
 
 export default Header;
+
+
+/** A.1: alterna vista Canvas ↔ Chat ( BottomNav en móvil usa el mismo store). */
+function ViewToggle() {
+  const view = useChatUiStore((st) => st.view);
+  const setView = useChatUiStore((st) => st.setView);
+  const { t } = useI18n();
+  return (
+    <>
+      <button
+        className={`header-btn ${view === 'canvas' ? 'active' : ''}`}
+        data-testid="view-canvas"
+        onClick={() => setView('canvas')}
+        title={t('view.canvas')}
+        aria-label={t('view.canvas')}
+      >
+        <LayoutGrid width={18} height={18} />
+      </button>
+      <button
+        className={`header-btn ${view === 'chat' ? 'active' : ''}`}
+        data-testid="view-chat"
+        onClick={() => setView('chat')}
+        title={t('view.chat')}
+        aria-label={t('view.chat')}
+      >
+        <MessageSquare width={18} height={18} />
+      </button>
+      <div className="header-divider" />
+    </>
+  );
+}

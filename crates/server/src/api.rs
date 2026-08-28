@@ -146,6 +146,11 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/canvases/:id/test", post(test_canvas))
         .route("/api/canvases/:id/validate", post(validate_canvas))
         
+        // Sessions + messages (A.1 — chat con sesiones)
+        .route("/api/sessions", get(list_sessions).post(create_session))
+        .route("/api/sessions/:id", get(get_session).delete(delete_session))
+        .route("/api/sessions/:id/messages", get(list_messages).post(create_message))
+        
         // Projects como SCOPE (A.0) + settings con scopes Global→Proyecto
         .route("/api/projects", get(list_projects).post(create_project))
         .route("/api/projects/:id", get(get_project).patch(rename_project).delete(delete_project))
@@ -483,6 +488,93 @@ fn has_cycle(nodes: &[CanvasNode], edges: &[CanvasEdge]) -> bool {
     }
     
     visited != nodes.len()
+}
+
+// ============================================================================
+// HANDLERS - SESSIONS + MESSAGES (A.1, chat con sesiones persistentes)
+// ============================================================================
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct CreateSessionRequest {
+    pub title: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct CreateMessageRequest {
+    pub role: String, // user|assistant|system|tool
+    pub content: String,
+    pub model: Option<String>,
+    pub tokens_prompt: Option<i64>,
+    pub tokens_completion: Option<i64>,
+    pub cost_usd: Option<f64>,
+}
+
+async fn list_sessions(State(state): State<AppState>) -> ApiResult<Vec<repo::Session>> {
+    repo::session_list_by_project(&state.db, &state.project_id)
+        .await.map(Json).map_err(|e| db_err(e))
+}
+
+async fn create_session(
+    State(state): State<AppState>,
+    Json(req): Json<CreateSessionRequest>,
+) -> ApiResult<repo::Session> {
+    let id = Uuid::new_v4().to_string();
+    let session = repo::session_create(&state.db, &id, &state.project_id, &req.title)
+        .await.map_err(|e| db_err(e))?;
+    info!("Sesión creada: {} ({})", req.title, id);
+    Ok(Json(session))
+}
+
+async fn get_session(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<repo::Session> {
+    repo::session_get(&state.db, &id).await
+        .map_err(|e| db_err(e))?
+        .map(Json)
+        .ok_or_else(|| not_found("Session"))
+}
+
+async fn delete_session(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<repo::Session> {
+    let session = repo::session_get(&state.db, &id).await
+        .map_err(|e| db_err(e))?
+        .ok_or_else(|| not_found("Session"))?;
+    let affected = sqlx::query("UPDATE sessions SET status = 'deleted', deleted_at = ?2 WHERE id = ?1")
+        .bind(&id).bind(chrono::Utc::now().timestamp_millis())
+        .execute(&state.db).await.map_err(|e| db_err(e))?
+        .rows_affected();
+    if affected == 0 { return Err(not_found("Session")); }
+    Ok(Json(session))
+}
+
+async fn list_messages(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<Vec<repo::Message>> {
+    if repo::session_get(&state.db, &id).await.map_err(|e| db_err(e))?.is_none() {
+        return Err(not_found("Session"));
+    }
+    repo::message_list_by_session(&state.db, &id).await.map(Json).map_err(|e| db_err(e))
+}
+
+async fn create_message(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Json(req): Json<CreateMessageRequest>,
+) -> ApiResult<repo::Message> {
+    if repo::session_get(&state.db, &id).await.map_err(|e| db_err(e))?.is_none() {
+        return Err(not_found("Session"));
+    }
+    let msg_id = Uuid::new_v4().to_string();
+    let message = repo::message_create(
+        &state.db, &msg_id, &id, &req.role, &req.content,
+        req.model.as_deref(), req.tokens_prompt, req.tokens_completion,
+        req.cost_usd, &serde_json::json!({}),
+    ).await.map_err(|e| db_err(e))?;
+    Ok(Json(message))
 }
 
 // ============================================================================
@@ -1605,6 +1697,13 @@ const OPS: &[Op] = &[
     Op { method: "post", path: "/api/canvases/{id}/test", summary: "Testea canvas", tag: "canvases", request: Some("TestNodeRequest"), response: Some("TestResult") },
     Op { method: "post", path: "/api/canvases/{id}/validate", summary: "Valida canvas", tag: "canvases", request: None, response: Some("ValidationResult") },
 
+    Op { method: "get", path: "/api/sessions", summary: "Lista sesiones del proyecto", tag: "sessions", request: None, response: Some("Session") },
+    Op { method: "post", path: "/api/sessions", summary: "Crea sesión", tag: "sessions", request: Some("CreateSessionRequest"), response: Some("Session") },
+    Op { method: "get", path: "/api/sessions/{id}", summary: "Obtiene sesión", tag: "sessions", request: None, response: Some("Session") },
+    Op { method: "delete", path: "/api/sessions/{id}", summary: "Borra sesión (soft)", tag: "sessions", request: None, response: Some("Session") },
+    Op { method: "get", path: "/api/sessions/{id}/messages", summary: "Mensajes de la sesión", tag: "sessions", request: None, response: Some("Message") },
+    Op { method: "post", path: "/api/sessions/{id}/messages", summary: "Agrega mensaje", tag: "sessions", request: Some("CreateMessageRequest"), response: Some("Message") },
+
     Op { method: "get", path: "/api/providers", summary: "Lista providers BYOK", tag: "providers", request: None, response: Some("Provider") },
     Op { method: "post", path: "/api/providers", summary: "Crea provider (valida + cifra la key)", tag: "providers", request: Some("CreateProviderRequest"), response: Some("Provider") },
     Op { method: "get", path: "/api/providers/{id}", summary: "Obtiene provider", tag: "providers", request: None, response: Some("Provider") },
@@ -1678,6 +1777,10 @@ pub fn build_openapi() -> serde_json::Value {
         ("MCPTool", schema_for!(MCPTool)),
         ("ExecutionContext", schema_for!(ExecutionContext)),
         ("Provider", schema_for!(repo::Provider)),
+        ("Session", schema_for!(repo::Session)),
+        ("Message", schema_for!(repo::Message)),
+        ("CreateSessionRequest", schema_for!(CreateSessionRequest)),
+        ("CreateMessageRequest", schema_for!(CreateMessageRequest)),
         ("StreamEvent", schema_for!(repo::StreamEvent)),
         ("A2AAgentCard", schema_for!(A2AAgentCard)),
         ("A2ATask", schema_for!(A2ATask)),

@@ -129,5 +129,19 @@
   "project.newName": "Nome del progetto",
   "project.enter": "Entra",
   "project.gatewayOff": "Gateway offline — workspace locale unico",
-  "project.viewAll": "Vedi tutti i progetti"
+  "project.viewAll": "Vedi tutti i progetti",
+  "sidebar.sessions": "Sessioni",
+  "sessions.new": "Nuova sessione…",
+  "sessions.untitled": "Sessione senza titolo",
+  "sessions.empty": "Nessuna sessione",
+  "sessions.none": "Seleziona una sessione",
+  "sessions.pickFirst": "Crea o scegli prima una sessione",
+  "chat.placeholder": "Scrivi un messaggio…",
+  "chat.send": "Invia",
+  "chat.empty": "Nessun messaggio",
+  "chat.memoryTitle": "Memoria",
+  "chat.memorySoon": "Rail memoria — arriva nella Fase D",
+  "chat.providerNote": "I provider BYOK si collegano in A.3",
+  "view.canvas": "Canvas",
+  "view.chat": "Chat"
 }

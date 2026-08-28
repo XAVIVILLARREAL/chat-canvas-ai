@@ -129,5 +129,19 @@
   "project.newName": "프로젝트 이름",
   "project.enter": "열기",
   "project.gatewayOff": "게이트웨이 오프라인 — 단일 로컬 워크스페이스",
-  "project.viewAll": "모든 프로젝트 보기"
+  "project.viewAll": "모든 프로젝트 보기",
+  "sidebar.sessions": "세션",
+  "sessions.new": "새 세션…",
+  "sessions.untitled": "제목 없는 세션",
+  "sessions.empty": "세션이 없습니다",
+  "sessions.none": "세션 선택",
+  "sessions.pickFirst": "먼저 세션을 만들거나 선택하세요",
+  "chat.placeholder": "메시지 입력…",
+  "chat.send": "보내기",
+  "chat.empty": "메시지가 없습니다",
+  "chat.memoryTitle": "메모리",
+  "chat.memorySoon": "메모리 레일 — D 단계에서 제공",
+  "chat.providerNote": "BYOK 공급자는 A.3에서 연결",
+  "view.canvas": "캔버스",
+  "view.chat": "채팅"
 }

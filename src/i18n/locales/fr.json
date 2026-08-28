@@ -129,5 +129,19 @@
   "project.newName": "Nom du projet",
   "project.enter": "Entrer",
   "project.gatewayOff": "Gateway hors ligne — espace local unique",
-  "project.viewAll": "Voir tous les projets"
+  "project.viewAll": "Voir tous les projets",
+  "sidebar.sessions": "Sessions",
+  "sessions.new": "Nouvelle session…",
+  "sessions.untitled": "Session sans titre",
+  "sessions.empty": "Aucune session",
+  "sessions.none": "Choisir une session",
+  "sessions.pickFirst": "Créez ou choisissez d'abord une session",
+  "chat.placeholder": "Écrivez un message…",
+  "chat.send": "Envoyer",
+  "chat.empty": "Aucun message",
+  "chat.memoryTitle": "Mémoire",
+  "chat.memorySoon": "Rail mémoire — à l'Étape D",
+  "chat.providerNote": "Les fournisseurs BYOK arrivent en A.3",
+  "view.canvas": "Canvas",
+  "view.chat": "Chat"
 }

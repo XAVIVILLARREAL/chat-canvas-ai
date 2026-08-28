@@ -129,5 +129,19 @@
   "project.newName": "اسم المشروع",
   "project.enter": "دخول",
   "project.gatewayOff": "البوابة غير متصلة — مساحة عمل محلية واحدة",
-  "project.viewAll": "عرض كل المشاريع"
+  "project.viewAll": "عرض كل المشاريع",
+  "sidebar.sessions": "الجلسات",
+  "sessions.new": "جلسة جديدة…",
+  "sessions.untitled": "جلسة بدون عنوان",
+  "sessions.empty": "لا توجد جلسات بعد",
+  "sessions.none": "اختر جلسة",
+  "sessions.pickFirst": "أنشئ جلسة أو اخترها أولاً",
+  "chat.placeholder": "اكتب رسالة…",
+  "chat.send": "إرسال",
+  "chat.empty": "لا توجد رسائل بعد",
+  "chat.memoryTitle": "الذاكرة",
+  "chat.memorySoon": "شريط الذاكرة — قادم في المرحلة D",
+  "chat.providerNote": "مزودو BYOK يتصلون في A.3",
+  "view.canvas": "اللوحة",
+  "view.chat": "المحادثة"
 }

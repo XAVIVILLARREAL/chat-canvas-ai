@@ -5,11 +5,19 @@ import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { ToastContainer } from './components/ToastContainer';
 import { ModalProvider } from './components/Modal';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ChatPanel } from './components/ChatPanel';
+import { LayoutGrid, MessageSquare } from 'lucide-react';
+import { useChatUiStore } from './stores/chat-ui-store';
+import { useI18n } from './i18n';
 import { useCanvasStore } from './stores/canvas-store';
 import type { Canvas as CanvasDomain } from "./types";
 import './styles.css';
 
 function App() {
+  const { t } = useI18n();
+  const view = useChatUiStore((st) => st.view);
+  const setView = useChatUiStore((st) => st.setView);
   const {
     currentCanvas,
     sidebarOpen,
@@ -72,7 +80,11 @@ function App() {
           loading={loading}
         />
         <main className="app-main">
-          <section className="canvas-section mesh-bg"><ReactFlowProvider><Canvas /></ReactFlowProvider></section>
+          {view === 'chat' ? (
+            <section className="canvas-section" data-testid="chat-view"><ChatPanel /></section>
+          ) : (
+            <section className="canvas-section mesh-bg" data-testid="canvas-view"><ReactFlowProvider><Canvas /></ReactFlowProvider></section>
+          )}
           <aside className={`app-sidebar sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
             <Sidebar 
               activeTab={sidebarTab}
@@ -86,8 +98,31 @@ function App() {
         </main>
         <ToastContainer />
       </div>
+      {/* BottomNav (solo móvil ≤900px): alterna Canvas/Chat */}
+      <nav className="bottom-nav" data-testid="bottom-nav">
+        <button data-testid="bottom-canvas" onClick={() => setView('canvas')} aria-label={t('view.canvas')}>
+          <LayoutGrid width={20} height={20} />
+          <span>{t('view.canvas')}</span>
+        </button>
+        <button data-testid="bottom-chat" onClick={() => setView('chat')} aria-label={t('view.chat')}>
+          <MessageSquare width={20} height={20} />
+          <span>{t('view.chat')}</span>
+        </button>
+      </nav>
     </ModalProvider>
   );
 }
 
-export default App;
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
+});
+
+export default function AppRoot() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  );
+}
+
+

@@ -1217,3 +1217,50 @@ button:not(:disabled):active { transform: scale(0.97); }
   border: none;
   font-weight: 600;
 }
+
+
+/* ─── A.1: BottomNav móvil + toggle vista activa ─────────────────────────── */
+@media (max-width: 900px) {
+  .bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    inset-inline: 0;
+    z-index: 500;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px));
+    gap: 8px;
+    justify-content: space-around;
+  }
+  .bottom-nav button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: 0.7;
+    font-size: 11px;
+    cursor: pointer;
+    padding: 4px 12px;
+  }
+  .bottom-nav button.active { opacity: 1; color: #818cf8; }
+  .app-main { padding-bottom: 64px; }
+}
+.header-btn.active { color: #818cf8; }
+
+/* A.1 móvil: header compacto — los toggles de vista viven en el BottomNav */
+@media (max-width: 900px) {
+  .header-right [data-testid="view-canvas"],
+  .header-right [data-testid="view-chat"],
+  .header-right .header-divider { display: none; }
+  [data-testid="project-switcher"] span { display: none; } /* solo icono */
+  .header-right .execute-btn span { display: none; }
+  .header-right { gap: 2px; }
+}
+@media (max-width: 480px) {
+  .header-right .execute-btn { display: none; }
+}

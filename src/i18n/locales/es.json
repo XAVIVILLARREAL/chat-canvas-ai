@@ -129,5 +129,19 @@
   "project.newName": "Nombre del proyecto",
   "project.enter": "Entrar",
   "project.gatewayOff": "Gateway apagado — espacio local único",
-  "project.viewAll": "Ver todos los proyectos"
+  "project.viewAll": "Ver todos los proyectos",
+  "sidebar.sessions": "Sesiones",
+  "sessions.new": "Nueva sesión…",
+  "sessions.untitled": "Sesión sin título",
+  "sessions.empty": "Aún no hay sesiones",
+  "sessions.none": "Selecciona una sesión",
+  "sessions.pickFirst": "Crea o elige una sesión primero",
+  "chat.placeholder": "Escribe un mensaje…",
+  "chat.send": "Enviar",
+  "chat.empty": "Aún no hay mensajes",
+  "chat.memoryTitle": "Memoria",
+  "chat.memorySoon": "Rail de memoria — llega en la Etapa D",
+  "chat.providerNote": "Los proveedores BYOK se conectan en A.3",
+  "view.canvas": "Canvas",
+  "view.chat": "Chat"
 }

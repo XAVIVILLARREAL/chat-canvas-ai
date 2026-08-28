@@ -129,5 +129,19 @@
   "project.newName": "प्रोजेक्ट नाम",
   "project.enter": "दर्ज करें",
   "project.gatewayOff": "गेटवे ऑफ़लाइन — एकल स्थानीय वर्कस्पेस",
-  "project.viewAll": "सभी प्रोजेक्ट देखें"
+  "project.viewAll": "सभी प्रोजेक्ट देखें",
+  "sidebar.sessions": "सत्र",
+  "sessions.new": "नया सत्र…",
+  "sessions.untitled": "शीर्षकहीन सत्र",
+  "sessions.empty": "अभी कोई सत्र नहीं",
+  "sessions.none": "सत्र चुनें",
+  "sessions.pickFirst": "पहले सत्र बनाएं या चुनें",
+  "chat.placeholder": "संदेश लिखें…",
+  "chat.send": "भेजें",
+  "chat.empty": "अभी कोई संदेश नहीं",
+  "chat.memoryTitle": "स्मृति",
+  "chat.memorySoon": "मेमोरी रेल — चरण D में",
+  "chat.providerNote": "BYOK प्रदाता A.3 में जुड़ेंगे",
+  "view.canvas": "कैनवास",
+  "view.chat": "चैट"
 }
