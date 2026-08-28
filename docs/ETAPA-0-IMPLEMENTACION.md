@@ -37,7 +37,8 @@
 - **Tests:** cargo test: append-only rechazado; seed project→session→message→rung; cada evento de producto emitido al crear datos.
 - **Mini-gate:** ledger inmutable verificado.
 
-### 0.4 — Secretos BYOK + vault (d)
+### 0.4 — Secretos BYOK + vault (d) — ✅ COMPLETADO 2026-08-27
+> **Estado:** ✅ `0005_vault` (ambos dialectos) · `core::vault` envelope AES-256-GCM: KEK (env/keychain) envuelve DEK por proyecto, secreto cifrado con DEK · `EnvKeyStore` (CANVAS_KEK); keychain OS deferred al shell Tauri (nota TODO en vault.rs) · `validate_provider_key()` roundtrip GET /models (formato de key por proveedor + 401/403 → rechazo; mock axum en tests) · `scan_for_secrets()`/`redact_secrets()` (openai/anthropic/openrouter/aws/github/slack/google) · server `POST/GET/DELETE /api/providers` + `/:id/test` — key NUNCA en respuestas · gate: dump sqlite sin key en claro ✅ · KEK distinta → DecryptFailed ✅ · revocación ✅.
 - **Qué:** crate `keyring` (local) + envelope AES-GCM por tenant (nube) con KEK/DEK; `providers.key_ref`; validación del proveedor al pegar la key (roundtrip mínimo); scanner de secretos antes de enviar contexto.
 - **Tests:** cargo test: key cifra/descifra con la correcta; nunca en claro al webview; dump de SQLite no revela la key.
 - **Mini-gate:** flujo BYOK verificado + threat-model checkbox.

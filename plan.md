@@ -194,10 +194,10 @@ scripts/
 
 ### §15.0 Quick Resume
 
-- **Última sesión**: 2026-08-27 — i18n CERRADO (I.1–I.5) + **Etapa 0 slices 0.1, 0.2 y 0.3 COMPLETOS** (SQLite + Postgres/RLS + ledger append-only)
+- **Última sesión**: 2026-08-27 — i18n CERRADO (I.1–I.5) + **Etapa 0 slices 0.1, 0.2, 0.3 y 0.4 COMPLETOS** (SQLite + Postgres/RLS + ledger append-only + BYOK vault)
 - **Fase actual**: Etapa 0 de [ETAPA-0-IMPLEMENTACION](docs/ETAPA-0-IMPLEMENTACION.md) — orden estricto 0.1→0.8
-- **Próxima acción**: **slice 0.4** — Secretos BYOK + vault (keyring local + envelope AES-GCM, providers.key_ref, scanner de secretos)
-- **Progreso Etapa 0**: 0.1 ✅ · 0.2 ✅ · 0.3 ✅ · 0.7 ✅ · 0.4-0.6 pendientes · 0.8 (GATE 0) bloqueado
+- **Próxima acción**: **slice 0.5** — Frontera del sandbox Linux (límites de contenedor vía docker API en el worker)
+- **Progreso Etapa 0**: 0.1 ✅ · 0.2 ✅ · 0.3 ✅ · 0.4 ✅ · 0.7 ✅ · 0.5-0.6 pendientes · 0.8 (GATE 0) bloqueado
 - **Bloqueos activos**: Ninguno
 
 ### §15.1 Estado global

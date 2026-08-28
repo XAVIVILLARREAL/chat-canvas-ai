@@ -9,10 +9,14 @@ use serde_json::json;
 const DOWN_0001: &str = include_str!("../migrations/sqlite/down/0001_init.sql");
 const DOWN_0002: &str = include_str!("../migrations/sqlite/down/0002_workspace.sql");
 const DOWN_0004: &str = include_str!("../migrations/sqlite/down/0004_append_only.sql");
+const DOWN_0005: &str = include_str!("../migrations/sqlite/down/0005_vault.sql");
 
 /// Ejecuta TODAS las reversas (0002 → 0001) y limpia el registro de sqlx.
 async fn run_all_down(db: &repo::Db) {
     for stmt in DOWN_0002.split(';').map(str::trim).filter(|s| !s.is_empty()) {
+        sqlx::query(stmt).execute(db).await.unwrap();
+    }
+    for stmt in DOWN_0005.split(';').map(str::trim).filter(|s| !s.is_empty()) {
         sqlx::query(stmt).execute(db).await.unwrap();
     }
     for stmt in DOWN_0004.split(';').map(str::trim).filter(|s| !s.is_empty()) {
@@ -134,7 +138,7 @@ async fn data_sobrevive_reinicio_del_server() {
     let db = repo::connect(&url).await.unwrap();
     assert_eq!(repo::project_list(&db).await.unwrap().len(), 1);
     assert_eq!(repo::message_list_by_session(&db, "s1").await.unwrap().len(), 1);
-    // migraciones NO se reaplican (idempotente por _sqlx_migrations): 0001+0002+0004
+    // migraciones NO se reaplican (idempotente): 0001+0002+0004+0005
     let versiones: Vec<(i64,)> = sqlx::query_as("SELECT version FROM _sqlx_migrations").fetch_all(&db).await.unwrap();
-    assert_eq!(versiones.len(), 3);
+    assert_eq!(versiones.len(), 4);
 }

@@ -11,7 +11,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use canvas_ai_core::{domain::*, repo};
+use canvas_ai_core::{domain::*, repo, vault};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -29,17 +29,24 @@ pub const DEFAULT_PROJECT_ID: &str = "local-default";
 pub struct AppState {
     pub db: repo::Db,
     pub project_id: String,
+    /// KEK del vault BYOK (env CANVAS_KEK, base64 32B — THREAT-MODEL §3).
+    pub vault_ks: std::sync::Arc<dyn vault::KeyStore>,
 }
 
 impl AppState {
     /// Conecta a SQLite, aplica migraciones y asegura el proyecto default.
+    /// La KEK del vault se lee de `CANVAS_KEK` (tests la setean antes de llamar).
     pub async fn connect(url: &str) -> anyhow::Result<Self> {
         let db = repo::connect(url).await?;
         if repo::project_get(&db, DEFAULT_PROJECT_ID).await?.is_none() {
             repo::project_create(&db, DEFAULT_PROJECT_ID, "Canvas AI (local)").await?;
             info!("Proyecto default creado: {}", DEFAULT_PROJECT_ID);
         }
-        Ok(Self { db, project_id: DEFAULT_PROJECT_ID.into() })
+        Ok(Self {
+            db,
+            project_id: DEFAULT_PROJECT_ID.into(),
+            vault_ks: std::sync::Arc::new(vault::EnvKeyStore::from_env("CANVAS_KEK")),
+        })
     }
 }
 
@@ -47,6 +54,11 @@ type ApiResult<T> = Result<Json<T>, (StatusCode, String)>;
 
 fn not_found(que: &str) -> (StatusCode, String) {
     (StatusCode::NOT_FOUND, format!("{} not found", que))
+}
+
+fn vault_err(e: canvas_ai_core::vault::VaultError) -> (StatusCode, String) {
+    error!("vault error: {}", e);
+    (StatusCode::INTERNAL_SERVER_ERROR, format!("vault error: {e}"))
 }
 
 fn db_err(e: sqlx::Error) -> (StatusCode, String) {
@@ -132,6 +144,11 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/canvases/:id/execute", post(execute_canvas))
         .route("/api/canvases/:id/test", post(test_canvas))
         .route("/api/canvases/:id/validate", post(validate_canvas))
+        
+        // Providers BYOK (la key NUNCA en respuestas — solo key_ref)
+        .route("/api/providers", get(list_providers).post(create_provider))
+        .route("/api/providers/:id", get(get_provider).delete(delete_provider))
+        .route("/api/providers/:id/test", post(test_provider))
         
         // Skills CRUD
         .route("/api/skills", get(list_skills).post(create_skill))
@@ -443,6 +460,100 @@ fn has_cycle(nodes: &[CanvasNode], edges: &[CanvasEdge]) -> bool {
     }
     
     visited != nodes.len()
+}
+
+// ============================================================================
+// HANDLERS - PROVIDERS BYOK (secretos en vault, THREAT-MODEL §3)
+// ============================================================================
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CreateProviderRequest {
+    pub provider_type: String,   // openai|anthropic|openrouter|deepseek|ollama|generic
+    pub name: String,
+    pub base_url: String,
+    pub api_key: String,         // ENTRADA únicamente; jamás se devuelve
+    pub validate: Option<bool>,  // default true: roundtrip mínimo antes de guardar
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProviderTestResponse {
+    pub connected: bool,
+    pub error: Option<String>,
+}
+
+async fn create_provider(
+    State(state): State<AppState>,
+    Json(req): Json<CreateProviderRequest>,
+) -> ApiResult<repo::Provider> {
+    // validación roundtrip mínima antes de guardar (default: on)
+    if req.validate.unwrap_or(true) {
+        vault::validate_provider_key(&req.provider_type, &req.base_url, &req.api_key)
+            .await
+            .map_err(|e| (StatusCode::BAD_REQUEST, format!("provider inválido: {e}")))?;
+    }
+    // secreto al vault; key_ref al registro — la key nunca vuelve a verse
+    let key_ref = vault::store_secret(&state.db, &state.project_id, state.vault_ks.as_ref(), &req.api_key)
+        .await
+        .map_err(vault_err)?;
+    let id = Uuid::new_v4().to_string();
+    let provider = repo::provider_create(
+        &state.db, &id, &state.project_id, &req.provider_type, &req.name,
+        Some(&req.base_url), Some(&key_ref),
+    ).await.map_err(|e| db_err(e))?;
+    info!("Provider creado ({}): key_ref={}", req.provider_type, key_ref);
+    Ok(Json(provider))
+}
+
+async fn list_providers(State(state): State<AppState>) -> ApiResult<Vec<repo::Provider>> {
+    repo::provider_list_by_project(&state.db, &state.project_id)
+        .await.map(Json).map_err(|e| db_err(e))
+}
+
+async fn get_provider(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<repo::Provider> {
+    repo::provider_get(&state.db, &id).await
+        .map_err(|e| db_err(e))?
+        .map(Json)
+        .ok_or_else(|| not_found("Provider"))
+}
+
+/// Roundtrip de salud con la key almacenada (revela SOLO en memoria del server).
+async fn test_provider(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<ProviderTestResponse> {
+    let provider = repo::provider_get(&state.db, &id).await
+        .map_err(|e| db_err(e))?
+        .ok_or_else(|| not_found("Provider"))?;
+    let key_ref = provider.key_ref.clone()
+        .ok_or_else(|| (StatusCode::BAD_REQUEST, "provider sin key".into()))?;
+    match vault::reveal_secret(&state.db, &key_ref, state.vault_ks.as_ref()).await {
+        Ok(key) => {
+            match vault::validate_provider_key(&provider.provider_type,
+                provider.base_url.as_deref().unwrap_or(""), &key).await {
+                Ok(()) => Ok(Json(ProviderTestResponse { connected: true, error: None })),
+                Err(e) => Ok(Json(ProviderTestResponse { connected: false, error: Some(e.to_string()) })),
+            }
+        }
+        Err(e) => Ok(Json(ProviderTestResponse { connected: false, error: Some(e.to_string()) })),
+    }
+}
+
+async fn delete_provider(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<StatusCode, (StatusCode, String)> {
+    let provider = repo::provider_get(&state.db, &id).await
+        .map_err(|e| db_err(e))?
+        .ok_or_else(|| not_found("Provider"))?;
+    if let Some(key_ref) = &provider.key_ref {
+        vault::delete_secret(&state.db, key_ref).await.map_err(vault_err)?;
+    }
+    repo::provider_delete(&state.db, &id).await.map_err(|e| db_err(e))?;
+    info!("Provider eliminado: {}", id);
+    Ok(StatusCode::NO_CONTENT)
 }
 
 // ============================================================================

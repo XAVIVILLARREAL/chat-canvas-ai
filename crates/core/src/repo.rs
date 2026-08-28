@@ -357,6 +357,11 @@ pub async fn provider_list_by_project(db: &Db, project_id: &str) -> Result<Vec<P
         .bind(project_id).fetch_all(db).await
 }
 
+pub async fn provider_delete(db: &Db, id: &str) -> Result<u64, sqlx::Error> {
+    let r = sqlx::query("DELETE FROM providers WHERE id = ?1").bind(id).execute(db).await?;
+    Ok(r.rows_affected())
+}
+
 // ─── Executions (canvas de automatización) ──────────────────────────────────
 
 pub async fn execution_create(db: &Db, id: &str, canvas_id: &str, trigger: &serde_json::Value) -> Result<Execution, sqlx::Error> {

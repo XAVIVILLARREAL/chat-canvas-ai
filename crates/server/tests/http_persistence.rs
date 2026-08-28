@@ -8,6 +8,8 @@ use canvas_ai_server::api::{create_router, AppState};
 use http_body_util::BodyExt;
 use serde_json::{json, Value};
 use tower::ServiceExt;
+use base64::Engine;
+use sqlx::Row;
 
 async fn json_body(resp: axum::response::Response) -> Value {
     let bytes = resp.into_body().collect().await.unwrap().to_bytes();
@@ -151,4 +153,84 @@ async fn deletes_y_404() {
 
     let (st, _) = req_json(app, "GET", &format!("/api/canvases/{id}"), None).await;
     assert_eq!(st, StatusCode::NOT_FOUND);
+}
+
+// ─── Slice 0.4: flujo BYOK por HTTP — la key JAMÁS en respuestas ni en la DB ──
+
+async fn mock_provider(accept: &'static str) -> String {
+    use axum::routing::get;
+    let app = axum::Router::new().route(
+        "/models",
+        get(move |headers: axum::http::HeaderMap| async move {
+            let auth = headers.get("authorization").and_then(|v| v.to_str().ok()).unwrap_or("");
+            if auth == format!("Bearer {accept}") { axum::http::StatusCode::OK } else { axum::http::StatusCode::UNAUTHORIZED }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+    format!("http://{addr}")
+}
+
+#[tokio::test]
+async fn byok_provider_http_key_nunca_en_claro() {
+    // KEK para el vault ANTES de conectar
+    let kek_b64 = {
+        use aes_gcm::aead::rand_core::RngCore;
+        let mut k = [0u8; 32];
+        aes_gcm::aead::OsRng.fill_bytes(&mut k);
+        base64::engine::general_purpose::STANDARD.encode(k)
+    };
+    std::env::set_var("CANVAS_KEK", kek_b64);
+
+    let tmp = tempfile::tempdir().unwrap();
+    let url = format!("sqlite://{}/byok.db", tmp.path().display());
+    let state = AppState::connect(&url).await.unwrap();
+    let app = create_router(state);
+
+    let secret = "sk-or-v1-SECRETO-HTTP-123";
+    let base = mock_provider(secret).await;
+
+    // crear provider (valida roundtrip contra el mock y guarda cifrado)
+    let (st, provider) = req_json(app.clone(), "POST", "/api/providers", Some(json!({
+        "provider_type": "openrouter", "name": "OR free", "base_url": base, "api_key": secret
+    }))).await;
+    assert_eq!(st, StatusCode::OK, "body: {provider}");
+    let key_ref = provider["key_ref"].as_str().unwrap().to_string();
+    assert!(key_ref.starts_with("vault:"), "{key_ref}");
+
+    // GATE: la respuesta JAMÁS contiene la key
+    let respuesta = provider.to_string();
+    assert!(!respuesta.contains("SECRETO-HTTP"), "key filtrada en respuesta: {respuesta}");
+
+    // listado igual de limpio
+    let (st, lista) = req_json(app.clone(), "GET", "/api/providers", None).await;
+    assert_eq!(st, StatusCode::OK);
+    assert_eq!(lista.as_array().unwrap().len(), 1);
+    assert!(!lista.to_string().contains("SECRETO-HTTP"));
+
+    // /test → roundtrip de salud con la key almacenada
+    let id = provider["id"].as_str().unwrap();
+    let (st, test) = req_json(app.clone(), "POST", &format!("/api/providers/{id}/test"), None).await;
+    assert_eq!(st, StatusCode::OK);
+    assert_eq!(test["connected"], true, "{test}");
+
+    // provider inválido (key rechazada por el mock) → 400, sin guardar
+    let (st, _) = req_json(app.clone(), "POST", "/api/providers", Some(json!({
+        "provider_type": "openrouter", "name": "malo", "base_url": base, "api_key": "sk-or-v1-mala"
+    }))).await;
+    assert_eq!(st, StatusCode::BAD_REQUEST);
+    let (_, lista) = req_json(app.clone(), "GET", "/api/providers", None).await;
+    assert_eq!(lista.as_array().unwrap().len(), 1, "el provider inválido NO se guardó");
+
+    // GATE: dump de la DB sin la key en claro
+    drop(app);
+    let db = sqlx::sqlite::SqlitePool::connect(&url).await.unwrap();
+    let rows = sqlx::query(
+        "SELECT hex(wrapped_dek) || hex(nonce) || hex(ciphertext) AS blob FROM vault_entries",
+    ).fetch_all(&db).await.unwrap();
+    let dump: String = rows.iter().map(|r| r.get::<String, _>(0)).collect::<Vec<_>>().join("").to_lowercase();
+    let secreto_hex: String = secret.bytes().map(|b| format!("{b:02x}")).collect();
+    assert!(!dump.contains(&secreto_hex), "la key apareció en claro en la DB");
+    db.close().await;
 }
