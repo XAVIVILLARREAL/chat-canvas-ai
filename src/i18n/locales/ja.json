@@ -126,5 +126,8 @@
   "theme.system": "システム",
   "header.projects": "プロジェクト",
   "header.newProject": "新規プロジェクト",
-  "project.newName": "プロジェクト名"
+  "project.newName": "プロジェクト名",
+  "project.enter": "開く",
+  "project.gatewayOff": "ゲートウェイオフライン — 単一ローカルワークスペース",
+  "project.viewAll": "すべてのプロジェクトを表示"
 }

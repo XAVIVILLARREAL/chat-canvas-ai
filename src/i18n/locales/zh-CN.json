@@ -126,5 +126,8 @@
   "theme.system": "跟随系统",
   "header.projects": "项目",
   "header.newProject": "新建项目",
-  "project.newName": "项目名称"
+  "project.newName": "项目名称",
+  "project.enter": "进入",
+  "project.gatewayOff": "网关离线 — 单一本地工作区",
+  "project.viewAll": "查看所有项目"
 }

@@ -126,5 +126,8 @@
   "theme.system": "सिस्टम",
   "header.projects": "प्रोजेक्ट",
   "header.newProject": "नया प्रोजेक्ट",
-  "project.newName": "प्रोजेक्ट नाम"
+  "project.newName": "प्रोजेक्ट नाम",
+  "project.enter": "दर्ज करें",
+  "project.gatewayOff": "गेटवे ऑफ़लाइन — एकल स्थानीय वर्कस्पेस",
+  "project.viewAll": "सभी प्रोजेक्ट देखें"
 }

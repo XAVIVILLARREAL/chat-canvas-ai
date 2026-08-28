@@ -126,5 +126,8 @@
   "theme.system": "النظام",
   "header.projects": "المشاريع",
   "header.newProject": "مشروع جديد",
-  "project.newName": "اسم المشروع"
+  "project.newName": "اسم المشروع",
+  "project.enter": "دخول",
+  "project.gatewayOff": "البوابة غير متصلة — مساحة عمل محلية واحدة",
+  "project.viewAll": "عرض كل المشاريع"
 }

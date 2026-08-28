@@ -45,6 +45,17 @@ test.describe("Proyectos como scope — A.0", () => {
       await humanClick(page.getByTestId("project-switcher").locator("button").first());
     });
 
+    await step("card-grid: entro al proyecto nuevo por su CARD", async () => {
+      await humanClick(page.getByTestId("project-switcher").locator("button").first());
+      await humanClick(page.getByTestId("projects-grid-open"));
+      await expect(page.getByTestId("projects-grid")).toBeVisible();
+      // localizar la card del proyecto único por su texto y entrar
+      const card = page.locator(`[data-testid^="card-"]`, { hasText: projectName }).first();
+      await expect(card).toBeVisible();
+      await humanClick(card.getByRole("button", { name: /Entrar|Enter/i }));
+      await humanThink();
+    });
+
     await step("vuelvo al proyecto default y nada se mezcla", async () => {
       await humanClick(page.getByTestId("project-switcher").locator("button").first());
       await humanClick(page.getByTestId("project-local-default"));

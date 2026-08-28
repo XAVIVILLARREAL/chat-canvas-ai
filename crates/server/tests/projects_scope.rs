@@ -122,3 +122,46 @@ async fn cross_proyecto_datos_aislados_por_http() {
 }
 
 fn sql_skill_count(_project: &str) -> i64 { 0 } // placeholder: aislamiento cubierto en core tests
+
+// ─── A.0: skill GLOBAL vs copia LOCAL ────────────────────────────────────────
+
+#[tokio::test]
+async fn skill_global_vs_copia_local() {
+    let state = AppState::connect("sqlite::memory:").await.unwrap();
+    let app = create_router(state);
+
+    // proyecto destino
+    let (_, pb) = req_json(app.clone(), "POST", "/api/projects", Some(json!({"name": "Destino"}))).await;
+    let id_b = pb["id"].as_str().unwrap().to_string();
+
+    // skill en el proyecto default
+    let (st, skill) = req_json(app.clone(), "POST", "/api/skills",
+        Some(json!({"name": "revisor", "description": "d", "category": "custom", "created_by": "t"}))).await;
+    assert_eq!(st, StatusCode::OK, "{skill}");
+    let skill_id = skill["id"].as_str().unwrap().to_string();
+
+    // copiar ANTES de globalizar → copia local en Destino
+    let (st, copy) = req_json(app.clone(), "POST", &format!("/api/skills/{skill_id}/copy"),
+        Some(json!({"target_project_id": id_b}))).await;
+    assert_eq!(st, StatusCode::OK, "{copy}");
+    let copy_id = copy["id"].as_str().unwrap().to_string();
+    assert_ne!(copy_id, skill_id);
+
+    // compartir el ORIGINAL como global
+    let (st, shared) = req_json(app.clone(), "POST", &format!("/api/skills/{skill_id}/share"), None).await;
+    assert_eq!(st, StatusCode::OK);
+
+    // listar para Destino: su copia local + el global (2 skills)
+    let (_, lista_b) = req_json(app.clone(), "GET", &format!("/api/skills/all?project_id={id_b}"), None).await;
+    let ids: Vec<&str> = lista_b.as_array().unwrap().iter().map(|s| s["id"].as_str().unwrap()).collect();
+    assert!(ids.contains(&skill_id.as_str()), "el global se ve desde Destino: {ids:?}");
+    assert!(ids.contains(&copy_id.as_str()), "la copia local está en Destino");
+
+    // editar la COPIA (subir versión) → el global NO cambia
+    let mut copy_upd = copy.clone();
+    copy_upd["description"] = json!("editada local");
+    let (st, _) = req_json(app.clone(), "PUT", &format!("/api/skills/{copy_id}"), Some(copy_upd)).await;
+    assert_eq!(st, StatusCode::OK);
+    let (_, orig) = req_json(app.clone(), "GET", &format!("/api/skills/{skill_id}"), None).await;
+    assert_eq!(orig["description"], "d", "editar la copia local NO toca el global");
+}

@@ -163,6 +163,9 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/skills/:id/test", post(test_skill))
         .route("/api/skills/:id/improve", post(improve_skill))
         .route("/api/skills/:id/versions", get(list_skill_versions))
+        .route("/api/skills/all", get(list_all_skills))
+        .route("/api/skills/:id/share", post(share_skill))
+        .route("/api/skills/:id/copy", post(copy_skill))
         
         // Agents CRUD
         .route("/api/agents", get(list_agents).post(create_agent))
@@ -864,6 +867,56 @@ fn increment_version(version: &str) -> String {
     } else {
         "1.0.1".into()
     }
+}
+
+// ============================================================================
+// HANDLERS - SKILLS GLOBAL vs COPIA LOCAL (A.0)
+// ============================================================================
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct CopySkillRequest {
+    pub target_project_id: String,
+}
+
+/// Skills del proyecto (locales) + globales de otros proyectos.
+async fn list_all_skills(
+    State(state): State<AppState>,
+    Query(req): Query<ProjectQuery>,
+) -> ApiResult<Vec<repo::Skill>> {
+    let project = req.project_id.unwrap_or_else(|| state.project_id.clone());
+    repo::skill_list_for_project(&state.db, &project).await.map(Json).map_err(|e| db_err(e))
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct ProjectQuery {
+    pub project_id: Option<String>,
+}
+
+/// Comparte un skill globalmente (visible en todos los proyectos).
+async fn share_skill(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<Skill> {
+    let affected = repo::skill_set_global(&state.db, &id, true).await.map_err(|e| db_err(e))?;
+    if affected == 0 { return Err(not_found("Skill")); }
+    repo::skill_domain_get(&state.db, &id).await
+        .map_err(|e| db_err(e))?
+        .map(Json)
+        .ok_or_else(|| not_found("Skill"))
+}
+
+/// Copia un skill a otro proyecto (copia local; edita sin tocar el original).
+async fn copy_skill(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Json(req): Json<CopySkillRequest>,
+) -> ApiResult<Skill> {
+    let copy = repo::skill_copy_to_project(&state.db, &id, &req.target_project_id)
+        .await
+        .map_err(|e| db_err(e))?
+        .ok_or_else(|| not_found("Skill"))?;
+    info!("Skill {} copiado a proyecto {}", id, req.target_project_id);
+    Ok(Json(copy))
 }
 
 // ============================================================================

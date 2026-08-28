@@ -126,5 +126,8 @@
   "theme.system": "System",
   "header.projects": "Projects",
   "header.newProject": "New project",
-  "project.newName": "Project name"
+  "project.newName": "Project name",
+  "project.enter": "Enter",
+  "project.gatewayOff": "Gateway offline — single local workspace",
+  "project.viewAll": "View all projects"
 }

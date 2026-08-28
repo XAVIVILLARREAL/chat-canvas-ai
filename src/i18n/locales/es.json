@@ -126,5 +126,8 @@
   "theme.system": "Sistema",
   "header.projects": "Proyectos",
   "header.newProject": "Nuevo proyecto",
-  "project.newName": "Nombre del proyecto"
+  "project.newName": "Nombre del proyecto",
+  "project.enter": "Entrar",
+  "project.gatewayOff": "Gateway apagado — espacio local único",
+  "project.viewAll": "Ver todos los proyectos"
 }

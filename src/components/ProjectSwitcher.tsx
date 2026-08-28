@@ -8,11 +8,14 @@ import { useEffect, useRef, useState } from 'react';
 import { FolderOpen, Plus, Check } from 'lucide-react';
 import { projectsApi, UI_KEYS, type ProjectInfo } from '../lib/projectsApi';
 import { useI18n } from '../i18n';
+import { useModal } from './Modal';
+import { ProjectsGridContent } from './ProjectsGrid';
 
 const DEFAULT_PROJECT: ProjectInfo = { id: 'local-default', name: 'Canvas AI' };
 
 export function ProjectSwitcher() {
   const { t } = useI18n();
+  const { openModal } = useModal();
   const [open, setOpen] = useState(false);
   const [projects, setProjects] = useState<ProjectInfo[]>([DEFAULT_PROJECT]);
   const [activeId, setActiveId] = useState<string>(DEFAULT_PROJECT.id);
@@ -96,6 +99,13 @@ export function ProjectSwitcher() {
           ))}
           <button className="dropdown-item" data-testid="project-new" onClick={createProject}>
             <Plus width={14} height={14} /> {t('header.newProject')}
+          </button>
+          <button
+            className="dropdown-item"
+            data-testid="projects-grid-open"
+            onClick={() => { setOpen(false); openModal(<><h2 style={{ margin: '0 0 16px' }}>{t('header.projects')}</h2><ProjectsGridContent /></>, { size: 'lg' }); }}
+          >
+            <FolderOpen width={14} height={14} /> {t('project.viewAll')}
           </button>
         </div>
       )}

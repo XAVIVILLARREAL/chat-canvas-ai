@@ -126,5 +126,8 @@
   "theme.system": "시스템",
   "header.projects": "프로젝트",
   "header.newProject": "새 프로젝트",
-  "project.newName": "프로젝트 이름"
+  "project.newName": "프로젝트 이름",
+  "project.enter": "열기",
+  "project.gatewayOff": "게이트웨이 오프라인 — 단일 로컬 워크스페이스",
+  "project.viewAll": "모든 프로젝트 보기"
 }

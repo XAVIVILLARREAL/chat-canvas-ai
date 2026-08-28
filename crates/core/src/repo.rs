@@ -812,3 +812,44 @@ pub async fn project_setting_clear(db: &Db, project_id: &str, key: &str) -> Resu
         .await?;
     Ok(r.rows_affected())
 }
+
+// ─── Skills globales vs copia local (A.0) ───────────────────────────────────
+
+/// Marca/desmarca un skill como GLOBAL (visible desde cualquier proyecto).
+pub async fn skill_set_global(db: &Db, id: &str, is_global: bool) -> Result<u64, sqlx::Error> {
+    let r = sqlx::query("UPDATE skills SET is_global = ?2 WHERE id = ?1 AND deleted_at IS NULL")
+        .bind(id).bind(is_global)
+        .execute(db).await?;
+    Ok(r.rows_affected())
+}
+
+/// Lista para un proyecto: sus skills locales + los GLOBALES de otros proyectos.
+pub async fn skill_list_for_project(db: &Db, project_id: &str) -> Result<Vec<Skill>, sqlx::Error> {
+    sqlx::query_as(
+        "SELECT * FROM skills WHERE deleted_at IS NULL AND (project_id = ?1 OR is_global = 1) ORDER BY created_at",
+    )
+    .bind(project_id)
+    .fetch_all(db)
+    .await
+}
+
+/// Copia un skill a otro proyecto como copia LOCAL (nuevo id, parent apunta al
+/// original; la copia nunca es global — edición local no toca el original).
+pub async fn skill_copy_to_project(
+    db: &Db,
+    skill_id: &str,
+    target_project: &str,
+) -> Result<Option<DomainSkill>, sqlx::Error> {
+    let original = match skill_domain_get(db, skill_id).await? {
+        Some(s) => s,
+        None => return Ok(None),
+    };
+    let mut copy = original.clone();
+    copy.id = uuid::Uuid::new_v4().to_string();
+    copy.metadata.parent_skill_id = Some(skill_id.to_string());
+    copy.created_at = now_ms();
+    copy.updated_at = now_ms();
+    let manifest = serde_json::to_value(&copy).expect("skill serializable");
+    skill_create(db, &copy.id, target_project, &copy.id, &manifest, "").await?;
+    Ok(Some(copy))
+}

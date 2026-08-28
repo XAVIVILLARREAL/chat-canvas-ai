@@ -126,5 +126,8 @@
   "theme.system": "Системная",
   "header.projects": "Проекты",
   "header.newProject": "Новый проект",
-  "project.newName": "Название проекта"
+  "project.newName": "Название проекта",
+  "project.enter": "Открыть",
+  "project.gatewayOff": "Шлюз отключён — единое локальное рабочее пространство",
+  "project.viewAll": "Все проекты"
 }

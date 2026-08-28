@@ -7,6 +7,7 @@
 export interface ProjectInfo {
   id: string;
   name: string;
+  created_at?: number;
 }
 
 const API = import.meta.env.VITE_API_BASE ?? '';
