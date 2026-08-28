@@ -300,3 +300,63 @@ mod tests {
         assert!(scan_for_secrets("hola mundo, nada raro").is_empty());
     }
 }
+
+// ─── Secret settings (A.2): settings sensibles cifradas — jamás plano ───────
+//
+// Patrón T.SEC: la fila de `settings` guarda SOLO el marcador {"__secret": key_ref};
+// el secreto vive cifrado en vault_entries. `settings_resolved` es safe-by-default
+// (devuelve key_refs, nunca plaintext); el plaintext SOLO via reveal explícito.
+
+pub const SECRET_MARKER: &str = "__secret";
+
+/// Guarda un setting sensible cifrado. La fila queda con la referencia, jamás el valor.
+pub async fn set_secret_setting(
+    db: &Db,
+    project_id: &str,
+    key: &str,
+    plaintext: &str,
+    ks: &dyn KeyStore,
+) -> Result<(), VaultError> {
+    let key_ref = store_secret(db, project_id, ks, plaintext).await?;
+    crate::repo::setting_set(db, project_id, key, &serde_json::json!({ SECRET_MARKER: key_ref })).await?;
+    Ok(())
+}
+
+/// Lee el marcador de un setting sensible (key_ref, sin descifrar).
+pub async fn secret_setting_ref(
+    db: &Db,
+    project_id: &str,
+    key: &str,
+) -> Result<Option<String>, VaultError> {
+    match crate::repo::setting_resolve(db, project_id, key).await? {
+        Some(v) => Ok(Some(
+            v.get(SECRET_MARKER)
+                .and_then(|r| r.as_str())
+                .map(String::from)
+                .ok_or(VaultError::NotFound(format!("setting '{key}' no es un secreto")))?,
+        )),
+        None => Ok(None),
+    }
+}
+
+/// Descifra un setting sensible (server/worker — jamás el webview).
+pub async fn reveal_secret_setting(
+    db: &Db,
+    project_id: &str,
+    key: &str,
+    ks: &dyn KeyStore,
+) -> Result<Option<String>, VaultError> {
+    match secret_setting_ref(db, project_id, key).await? {
+        Some(key_ref) => Ok(Some(reveal_secret(db, &key_ref, ks).await?)),
+        None => Ok(None),
+    }
+}
+
+/// Borra un setting sensible (fila + secreto del vault).
+pub async fn delete_secret_setting(db: &Db, project_id: &str, key: &str) -> Result<(), VaultError> {
+    if let Some(key_ref) = secret_setting_ref(db, project_id, key).await? {
+        delete_secret(db, &key_ref).await?;
+    }
+    crate::repo::project_setting_clear(db, project_id, key).await?;
+    Ok(())
+}

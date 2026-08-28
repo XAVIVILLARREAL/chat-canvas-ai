@@ -9,6 +9,7 @@ use http_body_util::BodyExt;
 use serde_json::{json, Value};
 use sqlx::Row;
 use tower::ServiceExt;
+use base64::Engine;
 
 async fn req_json(app: axum::Router, method: &str, uri: &str, body: Option<Value>) -> (StatusCode, Value) {
     let method = axum::http::Method::from_bytes(method.as_bytes()).unwrap();
@@ -209,4 +210,79 @@ async fn sesiones_y_mensajes_roundtrip_tras_reinicio() {
     let (st, msgs_r) = req_json(app, "GET", &format!("/api/sessions/{sid}/messages"), None).await;
     assert_eq!(st, StatusCode::OK);
     assert_eq!(msgs_r.as_array().unwrap().len(), 2, "mensajes restauran tras reinicio");
+}
+
+// ─── A.2: settings CIFRADAS (T.SEC) — jamás plano ───────────────────────────
+
+#[tokio::test]
+async fn settings_cifradas_dump_sin_plaintext() {
+    use base64::engine::general_purpose::STANDARD as B64;
+    use aes_gcm::aead::rand_core::RngCore;
+
+    let kek = {
+        let mut k = [0u8; 32];
+        aes_gcm::aead::OsRng.fill_bytes(&mut k);
+        B64.encode(k)
+    };
+    std::env::set_var("CANVAS_KEK", &kek);
+
+    let tmp = tempfile::tempdir().unwrap();
+    let url = format!("sqlite://{}/sec.db", tmp.path().display());
+    let state = AppState::connect(&url).await.unwrap();
+    let app = create_router(state);
+
+    const KEY: &str = "api.token";
+    const SECRET: &str = "sk-super-secreto-A2-9876";
+
+    // guardar setting cifrado
+    let (st, r) = req_json(app.clone(), "PUT", "/api/settings/local-default/secret",
+        Some(json!({"key": KEY, "value": SECRET}))).await;
+    assert_eq!(st, StatusCode::OK, "{r}");
+    assert_eq!(r["encrypted"], true);
+
+    // GET settings (safe-by-default): SOLO key_ref, nunca el valor
+    let (_, settings) = req_json(app.clone(), "GET", "/api/settings/local-default", None).await;
+    let raw_settings = settings.to_string();
+    assert!(!raw_settings.contains("sk-super-secreto"), "plaintext filtrado en GET: {raw_settings}");
+    assert!(settings[KEY]["__secret"].as_str().unwrap().starts_with("vault:"));
+
+    // reveal (server-side) → original
+    let (st, rev) = req_json(app.clone(), "POST", "/api/settings/local-default/reveal",
+        Some(json!({"key": KEY, "value": ""}))).await;
+    assert_eq!(st, StatusCode::OK);
+    assert_eq!(rev["value"], SECRET, "roundtrip del secreto");
+
+    // GATE T.SEC: dump de la DB SIN plaintext (fila settings + vault blobs)
+    drop(app);
+    let db = sqlx::sqlite::SqlitePool::connect(&url).await.unwrap();
+    let rows = sqlx::query(
+        "SELECT hex(value) || COALESCE((SELECT hex(group_concat(hex(wrapped_dek) || hex(nonce) || hex(ciphertext))) FROM vault_entries), '') AS blob FROM settings WHERE key = ?1",
+    ).bind(KEY).fetch_all(&db).await.unwrap();
+    let dump: String = rows.iter().map(|r| r.get::<String, _>(0)).collect::<String>().to_lowercase();
+    let secreto_hex: String = SECRET.bytes().map(|b| format!("{b:02x}")).collect();
+    assert!(!dump.contains(&secreto_hex), "el secreto apareció EN CLARO en la DB");
+    assert!(!dump.contains("super-secreto"), "fragmento en claro");
+    db.close().await;
+
+    // override local de un secret en otro proyecto + KEK ausente → fail-closed
+    let state = AppState::connect(&url).await.unwrap();
+    let app = create_router(state);
+    let (_, p2) = req_json(app.clone(), "POST", "/api/projects", Some(json!({"name": "Dos"}))).await;
+    let id_b = p2["id"].as_str().unwrap().to_string();
+    let (st, _) = req_json(app.clone(), "PUT", &format!("/api/settings/{id_b}/secret"),
+        Some(json!({"key": KEY, "value": "otro-secreto-b"}))).await;
+    assert_eq!(st, StatusCode::OK);
+    std::env::remove_var("CANVAS_KEK");
+    let (st, rev) = req_json(app.clone(), "POST", &format!("/api/settings/{id_b}/reveal"),
+        Some(json!({"key": KEY, "value": ""}))).await;
+    // fail-closed: 500 (KekUnavailable) o 200+null — JAMÁS el plaintext
+    assert!(
+        (st == StatusCode::INTERNAL_SERVER_ERROR && !rev.to_string().contains("otro-secreto-b"))
+            || (st == StatusCode::OK && rev["value"] == Value::Null),
+        "sin KEK debe fallar sin filtrar: {st} {rev}"
+    );
+    std::env::set_var("CANVAS_KEK", &kek);
+    let (_, rev) = req_json(app.clone(), "POST", &format!("/api/settings/{id_b}/reveal"),
+        Some(json!({"key": KEY, "value": ""}))).await;
+    assert_eq!(rev["value"], "otro-secreto-b");
 }

@@ -8,7 +8,7 @@ use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
     response::Json,
-    routing::{get, post},
+    routing::{get, post, put},
     Router,
 };
 use canvas_ai_core::{domain::*, repo, vault};
@@ -155,6 +155,8 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/projects", get(list_projects).post(create_project))
         .route("/api/projects/:id", get(get_project).patch(rename_project).delete(delete_project))
         .route("/api/settings/:project_id", get(get_settings).put(put_setting).delete(clear_setting))
+        .route("/api/settings/:project_id/secret", put(put_secret_setting))
+        .route("/api/settings/:project_id/reveal", post(reveal_setting))
         .route("/api/settings", get(get_global_settings).put(put_global_setting))
         
         // Providers BYOK (la key NUNCA en respuestas — solo key_ref)
@@ -575,6 +577,37 @@ async fn create_message(
         req.cost_usd, &serde_json::json!({}),
     ).await.map_err(|e| db_err(e))?;
     Ok(Json(message))
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct SecretSettingRequest {
+    pub key: String,
+    pub value: String, // ENTRADA únicamente; la fila guarda solo key_ref
+}
+
+/// A.2: setting sensible CIFRADO (T.SEC) — la fila guarda {"__secret": key_ref}.
+async fn put_secret_setting(
+    State(state): State<AppState>,
+    Path(project_id): Path<String>,
+    Json(req): Json<SecretSettingRequest>,
+) -> ApiResult<serde_json::Value> {
+    vault::set_secret_setting(&state.db, &project_id, &req.key, &req.value, state.vault_ks.as_ref())
+        .await
+        .map_err(vault_err)?;
+    info!("setting cifrado: {} (scope {})", req.key, project_id);
+    Ok(Json(serde_json::json!({ "ok": true, "encrypted": true, "key": req.key })))
+}
+
+/// Descifra un setting sensible (worker/proveedores vía gateway — THREAT-MODEL).
+async fn reveal_setting(
+    State(state): State<AppState>,
+    Path(project_id): Path<String>,
+    Json(req): Json<SecretSettingRequest>,
+) -> ApiResult<serde_json::Value> {
+    let value = vault::reveal_secret_setting(&state.db, &project_id, &req.key, state.vault_ks.as_ref())
+        .await
+        .map_err(vault_err)?;
+    Ok(Json(serde_json::json!({ "key": req.key, "value": value })))
 }
 
 // ============================================================================
@@ -1704,6 +1737,9 @@ const OPS: &[Op] = &[
     Op { method: "get", path: "/api/sessions/{id}/messages", summary: "Mensajes de la sesión", tag: "sessions", request: None, response: Some("Message") },
     Op { method: "post", path: "/api/sessions/{id}/messages", summary: "Agrega mensaje", tag: "sessions", request: Some("CreateMessageRequest"), response: Some("Message") },
 
+    Op { method: "put", path: "/api/settings/{project_id}/secret", summary: "Setting sensible CIFRADO (T.SEC)", tag: "settings", request: Some("SecretSettingRequest"), response: None },
+    Op { method: "post", path: "/api/settings/{project_id}/reveal", summary: "Descifra un setting (server-side)", tag: "settings", request: Some("SecretSettingRequest"), response: None },
+
     Op { method: "get", path: "/api/providers", summary: "Lista providers BYOK", tag: "providers", request: None, response: Some("Provider") },
     Op { method: "post", path: "/api/providers", summary: "Crea provider (valida + cifra la key)", tag: "providers", request: Some("CreateProviderRequest"), response: Some("Provider") },
     Op { method: "get", path: "/api/providers/{id}", summary: "Obtiene provider", tag: "providers", request: None, response: Some("Provider") },
@@ -1781,6 +1817,7 @@ pub fn build_openapi() -> serde_json::Value {
         ("Message", schema_for!(repo::Message)),
         ("CreateSessionRequest", schema_for!(CreateSessionRequest)),
         ("CreateMessageRequest", schema_for!(CreateMessageRequest)),
+        ("SecretSettingRequest", schema_for!(SecretSettingRequest)),
         ("StreamEvent", schema_for!(repo::StreamEvent)),
         ("A2AAgentCard", schema_for!(A2AAgentCard)),
         ("A2ATask", schema_for!(A2ATask)),
