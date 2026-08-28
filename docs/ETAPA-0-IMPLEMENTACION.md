@@ -31,7 +31,8 @@
 - **Tests:** cargo test contra Postgres (Compose); 2 tenants → datos aislados (SQL directo, no solo UI).
 - **Mini-gate:** integración Postgres verde; RLS verificado.
 
-### 0.3 — event_stream + eventos de producto (c)
+### 0.3 — event_stream + eventos de producto (c) — ✅ COMPLETADO 2026-08-27
+> **Estado:** ✅ `0004_append_only` en sqlite+postgres (UPDATE/DELETE/TRUNCATE rechazados por trigger) · taxonomía de rungs en `repo::Rung` (sin CHECK SQL: conviven rungs y eventos de producto dot-namespace) · `emit_event()` tipado + auto-emisión al crear datos (session.created / message.streamed con tokens-costo / skill.created con ancla de sesión) · tests: append-only sqlite+PG, seed project→session→message→rung, producto events. Commit `39aa766`.
 - **Qué:** taxonomía de rungs (PROMPT/PHASE/DIFF/TEST_RESULT/DECISION/ESCALATION/DELIVERY); trigger append-only (UPDATE/DELETE rechazados); helper `emitEvent()`; eventos de producto ([PRODUCT-METRICS](./PRODUCT-METRICS.md)).
 - **Tests:** cargo test: append-only rechazado; seed project→session→message→rung; cada evento de producto emitido al crear datos.
 - **Mini-gate:** ledger inmutable verificado.

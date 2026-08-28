@@ -18,11 +18,12 @@
 
 ## Próximo paso (Etapa 0 — ya concretada y con plan de implementación)
 
-- [ ] **Implementar la Etapa 0 por slices** ([ETAPA-0-IMPLEMENTACION](./ETAPA-0-IMPLEMENTACION.md)): ~~0.1 migraciones+repos SQLite~~ ✅ → ~~0.2 Postgres+RLS~~ ✅ → 0.3 event_stream → 0.4 secretos BYOK → 0.5 sandbox → 0.6 OpenAPI → ~~0.7 i18n~~ ✅ → **M0 (Gate 0)**.
+- [ ] **Implementar la Etapa 0 por slices** ([ETAPA-0-IMPLEMENTACION](./ETAPA-0-IMPLEMENTACION.md)): ~~0.1 migraciones+repos SQLite~~ ✅ → ~~0.2 Postgres+RLS~~ ✅ → ~~0.3 event_stream~~ ✅ → 0.4 secretos BYOK → 0.5 sandbox → 0.6 OpenAPI → ~~0.7 i18n~~ ✅ → **M0 (Gate 0)**.
   - ✅ **Slice 0.7 (i18n) COMPLETADO 2026-08-27** — I.1-I.5 completos (12 locales + RTL árabe + Intl), suite humana verde. Commit `f87b26c`. Ver [plan.md](../plan.md).
   - ✅ **Slice 0.1 (SQLite) COMPLETADO 2026-08-27** — migraciones + repos + server rewired ([ADR-007](./ADRs/ADR-007-mapping-dominio-sqlite.md)). Tests 9/9. Commits `ad46ac8`, `aaf4486`.
   - ✅ **Slice 0.2 (Postgres + RLS) COMPLETADO 2026-08-27** — migraciones por dialecto (`migrations/{sqlite,postgres}/`) · `0003_rls.sql`: RLS **fail-closed** en 13 tablas (ENABLE + FORCE + políticas `project_id = app_tenant()`; mensajes/event_stream/skill_versions/document_links vía EXISTS) · `repo::connect_postgres` con migrador runtime · tests `rls_postgres.rs` contra Postgres real (skip sin `CANVAS_TEST_PG_URL`): aislamiento 2 tenants ✅ · sin tenant → 0 filas ✅ · cross-tenant UPDATE/DELETE → 0 filas ✅ · WITH CHECK impide crear filas ajenas ✅ · up/down/up PG ✅ · 14 políticas verificadas ✅.
-- **SIGUIENTE EN ORDEN: slice 0.3** — event_stream + taxonomía de rungs + trigger append-only + `emitEvent()` + eventos de producto.
+  - ✅ **Slice 0.3 (event_stream) COMPLETADO 2026-08-27** — `0004_append_only` (UPDATE/DELETE/TRUNCATE rechazados en ambos dialectos) · taxonomía de rungs como tipos Rust (`Rung`: PROMPT/PHASE/DIFF/TEST_RESULT/DECISION/ESCALATION/DELIVERY) · constantes `product_events` (PRODUCT-METRICS §2) · `emit_event()` tipado · **auto-emisión al crear datos**: session→`session.created`, message→`message.streamed` (tokens/costo), skill→`skill.created` (ancla de sesión) · tests: append-only sqlite+PG ✅ · seed project→session→message→rung ✅ · commit `39aa766`.
+- **SIGUIENTE EN ORDEN: slice 0.4** — Secretos BYOK + vault (keyring local + envelope AES-GCM nube, providers.key_ref, validación roundtrip, scanner de secretos).
 - **SIGUIENTE EN ORDEN: slice 0.2** — Postgres + RLS fail-closed (mismas migraciones a Postgres, seed, 2 tenants aislados).
 - El server aún vive en `HashMap` en memoria; conectar sqlx/sqlite + Postgres ([SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md)) ← **SIGUIENTE EN ORDEN (slice 0.1)**
 - Contrato `event_stream` (ledger append-only) + eventos de producto ([PRODUCT-METRICS](./PRODUCT-METRICS.md))
