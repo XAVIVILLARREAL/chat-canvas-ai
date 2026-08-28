@@ -123,7 +123,7 @@ pub struct Skill {
     pub deleted_at: Option<i64>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow)]
+#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow, schemars::JsonSchema, specta::Type)]
 pub struct Provider {
     pub id: String,
     pub project_id: String,
@@ -150,7 +150,7 @@ pub struct Execution {
     pub result: Option<String>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow)]
+#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow, schemars::JsonSchema, specta::Type)]
 pub struct StreamEvent {
     pub id: i64,
     pub session_id: String,

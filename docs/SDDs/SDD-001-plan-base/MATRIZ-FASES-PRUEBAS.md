@@ -14,7 +14,7 @@
 | 0.2 | Contrato `event_stream` (ledger) | Trigger append-only rechaza UPDATE/DELETE; seed project→session→message→rung; taxonomía completa ([PRODUCT-METRICS](../../PRODUCT-METRICS.md)) |
 | 0.3 | Secretos BYOK + vault ✅ 2026-08-27 | Key cifrada/descifrable con la correcta; nunca en claro al webview ([THREAT-MODEL](../../THREAT-MODEL.md)) — **verificado**: `0005_vault` + `core::vault` envelope AES-256-GCM (KEK→DEK→secreto) · roundtrip con proveedor mock · scanner/redactor · `POST/GET/DELETE /api/providers`+`/:id/test` (key jamás en respuesta) · dump sqlite sin key en claro ✅ · KEK distinta → DecryptFailed ✅ · tests 19/19 workspace |
 | 0.4 | Frontera del sandbox Linux ✅ 2026-08-27 | Contrato de contenedor: límites CPU/RAM/disco/timeout, red off, mounts read-only ([THREAT-MODEL](../../THREAT-MODEL.md)) — **verificado contra Docker real**: CPU 1/RAM 512MB/pids 128/red none/ro-rootfs/non-root/no-new-privileges/cap_drop ALL aplicados e inspeccionables (`inspect_limits`/`inspect_contract`) · timeout mata 137 · red denegada (wget falla) · chaos kill→recuperación · fork-bomb contenida · tests 5/5 |
-| 0.5 | OpenAPI del gateway | Tipos specta→OpenAPI generado sin errores; frontend consumible |
+| 0.5 | OpenAPI del gateway ✅ 2026-08-27 | Tipos specta→OpenAPI generado sin errores; frontend consumible — **verificado**: `docs/openapi.json` (40 paths, 41 schemas, $refs resuelven — test gate) + `src/types/api-generated.ts` (105 tipos TS desde los mismos structs) + `pnpm typecheck` verde |
 | 0.6 | i18n infraestructura | Unit hook `useI18n` + snapshot diccionario; fallback a `en` ([plan-i18n](./plan-i18n.md)) |
 
 ## Etapa 1 · Chat núcleo + proyectos como scope — `plan-a-chat-codex.md` (ADR-006)

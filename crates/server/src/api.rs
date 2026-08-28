@@ -70,14 +70,14 @@ fn db_err(e: sqlx::Error) -> (StatusCode, String) {
 // REQUEST/RESPONSE TYPES
 // ============================================================================
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct CreateCanvasRequest {
     pub name: String,
     pub description: String,
     pub created_by: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct UpdateCanvasRequest {
     pub name: Option<String>,
     pub description: Option<String>,
@@ -87,7 +87,7 @@ pub struct UpdateCanvasRequest {
     pub settings: Option<CanvasSettings>,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct CreateSkillRequest {
     pub name: String,
     pub description: String,
@@ -95,7 +95,7 @@ pub struct CreateSkillRequest {
     pub created_by: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct CreateAgentRequest {
     pub name: String,
     pub description: String,
@@ -103,26 +103,26 @@ pub struct CreateAgentRequest {
     pub created_by: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct CreateMCPServerRequest {
     pub name: String,
     pub description: String,
     pub transport: MCPTransport,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct ExecuteCanvasRequest {
     pub canvas_id: String,
     pub trigger: ExecutionTrigger,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct TestNodeRequest {
     pub node: CanvasNode,
     pub inputs: HashMap<String, serde_json::Value>,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct A2AMessageRequest {
     pub target_agent_url: String,
     pub message: A2AMessage,
@@ -203,11 +203,24 @@ async fn healthz() -> &'static str {
     "ok"
 }
 
-async fn version() -> Json<serde_json::Value> {
-    Json(serde_json::json!({
-        "app": env!("CARGO_PKG_NAME"),
-        "version": env!("CARGO_PKG_VERSION"),
-    }))
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct VersionInfo {
+    pub app: String,
+    pub version: String,
+}
+
+async fn version() -> Json<VersionInfo> {
+    Json(VersionInfo {
+        app: env!("CARGO_PKG_NAME").into(),
+        version: env!("CARGO_PKG_VERSION").into(),
+    })
+}
+
+/// Body de POST /api/skills/:id/test (mapa de inputs libre).
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct TestNodeInputs {
+    #[serde(flatten)]
+    pub inputs: HashMap<String, serde_json::Value>,
 }
 
 // ============================================================================
@@ -413,7 +426,7 @@ async fn validate_canvas(
     }))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct ValidationResult {
     pub valid: bool,
     pub errors: Vec<String>,
@@ -466,7 +479,7 @@ fn has_cycle(nodes: &[CanvasNode], edges: &[CanvasEdge]) -> bool {
 // HANDLERS - PROVIDERS BYOK (secretos en vault, THREAT-MODEL §3)
 // ============================================================================
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct CreateProviderRequest {
     pub provider_type: String,   // openai|anthropic|openrouter|deepseek|ollama|generic
     pub name: String,
@@ -475,7 +488,7 @@ pub struct CreateProviderRequest {
     pub validate: Option<bool>,  // default true: roundtrip mínimo antes de guardar
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct ProviderTestResponse {
     pub connected: bool,
     pub error: Option<String>,
@@ -696,7 +709,7 @@ async fn improve_skill(
     Ok(Json(improved_skill))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct SkillImprovementRequest {
     pub description: String,
     pub trigger: ImprovementTrigger,
@@ -813,12 +826,12 @@ async fn remove_skill_from_agent(
     Ok(Json(agent))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct AssignSkillRequest {
     pub skill_id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct RemoveSkillQuery {
     pub skill_id: String,
 }
@@ -855,12 +868,12 @@ async fn remove_mcp_from_agent(
     Ok(Json(agent))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct AssignMCPRequest {
     pub mcp_server_id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct RemoveMCPQuery {
     pub mcp_server_id: String,
 }
@@ -881,13 +894,13 @@ async fn chat_with_agent(
     }))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct ChatRequest {
     pub message: String,
     pub context: Option<HashMap<String, serde_json::Value>>,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct ChatResponse {
     pub message: String,
     pub used_skills: Vec<String>,
@@ -1036,7 +1049,7 @@ async fn call_mcp_tool(
     Ok(Json(serde_json::json!({"result": "success", "data": {}})))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct CallMCPToolRequest {
     pub tool_name: String,
     pub arguments: serde_json::Value,
@@ -1077,7 +1090,7 @@ async fn get_agent_card(
     }))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct GetAgentCardQuery {
     pub agent_id: String,
 }
@@ -1252,7 +1265,7 @@ async fn ai_generate_node(
     Ok(Json(node))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct AIGenerateNodeRequest {
     pub prompt: String,
     pub node_type: NodeType,
@@ -1274,7 +1287,7 @@ async fn ai_generate_canvas(
     Ok(Json(canvas))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct AIGenerateCanvasRequest {
     pub name: String,
     pub description: String,
@@ -1295,7 +1308,7 @@ async fn ai_generate_skill(
     Ok(Json(skill))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct AIGenerateSkillRequest {
     pub name: String,
     pub description: String,
@@ -1315,14 +1328,14 @@ async fn ai_optimize_canvas(
         .ok_or_else(|| not_found("Canvas"))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct AIOptimizeCanvasRequest {
     pub canvas_id: String,
     pub optimization_goal: OptimizationGoal,
     pub generations: u32,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 #[serde(rename_all = "snake_case")]
 pub enum OptimizationGoal {
     MinimizeCost,
@@ -1347,7 +1360,7 @@ async fn ai_test_generation(
     }]))
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
 pub struct AITestGenerationRequest {
     pub node_id: String,
     pub node_config: NodeConfig,
@@ -1377,4 +1390,208 @@ pub async fn serve() -> anyhow::Result<()> {
     
     axum::serve(listener, app).await?;
     Ok(())
+}
+
+// ============================================================================
+// OPENAPI (slice 0.6) — specta/schemars → docs/openapi.json
+// Fuente de tipos ÚNICA: los structs del server/core con JsonSchema.
+// El frontend consume tipos generados con openapi-typescript (package.json).
+// ============================================================================
+
+/// Una operación del inventario REST (API.md).
+struct Op {
+    method: &'static str,
+    path: &'static str,
+    summary: &'static str,
+    tag: &'static str,
+    request: Option<&'static str>,
+    response: Option<&'static str>,
+}
+
+const OPS: &[Op] = &[
+    Op { method: "get", path: "/healthz", summary: "Health check", tag: "meta", request: None, response: None },
+    Op { method: "get", path: "/api/version", summary: "Versión del gateway", tag: "meta", request: None, response: Some("VersionInfo") },
+
+    Op { method: "get", path: "/api/canvases", summary: "Lista canvases", tag: "canvases", request: None, response: Some("Canvas") },
+    Op { method: "post", path: "/api/canvases", summary: "Crea canvas", tag: "canvases", request: Some("CreateCanvasRequest"), response: Some("Canvas") },
+    Op { method: "get", path: "/api/canvases/{id}", summary: "Obtiene canvas", tag: "canvases", request: None, response: Some("Canvas") },
+    Op { method: "put", path: "/api/canvases/{id}", summary: "Actualiza canvas", tag: "canvases", request: Some("UpdateCanvasRequest"), response: Some("Canvas") },
+    Op { method: "delete", path: "/api/canvases/{id}", summary: "Borra canvas", tag: "canvases", request: None, response: None },
+    Op { method: "post", path: "/api/canvases/{id}/execute", summary: "Ejecuta canvas", tag: "canvases", request: Some("ExecuteCanvasRequest"), response: Some("ExecutionContext") },
+    Op { method: "post", path: "/api/canvases/{id}/test", summary: "Testea canvas", tag: "canvases", request: Some("TestNodeRequest"), response: Some("TestResult") },
+    Op { method: "post", path: "/api/canvases/{id}/validate", summary: "Valida canvas", tag: "canvases", request: None, response: Some("ValidationResult") },
+
+    Op { method: "get", path: "/api/providers", summary: "Lista providers BYOK", tag: "providers", request: None, response: Some("Provider") },
+    Op { method: "post", path: "/api/providers", summary: "Crea provider (valida + cifra la key)", tag: "providers", request: Some("CreateProviderRequest"), response: Some("Provider") },
+    Op { method: "get", path: "/api/providers/{id}", summary: "Obtiene provider", tag: "providers", request: None, response: Some("Provider") },
+    Op { method: "delete", path: "/api/providers/{id}", summary: "Borra provider + secreto", tag: "providers", request: None, response: None },
+    Op { method: "post", path: "/api/providers/{id}/test", summary: "Roundtrip de salud", tag: "providers", request: None, response: Some("ProviderTestResponse") },
+
+    Op { method: "get", path: "/api/skills", summary: "Lista skills", tag: "skills", request: None, response: Some("Skill") },
+    Op { method: "post", path: "/api/skills", summary: "Crea skill", tag: "skills", request: Some("CreateSkillRequest"), response: Some("Skill") },
+    Op { method: "get", path: "/api/skills/{id}", summary: "Obtiene skill", tag: "skills", request: None, response: Some("Skill") },
+    Op { method: "put", path: "/api/skills/{id}", summary: "Actualiza skill (nueva versión)", tag: "skills", request: Some("Skill"), response: Some("Skill") },
+    Op { method: "delete", path: "/api/skills/{id}", summary: "Borra skill", tag: "skills", request: None, response: None },
+    Op { method: "post", path: "/api/skills/{id}/test", summary: "Testea skill", tag: "skills", request: Some("TestNodeInputs"), response: Some("TestResult") },
+    Op { method: "post", path: "/api/skills/{id}/improve", summary: "Mejora skill (nueva variante)", tag: "skills", request: Some("SkillImprovementRequest"), response: Some("Skill") },
+    Op { method: "get", path: "/api/skills/{id}/versions", summary: "Historial de versiones", tag: "skills", request: None, response: Some("Skill") },
+
+    Op { method: "get", path: "/api/agents", summary: "Lista agentes", tag: "agents", request: None, response: Some("Agent") },
+    Op { method: "post", path: "/api/agents", summary: "Crea agente", tag: "agents", request: Some("CreateAgentRequest"), response: Some("Agent") },
+    Op { method: "get", path: "/api/agents/{id}", summary: "Obtiene agente", tag: "agents", request: None, response: Some("Agent") },
+    Op { method: "put", path: "/api/agents/{id}", summary: "Actualiza agente", tag: "agents", request: Some("Agent"), response: Some("Agent") },
+    Op { method: "delete", path: "/api/agents/{id}", summary: "Borra agente", tag: "agents", request: None, response: None },
+    Op { method: "post", path: "/api/agents/{id}/skills", summary: "Asigna skill", tag: "agents", request: Some("AssignSkillRequest"), response: Some("Agent") },
+    Op { method: "delete", path: "/api/agents/{id}/skills", summary: "Quita skill", tag: "agents", request: None, response: Some("Agent") },
+    Op { method: "post", path: "/api/agents/{id}/mcp", summary: "Asigna MCP server", tag: "agents", request: Some("AssignMCPRequest"), response: Some("Agent") },
+    Op { method: "delete", path: "/api/agents/{id}/mcp", summary: "Quita MCP server", tag: "agents", request: None, response: Some("Agent") },
+    Op { method: "post", path: "/api/agents/{id}/chat", summary: "Chat con agente", tag: "agents", request: Some("ChatRequest"), response: Some("ChatResponse") },
+    Op { method: "get", path: "/api/agents/{id}/memory", summary: "Memoria del agente", tag: "agents", request: None, response: Some("AgentMemory") },
+    Op { method: "post", path: "/api/agents/{id}/memory", summary: "Actualiza memoria", tag: "agents", request: Some("AgentMemory"), response: Some("Agent") },
+
+    Op { method: "get", path: "/api/mcp/servers", summary: "Lista MCP servers", tag: "mcp", request: None, response: Some("MCPServer") },
+    Op { method: "post", path: "/api/mcp/servers", summary: "Registra MCP server", tag: "mcp", request: Some("CreateMCPServerRequest"), response: Some("MCPServer") },
+    Op { method: "get", path: "/api/mcp/servers/{id}", summary: "Obtiene MCP server", tag: "mcp", request: None, response: Some("MCPServer") },
+    Op { method: "put", path: "/api/mcp/servers/{id}", summary: "Actualiza MCP server", tag: "mcp", request: Some("MCPServer"), response: Some("MCPServer") },
+    Op { method: "delete", path: "/api/mcp/servers/{id}", summary: "Borra MCP server", tag: "mcp", request: None, response: None },
+    Op { method: "post", path: "/api/mcp/servers/{id}/connect", summary: "Conecta", tag: "mcp", request: None, response: Some("MCPServer") },
+    Op { method: "post", path: "/api/mcp/servers/{id}/disconnect", summary: "Desconecta", tag: "mcp", request: None, response: Some("MCPServer") },
+    Op { method: "get", path: "/api/mcp/servers/{id}/tools", summary: "Tools del server", tag: "mcp", request: None, response: Some("MCPTool") },
+    Op { method: "post", path: "/api/mcp/servers/{id}/call", summary: "Llama una tool", tag: "mcp", request: Some("CallMCPToolRequest"), response: None },
+
+    Op { method: "get", path: "/api/a2a/agent-card", summary: "Agent card (A2A)", tag: "a2a", request: None, response: Some("A2AAgentCard") },
+    Op { method: "post", path: "/api/a2a/message/send", summary: "Envía mensaje A2A", tag: "a2a", request: Some("A2AMessageRequest"), response: Some("A2ATask") },
+    Op { method: "get", path: "/api/a2a/tasks/{id}", summary: "Estado de tarea A2A", tag: "a2a", request: None, response: Some("A2ATask") },
+    Op { method: "post", path: "/api/a2a/tasks/{id}/cancel", summary: "Cancela tarea A2A", tag: "a2a", request: None, response: Some("A2ATask") },
+
+    Op { method: "get", path: "/api/executions", summary: "Lista ejecuciones", tag: "executions", request: None, response: Some("ExecutionContext") },
+    Op { method: "get", path: "/api/executions/{id}", summary: "Obtiene ejecución", tag: "executions", request: None, response: Some("ExecutionContext") },
+    Op { method: "post", path: "/api/executions/{id}/cancel", summary: "Cancela ejecución", tag: "executions", request: None, response: Some("ExecutionContext") },
+    Op { method: "post", path: "/api/executions/{id}/retry", summary: "Reintenta ejecución", tag: "executions", request: None, response: Some("ExecutionContext") },
+
+    Op { method: "post", path: "/api/ai/generate-node", summary: "IA genera nodo", tag: "ai", request: Some("AIGenerateNodeRequest"), response: Some("CanvasNode") },
+    Op { method: "post", path: "/api/ai/generate-canvas", summary: "IA genera canvas", tag: "ai", request: Some("AIGenerateCanvasRequest"), response: Some("Canvas") },
+    Op { method: "post", path: "/api/ai/generate-skill", summary: "IA genera skill", tag: "ai", request: Some("AIGenerateSkillRequest"), response: Some("Skill") },
+    Op { method: "post", path: "/api/ai/optimize-canvas", summary: "IA optimiza canvas", tag: "ai", request: Some("AIOptimizeCanvasRequest"), response: Some("Canvas") },
+    Op { method: "post", path: "/api/ai/test-generation", summary: "IA genera test cases", tag: "ai", request: Some("AITestGenerationRequest"), response: Some("TestCase") },
+];
+
+/// Construye el documento OpenAPI 3.0 (JSON) desde los tipos con JsonSchema.
+pub fn build_openapi() -> serde_json::Value {
+    use schemars::schema_for;
+
+    // (nombre, RootSchema) — fuente ÚNICA de verdad: los structs con derive.
+    let schemas: Vec<(&str, schemars::schema::RootSchema)> = vec![
+        ("Canvas", schema_for!(Canvas)),
+        ("CanvasNode", schema_for!(CanvasNode)),
+        ("ViewPort", schema_for!(Viewport)),
+        ("TestResult", schema_for!(TestResult)),
+        ("ValidationResult", schema_for!(ValidationResult)),
+        ("Skill", schema_for!(Skill)),
+        ("Agent", schema_for!(Agent)),
+        ("AgentMemory", schema_for!(AgentMemory)),
+        ("MCPServer", schema_for!(MCPServer)),
+        ("MCPTool", schema_for!(MCPTool)),
+        ("ExecutionContext", schema_for!(ExecutionContext)),
+        ("Provider", schema_for!(repo::Provider)),
+        ("StreamEvent", schema_for!(repo::StreamEvent)),
+        ("A2AAgentCard", schema_for!(A2AAgentCard)),
+        ("A2ATask", schema_for!(A2ATask)),
+        ("VersionInfo", schema_for!(VersionInfo)),
+        ("CreateCanvasRequest", schema_for!(CreateCanvasRequest)),
+        ("UpdateCanvasRequest", schema_for!(UpdateCanvasRequest)),
+        ("ExecuteCanvasRequest", schema_for!(ExecuteCanvasRequest)),
+        ("TestNodeRequest", schema_for!(TestNodeRequest)),
+        ("TestNodeInputs", schema_for!(TestNodeInputs)),
+        ("TestCase", schema_for!(TestCase)),
+        ("CanvasEdge", schema_for!(CanvasEdge)),
+        ("NodeConfig", schema_for!(NodeConfig)),
+        ("CreateProviderRequest", schema_for!(CreateProviderRequest)),
+        ("ProviderTestResponse", schema_for!(ProviderTestResponse)),
+        ("CreateSkillRequest", schema_for!(CreateSkillRequest)),
+        ("SkillImprovementRequest", schema_for!(SkillImprovementRequest)),
+        ("CreateAgentRequest", schema_for!(CreateAgentRequest)),
+        ("AssignSkillRequest", schema_for!(AssignSkillRequest)),
+        ("AssignMCPRequest", schema_for!(AssignMCPRequest)),
+        ("ChatRequest", schema_for!(ChatRequest)),
+        ("ChatResponse", schema_for!(ChatResponse)),
+        ("CreateMCPServerRequest", schema_for!(CreateMCPServerRequest)),
+        ("CallMCPToolRequest", schema_for!(CallMCPToolRequest)),
+        ("A2AMessageRequest", schema_for!(A2AMessageRequest)),
+        ("AIGenerateNodeRequest", schema_for!(AIGenerateNodeRequest)),
+        ("AIGenerateCanvasRequest", schema_for!(AIGenerateCanvasRequest)),
+        ("AIGenerateSkillRequest", schema_for!(AIGenerateSkillRequest)),
+        ("AIOptimizeCanvasRequest", schema_for!(AIOptimizeCanvasRequest)),
+        ("AITestGenerationRequest", schema_for!(AITestGenerationRequest)),
+    ];
+
+    let mut components_schemas = serde_json::Map::new();
+    for (name, schema) in &schemas {
+        let v = serde_json::to_value(schema).expect("schema serializable");
+        components_schemas.insert(name.to_string(), v);
+    }
+
+    // agrupar paths
+    let mut paths: serde_json::Map<String, serde_json::Value> = serde_json::Map::new();
+    for op in OPS {
+        let path_entry = paths.entry(op.path.to_string()).or_insert_with(|| serde_json::json!({}));
+        let mut operation = serde_json::json!({
+            "summary": op.summary,
+            "tags": [op.tag],
+            "responses": {
+                "200": { "description": "OK" },
+                "404": { "description": "Not found" },
+                "500": { "description": "Internal error" },
+            }
+        });
+        if let Some(req) = op.request {
+            operation["requestBody"] = serde_json::json!({
+                "required": true,
+                "content": { "application/json": { "schema": { "$ref": format!("#/components/schemas/{req}") } } }
+            });
+        }
+        if let Some(res) = op.response {
+            operation["responses"]["200"]["content"] = serde_json::json!({
+                "application/json": { "schema": { "$ref": format!("#/components/schemas/{res}") } }
+            });
+        }
+        path_entry[op.method] = operation;
+    }
+
+    serde_json::json!({
+        "openapi": "3.0.3",
+        "info": {
+            "title": "Canvas AI Gateway",
+            "version": env!("CARGO_PKG_VERSION"),
+            "description": "API del gateway Canvas AI — generada desde los tipos Rust (fuente única). Slice 0.6."
+        },
+        "paths": paths,
+        "components": { "schemas": components_schemas }
+    })
+}
+
+#[cfg(test)]
+mod openapi_tests {
+    /// Gate slice 0.6: spec generado sin errores, todos los $ref resuelven.
+    #[test]
+    fn openapi_generado_sin_errores() {
+        let spec = super::build_openapi();
+        assert_eq!(spec["openapi"], "3.0.3");
+        let paths = spec["paths"].as_object().expect("paths");
+        assert!(paths.len() >= 40, "esperábamos ≥40 paths, hay {}", paths.len());
+        let schemas = spec["components"]["schemas"].as_object().expect("schemas");
+        assert!(schemas.contains_key("Canvas"));
+        assert!(schemas.contains_key("ExecutionContext"));
+        assert!(schemas.contains_key("Provider"), "BYOK en el contrato");
+        // cada $ref debe resolver en components.schemas
+        let raw = serde_json::to_string(&spec).unwrap();
+        for part in raw.split("\"$ref\":\"#/components/schemas/").skip(1) {
+            let name = part.split('"').next().unwrap();
+            assert!(schemas.contains_key(name), "ref roto: {name}");
+        }
+        // las ops referencian tags consistentes
+        for (p, ops) in paths {
+            assert!(!ops.as_object().unwrap().is_empty(), "path vacío: {p}");
+        }
+    }
 }

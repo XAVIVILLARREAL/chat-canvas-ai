@@ -24,6 +24,9 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 anyhow.workspace = true
 schemars.workspace = true
+specta.workspace = true
+specta-typescript = "0.0.12"
+specta-serde = "0.0.12"
 rmcp.workspace = true
 sqlx.workspace = true
 

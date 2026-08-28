@@ -1,0 +1,7139 @@
+{
+  "components": {
+    "schemas": {
+      "A2AAgentCard": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "A2AAuth": {
+            "properties": {
+              "credentials": true,
+              "schemes": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "credentials",
+              "schemes"
+            ],
+            "type": "object"
+          },
+          "A2ACapabilities": {
+            "properties": {
+              "push_notifications": {
+                "type": "boolean"
+              },
+              "state_transition_history": {
+                "type": "boolean"
+              },
+              "streaming": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "push_notifications",
+              "state_transition_history",
+              "streaming"
+            ],
+            "type": "object"
+          },
+          "A2ASkill": {
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "examples": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "id": {
+                "type": "string"
+              },
+              "input_modes": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "output_modes": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "description",
+              "examples",
+              "id",
+              "input_modes",
+              "name",
+              "output_modes",
+              "tags"
+            ],
+            "type": "object"
+          }
+        },
+        "description": "============================================================================ A2A PROTOCOL — Agent-to-Agent Communication ============================================================================",
+        "properties": {
+          "auth": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/A2AAuth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "capabilities": {
+            "$ref": "#/definitions/A2ACapabilities"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/definitions/A2ASkill"
+            },
+            "type": "array"
+          },
+          "url": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "capabilities",
+          "description",
+          "name",
+          "skills",
+          "url",
+          "version"
+        ],
+        "title": "A2AAgentCard",
+        "type": "object"
+      },
+      "A2AMessageRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "A2AMessage": {
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "metadata": true,
+              "parts": {
+                "items": {
+                  "$ref": "#/definitions/A2APart"
+                },
+                "type": "array"
+              },
+              "role": {
+                "$ref": "#/definitions/A2ARole"
+              }
+            },
+            "required": [
+              "id",
+              "parts",
+              "role"
+            ],
+            "type": "object"
+          },
+          "A2APart": {
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "metadata": true,
+              "part_type": {
+                "$ref": "#/definitions/A2APartType"
+              }
+            },
+            "required": [
+              "content",
+              "part_type"
+            ],
+            "type": "object"
+          },
+          "A2APartType": {
+            "enum": [
+              "text",
+              "file",
+              "data",
+              "form"
+            ],
+            "type": "string"
+          },
+          "A2ARole": {
+            "enum": [
+              "user",
+              "agent",
+              "system"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "message": {
+            "$ref": "#/definitions/A2AMessage"
+          },
+          "target_agent_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "target_agent_url"
+        ],
+        "title": "A2AMessageRequest",
+        "type": "object"
+      },
+      "A2ATask": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "A2AArtifact": {
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "metadata": true,
+              "name": {
+                "type": "string"
+              },
+              "parts": {
+                "items": {
+                  "$ref": "#/definitions/A2APart"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "description",
+              "id",
+              "name",
+              "parts"
+            ],
+            "type": "object"
+          },
+          "A2AMessage": {
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "metadata": true,
+              "parts": {
+                "items": {
+                  "$ref": "#/definitions/A2APart"
+                },
+                "type": "array"
+              },
+              "role": {
+                "$ref": "#/definitions/A2ARole"
+              }
+            },
+            "required": [
+              "id",
+              "parts",
+              "role"
+            ],
+            "type": "object"
+          },
+          "A2APart": {
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "metadata": true,
+              "part_type": {
+                "$ref": "#/definitions/A2APartType"
+              }
+            },
+            "required": [
+              "content",
+              "part_type"
+            ],
+            "type": "object"
+          },
+          "A2APartType": {
+            "enum": [
+              "text",
+              "file",
+              "data",
+              "form"
+            ],
+            "type": "string"
+          },
+          "A2ARole": {
+            "enum": [
+              "user",
+              "agent",
+              "system"
+            ],
+            "type": "string"
+          },
+          "A2ATaskStatus": {
+            "enum": [
+              "submitted",
+              "working",
+              "input_required",
+              "completed",
+              "failed",
+              "cancelled",
+              "rejected",
+              "auth_failed"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/definitions/A2AArtifact"
+            },
+            "type": "array"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/definitions/A2AMessage"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "message": {
+            "$ref": "#/definitions/A2AMessage"
+          },
+          "status": {
+            "$ref": "#/definitions/A2ATaskStatus"
+          }
+        },
+        "required": [
+          "artifacts",
+          "history",
+          "id",
+          "message",
+          "status"
+        ],
+        "title": "A2ATask",
+        "type": "object"
+      },
+      "AIGenerateCanvasRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "created_by": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_by",
+          "description",
+          "name",
+          "prompt"
+        ],
+        "title": "AIGenerateCanvasRequest",
+        "type": "object"
+      },
+      "AIGenerateNodeRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "NodeType": {
+            "enum": [
+              "code",
+              "l_l_m_call",
+              "m_c_p_call",
+              "a2_a_message",
+              "skill_invoke",
+              "sub_canvas",
+              "human_input",
+              "conditional",
+              "loop",
+              "parallel",
+              "trigger",
+              "output",
+              "transform",
+              "aggregate"
+            ],
+            "type": "string"
+          },
+          "Position": {
+            "properties": {
+              "x": {
+                "format": "double",
+                "type": "number"
+              },
+              "y": {
+                "format": "double",
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "node_type": {
+            "$ref": "#/definitions/NodeType"
+          },
+          "position": {
+            "$ref": "#/definitions/Position"
+          },
+          "prompt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "description",
+          "label",
+          "node_type",
+          "position",
+          "prompt"
+        ],
+        "title": "AIGenerateNodeRequest",
+        "type": "object"
+      },
+      "AIGenerateSkillRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "SkillCategory": {
+            "enum": [
+              "automation",
+              "data_processing",
+              "communication",
+              "analysis",
+              "generation",
+              "integration",
+              "custom"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "category": {
+            "$ref": "#/definitions/SkillCategory"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "created_by",
+          "description",
+          "name",
+          "prompt"
+        ],
+        "title": "AIGenerateSkillRequest",
+        "type": "object"
+      },
+      "AIOptimizeCanvasRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OptimizationGoal": {
+            "enum": [
+              "minimize_cost",
+              "minimize_latency",
+              "maximize_success_rate",
+              "maximize_accuracy",
+              "balanced"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "canvas_id": {
+            "type": "string"
+          },
+          "generations": {
+            "format": "uint32",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "optimization_goal": {
+            "$ref": "#/definitions/OptimizationGoal"
+          }
+        },
+        "required": [
+          "canvas_id",
+          "generations",
+          "optimization_goal"
+        ],
+        "title": "AIOptimizeCanvasRequest",
+        "type": "object"
+      },
+      "AITestGenerationRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "CodeLanguage": {
+            "enum": [
+              "typescript",
+              "python",
+              "rust",
+              "javascript"
+            ],
+            "type": "string"
+          },
+          "LoopConfig": {
+            "properties": {
+              "collection_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "loop_type": {
+                "$ref": "#/definitions/LoopType"
+              },
+              "max_iterations": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "loop_type",
+              "max_iterations"
+            ],
+            "type": "object"
+          },
+          "LoopType": {
+            "enum": [
+              "for_each",
+              "while",
+              "times"
+            ],
+            "type": "string"
+          },
+          "NodeConfig": {
+            "properties": {
+              "code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "continue_on_error": {
+                "type": "boolean"
+              },
+              "imports": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "language": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/CodeLanguage"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "loop_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/LoopConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max_tokens": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "mcp_args_schema": true,
+              "mcp_server_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mcp_tool_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "model": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prompt_template": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "response_schema": true,
+              "retries": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "skill_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "skill_version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sub_canvas_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "temperature": {
+                "format": "float",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "timeout_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "trigger_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/TriggerConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "continue_on_error",
+              "imports"
+            ],
+            "type": "object"
+          },
+          "TriggerConfig": {
+            "properties": {
+              "cron_expression": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "event_filters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "trigger_type": {
+                "$ref": "#/definitions/TriggerType"
+              },
+              "webhook_path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "event_filters",
+              "trigger_type"
+            ],
+            "type": "object"
+          },
+          "TriggerType": {
+            "enum": [
+              "manual",
+              "cron",
+              "webhook",
+              "event",
+              "m_c_p_notification"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "node_config": {
+            "$ref": "#/definitions/NodeConfig"
+          },
+          "node_id": {
+            "type": "string"
+          },
+          "num_cases": {
+            "format": "uint32",
+            "minimum": 0.0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "node_config",
+          "node_id",
+          "num_cases"
+        ],
+        "title": "AITestGenerationRequest",
+        "type": "object"
+      },
+      "Agent": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "AgentConfig": {
+            "properties": {
+              "auto_improve_skills": {
+                "type": "boolean"
+              },
+              "budget_usd_per_day": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "learning_enabled": {
+                "type": "boolean"
+              },
+              "max_concurrent_tasks": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "max_tokens": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "model": {
+                "type": "string"
+              },
+              "system_prompt": {
+                "type": "string"
+              },
+              "temperature": {
+                "format": "float",
+                "type": "number"
+              }
+            },
+            "required": [
+              "auto_improve_skills",
+              "learning_enabled",
+              "max_concurrent_tasks",
+              "max_tokens",
+              "model",
+              "system_prompt",
+              "temperature"
+            ],
+            "type": "object"
+          },
+          "AgentMemory": {
+            "properties": {
+              "episodic": {
+                "items": {
+                  "$ref": "#/definitions/EpisodicMemory"
+                },
+                "type": "array"
+              },
+              "long_term": {
+                "items": {
+                  "$ref": "#/definitions/MemoryEntry"
+                },
+                "type": "array"
+              },
+              "short_term": {
+                "items": {
+                  "$ref": "#/definitions/MemoryEntry"
+                },
+                "type": "array"
+              },
+              "skill_knowledge": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/SkillKnowledge"
+                },
+                "type": "object"
+              }
+            },
+            "required": [
+              "episodic",
+              "long_term",
+              "short_term",
+              "skill_knowledge"
+            ],
+            "type": "object"
+          },
+          "AgentMetrics": {
+            "properties": {
+              "avg_task_duration_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "skills_executed": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "tasks_completed": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "tasks_failed": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "total_cost_usd": {
+                "format": "double",
+                "type": "number"
+              },
+              "uptime_percentage": {
+                "format": "float",
+                "type": "number"
+              }
+            },
+            "required": [
+              "avg_task_duration_ms",
+              "skills_executed",
+              "tasks_completed",
+              "tasks_failed",
+              "total_cost_usd",
+              "uptime_percentage"
+            ],
+            "type": "object"
+          },
+          "AgentRole": {
+            "oneOf": [
+              {
+                "enum": [
+                  "coordinator",
+                  "specialist",
+                  "reviewer",
+                  "planner",
+                  "executor"
+                ],
+                "type": "string"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "custom": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "custom"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "AgentStatus": {
+            "enum": [
+              "idle",
+              "working",
+              "blocked",
+              "error",
+              "offline",
+              "learning"
+            ],
+            "type": "string"
+          },
+          "EpisodicMemory": {
+            "properties": {
+              "canvas_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "id": {
+                "type": "string"
+              },
+              "lessons_learned": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "outcome": {
+                "$ref": "#/definitions/TaskOutcome"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "task_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_at",
+              "id",
+              "lessons_learned",
+              "outcome",
+              "summary",
+              "task_id"
+            ],
+            "type": "object"
+          },
+          "MemoryEntry": {
+            "properties": {
+              "access_count": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "accessed_at": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "content": {
+                "type": "string"
+              },
+              "created_at": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "embedding": {
+                "items": {
+                  "format": "float",
+                  "type": "number"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "importance": {
+                "format": "float",
+                "type": "number"
+              }
+            },
+            "required": [
+              "access_count",
+              "accessed_at",
+              "content",
+              "created_at",
+              "id",
+              "importance"
+            ],
+            "type": "object"
+          },
+          "SkillKnowledge": {
+            "properties": {
+              "failure_patterns": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "last_used": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "optimal_params": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "proficiency": {
+                "format": "float",
+                "type": "number"
+              },
+              "skill_id": {
+                "type": "string"
+              },
+              "successful_patterns": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "failure_patterns",
+              "last_used",
+              "optimal_params",
+              "proficiency",
+              "skill_id",
+              "successful_patterns"
+            ],
+            "type": "object"
+          },
+          "TaskOutcome": {
+            "enum": [
+              "success",
+              "partial_success",
+              "failure",
+              "cancelled"
+            ],
+            "type": "string"
+          }
+        },
+        "description": "============================================================================ AGENTES — Agentes basados en Skills con identidad propia ============================================================================",
+        "properties": {
+          "avatar": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "config": {
+            "$ref": "#/definitions/AgentConfig"
+          },
+          "created_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "mcp_servers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "memory": {
+            "$ref": "#/definitions/AgentMemory"
+          },
+          "metrics": {
+            "$ref": "#/definitions/AgentMetrics"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/definitions/AgentRole"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "status": {
+            "$ref": "#/definitions/AgentStatus"
+          },
+          "updated_at": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "config",
+          "created_at",
+          "created_by",
+          "description",
+          "id",
+          "mcp_servers",
+          "memory",
+          "metrics",
+          "name",
+          "role",
+          "skills",
+          "status",
+          "updated_at"
+        ],
+        "title": "Agent",
+        "type": "object"
+      },
+      "AgentMemory": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "EpisodicMemory": {
+            "properties": {
+              "canvas_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "id": {
+                "type": "string"
+              },
+              "lessons_learned": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "outcome": {
+                "$ref": "#/definitions/TaskOutcome"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "task_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_at",
+              "id",
+              "lessons_learned",
+              "outcome",
+              "summary",
+              "task_id"
+            ],
+            "type": "object"
+          },
+          "MemoryEntry": {
+            "properties": {
+              "access_count": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "accessed_at": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "content": {
+                "type": "string"
+              },
+              "created_at": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "embedding": {
+                "items": {
+                  "format": "float",
+                  "type": "number"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "importance": {
+                "format": "float",
+                "type": "number"
+              }
+            },
+            "required": [
+              "access_count",
+              "accessed_at",
+              "content",
+              "created_at",
+              "id",
+              "importance"
+            ],
+            "type": "object"
+          },
+          "SkillKnowledge": {
+            "properties": {
+              "failure_patterns": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "last_used": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "optimal_params": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "proficiency": {
+                "format": "float",
+                "type": "number"
+              },
+              "skill_id": {
+                "type": "string"
+              },
+              "successful_patterns": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "failure_patterns",
+              "last_used",
+              "optimal_params",
+              "proficiency",
+              "skill_id",
+              "successful_patterns"
+            ],
+            "type": "object"
+          },
+          "TaskOutcome": {
+            "enum": [
+              "success",
+              "partial_success",
+              "failure",
+              "cancelled"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "episodic": {
+            "items": {
+              "$ref": "#/definitions/EpisodicMemory"
+            },
+            "type": "array"
+          },
+          "long_term": {
+            "items": {
+              "$ref": "#/definitions/MemoryEntry"
+            },
+            "type": "array"
+          },
+          "short_term": {
+            "items": {
+              "$ref": "#/definitions/MemoryEntry"
+            },
+            "type": "array"
+          },
+          "skill_knowledge": {
+            "additionalProperties": {
+              "$ref": "#/definitions/SkillKnowledge"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "episodic",
+          "long_term",
+          "short_term",
+          "skill_knowledge"
+        ],
+        "title": "AgentMemory",
+        "type": "object"
+      },
+      "AssignMCPRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "mcp_server_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "mcp_server_id"
+        ],
+        "title": "AssignMCPRequest",
+        "type": "object"
+      },
+      "AssignSkillRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "skill_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "skill_id"
+        ],
+        "title": "AssignSkillRequest",
+        "type": "object"
+      },
+      "CallMCPToolRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "arguments": true,
+          "tool_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arguments",
+          "tool_name"
+        ],
+        "title": "CallMCPToolRequest",
+        "type": "object"
+      },
+      "Canvas": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "CanvasEdge": {
+            "description": "============================================================================ EDGES — Conexiones entre nodos ============================================================================",
+            "properties": {
+              "condition": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "edge_type": {
+                "$ref": "#/definitions/EdgeType"
+              },
+              "id": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "source_port": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "target_port": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "edge_type",
+              "id",
+              "source",
+              "source_port",
+              "target",
+              "target_port"
+            ],
+            "type": "object"
+          },
+          "CanvasNode": {
+            "description": "============================================================================ NODOS — Unidades de ejecución (AI diseña, no conectores predefinidos) ============================================================================",
+            "properties": {
+              "config": {
+                "$ref": "#/definitions/NodeConfig"
+              },
+              "id": {
+                "type": "string"
+              },
+              "inputs": {
+                "items": {
+                  "$ref": "#/definitions/Port"
+                },
+                "type": "array"
+              },
+              "metadata": {
+                "$ref": "#/definitions/NodeMetadata"
+              },
+              "node_type": {
+                "$ref": "#/definitions/NodeType"
+              },
+              "outputs": {
+                "items": {
+                  "$ref": "#/definitions/Port"
+                },
+                "type": "array"
+              },
+              "position": {
+                "$ref": "#/definitions/Position"
+              }
+            },
+            "required": [
+              "config",
+              "id",
+              "inputs",
+              "metadata",
+              "node_type",
+              "outputs",
+              "position"
+            ],
+            "type": "object"
+          },
+          "CanvasSettings": {
+            "properties": {
+              "auto_save": {
+                "type": "boolean"
+              },
+              "execution_mode": {
+                "$ref": "#/definitions/ExecutionMode"
+              },
+              "parallel_execution": {
+                "type": "boolean"
+              },
+              "retry_policy": {
+                "$ref": "#/definitions/RetryPolicy"
+              },
+              "timeout_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "auto_save",
+              "execution_mode",
+              "parallel_execution",
+              "retry_policy",
+              "timeout_ms"
+            ],
+            "type": "object"
+          },
+          "CodeLanguage": {
+            "enum": [
+              "typescript",
+              "python",
+              "rust",
+              "javascript"
+            ],
+            "type": "string"
+          },
+          "DataType": {
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "object",
+              "array",
+              "any",
+              "agent",
+              "skill",
+              "m_c_p_tool",
+              "canvas",
+              "file",
+              "image",
+              "audio"
+            ],
+            "type": "string"
+          },
+          "EdgeType": {
+            "enum": [
+              "data",
+              "control",
+              "conditional",
+              "error"
+            ],
+            "type": "string"
+          },
+          "ExecutionMode": {
+            "enum": [
+              "sequential",
+              "parallel",
+              "d_a_g"
+            ],
+            "type": "string"
+          },
+          "LoopConfig": {
+            "properties": {
+              "collection_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "loop_type": {
+                "$ref": "#/definitions/LoopType"
+              },
+              "max_iterations": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "loop_type",
+              "max_iterations"
+            ],
+            "type": "object"
+          },
+          "LoopType": {
+            "enum": [
+              "for_each",
+              "while",
+              "times"
+            ],
+            "type": "string"
+          },
+          "NodeCategory": {
+            "enum": [
+              "trigger",
+              "action",
+              "logic",
+              "data",
+              "a_i",
+              "m_c_p",
+              "agent",
+              "human",
+              "output"
+            ],
+            "type": "string"
+          },
+          "NodeConfig": {
+            "properties": {
+              "code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "continue_on_error": {
+                "type": "boolean"
+              },
+              "imports": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "language": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/CodeLanguage"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "loop_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/LoopConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max_tokens": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "mcp_args_schema": true,
+              "mcp_server_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mcp_tool_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "model": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prompt_template": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "response_schema": true,
+              "retries": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "skill_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "skill_version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sub_canvas_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "temperature": {
+                "format": "float",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "timeout_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "trigger_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/TriggerConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "continue_on_error",
+              "imports"
+            ],
+            "type": "object"
+          },
+          "NodeMetadata": {
+            "properties": {
+              "ai_generation_prompt": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "category": {
+                "$ref": "#/definitions/NodeCategory"
+              },
+              "color": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "is_ai_generated": {
+                "type": "boolean"
+              },
+              "label": {
+                "type": "string"
+              },
+              "last_test_result": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/TestResult"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "test_cases": {
+                "items": {
+                  "$ref": "#/definitions/TestCase"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "category",
+              "color",
+              "description",
+              "icon",
+              "is_ai_generated",
+              "label",
+              "test_cases"
+            ],
+            "type": "object"
+          },
+          "NodeType": {
+            "enum": [
+              "code",
+              "l_l_m_call",
+              "m_c_p_call",
+              "a2_a_message",
+              "skill_invoke",
+              "sub_canvas",
+              "human_input",
+              "conditional",
+              "loop",
+              "parallel",
+              "trigger",
+              "output",
+              "transform",
+              "aggregate"
+            ],
+            "type": "string"
+          },
+          "Port": {
+            "properties": {
+              "data_type": {
+                "$ref": "#/definitions/DataType"
+              },
+              "default_value": true,
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "data_type",
+              "id",
+              "name",
+              "required"
+            ],
+            "type": "object"
+          },
+          "Position": {
+            "properties": {
+              "x": {
+                "format": "double",
+                "type": "number"
+              },
+              "y": {
+                "format": "double",
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y"
+            ],
+            "type": "object"
+          },
+          "RetryPolicy": {
+            "properties": {
+              "backoff_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "max_retries": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "retry_on": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "backoff_ms",
+              "max_retries",
+              "retry_on"
+            ],
+            "type": "object"
+          },
+          "TestCase": {
+            "properties": {
+              "created_by": {
+                "type": "string"
+              },
+              "expected_outputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "inputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_by",
+              "expected_outputs",
+              "id",
+              "inputs",
+              "name"
+            ],
+            "type": "object"
+          },
+          "TestResult": {
+            "properties": {
+              "duration_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "error": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "outputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "passed": {
+                "type": "boolean"
+              },
+              "tested_at": {
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "duration_ms",
+              "outputs",
+              "passed",
+              "tested_at"
+            ],
+            "type": "object"
+          },
+          "TriggerConfig": {
+            "properties": {
+              "cron_expression": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "event_filters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "trigger_type": {
+                "$ref": "#/definitions/TriggerType"
+              },
+              "webhook_path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "event_filters",
+              "trigger_type"
+            ],
+            "type": "object"
+          },
+          "TriggerType": {
+            "enum": [
+              "manual",
+              "cron",
+              "webhook",
+              "event",
+              "m_c_p_notification"
+            ],
+            "type": "string"
+          },
+          "Viewport": {
+            "properties": {
+              "x": {
+                "format": "double",
+                "type": "number"
+              },
+              "y": {
+                "format": "double",
+                "type": "number"
+              },
+              "zoom": {
+                "format": "double",
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y",
+              "zoom"
+            ],
+            "type": "object"
+          }
+        },
+        "description": "============================================================================ CANVAS — El grafo de automatización visual ============================================================================",
+        "properties": {
+          "created_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/definitions/CanvasEdge"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/definitions/CanvasNode"
+            },
+            "type": "array"
+          },
+          "settings": {
+            "$ref": "#/definitions/CanvasSettings"
+          },
+          "updated_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "version": {
+            "format": "uint32",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "viewport": {
+            "$ref": "#/definitions/Viewport"
+          }
+        },
+        "required": [
+          "created_at",
+          "created_by",
+          "description",
+          "edges",
+          "id",
+          "name",
+          "nodes",
+          "settings",
+          "updated_at",
+          "version",
+          "viewport"
+        ],
+        "title": "Canvas",
+        "type": "object"
+      },
+      "CanvasEdge": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "EdgeType": {
+            "enum": [
+              "data",
+              "control",
+              "conditional",
+              "error"
+            ],
+            "type": "string"
+          }
+        },
+        "description": "============================================================================ EDGES — Conexiones entre nodos ============================================================================",
+        "properties": {
+          "condition": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "edge_type": {
+            "$ref": "#/definitions/EdgeType"
+          },
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_port": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "target_port": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "edge_type",
+          "id",
+          "source",
+          "source_port",
+          "target",
+          "target_port"
+        ],
+        "title": "CanvasEdge",
+        "type": "object"
+      },
+      "CanvasNode": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "CodeLanguage": {
+            "enum": [
+              "typescript",
+              "python",
+              "rust",
+              "javascript"
+            ],
+            "type": "string"
+          },
+          "DataType": {
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "object",
+              "array",
+              "any",
+              "agent",
+              "skill",
+              "m_c_p_tool",
+              "canvas",
+              "file",
+              "image",
+              "audio"
+            ],
+            "type": "string"
+          },
+          "LoopConfig": {
+            "properties": {
+              "collection_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "loop_type": {
+                "$ref": "#/definitions/LoopType"
+              },
+              "max_iterations": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "loop_type",
+              "max_iterations"
+            ],
+            "type": "object"
+          },
+          "LoopType": {
+            "enum": [
+              "for_each",
+              "while",
+              "times"
+            ],
+            "type": "string"
+          },
+          "NodeCategory": {
+            "enum": [
+              "trigger",
+              "action",
+              "logic",
+              "data",
+              "a_i",
+              "m_c_p",
+              "agent",
+              "human",
+              "output"
+            ],
+            "type": "string"
+          },
+          "NodeConfig": {
+            "properties": {
+              "code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "continue_on_error": {
+                "type": "boolean"
+              },
+              "imports": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "language": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/CodeLanguage"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "loop_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/LoopConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max_tokens": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "mcp_args_schema": true,
+              "mcp_server_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mcp_tool_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "model": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prompt_template": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "response_schema": true,
+              "retries": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "skill_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "skill_version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sub_canvas_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "temperature": {
+                "format": "float",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "timeout_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "trigger_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/TriggerConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "continue_on_error",
+              "imports"
+            ],
+            "type": "object"
+          },
+          "NodeMetadata": {
+            "properties": {
+              "ai_generation_prompt": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "category": {
+                "$ref": "#/definitions/NodeCategory"
+              },
+              "color": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "is_ai_generated": {
+                "type": "boolean"
+              },
+              "label": {
+                "type": "string"
+              },
+              "last_test_result": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/TestResult"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "test_cases": {
+                "items": {
+                  "$ref": "#/definitions/TestCase"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "category",
+              "color",
+              "description",
+              "icon",
+              "is_ai_generated",
+              "label",
+              "test_cases"
+            ],
+            "type": "object"
+          },
+          "NodeType": {
+            "enum": [
+              "code",
+              "l_l_m_call",
+              "m_c_p_call",
+              "a2_a_message",
+              "skill_invoke",
+              "sub_canvas",
+              "human_input",
+              "conditional",
+              "loop",
+              "parallel",
+              "trigger",
+              "output",
+              "transform",
+              "aggregate"
+            ],
+            "type": "string"
+          },
+          "Port": {
+            "properties": {
+              "data_type": {
+                "$ref": "#/definitions/DataType"
+              },
+              "default_value": true,
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "data_type",
+              "id",
+              "name",
+              "required"
+            ],
+            "type": "object"
+          },
+          "Position": {
+            "properties": {
+              "x": {
+                "format": "double",
+                "type": "number"
+              },
+              "y": {
+                "format": "double",
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y"
+            ],
+            "type": "object"
+          },
+          "TestCase": {
+            "properties": {
+              "created_by": {
+                "type": "string"
+              },
+              "expected_outputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "inputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_by",
+              "expected_outputs",
+              "id",
+              "inputs",
+              "name"
+            ],
+            "type": "object"
+          },
+          "TestResult": {
+            "properties": {
+              "duration_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "error": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "outputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "passed": {
+                "type": "boolean"
+              },
+              "tested_at": {
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "duration_ms",
+              "outputs",
+              "passed",
+              "tested_at"
+            ],
+            "type": "object"
+          },
+          "TriggerConfig": {
+            "properties": {
+              "cron_expression": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "event_filters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "trigger_type": {
+                "$ref": "#/definitions/TriggerType"
+              },
+              "webhook_path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "event_filters",
+              "trigger_type"
+            ],
+            "type": "object"
+          },
+          "TriggerType": {
+            "enum": [
+              "manual",
+              "cron",
+              "webhook",
+              "event",
+              "m_c_p_notification"
+            ],
+            "type": "string"
+          }
+        },
+        "description": "============================================================================ NODOS — Unidades de ejecución (AI diseña, no conectores predefinidos) ============================================================================",
+        "properties": {
+          "config": {
+            "$ref": "#/definitions/NodeConfig"
+          },
+          "id": {
+            "type": "string"
+          },
+          "inputs": {
+            "items": {
+              "$ref": "#/definitions/Port"
+            },
+            "type": "array"
+          },
+          "metadata": {
+            "$ref": "#/definitions/NodeMetadata"
+          },
+          "node_type": {
+            "$ref": "#/definitions/NodeType"
+          },
+          "outputs": {
+            "items": {
+              "$ref": "#/definitions/Port"
+            },
+            "type": "array"
+          },
+          "position": {
+            "$ref": "#/definitions/Position"
+          }
+        },
+        "required": [
+          "config",
+          "id",
+          "inputs",
+          "metadata",
+          "node_type",
+          "outputs",
+          "position"
+        ],
+        "title": "CanvasNode",
+        "type": "object"
+      },
+      "ChatRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "context": {
+            "additionalProperties": true,
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ChatRequest",
+        "type": "object"
+      },
+      "ChatResponse": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "cost_usd": {
+            "format": "double",
+            "type": "number"
+          },
+          "message": {
+            "type": "string"
+          },
+          "used_skills": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "cost_usd",
+          "message",
+          "used_skills"
+        ],
+        "title": "ChatResponse",
+        "type": "object"
+      },
+      "CreateAgentRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "AgentRole": {
+            "oneOf": [
+              {
+                "enum": [
+                  "coordinator",
+                  "specialist",
+                  "reviewer",
+                  "planner",
+                  "executor"
+                ],
+                "type": "string"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "custom": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "custom"
+                ],
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "properties": {
+          "created_by": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/definitions/AgentRole"
+          }
+        },
+        "required": [
+          "created_by",
+          "description",
+          "name",
+          "role"
+        ],
+        "title": "CreateAgentRequest",
+        "type": "object"
+      },
+      "CreateCanvasRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "created_by": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_by",
+          "description",
+          "name"
+        ],
+        "title": "CreateCanvasRequest",
+        "type": "object"
+      },
+      "CreateMCPServerRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "MCPTransport": {
+            "enum": [
+              "stdio",
+              "s_s_e",
+              "streamable_h_t_t_p",
+              "web_socket"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "transport": {
+            "$ref": "#/definitions/MCPTransport"
+          }
+        },
+        "required": [
+          "description",
+          "name",
+          "transport"
+        ],
+        "title": "CreateMCPServerRequest",
+        "type": "object"
+      },
+      "CreateProviderRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "api_key": {
+            "type": "string"
+          },
+          "base_url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "provider_type": {
+            "type": "string"
+          },
+          "validate": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "api_key",
+          "base_url",
+          "name",
+          "provider_type"
+        ],
+        "title": "CreateProviderRequest",
+        "type": "object"
+      },
+      "CreateSkillRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "SkillCategory": {
+            "enum": [
+              "automation",
+              "data_processing",
+              "communication",
+              "analysis",
+              "generation",
+              "integration",
+              "custom"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "category": {
+            "$ref": "#/definitions/SkillCategory"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "created_by",
+          "description",
+          "name"
+        ],
+        "title": "CreateSkillRequest",
+        "type": "object"
+      },
+      "ExecuteCanvasRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "ExecutionTrigger": {
+            "properties": {
+              "payload": true,
+              "trigger_type": {
+                "$ref": "#/definitions/TriggerType"
+              },
+              "triggered_by": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "payload",
+              "trigger_type",
+              "triggered_by"
+            ],
+            "type": "object"
+          },
+          "TriggerType": {
+            "enum": [
+              "manual",
+              "cron",
+              "webhook",
+              "event",
+              "m_c_p_notification"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "canvas_id": {
+            "type": "string"
+          },
+          "trigger": {
+            "$ref": "#/definitions/ExecutionTrigger"
+          }
+        },
+        "required": [
+          "canvas_id",
+          "trigger"
+        ],
+        "title": "ExecuteCanvasRequest",
+        "type": "object"
+      },
+      "ExecutionContext": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "ExecutionResult": {
+            "properties": {
+              "cost_usd": {
+                "format": "double",
+                "type": "number"
+              },
+              "error": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "node_results": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/NodeExecutionState"
+                },
+                "type": "object"
+              },
+              "outputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "success": {
+                "type": "boolean"
+              },
+              "total_duration_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "cost_usd",
+              "node_results",
+              "outputs",
+              "success",
+              "total_duration_ms"
+            ],
+            "type": "object"
+          },
+          "ExecutionStatus": {
+            "enum": [
+              "pending",
+              "running",
+              "paused",
+              "completed",
+              "failed",
+              "cancelled",
+              "waiting_for_human"
+            ],
+            "type": "string"
+          },
+          "ExecutionTrigger": {
+            "properties": {
+              "payload": true,
+              "trigger_type": {
+                "$ref": "#/definitions/TriggerType"
+              },
+              "triggered_by": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "payload",
+              "trigger_type",
+              "triggered_by"
+            ],
+            "type": "object"
+          },
+          "NodeExecutionState": {
+            "properties": {
+              "completed_at": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "error": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "inputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "node_id": {
+                "type": "string"
+              },
+              "outputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "retry_count": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "started_at": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "status": {
+                "$ref": "#/definitions/NodeExecutionStatus"
+              }
+            },
+            "required": [
+              "inputs",
+              "node_id",
+              "outputs",
+              "retry_count",
+              "status"
+            ],
+            "type": "object"
+          },
+          "NodeExecutionStatus": {
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed",
+              "skipped",
+              "waiting_for_input"
+            ],
+            "type": "string"
+          },
+          "TriggerType": {
+            "enum": [
+              "manual",
+              "cron",
+              "webhook",
+              "event",
+              "m_c_p_notification"
+            ],
+            "type": "string"
+          }
+        },
+        "description": "============================================================================ EJECUCIÓN Y TESTING ============================================================================",
+        "properties": {
+          "canvas_id": {
+            "type": "string"
+          },
+          "completed_at": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "execution_id": {
+            "type": "string"
+          },
+          "node_states": {
+            "additionalProperties": {
+              "$ref": "#/definitions/NodeExecutionState"
+            },
+            "type": "object"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/ExecutionResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "started_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/definitions/ExecutionStatus"
+          },
+          "trigger": {
+            "$ref": "#/definitions/ExecutionTrigger"
+          },
+          "variables": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "canvas_id",
+          "execution_id",
+          "node_states",
+          "started_at",
+          "status",
+          "trigger",
+          "variables"
+        ],
+        "title": "ExecutionContext",
+        "type": "object"
+      },
+      "MCPServer": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "MCPAuth": {
+            "properties": {
+              "auth_type": {
+                "$ref": "#/definitions/MCPAuthType"
+              },
+              "config": true
+            },
+            "required": [
+              "auth_type",
+              "config"
+            ],
+            "type": "object"
+          },
+          "MCPAuthType": {
+            "oneOf": [
+              {
+                "enum": [
+                  "none",
+                  "bearer_token",
+                  "a_p_i_key",
+                  "o_auth2"
+                ],
+                "type": "string"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "custom": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "custom"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "MCPCapabilities": {
+            "properties": {
+              "completions": {
+                "type": "boolean"
+              },
+              "logging": {
+                "type": "boolean"
+              },
+              "prompts": {
+                "type": "boolean"
+              },
+              "resources": {
+                "type": "boolean"
+              },
+              "tools": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "completions",
+              "logging",
+              "prompts",
+              "resources",
+              "tools"
+            ],
+            "type": "object"
+          },
+          "MCPServerStatus": {
+            "enum": [
+              "disconnected",
+              "connecting",
+              "connected",
+              "error",
+              "unauthorized"
+            ],
+            "type": "string"
+          },
+          "MCPTool": {
+            "properties": {
+              "annotations": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/MCPToolAnnotations"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "description": {
+                "type": "string"
+              },
+              "input_schema": true,
+              "name": {
+                "type": "string"
+              },
+              "output_schema": true
+            },
+            "required": [
+              "description",
+              "input_schema",
+              "name"
+            ],
+            "type": "object"
+          },
+          "MCPToolAnnotations": {
+            "properties": {
+              "destructive": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "idempotent": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "open_world": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "read_only": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "title": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "MCPTransport": {
+            "enum": [
+              "stdio",
+              "s_s_e",
+              "streamable_h_t_t_p",
+              "web_socket"
+            ],
+            "type": "string"
+          }
+        },
+        "description": "============================================================================ MCP — Model Context Protocol Integration ============================================================================",
+        "properties": {
+          "auth": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/MCPAuth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "capabilities": {
+            "$ref": "#/definitions/MCPCapabilities"
+          },
+          "created_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/definitions/MCPServerStatus"
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/definitions/MCPTool"
+            },
+            "type": "array"
+          },
+          "transport": {
+            "$ref": "#/definitions/MCPTransport"
+          },
+          "updated_at": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "capabilities",
+          "created_at",
+          "description",
+          "id",
+          "name",
+          "status",
+          "tools",
+          "transport",
+          "updated_at"
+        ],
+        "title": "MCPServer",
+        "type": "object"
+      },
+      "MCPTool": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "MCPToolAnnotations": {
+            "properties": {
+              "destructive": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "idempotent": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "open_world": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "read_only": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "title": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "type": "object"
+          }
+        },
+        "properties": {
+          "annotations": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/MCPToolAnnotations"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "input_schema": true,
+          "name": {
+            "type": "string"
+          },
+          "output_schema": true
+        },
+        "required": [
+          "description",
+          "input_schema",
+          "name"
+        ],
+        "title": "MCPTool",
+        "type": "object"
+      },
+      "NodeConfig": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "CodeLanguage": {
+            "enum": [
+              "typescript",
+              "python",
+              "rust",
+              "javascript"
+            ],
+            "type": "string"
+          },
+          "LoopConfig": {
+            "properties": {
+              "collection_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "loop_type": {
+                "$ref": "#/definitions/LoopType"
+              },
+              "max_iterations": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "loop_type",
+              "max_iterations"
+            ],
+            "type": "object"
+          },
+          "LoopType": {
+            "enum": [
+              "for_each",
+              "while",
+              "times"
+            ],
+            "type": "string"
+          },
+          "TriggerConfig": {
+            "properties": {
+              "cron_expression": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "event_filters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "trigger_type": {
+                "$ref": "#/definitions/TriggerType"
+              },
+              "webhook_path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "event_filters",
+              "trigger_type"
+            ],
+            "type": "object"
+          },
+          "TriggerType": {
+            "enum": [
+              "manual",
+              "cron",
+              "webhook",
+              "event",
+              "m_c_p_notification"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "condition": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "continue_on_error": {
+            "type": "boolean"
+          },
+          "imports": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CodeLanguage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "loop_config": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/LoopConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "max_tokens": {
+            "format": "uint32",
+            "minimum": 0.0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "mcp_args_schema": true,
+          "mcp_server_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mcp_tool_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prompt_template": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "response_schema": true,
+          "retries": {
+            "format": "uint32",
+            "minimum": 0.0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "skill_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "skill_version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sub_canvas_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "temperature": {
+            "format": "float",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "timeout_ms": {
+            "format": "uint64",
+            "minimum": 0.0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "trigger_config": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/TriggerConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "continue_on_error",
+          "imports"
+        ],
+        "title": "NodeConfig",
+        "type": "object"
+      },
+      "Provider": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "base_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "key_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "model_tier": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "provider_type": {
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "created_at",
+          "enabled",
+          "id",
+          "name",
+          "project_id",
+          "provider_type",
+          "updated_at"
+        ],
+        "title": "Provider",
+        "type": "object"
+      },
+      "ProviderTestResponse": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "connected"
+        ],
+        "title": "ProviderTestResponse",
+        "type": "object"
+      },
+      "Skill": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "CodeLanguage": {
+            "enum": [
+              "typescript",
+              "python",
+              "rust",
+              "javascript"
+            ],
+            "type": "string"
+          },
+          "Dependency": {
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "source": {
+                "$ref": "#/definitions/DependencySource"
+              },
+              "version": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "source",
+              "version"
+            ],
+            "type": "object"
+          },
+          "DependencySource": {
+            "enum": [
+              "n_p_m",
+              "py_p_i",
+              "cargo",
+              "local",
+              "git"
+            ],
+            "type": "string"
+          },
+          "ImplementationKind": {
+            "enum": [
+              "function",
+              "class",
+              "canvas",
+              "m_c_p_wrapper",
+              "a2_a_delegate"
+            ],
+            "type": "string"
+          },
+          "ImprovementTrigger": {
+            "enum": [
+              "test_failure",
+              "performance_regression",
+              "user_feedback",
+              "new_requirement",
+              "a_i_optimization"
+            ],
+            "type": "string"
+          },
+          "SkillCategory": {
+            "enum": [
+              "automation",
+              "data_processing",
+              "communication",
+              "analysis",
+              "generation",
+              "integration",
+              "custom"
+            ],
+            "type": "string"
+          },
+          "SkillImplementation": {
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "dependencies": {
+                "items": {
+                  "$ref": "#/definitions/Dependency"
+                },
+                "type": "array"
+              },
+              "entry_point": {
+                "type": "string"
+              },
+              "kind": {
+                "$ref": "#/definitions/ImplementationKind"
+              },
+              "language": {
+                "$ref": "#/definitions/CodeLanguage"
+              },
+              "schema": {
+                "$ref": "#/definitions/SkillSchema"
+              }
+            },
+            "required": [
+              "code",
+              "dependencies",
+              "entry_point",
+              "kind",
+              "language",
+              "schema"
+            ],
+            "type": "object"
+          },
+          "SkillImprovement": {
+            "properties": {
+              "after_metrics": {
+                "$ref": "#/definitions/SkillMetrics"
+              },
+              "before_metrics": {
+                "$ref": "#/definitions/SkillMetrics"
+              },
+              "description": {
+                "type": "string"
+              },
+              "improved_at": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "trigger": {
+                "$ref": "#/definitions/ImprovementTrigger"
+              },
+              "version": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "after_metrics",
+              "before_metrics",
+              "description",
+              "improved_at",
+              "trigger",
+              "version"
+            ],
+            "type": "object"
+          },
+          "SkillMetadata": {
+            "properties": {
+              "avg_duration_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "improvement_history": {
+                "items": {
+                  "$ref": "#/definitions/SkillImprovement"
+                },
+                "type": "array"
+              },
+              "is_auto_generated": {
+                "type": "boolean"
+              },
+              "last_improved_at": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "parent_skill_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "success_rate": {
+                "format": "float",
+                "type": "number"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "usage_count": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "avg_duration_ms",
+              "improvement_history",
+              "is_auto_generated",
+              "success_rate",
+              "tags",
+              "usage_count"
+            ],
+            "type": "object"
+          },
+          "SkillMetrics": {
+            "properties": {
+              "avg_duration_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "cost_per_execution": {
+                "format": "double",
+                "type": "number"
+              },
+              "error_rate": {
+                "format": "float",
+                "type": "number"
+              },
+              "success_rate": {
+                "format": "float",
+                "type": "number"
+              }
+            },
+            "required": [
+              "avg_duration_ms",
+              "cost_per_execution",
+              "error_rate",
+              "success_rate"
+            ],
+            "type": "object"
+          },
+          "SkillPermissions": {
+            "properties": {
+              "allowed_domains": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "allowed_files": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "allowed_mcp_servers": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "filesystem_access": {
+                "type": "boolean"
+              },
+              "max_execution_time_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "max_memory_mb": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "network_access": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "allowed_domains",
+              "allowed_files",
+              "allowed_mcp_servers",
+              "filesystem_access",
+              "max_execution_time_ms",
+              "max_memory_mb",
+              "network_access"
+            ],
+            "type": "object"
+          },
+          "SkillSchema": {
+            "properties": {
+              "input": true,
+              "output": true
+            },
+            "required": [
+              "input",
+              "output"
+            ],
+            "type": "object"
+          },
+          "SkillTrigger": {
+            "properties": {
+              "conditions": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "pattern": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "trigger_type": {
+                "$ref": "#/definitions/TriggerType"
+              }
+            },
+            "required": [
+              "conditions",
+              "trigger_type"
+            ],
+            "type": "object"
+          },
+          "TriggerType": {
+            "enum": [
+              "manual",
+              "cron",
+              "webhook",
+              "event",
+              "m_c_p_notification"
+            ],
+            "type": "string"
+          }
+        },
+        "description": "============================================================================ SKILLS — Capacidades reutilizables, auto-mejorables (estilo Hermes) ============================================================================",
+        "properties": {
+          "category": {
+            "$ref": "#/definitions/SkillCategory"
+          },
+          "created_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "implementation": {
+            "$ref": "#/definitions/SkillImplementation"
+          },
+          "is_auto_generated": {
+            "type": "boolean"
+          },
+          "metadata": {
+            "$ref": "#/definitions/SkillMetadata"
+          },
+          "name": {
+            "type": "string"
+          },
+          "permissions": {
+            "$ref": "#/definitions/SkillPermissions"
+          },
+          "triggers": {
+            "items": {
+              "$ref": "#/definitions/SkillTrigger"
+            },
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "created_at",
+          "created_by",
+          "description",
+          "id",
+          "implementation",
+          "is_auto_generated",
+          "metadata",
+          "name",
+          "permissions",
+          "triggers",
+          "updated_at",
+          "version"
+        ],
+        "title": "Skill",
+        "type": "object"
+      },
+      "SkillImprovementRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "CodeLanguage": {
+            "enum": [
+              "typescript",
+              "python",
+              "rust",
+              "javascript"
+            ],
+            "type": "string"
+          },
+          "Dependency": {
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "source": {
+                "$ref": "#/definitions/DependencySource"
+              },
+              "version": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "source",
+              "version"
+            ],
+            "type": "object"
+          },
+          "DependencySource": {
+            "enum": [
+              "n_p_m",
+              "py_p_i",
+              "cargo",
+              "local",
+              "git"
+            ],
+            "type": "string"
+          },
+          "ImplementationKind": {
+            "enum": [
+              "function",
+              "class",
+              "canvas",
+              "m_c_p_wrapper",
+              "a2_a_delegate"
+            ],
+            "type": "string"
+          },
+          "ImprovementTrigger": {
+            "enum": [
+              "test_failure",
+              "performance_regression",
+              "user_feedback",
+              "new_requirement",
+              "a_i_optimization"
+            ],
+            "type": "string"
+          },
+          "SkillImplementation": {
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "dependencies": {
+                "items": {
+                  "$ref": "#/definitions/Dependency"
+                },
+                "type": "array"
+              },
+              "entry_point": {
+                "type": "string"
+              },
+              "kind": {
+                "$ref": "#/definitions/ImplementationKind"
+              },
+              "language": {
+                "$ref": "#/definitions/CodeLanguage"
+              },
+              "schema": {
+                "$ref": "#/definitions/SkillSchema"
+              }
+            },
+            "required": [
+              "code",
+              "dependencies",
+              "entry_point",
+              "kind",
+              "language",
+              "schema"
+            ],
+            "type": "object"
+          },
+          "SkillSchema": {
+            "properties": {
+              "input": true,
+              "output": true
+            },
+            "required": [
+              "input",
+              "output"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "implementation": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/SkillImplementation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "improved_by": {
+            "type": "string"
+          },
+          "is_auto_generated": {
+            "type": "boolean"
+          },
+          "trigger": {
+            "$ref": "#/definitions/ImprovementTrigger"
+          }
+        },
+        "required": [
+          "description",
+          "improved_by",
+          "is_auto_generated",
+          "trigger"
+        ],
+        "title": "SkillImprovementRequest",
+        "type": "object"
+      },
+      "StreamEvent": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "actor_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "actor_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cost_usd": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "created_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "event_type": {
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "lines_added": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "lines_deleted": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "model_used": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "payload": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "session_id": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "tokens_used": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "created_at",
+          "event_type",
+          "id",
+          "session_id",
+          "summary"
+        ],
+        "title": "StreamEvent",
+        "type": "object"
+      },
+      "TestCase": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "created_by": {
+            "type": "string"
+          },
+          "expected_outputs": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "inputs": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_by",
+          "expected_outputs",
+          "id",
+          "inputs",
+          "name"
+        ],
+        "title": "TestCase",
+        "type": "object"
+      },
+      "TestNodeInputs": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "description": "Body de POST /api/skills/:id/test (mapa de inputs libre).",
+        "title": "TestNodeInputs",
+        "type": "object"
+      },
+      "TestNodeRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "CanvasNode": {
+            "description": "============================================================================ NODOS — Unidades de ejecución (AI diseña, no conectores predefinidos) ============================================================================",
+            "properties": {
+              "config": {
+                "$ref": "#/definitions/NodeConfig"
+              },
+              "id": {
+                "type": "string"
+              },
+              "inputs": {
+                "items": {
+                  "$ref": "#/definitions/Port"
+                },
+                "type": "array"
+              },
+              "metadata": {
+                "$ref": "#/definitions/NodeMetadata"
+              },
+              "node_type": {
+                "$ref": "#/definitions/NodeType"
+              },
+              "outputs": {
+                "items": {
+                  "$ref": "#/definitions/Port"
+                },
+                "type": "array"
+              },
+              "position": {
+                "$ref": "#/definitions/Position"
+              }
+            },
+            "required": [
+              "config",
+              "id",
+              "inputs",
+              "metadata",
+              "node_type",
+              "outputs",
+              "position"
+            ],
+            "type": "object"
+          },
+          "CodeLanguage": {
+            "enum": [
+              "typescript",
+              "python",
+              "rust",
+              "javascript"
+            ],
+            "type": "string"
+          },
+          "DataType": {
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "object",
+              "array",
+              "any",
+              "agent",
+              "skill",
+              "m_c_p_tool",
+              "canvas",
+              "file",
+              "image",
+              "audio"
+            ],
+            "type": "string"
+          },
+          "LoopConfig": {
+            "properties": {
+              "collection_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "loop_type": {
+                "$ref": "#/definitions/LoopType"
+              },
+              "max_iterations": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "loop_type",
+              "max_iterations"
+            ],
+            "type": "object"
+          },
+          "LoopType": {
+            "enum": [
+              "for_each",
+              "while",
+              "times"
+            ],
+            "type": "string"
+          },
+          "NodeCategory": {
+            "enum": [
+              "trigger",
+              "action",
+              "logic",
+              "data",
+              "a_i",
+              "m_c_p",
+              "agent",
+              "human",
+              "output"
+            ],
+            "type": "string"
+          },
+          "NodeConfig": {
+            "properties": {
+              "code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "continue_on_error": {
+                "type": "boolean"
+              },
+              "imports": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "language": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/CodeLanguage"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "loop_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/LoopConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max_tokens": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "mcp_args_schema": true,
+              "mcp_server_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mcp_tool_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "model": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prompt_template": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "response_schema": true,
+              "retries": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "skill_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "skill_version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sub_canvas_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "temperature": {
+                "format": "float",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "timeout_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "trigger_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/TriggerConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "continue_on_error",
+              "imports"
+            ],
+            "type": "object"
+          },
+          "NodeMetadata": {
+            "properties": {
+              "ai_generation_prompt": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "category": {
+                "$ref": "#/definitions/NodeCategory"
+              },
+              "color": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "is_ai_generated": {
+                "type": "boolean"
+              },
+              "label": {
+                "type": "string"
+              },
+              "last_test_result": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/TestResult"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "test_cases": {
+                "items": {
+                  "$ref": "#/definitions/TestCase"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "category",
+              "color",
+              "description",
+              "icon",
+              "is_ai_generated",
+              "label",
+              "test_cases"
+            ],
+            "type": "object"
+          },
+          "NodeType": {
+            "enum": [
+              "code",
+              "l_l_m_call",
+              "m_c_p_call",
+              "a2_a_message",
+              "skill_invoke",
+              "sub_canvas",
+              "human_input",
+              "conditional",
+              "loop",
+              "parallel",
+              "trigger",
+              "output",
+              "transform",
+              "aggregate"
+            ],
+            "type": "string"
+          },
+          "Port": {
+            "properties": {
+              "data_type": {
+                "$ref": "#/definitions/DataType"
+              },
+              "default_value": true,
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "data_type",
+              "id",
+              "name",
+              "required"
+            ],
+            "type": "object"
+          },
+          "Position": {
+            "properties": {
+              "x": {
+                "format": "double",
+                "type": "number"
+              },
+              "y": {
+                "format": "double",
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y"
+            ],
+            "type": "object"
+          },
+          "TestCase": {
+            "properties": {
+              "created_by": {
+                "type": "string"
+              },
+              "expected_outputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "inputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_by",
+              "expected_outputs",
+              "id",
+              "inputs",
+              "name"
+            ],
+            "type": "object"
+          },
+          "TestResult": {
+            "properties": {
+              "duration_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "error": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "outputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "passed": {
+                "type": "boolean"
+              },
+              "tested_at": {
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "duration_ms",
+              "outputs",
+              "passed",
+              "tested_at"
+            ],
+            "type": "object"
+          },
+          "TriggerConfig": {
+            "properties": {
+              "cron_expression": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "event_filters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "trigger_type": {
+                "$ref": "#/definitions/TriggerType"
+              },
+              "webhook_path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "event_filters",
+              "trigger_type"
+            ],
+            "type": "object"
+          },
+          "TriggerType": {
+            "enum": [
+              "manual",
+              "cron",
+              "webhook",
+              "event",
+              "m_c_p_notification"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "inputs": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "node": {
+            "$ref": "#/definitions/CanvasNode"
+          }
+        },
+        "required": [
+          "inputs",
+          "node"
+        ],
+        "title": "TestNodeRequest",
+        "type": "object"
+      },
+      "TestResult": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "duration_ms": {
+            "format": "uint64",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "outputs": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "tested_at": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "duration_ms",
+          "outputs",
+          "passed",
+          "tested_at"
+        ],
+        "title": "TestResult",
+        "type": "object"
+      },
+      "UpdateCanvasRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "CanvasEdge": {
+            "description": "============================================================================ EDGES — Conexiones entre nodos ============================================================================",
+            "properties": {
+              "condition": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "edge_type": {
+                "$ref": "#/definitions/EdgeType"
+              },
+              "id": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "source_port": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "target_port": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "edge_type",
+              "id",
+              "source",
+              "source_port",
+              "target",
+              "target_port"
+            ],
+            "type": "object"
+          },
+          "CanvasNode": {
+            "description": "============================================================================ NODOS — Unidades de ejecución (AI diseña, no conectores predefinidos) ============================================================================",
+            "properties": {
+              "config": {
+                "$ref": "#/definitions/NodeConfig"
+              },
+              "id": {
+                "type": "string"
+              },
+              "inputs": {
+                "items": {
+                  "$ref": "#/definitions/Port"
+                },
+                "type": "array"
+              },
+              "metadata": {
+                "$ref": "#/definitions/NodeMetadata"
+              },
+              "node_type": {
+                "$ref": "#/definitions/NodeType"
+              },
+              "outputs": {
+                "items": {
+                  "$ref": "#/definitions/Port"
+                },
+                "type": "array"
+              },
+              "position": {
+                "$ref": "#/definitions/Position"
+              }
+            },
+            "required": [
+              "config",
+              "id",
+              "inputs",
+              "metadata",
+              "node_type",
+              "outputs",
+              "position"
+            ],
+            "type": "object"
+          },
+          "CanvasSettings": {
+            "properties": {
+              "auto_save": {
+                "type": "boolean"
+              },
+              "execution_mode": {
+                "$ref": "#/definitions/ExecutionMode"
+              },
+              "parallel_execution": {
+                "type": "boolean"
+              },
+              "retry_policy": {
+                "$ref": "#/definitions/RetryPolicy"
+              },
+              "timeout_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "auto_save",
+              "execution_mode",
+              "parallel_execution",
+              "retry_policy",
+              "timeout_ms"
+            ],
+            "type": "object"
+          },
+          "CodeLanguage": {
+            "enum": [
+              "typescript",
+              "python",
+              "rust",
+              "javascript"
+            ],
+            "type": "string"
+          },
+          "DataType": {
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "object",
+              "array",
+              "any",
+              "agent",
+              "skill",
+              "m_c_p_tool",
+              "canvas",
+              "file",
+              "image",
+              "audio"
+            ],
+            "type": "string"
+          },
+          "EdgeType": {
+            "enum": [
+              "data",
+              "control",
+              "conditional",
+              "error"
+            ],
+            "type": "string"
+          },
+          "ExecutionMode": {
+            "enum": [
+              "sequential",
+              "parallel",
+              "d_a_g"
+            ],
+            "type": "string"
+          },
+          "LoopConfig": {
+            "properties": {
+              "collection_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition_expr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "loop_type": {
+                "$ref": "#/definitions/LoopType"
+              },
+              "max_iterations": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "loop_type",
+              "max_iterations"
+            ],
+            "type": "object"
+          },
+          "LoopType": {
+            "enum": [
+              "for_each",
+              "while",
+              "times"
+            ],
+            "type": "string"
+          },
+          "NodeCategory": {
+            "enum": [
+              "trigger",
+              "action",
+              "logic",
+              "data",
+              "a_i",
+              "m_c_p",
+              "agent",
+              "human",
+              "output"
+            ],
+            "type": "string"
+          },
+          "NodeConfig": {
+            "properties": {
+              "code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "continue_on_error": {
+                "type": "boolean"
+              },
+              "imports": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "language": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/CodeLanguage"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "loop_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/LoopConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max_tokens": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "mcp_args_schema": true,
+              "mcp_server_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mcp_tool_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "model": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prompt_template": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "response_schema": true,
+              "retries": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "skill_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "skill_version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sub_canvas_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "temperature": {
+                "format": "float",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "timeout_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "trigger_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/TriggerConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "continue_on_error",
+              "imports"
+            ],
+            "type": "object"
+          },
+          "NodeMetadata": {
+            "properties": {
+              "ai_generation_prompt": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "category": {
+                "$ref": "#/definitions/NodeCategory"
+              },
+              "color": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "is_ai_generated": {
+                "type": "boolean"
+              },
+              "label": {
+                "type": "string"
+              },
+              "last_test_result": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/TestResult"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "test_cases": {
+                "items": {
+                  "$ref": "#/definitions/TestCase"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "category",
+              "color",
+              "description",
+              "icon",
+              "is_ai_generated",
+              "label",
+              "test_cases"
+            ],
+            "type": "object"
+          },
+          "NodeType": {
+            "enum": [
+              "code",
+              "l_l_m_call",
+              "m_c_p_call",
+              "a2_a_message",
+              "skill_invoke",
+              "sub_canvas",
+              "human_input",
+              "conditional",
+              "loop",
+              "parallel",
+              "trigger",
+              "output",
+              "transform",
+              "aggregate"
+            ],
+            "type": "string"
+          },
+          "Port": {
+            "properties": {
+              "data_type": {
+                "$ref": "#/definitions/DataType"
+              },
+              "default_value": true,
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "data_type",
+              "id",
+              "name",
+              "required"
+            ],
+            "type": "object"
+          },
+          "Position": {
+            "properties": {
+              "x": {
+                "format": "double",
+                "type": "number"
+              },
+              "y": {
+                "format": "double",
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y"
+            ],
+            "type": "object"
+          },
+          "RetryPolicy": {
+            "properties": {
+              "backoff_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "max_retries": {
+                "format": "uint32",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "retry_on": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "backoff_ms",
+              "max_retries",
+              "retry_on"
+            ],
+            "type": "object"
+          },
+          "TestCase": {
+            "properties": {
+              "created_by": {
+                "type": "string"
+              },
+              "expected_outputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "inputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_by",
+              "expected_outputs",
+              "id",
+              "inputs",
+              "name"
+            ],
+            "type": "object"
+          },
+          "TestResult": {
+            "properties": {
+              "duration_ms": {
+                "format": "uint64",
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              "error": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "outputs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "passed": {
+                "type": "boolean"
+              },
+              "tested_at": {
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "duration_ms",
+              "outputs",
+              "passed",
+              "tested_at"
+            ],
+            "type": "object"
+          },
+          "TriggerConfig": {
+            "properties": {
+              "cron_expression": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "event_filters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "trigger_type": {
+                "$ref": "#/definitions/TriggerType"
+              },
+              "webhook_path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "event_filters",
+              "trigger_type"
+            ],
+            "type": "object"
+          },
+          "TriggerType": {
+            "enum": [
+              "manual",
+              "cron",
+              "webhook",
+              "event",
+              "m_c_p_notification"
+            ],
+            "type": "string"
+          },
+          "Viewport": {
+            "properties": {
+              "x": {
+                "format": "double",
+                "type": "number"
+              },
+              "y": {
+                "format": "double",
+                "type": "number"
+              },
+              "zoom": {
+                "format": "double",
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y",
+              "zoom"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/definitions/CanvasEdge"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/definitions/CanvasNode"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "settings": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CanvasSettings"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "viewport": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/Viewport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "UpdateCanvasRequest",
+        "type": "object"
+      },
+      "ValidationResult": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "valid": {
+            "type": "boolean"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "errors",
+          "valid",
+          "warnings"
+        ],
+        "title": "ValidationResult",
+        "type": "object"
+      },
+      "VersionInfo": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "app",
+          "version"
+        ],
+        "title": "VersionInfo",
+        "type": "object"
+      },
+      "ViewPort": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "x": {
+            "format": "double",
+            "type": "number"
+          },
+          "y": {
+            "format": "double",
+            "type": "number"
+          },
+          "zoom": {
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "zoom"
+        ],
+        "title": "Viewport",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "API del gateway Canvas AI — generada desde los tipos Rust (fuente única). Slice 0.6.",
+    "title": "Canvas AI Gateway",
+    "version": "0.1.0"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/api/a2a/agent-card": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A2AAgentCard"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Agent card (A2A)",
+        "tags": [
+          "a2a"
+        ]
+      }
+    },
+    "/api/a2a/message/send": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/A2AMessageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A2ATask"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Envía mensaje A2A",
+        "tags": [
+          "a2a"
+        ]
+      }
+    },
+    "/api/a2a/tasks/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A2ATask"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Estado de tarea A2A",
+        "tags": [
+          "a2a"
+        ]
+      }
+    },
+    "/api/a2a/tasks/{id}/cancel": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A2ATask"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Cancela tarea A2A",
+        "tags": [
+          "a2a"
+        ]
+      }
+    },
+    "/api/agents": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Agent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Lista agentes",
+        "tags": [
+          "agents"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Agent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Crea agente",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/agents/{id}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Borra agente",
+        "tags": [
+          "agents"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Agent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Obtiene agente",
+        "tags": [
+          "agents"
+        ]
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Agent"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Agent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Actualiza agente",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/agents/{id}/chat": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Chat con agente",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/agents/{id}/mcp": {
+      "delete": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Agent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Quita MCP server",
+        "tags": [
+          "agents"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignMCPRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Agent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Asigna MCP server",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/agents/{id}/memory": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentMemory"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Memoria del agente",
+        "tags": [
+          "agents"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentMemory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Agent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Actualiza memoria",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/agents/{id}/skills": {
+      "delete": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Agent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Quita skill",
+        "tags": [
+          "agents"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignSkillRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Agent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Asigna skill",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/ai/generate-canvas": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AIGenerateCanvasRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Canvas"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "IA genera canvas",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/ai/generate-node": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AIGenerateNodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CanvasNode"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "IA genera nodo",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/ai/generate-skill": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AIGenerateSkillRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "IA genera skill",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/ai/optimize-canvas": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AIOptimizeCanvasRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Canvas"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "IA optimiza canvas",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/ai/test-generation": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AITestGenerationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestCase"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "IA genera test cases",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/canvases": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Canvas"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Lista canvases",
+        "tags": [
+          "canvases"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCanvasRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Canvas"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Crea canvas",
+        "tags": [
+          "canvases"
+        ]
+      }
+    },
+    "/api/canvases/{id}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Borra canvas",
+        "tags": [
+          "canvases"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Canvas"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Obtiene canvas",
+        "tags": [
+          "canvases"
+        ]
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCanvasRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Canvas"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Actualiza canvas",
+        "tags": [
+          "canvases"
+        ]
+      }
+    },
+    "/api/canvases/{id}/execute": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteCanvasRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionContext"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Ejecuta canvas",
+        "tags": [
+          "canvases"
+        ]
+      }
+    },
+    "/api/canvases/{id}/test": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestNodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResult"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Testea canvas",
+        "tags": [
+          "canvases"
+        ]
+      }
+    },
+    "/api/canvases/{id}/validate": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Valida canvas",
+        "tags": [
+          "canvases"
+        ]
+      }
+    },
+    "/api/executions": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionContext"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Lista ejecuciones",
+        "tags": [
+          "executions"
+        ]
+      }
+    },
+    "/api/executions/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionContext"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Obtiene ejecución",
+        "tags": [
+          "executions"
+        ]
+      }
+    },
+    "/api/executions/{id}/cancel": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionContext"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Cancela ejecución",
+        "tags": [
+          "executions"
+        ]
+      }
+    },
+    "/api/executions/{id}/retry": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionContext"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Reintenta ejecución",
+        "tags": [
+          "executions"
+        ]
+      }
+    },
+    "/api/mcp/servers": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MCPServer"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Lista MCP servers",
+        "tags": [
+          "mcp"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMCPServerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MCPServer"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Registra MCP server",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/mcp/servers/{id}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Borra MCP server",
+        "tags": [
+          "mcp"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MCPServer"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Obtiene MCP server",
+        "tags": [
+          "mcp"
+        ]
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MCPServer"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MCPServer"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Actualiza MCP server",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/mcp/servers/{id}/call": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CallMCPToolRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Llama una tool",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/mcp/servers/{id}/connect": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MCPServer"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Conecta",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/mcp/servers/{id}/disconnect": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MCPServer"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Desconecta",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/mcp/servers/{id}/tools": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MCPTool"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Tools del server",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/providers": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Provider"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Lista providers BYOK",
+        "tags": [
+          "providers"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProviderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Provider"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Crea provider (valida + cifra la key)",
+        "tags": [
+          "providers"
+        ]
+      }
+    },
+    "/api/providers/{id}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Borra provider + secreto",
+        "tags": [
+          "providers"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Provider"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Obtiene provider",
+        "tags": [
+          "providers"
+        ]
+      }
+    },
+    "/api/providers/{id}/test": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderTestResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Roundtrip de salud",
+        "tags": [
+          "providers"
+        ]
+      }
+    },
+    "/api/skills": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Lista skills",
+        "tags": [
+          "skills"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSkillRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Crea skill",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/skills/{id}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Borra skill",
+        "tags": [
+          "skills"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Obtiene skill",
+        "tags": [
+          "skills"
+        ]
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Skill"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Actualiza skill (nueva versión)",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/skills/{id}/improve": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillImprovementRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Mejora skill (nueva variante)",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/skills/{id}/test": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestNodeInputs"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResult"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Testea skill",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/skills/{id}/versions": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Historial de versiones",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/version": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionInfo"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Versión del gateway",
+        "tags": [
+          "meta"
+        ]
+      }
+    },
+    "/healthz": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Health check",
+        "tags": [
+          "meta"
+        ]
+      }
+    }
+  }
+}

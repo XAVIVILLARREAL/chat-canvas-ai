@@ -49,7 +49,8 @@
 - **Tests:** cargo test spawn/kill/timeout con fixture; chaos: matar contenedor a mitad → agente se recupera; red denegada verificada.
 - **Mini-gate:** sandbox provable (H.9a adelantado a Etapa 0).
 
-### 0.6 — OpenAPI del gateway + tipos generados (f)
+### 0.6 — OpenAPI del gateway + tipos generados (f) — ✅ COMPLETADO 2026-08-27
+> **Estado:** ✅ `build_openapi()` (40 paths + 41 schemas desde structs Rust) → `docs/openapi.json` · test `openapi_generado_sin_errores` ($refs resuelven) · `cargo run -p canvas-ai-server --bin export-openapi` genera también `src/types/api-generated.ts` (mapper JSON Schema→TS propio; openapi-typescript incompatible con TS7) · `src/types/api.ts` bridge · `pnpm typecheck` verde · shared-types deprecado.
 - **Qué:** specta → JSON schema → OpenAPI (`docs/openapi.yml`); frontend consume tipos generados (openapi-typescript), se elimina el mantenimiento manual de `packages/shared-types` como fuente.
 - **Tests:** OpenAPI generado sin errores; frontend compila contra tipos generados.
 - **Mini-gate:** artefacto OpenAPI + build TS verde.

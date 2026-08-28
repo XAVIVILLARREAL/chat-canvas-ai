@@ -196,8 +196,8 @@ scripts/
 
 - **Última sesión**: 2026-08-27 — i18n CERRADO (I.1–I.5) + **Etapa 0 slices 0.1–0.4 y 0.5 COMPLETOS** (SQLite + Postgres/RLS + ledger + BYOK vault + sandbox Linux)
 - **Fase actual**: Etapa 0 de [ETAPA-0-IMPLEMENTACION](docs/ETAPA-0-IMPLEMENTACION.md) — orden estricto 0.1→0.8
-- **Próxima acción**: **slice 0.6** — OpenAPI del gateway (specta → openapi.yml, tipos generados para el frontend)
-- **Progreso Etapa 0**: 0.1 ✅ · 0.2 ✅ · 0.3 ✅ · 0.4 ✅ · 0.5 ✅ · 0.7 ✅ · solo 0.6 pendiente · 0.8 (GATE 0) tras 0.6
+- - **Próxima acción**: **slice 0.8 GATE 0** — cierre formal de Etapa 0 (verificaciones completas + evidencia)
+- **Progreso Etapa 0**: 0.1 ✅ · 0.2 ✅ · 0.3 ✅ · 0.4 ✅ · 0.5 ✅ · 0.6 ✅ · 0.7 ✅ — TODOS los slices completos · solo falta 0.8 (GATE 0, cierre)
 - **Bloqueos activos**: Ninguno
 
 ### §15.1 Estado global

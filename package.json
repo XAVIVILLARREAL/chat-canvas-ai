@@ -27,7 +27,8 @@
     "check:all": "pnpm typecheck && pnpm lint && pnpm lint:oxc",
     "i18n:check": "node scripts/i18n-check.mjs",
     "i18n:translate": "npx tsx scripts/translate.ts",
-    "i18n:translate:locale": "npx tsx scripts/translate.ts --locale"
+    "i18n:translate:locale": "npx tsx scripts/translate.ts --locale",
+    "openapi:generate": "cargo run -p canvas-ai-server --bin export-openapi"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.9",
