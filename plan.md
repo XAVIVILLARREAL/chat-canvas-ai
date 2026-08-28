@@ -194,11 +194,48 @@ scripts/
 
 ### §15.0 Quick Resume
 
-- **Última sesión**: 2026-08-27 — **ETAPA 0 CERRADA (GATE 0 ✅)**: slices 0.1–0.7 completos y verificados (25/25 Rust + Docker real + PG real + typecheck/build)
-- **Fase actual**: Etapa 0 de [ETAPA-0-IMPLEMENTACION](docs/ETAPA-0-IMPLEMENTACION.md) — orden estricto 0.1→0.8
-- - **Próxima acción**: **Etapa 1 A.5** — Medidor y debug de contexto (desglose tokens por fuente en vivo) ([plan-a-chat-codex](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md))
-- **Progreso Etapa 0**: ✅ COMPLETA (GATE 0) · **Etapa 1**: A.0–A.4 ✅ (37/37 rust, streaming SSE en vivo) → A.5 en curso
-- **Bloqueos activos**: Ninguno
+> **📌 PUNTO DE CONTINUIDAD — leer esto primero en una sesión nueva**
+
+- **Última sesión (2026-08-27)**: **ETAPA 0 CERRADA (GATE 0 ✅)** + **Etapa 1: A.0 ✅ A.1 ✅ A.2 ✅ A.3 ✅ A.4 ✅**
+- **Próxima acción**: **Etapa 1 A.5 — Medidor y debug de contexto** (desglose de tokens por fuente — historial/system/knowledge/tools — en vivo; ajustar límite → siguiente request lo refleja). Spec: [plan-a-chat-codex §A.5](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md). Luego A.6 (centro de config), A.7 (modo ENCARGO), A.8 (resume), A.9 (ramas) → **GATE A**.
+
+**Estado del código (todo en main, verificado):**
+- Rust **37/37** (SQLite + PG 16 real + Docker real) · vitest 7/7 · typecheck (tsgo) ✅ · build ✅ · i18n 12/12 · humana: A.0 6/6, A.1/A.4 8/8, móvil 3/3
+- Etapa 0: migraciones {sqlite,postgres}/0001-0005 · repos sqlx · server axum persistido (ADR-007) · RLS fail-closed 13 tablas · event_stream append-only · vault BYOK AES-256-GCM · sandbox Linux (bollard) · OpenAPI 43 paths + `src/types/api-generated.ts` · i18n 12 locales + RTL
+- Etapa 1: A.0 proyectos+settings scopes+switcher/grid+skills global/copia · A.1 /api/sessions+messages + ChatPanel + SessionsList + BottomNav · A.2 settings cifradas (`{__secret: key_ref}`) · A.3 `AgentProvider` + OpenAICompatProvider universal + `/chat` · A.4 streaming SSE + slash honestos + usage
+
+**Cómo correr las verificaciones (comandos exactos):**
+```bash
+# Rust completo con PG real (docker empresa-dev-postgres en :5433)
+docker exec -e PGPASSWORD=empresa_dev empresa-dev-postgres psql -h localhost -U empresa -d empresa_dev \
+  -c "DROP DATABASE IF EXISTS canvas_ai_test;" -c "CREATE DATABASE canvas_ai_test OWNER empresa;"
+CANVAS_TEST_PG_URL="postgres://empresa:empresa_dev@localhost:5433/canvas_ai_test" cargo test --workspace
+
+# i18n + frontend
+node scripts/i18n-check.mjs && pnpm typecheck && pnpm build:frontend && pnpm test
+
+# gateway + vite para pruebas humanas (Playwright human config):
+cargo build -p canvas-ai-server --bin canvas-ai-server
+export CANVAS_KEK=$(python3 -c "import base64,os; print(base64.b64encode(os.urandom(32)).decode())")  # OBLIGATORIO para flujos con secretos
+CANVAS_AI_PORT=3031 setsid ./target/debug/canvas-ai-server > /tmp/gateway.log 2>&1 < /dev/null &
+CANVAS_GATEWAY=http://127.0.0.1:3031 setsid npx vite --port 1420 --host > /tmp/vite.log 2>&1 < /dev/null &
+A1_GATEWAY=1 npx playwright test --config=e2e/playwright.human.config.ts --project=human-desktop e2e/human/tests/chat-shell.spec.ts
+
+# LLM real free-first (opt-in; fallback multi-modelo ante 429 del pool)
+set -a; source .env; set +a; export CANVAS_REAL_LLM=1
+cargo test -p canvas-ai-core --test providers_byok openrouter_free_real -- --nocapture
+```
+
+**Gotchas críticos del entorno (leer antes de tocar):**
+- Host compartido: zombie SUPERVISADO `empresa-dev-server` en :3030 (renace al matarlo) → gateway canvas SIEMPRE en `CANVAS_AI_PORT=3031` + vite con `CANVAS_GATEWAY=http://127.0.0.1:3031`
+- El gateway DEBE arrancar con `CANVAS_KEK` (base64 32B) o el vault no puede cifrar (providers/settings-secret fallan)
+- `.env` define `VITE_API_BASE=/api` → el cliente normaliza (no duplicar /api/api)
+- `pkill -f` con patrón presente en tu propio comando mata tu shell; matar por PID (ss -tlnp)
+- Edits por script (python/sed): SIEMPRE grep-verify después (anchors silenciosos)
+- Los errores de handlers axum `(StatusCode, String)` van como texto plano → tests HTTP aserten status, no body
+- Deuda lint legacy documentada: 15 noExplicitAny en `src/types.ts` + Header.css (17 antes de Etapa 0 — NO tocar sin suite)
+
+**Bloqueos activos**: Ninguno
 
 ### §15.1 Estado global
 
