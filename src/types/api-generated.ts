@@ -532,6 +532,13 @@ export type ChatResponse = {
   used_skills: string[];
 };
 
+export type CompactResponse = {
+  compacted: boolean;
+  reason?: Record<string, unknown>;
+  removed: number;
+  summary_message_id?: Record<string, unknown>;
+};
+
 export type CreateAgentRequest = {
   created_by: string;
   description: string;
@@ -687,6 +694,17 @@ export type SessionContextResponse = {
   session_id: string;
   sources: ContextSource[];
   total_tokens: number;
+};
+
+export type SessionResumeResponse = {
+  last_activity_at: number;
+  last_assistant_message?: Record<string, unknown>;
+  last_user_message?: Record<string, unknown>;
+  session_id: string;
+  total_cost_usd: number;
+  total_messages: number;
+  total_tokens: number;
+  unanswered: boolean;
 };
 
 export type Skill = {

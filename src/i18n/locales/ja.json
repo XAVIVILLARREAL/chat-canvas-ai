@@ -144,7 +144,7 @@
   "chat.providerNote": "BYOKプロバイダはA.3で接続",
   "view.canvas": "キャンバス",
   "view.chat": "チャット",
-  "chat.help": "コマンド: /help。他のスラッシュはC段階で登場。",
+  "chat.help": "コマンド: /help、/compact（古い履歴を要約）。他は次のフェーズで追加されます。",
   "chat.slashLater": "{cmd}は後の段階で登場",
   "context.title": "コンテキスト",
   "context.noSession": "使用状況を見るにはセッションを開いてください",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "依頼を開始しました",
   "encargo.toastCompleted": "依頼が完了 — 証跡が準備できました",
   "encargo.toastFailed": "依頼が失敗しました",
-  "encargo.gatewayOff": "ゲートウェイがオフライン — 依頼は作成されませんでした"
+  "encargo.gatewayOff": "ゲートウェイがオフライン — 依頼は作成されませんでした",
+  "resume.title": "前回の続き",
+  "resume.unanswered": "最後のメッセージが未返信 — 途中から再開できます",
+  "resume.lastActivity": "最終アクティビティ {when}",
+  "resume.messages": "{n} 件のメッセージ",
+  "resume.tokens": "{n} トークン",
+  "resume.you": "あなた",
+  "resume.agent": "エージェント",
+  "resume.continueHint": "下の入力欄から続けられます — 何も失われません",
+  "resume.dismiss": "閉じる",
+  "chat.compacting": "履歴を圧縮中…",
+  "chat.compacted": "履歴を圧縮しました — 古い {n} 件を要約",
+  "chat.compactNothing": "圧縮するものはまだありません",
+  "chat.compactNoProvider": "圧縮には BYOK プロバイダーが必要です（設定で接続）"
 }

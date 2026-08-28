@@ -190,6 +190,7 @@ scripts/
 | 2026-08-28 | A.5 completada: medidor de contexto (core/context.rs + GET /api/sessions/:id/context + truncado en chat + ContextMeter en memory rail + 13 keys × 12 locales + OpenAPI 47 paths) |
 | 2026-08-28 | A.6 completada: Centro de Configuración (settings por scope Agente>Sesión>Proyecto>Global con valor efectivo+origen, /api/settings/:pid/effective, overrides de sesión en agent_config, chat usa temperature/model, ConfigCenter 2 públicos, 19 keys × 12 locales, OpenAPI 50 paths) |
 | 2026-08-28 | A.7 completada: Modo ENCARGO (migración 0006 encargos sqlite+postgres+RLS, POST/GET /api/encargos con runner en background que compone el prompt de título+criterios, evidencia en encargo+sesión+event_stream, EncargosPanel en memory rail con toasts, 11 keys × 12 locales, OpenAPI 52 paths) |
+| 2026-08-28 | A.8 completada: Resume inteligente (GET /api/sessions/:id/resume con unanswered + actividad, POST /api/sessions/:id/compact con resumen LLM → mensaje system + borrado de viejos, ResumeCard descartable en chat, /compact en el input, 13 keys × 12 locales, OpenAPI 54 paths) |
 
 ---
 
@@ -199,11 +200,11 @@ scripts/
 
 > **📌 PUNTO DE CONTINUIDAD — leer esto primero en una sesión nueva**
 
-- **Última sesión (2026-08-28)**: **ETAPA 0 CERRADA (GATE 0 ✅)** + **Etapa 1: A.0 ✅ A.1 ✅ A.2 ✅ A.3 ✅ A.4 ✅ A.5 ✅ A.6 ✅ A.7 ✅**
-- **Próxima acción**: **Etapa 1 A.8 — Resume inteligente (v1)** (reanudar sesión interrumpida: card de resumen; `/compact` comprime historial viejo). Spec: [plan-a-chat-codex §A.8](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md). Luego A.9 (ramas) → **GATE A**.
+- **Última sesión (2026-08-28)**: **ETAPA 0 CERRADA (GATE 0 ✅)** + **Etapa 1: A.0 ✅ A.1 ✅ A.2 ✅ A.3 ✅ A.4 ✅ A.5 ✅ A.6 ✅ A.7 ✅ A.8 ✅**
+- **Próxima acción**: **Etapa 1 A.9 — Ramas visuales al editar** (editar un mensaje → rama; flechas ‹/› navegan alternativas sin perder ninguna). Spec: [plan-a-chat-codex §A.9](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md). Luego → **GATE A** (demo verificable completa).
 
 **Estado del código (todo en main, verificado):**
-- Rust **53/53** (SQLite + PG 16 real + Docker real + context A.5 + scopes A.6 + encargos A.7) · vitest 7/7 · typecheck (tsgo) ✅ · build ✅ · i18n 12/12 (167 keys) · humana: A.0 6/6, A.1/A.4 8/8, A.5 6/6, A.6 6/6, A.7 7/7, móvil 3/3
+- Rust **56/56** (SQLite + PG 16 real + Docker real + context A.5 + scopes A.6 + encargos A.7 + resume/compact A.8) · vitest 7/7 · typecheck (tsgo) ✅ · build ✅ · i18n 12/12 (180 keys) · humana: A.0 6/6, A.1/A.4 8/8, A.5 6/6, A.6 6/6, A.7 7/7, A.8 7/7, móvil 3/3
 - Etapa 0: migraciones {sqlite,postgres}/0001-0005 · repos sqlx · server axum persistido (ADR-007) · RLS fail-closed 13 tablas · event_stream append-only · vault BYOK AES-256-GCM · sandbox Linux (bollard) · OpenAPI 43 paths + `src/types/api-generated.ts` · i18n 12 locales + RTL
 - Etapa 1: A.0 proyectos+settings scopes+switcher/grid+skills global/copia · A.1 /api/sessions+messages + ChatPanel + SessionsList + BottomNav · A.2 settings cifradas (`{__secret: key_ref}`) · A.3 `AgentProvider` + OpenAICompatProvider universal + `/chat` · A.4 streaming SSE + slash honestos + usage · A.5 medidor de contexto (desglose por fuentes en vivo + límite `context_max_tokens` con truncado real del request) · A.6 Centro de Configuración (4 scopes Agente>Sesión>Proyecto>Global con valor efectivo+origen, 2 públicos, chat usa temperature/model reales) · A.7 Modo ENCARGO (título+criterios sin prompt, runner en background, evidencia en encargo+sesión, toast de vuelta)
 
@@ -293,6 +294,11 @@ cargo test -p canvas-ai-core --test providers_byok openrouter_free_real -- --noc
 | Archivos | `crates/core/migrations/{sqlite,postgres}/0006_encargos.sql` (+down) · `crates/core/src/repo.rs` · `crates/server/src/api.rs` · `crates/server/tests/encargos.rs` · `src/components/EncargosPanel.tsx` · `src/components/ChatPanel.tsx` · `src/lib/encargosApi.ts` · `src/hooks/useEncargos.ts` · `src/styles.css` · `e2e/human/tests/encargo.spec.ts` |
 | Tests | integration 3/3 (completado con mock: evidencia+tokens+mensajes en sesión auto-creada; sin provider → failed honesto; validación 400) · E2E humana @core desktop 7/7 (delegar con clicks → mock completa → toast → evidencia en panel y en su sesión) · workspace cargo 53/0 · suite @core 9 passed |
 | Lecciones | (1) el test de migraciones mantiene la reversa MANUAL en `repo_sqlite.rs` (DOWN_000X + run_all_down) — nueva tabla ⇒ sumar su DOWN ahí y actualizar el conteo de `_sqlx_migrations` · (2) los toasts son efímeros (4-6s): asertarlos con `toContainText` (reintenta) y locator simple, nunca `toBeVisible` con filtros complejos · (3) el encargo auto-crea SU propia sesión "Encargo: …" — para ver mensajes el spec debe navegar a ella desde el tab Sesiones |
+| **A.8 — Resume inteligente (v1)** | ✅ Cerrada 2026-08-28 |
+| Deliverables | `GET /api/sessions/:id/resume` (dónde se quedó: total mensajes/tokens/costo, última actividad, `unanswered` = último mensaje es user sin responder, previews) · `POST /api/sessions/:id/compact` (keep default 4: LLM resume los viejos → mensaje `system` retimed ANTES de los recientes, viejos borrados — el event_stream conserva auditoría; medidor A.5 refleja la compresión) · repo: `message_delete_ids` + `message_retime` + evento `session.compacted` · `ResumeCard` en chat (descartable por sesión, visible si unanswered o >1h sin actividad) · `/compact` cableado en el input (notices honestos: sin provider → aviso) · 13 keys × 12 locales + `chat.help` actualizado · OpenAPI 54 paths |
+| Archivos | `crates/core/src/repo.rs` · `crates/server/src/api.rs` · `crates/server/tests/resume_compact.rs` · `src/components/ResumeCard.tsx` · `src/components/ChatPanel.tsx` · `src/lib/chatApi.ts` · `src/hooks/useSessions.ts` · `e2e/human/tests/resume.spec.ts` |
+| Tests | integration 3/3 (turno interrumpido detectado; compact: 6→resumen+2 y el contexto pesa menos; sin provider → 400 honesto y sin viejos → no-op) · E2E humana @core desktop 7/7 (dejar a mitad → alternar sesión → reabrir → card con unanswered → continuar fluido → /compact comprime y el resumen aparece) · workspace cargo 56/0 · suite @core 10 passed |
+| Lecciones | (1) los providers de specs anteriores VIVEN en la DB del gateway con sus servidores muertos — puertos efímeros reciclados pueden "responder" y un mensaje fantasma del assistant mata la aserción de unanswered ⇒ cada spec debe limpiar providers al inicio (DELETE /api/providers/:id) · (2) sesiones con título fijo colisionan entre runs (la DB persiste) ⇒ títulos únicos con Date.now() · (3) crear datos por API dentro de page.evaluate deja la React Query stale ⇒ page.reload() antes de navegar a lo creado |
 
 ### §15.3 Pausas y reanudaciones
 

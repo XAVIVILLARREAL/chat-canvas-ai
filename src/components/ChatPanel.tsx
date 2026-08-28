@@ -14,6 +14,8 @@ import {
 import { streamChat } from '../lib/chatApi';
 import { ContextMeter } from './ContextMeter';
 import { EncargosPanel } from './EncargosPanel';
+import { ResumeCard } from './ResumeCard';
+import { useCompact } from '../hooks/useSessions';
 
 export function ChatPanel() {
   const { t } = useI18n();
@@ -26,6 +28,7 @@ export function ChatPanel() {
   const [notice, setNotice] = useState<string | null>(null);       // notas /help etc.
   const qc = useQueryClient();
   const bottomRef = useRef<HTMLDivElement>(null);
+  const compact = useCompact(activeSessionId);
 
   const active = sessions.find((s) => s.id === activeSessionId) ?? null;
 
@@ -38,11 +41,22 @@ export function ChatPanel() {
     if (!content || !activeSessionId || send.isPending || streaming !== null) return;
     setDraft('');
 
-    // slash commands — honestos: solo /help; los demás llegan en etapas C/A.5+
+    // slash commands — honestos: /help y /compact (A.8); los demás llegan en Etapa C
     if (content.startsWith('/')) {
       const cmd = content.split(' ')[0];
       if (cmd === '/help') {
         setNotice(t('chat.help'));
+      } else if (cmd === '/compact') {
+        setNotice(t('chat.compacting'));
+        compact.mutate(undefined, {
+          onSuccess: (r) =>
+            setNotice(
+              r.compacted
+                ? t('chat.compacted').replace('{n}', String(r.removed))
+                : t('chat.compactNothing'),
+            ),
+          onError: () => setNotice(t('chat.compactNoProvider')),
+        });
       } else {
         setNotice(t('chat.slashLater').replace('{cmd}', cmd));
       }
@@ -79,6 +93,7 @@ export function ChatPanel() {
         </div>
 
         <div className="chat-messages" style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <ResumeCard sessionId={activeSessionId} />
           {messages.length === 0 && (
             <p style={{ opacity: 0.6, textAlign: 'center', marginTop: 40 }} data-testid="chat-empty">
               {t('chat.empty')}

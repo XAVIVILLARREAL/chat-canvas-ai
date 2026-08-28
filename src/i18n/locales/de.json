@@ -144,7 +144,7 @@
   "chat.providerNote": "BYOK-Anbieter kommen in A.3",
   "view.canvas": "Canvas",
   "view.chat": "Chat",
-  "chat.help": "Befehle: /help. Weitere Slashes kommen in Stufe C.",
+  "chat.help": "Befehle: /help, /compact (fasst alten Verlauf zusammen). Weitere kommen mit Etappe C.",
   "chat.slashLater": "{cmd} kommt in einer späteren Stufe",
   "context.title": "Kontext",
   "context.noSession": "Sitzung öffnen, um die Nutzung zu sehen",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "Auftrag in Bearbeitung",
   "encargo.toastCompleted": "Auftrag abgeschlossen — Belege bereit",
   "encargo.toastFailed": "Auftrag fehlgeschlagen",
-  "encargo.gatewayOff": "Gateway offline — Auftrag nicht erstellt"
+  "encargo.gatewayOff": "Gateway offline — Auftrag nicht erstellt",
+  "resume.title": "Wo du aufgehört hast",
+  "resume.unanswered": "Letzte Nachricht unbeantwortet — mach dort weiter",
+  "resume.lastActivity": "Letzte Aktivität {when}",
+  "resume.messages": "{n} Nachrichten",
+  "resume.tokens": "{n} Token",
+  "resume.you": "Du",
+  "resume.agent": "Agent",
+  "resume.continueHint": "Weiter im Feld unten — nichts geht verloren",
+  "resume.dismiss": "Ausblenden",
+  "chat.compacting": "Verlauf wird komprimiert…",
+  "chat.compacted": "Verlauf komprimiert — {n} alte Nachrichten zusammengefasst",
+  "chat.compactNothing": "Noch nichts zu komprimieren",
+  "chat.compactNoProvider": "Komprimieren braucht einen BYOK-Provider (in Config verbinden)"
 }

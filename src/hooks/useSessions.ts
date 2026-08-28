@@ -3,12 +3,16 @@
  * invalidación tras mutaciones. Fail-open: error → listas vacías.
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { chatApi, type ContextInfo, type MessageInfo, type SessionInfo } from '../lib/chatApi';
+import {
+  chatApi, type CompactResult, type ContextInfo, type MessageInfo,
+  type SessionInfo, type SessionResumeInfo,
+} from '../lib/chatApi';
 
 export const sessionKeys = {
   all: ['sessions'] as const,
   messages: (id: string | null) => ['sessions', id, 'messages'] as const,
   context: (id: string | null) => ['sessions', id, 'context'] as const,
+  resume: (id: string | null) => ['sessions', id, 'resume'] as const,
 };
 
 export function useSessions() {
@@ -25,6 +29,33 @@ export function useMessages(sessionId: string | null) {
     queryFn: async () => (sessionId ? (await chatApi.listMessages(sessionId)) ?? [] : []),
     enabled: !!sessionId,
     staleTime: 5_000,
+  });
+}
+
+/** Dónde se quedó la sesión (A.8) — card de resume al reabrir. */
+export function useSessionResume(sessionId: string | null) {
+  return useQuery<SessionResumeInfo | null>({
+    queryKey: sessionKeys.resume(sessionId),
+    queryFn: async () => (sessionId ? (await chatApi.resume(sessionId)) ?? null : null),
+    enabled: !!sessionId,
+    staleTime: 30_000,
+  });
+}
+
+/** /compact — comprime el historial viejo (A.8). Invalida mensajes+contexto. */
+export function useCompact(sessionId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (keep?: number): Promise<CompactResult> => {
+      if (!sessionId) throw new Error('sin sesión');
+      const r = await chatApi.compact(sessionId, keep);
+      if (!r) throw new Error('compact falló (¿sin provider?)');
+      return r;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: sessionKeys.messages(sessionId) });
+      qc.invalidateQueries({ queryKey: sessionKeys.context(sessionId) });
+    },
   });
 }
 

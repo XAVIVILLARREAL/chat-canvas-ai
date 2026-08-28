@@ -144,7 +144,7 @@
   "chat.providerNote": "I provider BYOK si collegano in A.3",
   "view.canvas": "Canvas",
   "view.chat": "Chat",
-  "chat.help": "Comandi: /help. Altri slash arrivano nella Fase C.",
+  "chat.help": "Comandi: /help, /compact (riassume la vecchia cronologia). Altri arrivano con la fase C.",
   "chat.slashLater": "{cmd} arriva in una fase successiva",
   "context.title": "Contesto",
   "context.noSession": "Apri una sessione per vedere l'utilizzo",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "Incarico in corso",
   "encargo.toastCompleted": "Incarico completato — evidenza pronta",
   "encargo.toastFailed": "Incarico fallito",
-  "encargo.gatewayOff": "Gateway offline — incarico non creato"
+  "encargo.gatewayOff": "Gateway offline — incarico non creato",
+  "resume.title": "Dove eri rimasto",
+  "resume.unanswered": "Ultimo messaggio senza risposta — continua da dove eri",
+  "resume.lastActivity": "Ultima attività {when}",
+  "resume.messages": "{n} messaggi",
+  "resume.tokens": "{n} token",
+  "resume.you": "Tu",
+  "resume.agent": "Agente",
+  "resume.continueHint": "Continua nella casella sotto — non si perde nulla",
+  "resume.dismiss": "Chiudi",
+  "chat.compacting": "Compressione della cronologia…",
+  "chat.compacted": "Cronologia compressa — {n} vecchi messaggi riassunti",
+  "chat.compactNothing": "Niente da comprimere per ora",
+  "chat.compactNoProvider": "Comprimere richiede un provider BYOK (collegalo in Config)"
 }

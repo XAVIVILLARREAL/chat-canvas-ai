@@ -144,7 +144,7 @@
   "chat.providerNote": "BYOK प्रदाता A.3 में जुड़ेंगे",
   "view.canvas": "कैनवास",
   "view.chat": "चैट",
-  "chat.help": "कमांड: /help। अन्य स्लैश चरण C में।",
+  "chat.help": "कमांड: /help, /compact (पुराने इतिहास का सारांश)। अधिक अगले चरण में।",
   "chat.slashLater": "{cmd} बाद के चरण में आएगा",
   "context.title": "संदर्भ",
   "context.noSession": "उपयोग देखने के लिए सेशन खोलें",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "काम शुरू हुआ",
   "encargo.toastCompleted": "काम पूरा — सबूत तैयार",
   "encargo.toastFailed": "काम विफल",
-  "encargo.gatewayOff": "गेटवे ऑफ़लाइन — काम नहीं बना"
+  "encargo.gatewayOff": "गेटवे ऑफ़लाइन — काम नहीं बना",
+  "resume.title": "आप कहाँ रुके थे",
+  "resume.unanswered": "आख़िरी संदेश अनुत्तरित — वहीं से जारी रखें",
+  "resume.lastActivity": "अंतिम गतिविधि {when}",
+  "resume.messages": "{n} संदेश",
+  "resume.tokens": "{n} टोकन",
+  "resume.you": "आप",
+  "resume.agent": "एजेंट",
+  "resume.continueHint": "नीचे बॉक्स में जारी रखें — कुछ भी नहीं खोता",
+  "resume.dismiss": "हटाएँ",
+  "chat.compacting": "इतिहास संपीड़ित हो रहा है…",
+  "chat.compacted": "इतिहास संपीड़ित — {n} पुराने संदेशों का सारांश बना",
+  "chat.compactNothing": "अभी संपीड़ित करने को कुछ नहीं",
+  "chat.compactNoProvider": "संपीड़न के लिए BYOK प्रदाता चाहिए (Config में जोड़ें)"
 }

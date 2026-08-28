@@ -144,7 +144,7 @@
   "chat.providerNote": "Los proveedores BYOK se conectan en A.3",
   "view.canvas": "Canvas",
   "view.chat": "Chat",
-  "chat.help": "Comandos: /help. Más slash llegan con la Etapa C.",
+  "chat.help": "Comandos: /help, /compact (resume el historial viejo). Más llegan con Etapa C.",
   "chat.slashLater": "{cmd} llega en una etapa posterior",
   "context.title": "Contexto",
   "context.noSession": "Abre una sesión para ver el uso",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "Encargo en curso",
   "encargo.toastCompleted": "Encargo completado — evidencia lista",
   "encargo.toastFailed": "Encargo falló",
-  "encargo.gatewayOff": "Gateway fuera de línea — encargo no creado"
+  "encargo.gatewayOff": "Gateway fuera de línea — encargo no creado",
+  "resume.title": "Dónde te quedaste",
+  "resume.unanswered": "Último mensaje sin respuesta — continúa donde lo dejaste",
+  "resume.lastActivity": "Última actividad {when}",
+  "resume.messages": "{n} mensajes",
+  "resume.tokens": "{n} tokens",
+  "resume.you": "Tú",
+  "resume.agent": "Agente",
+  "resume.continueHint": "Continúa en el cuadro de abajo — no se pierde nada",
+  "resume.dismiss": "Descartar",
+  "chat.compacting": "Comprimiendo historial…",
+  "chat.compacted": "Historial comprimido — {n} mensajes viejos resumidos",
+  "chat.compactNothing": "Aún no hay nada que comprimir",
+  "chat.compactNoProvider": "Compactar necesita un provider BYOK (conéctalo en Config)"
 }

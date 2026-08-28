@@ -144,7 +144,7 @@
   "chat.providerNote": "Провайдеры BYOK подключатся в A.3",
   "view.canvas": "Канвас",
   "view.chat": "Чат",
-  "chat.help": "Команды: /help. Остальные слэши — с этапа C.",
+  "chat.help": "Команды: /help, /compact (резюмирует старую историю). Больше — с этапом C.",
   "chat.slashLater": "{cmd} появится на более позднем этапе",
   "context.title": "Контекст",
   "context.noSession": "Откройте сессию, чтобы увидеть расход",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "Поручение выполняется",
   "encargo.toastCompleted": "Поручение выполнено — доказательства готовы",
   "encargo.toastFailed": "Поручение провалено",
-  "encargo.gatewayOff": "Шлюз офлайн — поручение не создано"
+  "encargo.gatewayOff": "Шлюз офлайн — поручение не создано",
+  "resume.title": "На чём вы остановились",
+  "resume.unanswered": "Последнее сообщение без ответа — продолжите с того места",
+  "resume.lastActivity": "Последняя активность {when}",
+  "resume.messages": "{n} сообщений",
+  "resume.tokens": "{n} токенов",
+  "resume.you": "Вы",
+  "resume.agent": "Агент",
+  "resume.continueHint": "Продолжайте в поле ниже — ничего не теряется",
+  "resume.dismiss": "Скрыть",
+  "chat.compacting": "Сжимаю историю…",
+  "chat.compacted": "История сжата — {n} старых сообщений резюмировано",
+  "chat.compactNothing": "Пока нечего сжимать",
+  "chat.compactNoProvider": "Для сжатия нужен BYOK-провайдер (подключите в Config)"
 }

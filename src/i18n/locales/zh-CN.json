@@ -144,7 +144,7 @@
   "chat.providerNote": "BYOK 提供商将在 A.3 接入",
   "view.canvas": "画布",
   "view.chat": "聊天",
-  "chat.help": "命令：/help。更多斜杠命令将在 C 阶段推出。",
+  "chat.help": "命令：/help、/compact（汇总旧历史）。更多命令将在下一阶段推出。",
   "chat.slashLater": "{cmd} 将在后续阶段推出",
   "context.title": "上下文",
   "context.noSession": "打开会话以查看用量",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "委托已开始",
   "encargo.toastCompleted": "委托完成——证据已就绪",
   "encargo.toastFailed": "委托失败",
-  "encargo.gatewayOff": "网关离线——委托未创建"
+  "encargo.gatewayOff": "网关离线——委托未创建",
+  "resume.title": "上次进行到",
+  "resume.unanswered": "最后一条消息未回复——从上次继续",
+  "resume.lastActivity": "上次活动 {when}",
+  "resume.messages": "{n} 条消息",
+  "resume.tokens": "{n} 个 token",
+  "resume.you": "你",
+  "resume.agent": "代理",
+  "resume.continueHint": "在下方输入框继续——不会丢失任何内容",
+  "resume.dismiss": "关闭",
+  "chat.compacting": "正在压缩历史…",
+  "chat.compacted": "历史已压缩——{n} 条旧消息已汇总",
+  "chat.compactNothing": "还没有可压缩的内容",
+  "chat.compactNoProvider": "压缩需要 BYOK 提供商（在配置中连接）"
 }

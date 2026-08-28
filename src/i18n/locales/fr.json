@@ -144,7 +144,7 @@
   "chat.providerNote": "Les fournisseurs BYOK arrivent en A.3",
   "view.canvas": "Canvas",
   "view.chat": "Chat",
-  "chat.help": "Commandes : /help. D'autres slash arrivent à l'Étape C.",
+  "chat.help": "Commandes : /help, /compact (résume l'ancien historique). D'autres arrivent avec l'étape C.",
   "chat.slashLater": "{cmd} arrive dans une étape ultérieure",
   "context.title": "Contexte",
   "context.noSession": "Ouvrez une session pour voir l'utilisation",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "Mission en cours",
   "encargo.toastCompleted": "Mission terminée — preuves disponibles",
   "encargo.toastFailed": "Mission échouée",
-  "encargo.gatewayOff": "Passerelle hors ligne — mission non créée"
+  "encargo.gatewayOff": "Passerelle hors ligne — mission non créée",
+  "resume.title": "Où vous en étiez",
+  "resume.unanswered": "Dernier message sans réponse — reprenez où vous en étiez",
+  "resume.lastActivity": "Dernière activité {when}",
+  "resume.messages": "{n} messages",
+  "resume.tokens": "{n} jetons",
+  "resume.you": "Vous",
+  "resume.agent": "Agent",
+  "resume.continueHint": "Continuez dans le champ ci-dessous — rien ne se perd",
+  "resume.dismiss": "Fermer",
+  "chat.compacting": "Compression de l'historique…",
+  "chat.compacted": "Historique compressé — {n} anciens messages résumés",
+  "chat.compactNothing": "Rien à compresser pour l'instant",
+  "chat.compactNoProvider": "Compresser exige un provider BYOK (connectez-le dans Config)"
 }

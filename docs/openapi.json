@@ -2694,6 +2694,37 @@
         "title": "ChatResponse",
         "type": "object"
       },
+      "CompactResponse": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "compacted": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "removed": {
+            "format": "uint",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "summary_message_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "compacted",
+          "removed"
+        ],
+        "title": "CompactResponse",
+        "type": "object"
+      },
       "CreateAgentRequest": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "definitions": {
@@ -4130,6 +4161,57 @@
           "total_tokens"
         ],
         "title": "SessionContextResponse",
+        "type": "object"
+      },
+      "SessionResumeResponse": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "last_activity_at": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "last_assistant_message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_user_message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "session_id": {
+            "type": "string"
+          },
+          "total_cost_usd": {
+            "format": "double",
+            "type": "number"
+          },
+          "total_messages": {
+            "format": "uint",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "total_tokens": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "unanswered": {
+            "description": "true si el último mensaje es del usuario (turno interrumpido, sin respuesta).",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "last_activity_at",
+          "session_id",
+          "total_cost_usd",
+          "total_messages",
+          "total_tokens",
+          "unanswered"
+        ],
+        "title": "SessionResumeResponse",
         "type": "object"
       },
       "SettingEntry": {
@@ -7650,6 +7732,42 @@
         ]
       }
     },
+    "/api/sessions/{id}/compact": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompactResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Comprime el historial viejo en un resumen (A.8)",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
     "/api/sessions/{id}/context": {
       "get": {
         "responses": {
@@ -7731,6 +7849,32 @@
           }
         },
         "summary": "Agrega mensaje",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{id}/resume": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResumeResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Dónde se quedó la sesión (card de resume, A.8)",
         "tags": [
           "sessions"
         ]

@@ -155,6 +155,8 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/sessions/:id/chat", post(chat_in_session))
         .route("/api/sessions/:id/chat/stream", post(chat_in_session_stream))
         .route("/api/sessions/:id/context", get(session_context))
+        .route("/api/sessions/:id/resume", get(session_resume))
+        .route("/api/sessions/:id/compact", post(compact_session))
         
         // Projects como SCOPE (A.0) + settings con scopes Global→Proyecto
         .route("/api/projects", get(list_projects).post(create_project))
@@ -1095,6 +1097,154 @@ async fn put_global_setting(
 ) -> ApiResult<serde_json::Value> {
     repo::global_setting_set(&state.db, &req.key, &req.value).await.map_err(|e| db_err(e))?;
     Ok(Json(serde_json::json!({ "ok": true, "scope": "global", "key": req.key })))
+}
+
+// ─── Resume inteligente (A.8) — card de reanudación + /compact ──────────────
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct SessionResumeResponse {
+    pub session_id: String,
+    pub total_messages: usize,
+    pub total_tokens: i64,
+    pub total_cost_usd: f64,
+    pub last_activity_at: i64,
+    /// true si el último mensaje es del usuario (turno interrumpido, sin respuesta).
+    pub unanswered: bool,
+    pub last_user_message: Option<String>,
+    pub last_assistant_message: Option<String>,
+}
+
+/// Dónde se quedó la sesión (datos reales, sin inventar): la card del frontend
+/// se alimenta de esto al reabrir una sesión con actividad.
+async fn session_resume(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<SessionResumeResponse> {
+    let session = repo::session_get(&state.db, &id)
+        .await
+        .map_err(|e| db_err(e))?
+        .ok_or_else(|| not_found("Session"))?;
+    let history = repo::message_list_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
+    let last_user = history.iter().rev().find(|m| m.role == "user").map(|m| m.content.clone());
+    let last_assistant = history.iter().rev().find(|m| m.role == "assistant").map(|m| m.content.clone());
+    let unanswered = history.last().map(|m| m.role == "user").unwrap_or(false);
+    let last_activity_at = history
+        .last()
+        .map(|m| m.created_at)
+        .unwrap_or(session.updated_at);
+    Ok(Json(SessionResumeResponse {
+        session_id: id,
+        total_messages: history.len(),
+        total_tokens: session.total_tokens,
+        total_cost_usd: session.total_cost_usd,
+        last_activity_at,
+        unanswered,
+        last_user_message: last_user,
+        last_assistant_message: last_assistant,
+    }))
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct CompactRequest {
+    /// Mensajes recientes a conservar (default 4, mínimo 1).
+    pub keep: Option<usize>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct CompactResponse {
+    pub compacted: bool,
+    pub removed: usize,
+    pub summary_message_id: Option<String>,
+    pub reason: Option<String>,
+}
+
+/// /compact — comprime el historial viejo: un LLM resume los mensajes antiguos
+/// en un mensaje `system` y los viejos se borran (el event_stream conserva la
+/// pista de auditoría). El medidor de contexto (A.5) refleja la compresión.
+async fn compact_session(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Json(req): Json<CompactRequest>,
+) -> ApiResult<CompactResponse> {
+    let session = repo::session_get(&state.db, &id)
+        .await
+        .map_err(|e| db_err(e))?
+        .ok_or_else(|| not_found("Session"))?;
+    let keep = req.keep.unwrap_or(4).max(1);
+    let history = repo::message_list_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
+    if history.len() <= keep {
+        return Ok(Json(CompactResponse {
+            compacted: false,
+            removed: 0,
+            summary_message_id: None,
+            reason: Some("nada que comprimir".into()),
+        }));
+    }
+    let (old, recent) = history.split_at(history.len() - keep);
+
+    let session_map = repo::session_settings_map(&state.db, &id).await.unwrap_or_default();
+    let model = resolve_setting(&state, &session.project_id, &session_map, "model")
+        .await
+        .and_then(|v| v.as_str().map(String::from))
+        .unwrap_or_else(|| "auto".to_string());
+    let convo: String = old
+        .iter()
+        .map(|m| format!("{}: {}\n", m.role, m.content))
+        .collect();
+    let sum_req = providers::ChatCompletionRequest {
+        model,
+        messages: vec![
+            providers::ChatMessage {
+                role: "system".into(),
+                content: "Resume la conversación en un párrafo corto conservando decisiones, datos y pendientes. Sin preámbulos.".into(),
+            },
+            providers::ChatMessage {
+                role: "user".into(),
+                content: format!("Conversación a resumir:\n{convo}"),
+            },
+        ],
+        max_tokens: None,
+        temperature: None,
+        stream: false,
+    };
+    let (resp, provider_name) = chat_via_any_provider(&state, &sum_req).await?;
+    let summary = resp
+        .choices
+        .first()
+        .and_then(|c| c.message.content.clone())
+        .unwrap_or_default();
+
+    // resumen como mensaje system, reubicado ANTES de los mensajes conservados
+    let summary_id = Uuid::new_v4().to_string();
+    repo::message_create(
+        &state.db, &summary_id, &id, "system",
+        &format!("Resumen del historial previo ({} mensajes comprimidos):\n{summary}", old.len()),
+        Some(&provider_name), None, None, None,
+        &serde_json::json!({"kind": "compact", "covered": old.len()}),
+    )
+    .await
+    .map_err(|e| db_err(e))?;
+    repo::message_retime(&state.db, &summary_id, recent.first().map(|m| m.created_at - 1).unwrap_or_else(repo::now_ms))
+        .await
+        .map_err(|e| db_err(e))?;
+    let old_ids: Vec<String> = old.iter().map(|m| m.id.clone()).collect();
+    let removed = repo::message_delete_ids(&state.db, &old_ids).await.map_err(|e| db_err(e))?;
+    repo::event_append(
+        &state.db, &id, repo::product_events::SESSION_COMPACTED,
+        &format!("historial comprimido: {removed} mensajes → resumen"),
+        Some(&serde_json::json!({"removed": removed, "summary_message_id": summary_id})),
+        Some(&provider_name), 0, 0.0, Some("agent"), None,
+    )
+    .await
+    .ok();
+    info!("sesión {id} compactada: {removed} mensajes → resumen");
+
+    Ok(Json(CompactResponse {
+        compacted: true,
+        removed: removed as usize,
+        summary_message_id: Some(summary_id),
+        reason: None,
+    }))
 }
 
 // ─── Modo ENCARGO (A.7) — "haz X" sin escribir prompt ───────────────────────
@@ -2383,6 +2533,8 @@ const OPS: &[Op] = &[
     Op { method: "get", path: "/api/encargos", summary: "Lista encargos del proyecto (A.7)", tag: "encargos", request: None, response: Some("Encargo") },
     Op { method: "post", path: "/api/encargos", summary: "Crea encargo y lanza el runner en background (A.7)", tag: "encargos", request: Some("CreateEncargoRequest"), response: Some("Encargo") },
     Op { method: "get", path: "/api/encargos/{id}", summary: "Obtiene encargo con evidencia", tag: "encargos", request: None, response: Some("Encargo") },
+    Op { method: "get", path: "/api/sessions/{id}/resume", summary: "Dónde se quedó la sesión (card de resume, A.8)", tag: "sessions", request: None, response: Some("SessionResumeResponse") },
+    Op { method: "post", path: "/api/sessions/{id}/compact", summary: "Comprime el historial viejo en un resumen (A.8)", tag: "sessions", request: Some("CompactRequest"), response: Some("CompactResponse") },
 
     Op { method: "get", path: "/api/settings", summary: "Settings globales resueltas", tag: "settings", request: None, response: None },
     Op { method: "put", path: "/api/settings", summary: "Escribe setting GLOBAL", tag: "settings", request: Some("PutSettingRequest"), response: None },
@@ -2478,6 +2630,9 @@ pub fn build_openapi() -> serde_json::Value {
         ("PutSettingRequest", schema_for!(PutSettingRequest)),
         ("Encargo", schema_for!(repo::Encargo)),
         ("CreateEncargoRequest", schema_for!(CreateEncargoRequest)),
+        ("SessionResumeResponse", schema_for!(SessionResumeResponse)),
+        ("CompactResponse", schema_for!(CompactResponse)),
+        ("CompactRequest", schema_for!(CompactRequest)),
         ("StreamEvent", schema_for!(repo::StreamEvent)),
         ("A2AAgentCard", schema_for!(A2AAgentCard)),
         ("A2ATask", schema_for!(A2ATask)),

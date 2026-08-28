@@ -144,7 +144,7 @@
   "chat.providerNote": "BYOK 공급자는 A.3에서 연결",
   "view.canvas": "캔버스",
   "view.chat": "채팅",
-  "chat.help": "명령어: /help. 다른 슬래시는 C 단계에서 제공.",
+  "chat.help": "명령: /help, /compact (오래된 기록 요약). 더 많은 명령은 다음 단계에 추가됩니다.",
   "chat.slashLater": "{cmd}는 이후 단계에서 제공",
   "context.title": "컨텍스트",
   "context.noSession": "사용량을 보려면 세션을 여세요",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "위임 작업 시작됨",
   "encargo.toastCompleted": "위임 작업 완료 — 증거 준비됨",
   "encargo.toastFailed": "위임 작업 실패",
-  "encargo.gatewayOff": "게이트웨이 오프라인 — 생성되지 않았습니다"
+  "encargo.gatewayOff": "게이트웨이 오프라인 — 생성되지 않았습니다",
+  "resume.title": "어디까지 했는지",
+  "resume.unanswered": "마지막 메시지가 미응답입니다 — 이어서 계속하세요",
+  "resume.lastActivity": "마지막 활동 {when}",
+  "resume.messages": "메시지 {n}개",
+  "resume.tokens": "토큰 {n}개",
+  "resume.you": "나",
+  "resume.agent": "에이전트",
+  "resume.continueHint": "아래 입력창에서 계속하세요 — 아무것도 사라지지 않습니다",
+  "resume.dismiss": "닫기",
+  "chat.compacting": "기록 압축 중…",
+  "chat.compacted": "기록 압축됨 — 오래된 {n}개 메시지 요약됨",
+  "chat.compactNothing": "아직 압축할 내용이 없습니다",
+  "chat.compactNoProvider": "압축에는 BYOK 공급자가 필요합니다(설정에서 연결)"
 }

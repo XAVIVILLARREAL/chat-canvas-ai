@@ -144,7 +144,7 @@
   "chat.providerNote": "BYOK providers connect in A.3",
   "view.canvas": "Canvas",
   "view.chat": "Chat",
-  "chat.help": "Commands: /help. More slash commands arrive with Etapa C.",
+  "chat.help": "Commands: /help, /compact (summarizes old history). More arrive with Etapa C.",
   "chat.slashLater": "{cmd} arrives in a later stage",
   "context.title": "Context",
   "context.noSession": "Open a session to see usage",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "Encargo in progress",
   "encargo.toastCompleted": "Encargo completed — evidence ready",
   "encargo.toastFailed": "Encargo failed",
-  "encargo.gatewayOff": "Gateway offline — encargo not created"
+  "encargo.gatewayOff": "Gateway offline — encargo not created",
+  "resume.title": "Where you left off",
+  "resume.unanswered": "Last message unanswered — pick up where you left off",
+  "resume.lastActivity": "Last activity {when}",
+  "resume.messages": "{n} messages",
+  "resume.tokens": "{n} tokens",
+  "resume.you": "You",
+  "resume.agent": "Agent",
+  "resume.continueHint": "Continue in the box below — nothing is lost",
+  "resume.dismiss": "Dismiss",
+  "chat.compacting": "Compacting history…",
+  "chat.compacted": "History compacted — {n} old messages summarized",
+  "chat.compactNothing": "Nothing to compact yet",
+  "chat.compactNoProvider": "Compact needs a BYOK provider (connect one in Config)"
 }

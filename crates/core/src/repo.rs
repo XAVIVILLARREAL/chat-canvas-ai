@@ -267,6 +267,26 @@ pub async fn message_get(db: &Db, id: &str) -> Result<Option<Message>, sqlx::Err
     sqlx::query_as("SELECT * FROM messages WHERE id = ?1").bind(id).fetch_optional(db).await
 }
 
+/// Borra mensajes por id (usado por /compact — el event_stream conserva la
+/// pista de auditoría, es append-only).
+pub async fn message_delete_ids(db: &Db, ids: &[String]) -> Result<u64, sqlx::Error> {
+    let mut r = 0u64;
+    for id in ids {
+        let res = sqlx::query("DELETE FROM messages WHERE id = ?1").bind(id).execute(db).await?;
+        r += res.rows_affected();
+    }
+    Ok(r)
+}
+
+/// Reposiciona un mensaje en el tiempo (el resumen del /compact debe quedar
+/// ANTES de los mensajes recientes que se conservan).
+pub async fn message_retime(db: &Db, id: &str, created_at: i64) -> Result<(), sqlx::Error> {
+    sqlx::query("UPDATE messages SET created_at = ?2 WHERE id = ?1")
+        .bind(id).bind(created_at)
+        .execute(db).await?;
+    Ok(())
+}
+
 pub async fn message_list_by_session(db: &Db, session_id: &str) -> Result<Vec<Message>, sqlx::Error> {
     sqlx::query_as("SELECT * FROM messages WHERE session_id = ?1 ORDER BY created_at, id")
         .bind(session_id).fetch_all(db).await
@@ -651,6 +671,7 @@ pub mod product_events {
     pub const PROVIDER_ERROR: &str = "provider.error";
     pub const NUBE_SUBSCRIBED: &str = "nube.subscribed";
     pub const SESSION_EXPORTED: &str = "session.exported";
+    pub const SESSION_COMPACTED: &str = "session.compacted";
 }
 
 #[allow(clippy::too_many_arguments)]

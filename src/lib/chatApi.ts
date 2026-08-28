@@ -38,6 +38,26 @@ export interface ContextInfo {
   sent_tokens: number;
 }
 
+/** Dónde se quedó la sesión (A.8 — card de resume). */
+export interface SessionResumeInfo {
+  session_id: string;
+  total_messages: number;
+  total_tokens: number;
+  total_cost_usd: number;
+  last_activity_at: number;
+  unanswered: boolean;
+  last_user_message: string | null;
+  last_assistant_message: string | null;
+}
+
+/** Resultado de /compact (A.8). */
+export interface CompactResult {
+  compacted: boolean;
+  removed: number;
+  summary_message_id: string | null;
+  reason: string | null;
+}
+
 /** Callback por evento SSE del stream de chat. */
 export interface StreamHandlers {
   onDelta: (delta: string) => void;
@@ -147,6 +167,14 @@ export const chatApi = {
   listMessages: (sessionId: string) => apiFetch<MessageInfo[]>(`/api/sessions/${sessionId}/messages`),
   /** Medidor de contexto de la sesión (A.5). `null` si falla (fail-open). */
   context: (sessionId: string) => apiFetch<ContextInfo>(`/api/sessions/${sessionId}/context`),
+  /** Dónde se quedó la sesión (A.8). `null` si falla (fail-open). */
+  resume: (sessionId: string) => apiFetch<SessionResumeInfo>(`/api/sessions/${sessionId}/resume`),
+  /** Comprime el historial viejo en un resumen (A.8). `null` si falla (p.ej. sin provider). */
+  compact: (sessionId: string, keep?: number) =>
+    apiFetch<CompactResult>(`/api/sessions/${sessionId}/compact`, {
+      method: 'POST',
+      body: JSON.stringify({ keep: keep ?? 4 }),
+    }),
   /** Escribe el límite de contexto como override de proyecto (hereda si se borra). */
   setContextLimit: (projectId: string, limit: number) =>
     apiFetch<{ ok: boolean }>(`/api/settings/${projectId}`, {

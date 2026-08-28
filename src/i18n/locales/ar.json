@@ -144,7 +144,7 @@
   "chat.providerNote": "مزودو BYOK يتصلون في A.3",
   "view.canvas": "اللوحة",
   "view.chat": "المحادثة",
-  "chat.help": "الأوامر: /help. المزيد من الأوامر في المرحلة C.",
+  "chat.help": "الأوامر: /help، /compact (يلخص السجل القديم). المزيد لاحقاً في المرحلة C.",
   "chat.slashLater": "{cmd} سيصل في مرحلة لاحقة",
   "context.title": "السياق",
   "context.noSession": "افتح جلسة لعرض الاستخدام",
@@ -188,5 +188,18 @@
   "encargo.toastStarted": "المهمة قيد التنفيذ",
   "encargo.toastCompleted": "اكتملت المهمة — الأدلة جاهزة",
   "encargo.toastFailed": "فشلت المهمة",
-  "encargo.gatewayOff": "البوابة غير متصلة — لم تُنشأ المهمة"
+  "encargo.gatewayOff": "البوابة غير متصلة — لم تُنشأ المهمة",
+  "resume.title": "حيث توقفت",
+  "resume.unanswered": "آخر رسالة بلا رد — تابع من حيث توقفت",
+  "resume.lastActivity": "آخر نشاط {when}",
+  "resume.messages": "{n} رسالة",
+  "resume.tokens": "{n} رمزاً",
+  "resume.you": "أنت",
+  "resume.agent": "الوكيل",
+  "resume.continueHint": "تابع في المربع أدناه — لن يضيع شيء",
+  "resume.dismiss": "إغلاق",
+  "chat.compacting": "جارٍ ضغط السجل…",
+  "chat.compacted": "ضُغط السجل — لُخِّص {n} رسالة قديمة",
+  "chat.compactNothing": "لا شيء لضغطه بعد",
+  "chat.compactNoProvider": "الضغط يحتاج مزود BYOK (اربطه في الإعدادات)"
 }
