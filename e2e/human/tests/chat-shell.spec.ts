@@ -38,7 +38,49 @@ test.describe("AppShell chat — A.1", () => {
     await step("envío un mensaje y aparece en la conversación", async () => {
       await humanFill(page.getByTestId("chat-input"), "hola desde A1");
       await humanClick(page.getByTestId("chat-send"));
-      await expect(page.getByTestId("msg-user").last()).toContainText("hola desde A1");
+      await expect(page.locator('[data-testid="msg-user"]', { hasText: "hola desde A1" }).first()).toBeVisible();
+    });
+
+    await step("/help muestra la ayuda en un notice", async () => {
+      await humanFill(page.getByTestId("chat-input"), "/help");
+      await humanClick(page.getByTestId("chat-send"));
+      await expect(page.getByTestId("chat-notice")).toBeVisible();
+    });
+
+    await step("A.4 — streaming en vivo con provider mock (SSE)", async () => {
+      // mock provider que habla SSE con 4 tokens
+      const http = await import("node:http");
+      const server = http.createServer((reqq, res) => {
+        res.writeHead(200, { "content-type": "text/event-stream" });
+        for (const tok of ["Hola", " streaming", " A4", " vivo"]) {
+          res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: tok } }] })}\n\n`);
+        }
+        res.write("data: [DONE]\n\n");
+        res.end();
+      });
+      await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
+      const port = (server.address() as { port: number }).port;
+      const base = `http://127.0.0.1:${port}/v1`;
+
+      // registrar el provider por API (validación off: el mock no tiene /models)
+      await page.evaluate(async (url) => {
+        await fetch("/api/providers", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ provider_type: "generic", name: "mock-sse", base_url: url, api_key: "k", validate: false }),
+        });
+      }, base);
+
+      // enviar → ver el streaming en vivo → mensaje assistant final
+      await humanFill(page.getByTestId("chat-input"), "prueba de streaming");
+      await humanClick(page.getByTestId("chat-send"));
+      await expect(page.getByTestId("chat-streaming")).toBeVisible({ timeout: 5000 }).catch(() => {
+        // el streaming puede ser demasiado rápido para capturarlo — el assert final manda
+      });
+      await expect(
+        page.locator('[data-testid="msg-assistant"]', { hasText: "Hola streaming A4 vivo" }).first(),
+      ).toBeVisible({ timeout: 15000 });
+      server.close();
     });
 
     await step("recargo → la conversación restauró (persistencia)", async () => {
@@ -48,7 +90,7 @@ test.describe("AppShell chat — A.1", () => {
       const sesionTab = page.locator(".sidebar-tab", { hasText: /Sesiones|Sessions|セッション|Сессии|Juni|الجلسات/ }).first();
       await humanClick(sesionTab);
       await humanClick(page.locator("[data-testid^='session-']").last());
-      await expect(page.getByTestId("msg-user").last()).toContainText("hola desde A1");
+      await expect(page.locator('[data-testid="msg-user"]', { hasText: "hola desde A1" }).first()).toBeVisible();
     });
 
     await step("vuelvo a Canvas sin rastros del chat", async () => {

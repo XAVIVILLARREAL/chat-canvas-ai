@@ -143,5 +143,7 @@
   "chat.memorySoon": "मेमोरी रेल — चरण D में",
   "chat.providerNote": "BYOK प्रदाता A.3 में जुड़ेंगे",
   "view.canvas": "कैनवास",
-  "view.chat": "चैट"
+  "view.chat": "चैट",
+  "chat.help": "कमांड: /help। अन्य स्लैश चरण C में।",
+  "chat.slashLater": "{cmd} बाद के चरण में आएगा"
 }

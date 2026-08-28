@@ -18,7 +18,68 @@ export interface MessageInfo {
   role: 'user' | 'assistant' | 'system' | 'tool';
   content: string;
   model: string | null;
+  tokens_prompt?: number | null;
+  tokens_completion?: number | null;
   created_at: number;
+}
+
+/** Callback por evento SSE del stream de chat. */
+export interface StreamHandlers {
+  onDelta: (delta: string) => void;
+  onDone: (meta: { message_id: string; model: string; usage?: { prompt_tokens: number; completion_tokens: number } }) => void;
+}
+
+/**
+ * POST /chat/stream con parse SSE en vivo (A.4).
+ * Devuelve true si el stream arrancó (200); false si falló antes (fallback local).
+ */
+export async function streamChat(
+  sessionId: string,
+  content: string,
+  h: StreamHandlers,
+): Promise<boolean> {
+  let res: Response;
+  try {
+    res = await fetch(`${API}/api/sessions/${sessionId}/chat/stream`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ content }),
+    });
+  } catch {
+    return false;
+  }
+  if (!res.ok || !res.body) return false;
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let idx: number;
+    while ((idx = buffer.indexOf('\n\n')) !== -1) {
+      const event = buffer.slice(0, idx);
+      buffer = buffer.slice(idx + 2);
+      for (const line of event.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const v = JSON.parse(line.slice(6));
+          if (v.delta) h.onDelta(v.delta as string);
+          if (v.done && v.message_id) {
+            h.onDone({
+              message_id: v.message_id,
+              model: v.model ?? '',
+              usage: v.usage,
+            });
+          }
+        } catch {
+          // evento no-JSON ignorado (keep-alive)
+        }
+      }
+    }
+  }
+  return true;
 }
 
 const API = (import.meta.env.VITE_API_BASE ?? '').replace(/\/api\/?$/, '');

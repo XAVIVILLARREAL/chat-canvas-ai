@@ -196,8 +196,8 @@ scripts/
 
 - **Última sesión**: 2026-08-27 — **ETAPA 0 CERRADA (GATE 0 ✅)**: slices 0.1–0.7 completos y verificados (25/25 Rust + Docker real + PG real + typecheck/build)
 - **Fase actual**: Etapa 0 de [ETAPA-0-IMPLEMENTACION](docs/ETAPA-0-IMPLEMENTACION.md) — orden estricto 0.1→0.8
-- - **Próxima acción**: **Etapa 1 A.4** — UX del chat (streaming en vivo, markdown, perillas, slash commands) ([plan-a-chat-codex](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md))
-- **Progreso Etapa 0**: ✅ COMPLETA (GATE 0) · **Etapa 1**: A.0 ✅ · A.1 ✅ · A.2 ✅ · A.3 ✅ (36/36 rust, BYOK real con OpenRouter free) → A.4 en curso
+- - **Próxima acción**: **Etapa 1 A.5** — Medidor y debug de contexto (desglose tokens por fuente en vivo) ([plan-a-chat-codex](docs/SDDs/SDD-001-plan-base/plan-a-chat-codex.md))
+- **Progreso Etapa 0**: ✅ COMPLETA (GATE 0) · **Etapa 1**: A.0–A.4 ✅ (37/37 rust, streaming SSE en vivo) → A.5 en curso
 - **Bloqueos activos**: Ninguno
 
 ### §15.1 Estado global

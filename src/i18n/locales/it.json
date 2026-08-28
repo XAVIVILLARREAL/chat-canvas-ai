@@ -143,5 +143,7 @@
   "chat.memorySoon": "Rail memoria — arriva nella Fase D",
   "chat.providerNote": "I provider BYOK si collegano in A.3",
   "view.canvas": "Canvas",
-  "view.chat": "Chat"
+  "view.chat": "Chat",
+  "chat.help": "Comandi: /help. Altri slash arrivano nella Fase C.",
+  "chat.slashLater": "{cmd} arriva in una fase successiva"
 }

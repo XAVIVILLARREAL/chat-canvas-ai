@@ -143,5 +143,7 @@
   "chat.memorySoon": "Rail de memoria — llega en la Etapa D",
   "chat.providerNote": "Los proveedores BYOK se conectan en A.3",
   "view.canvas": "Canvas",
-  "view.chat": "Chat"
+  "view.chat": "Chat",
+  "chat.help": "Comandos: /help. Más slash llegan con la Etapa C.",
+  "chat.slashLater": "{cmd} llega en una etapa posterior"
 }

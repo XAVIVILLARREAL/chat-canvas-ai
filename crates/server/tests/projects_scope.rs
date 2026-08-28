@@ -361,3 +361,74 @@ async fn chat_sin_provider_es_honesto_400() {
     assert_eq!(st, StatusCode::BAD_REQUEST, "sin provider debe ser 400 honesto");
     let _ = err; // el body de error es texto plano ("sin provider…") — req_json lo trae Null
 }
+
+// ─── A.4: streaming SSE del chat — deltas en orden + persistencia final ─────
+
+#[tokio::test]
+async fn chat_stream_sse_deltas_y_persistencia() {
+    use base64::engine::general_purpose::STANDARD as B64;
+    use aes_gcm::aead::rand_core::RngCore;
+    let kek = { let mut k = [0u8; 32]; aes_gcm::aead::OsRng.fill_bytes(&mut k); B64.encode(k) };
+    std::env::set_var("CANVAS_KEK", &kek);
+
+    // provider mock que habla SSE (5 tokens + [DONE])
+    let sse_app = axum::Router::new().route(
+        "/v1/chat/completions",
+        axum::routing::post(|| async {
+            use axum::response::sse::{Event, KeepAlive, Sse};
+            use futures::StreamExt;
+            let tokens = vec!["Hola", " streaming", " A4"];
+            let iter = tokens.into_iter().map(|tok| {
+                let data = json!({ "choices": [{ "delta": { "content": tok }, "finish_reason": null }] });
+                Ok::<_, std::convert::Infallible>(Event::default().data(data.to_string()))
+            });
+            let fin = futures::stream::once(async {
+                Ok::<_, std::convert::Infallible>(Event::default().data("[DONE]"))
+            });
+            Sse::new(futures::stream::iter(iter).chain(fin)).keep_alive(KeepAlive::default())
+        }),
+    );
+    let l = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = l.local_addr().unwrap();
+    tokio::spawn(async move { axum::serve(l, sse_app).await.unwrap() });
+
+    let state = AppState::connect("sqlite::memory:").await.unwrap();
+    let app = create_router(state);
+
+    let (st, prov) = req_json(app.clone(), "POST", "/api/providers",
+        Some(json!({"provider_type": "generic", "name": "mock-sse", "base_url": format!("http://{addr}/v1"), "api_key": "k", "validate": false}))).await;
+    assert_eq!(st, StatusCode::OK, "{prov}");
+    let (_, ses) = req_json(app.clone(), "POST", "/api/sessions", Some(json!({"title": "stream"}))).await;
+    let sid = ses["id"].as_str().unwrap().to_string();
+
+    // POST /chat/stream → body SSE
+    let req = Request::builder()
+        .method("POST")
+        .uri(format!("/api/sessions/{sid}/chat/stream"))
+        .header("content-type", "application/json")
+        .body(Body::from(json!({"content": "hola stream"}).to_string()))
+        .unwrap();
+    let resp = app.clone().oneshot(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK, "stream debe arrancar 200");
+    let body = resp.into_body().collect().await.unwrap().to_bytes();
+    let text = String::from_utf8_lossy(&body);
+
+    // deltas en orden + meta final persistida
+    let texto_unido: String = text.lines()
+        .filter(|l| l.starts_with("data: ") && !l.contains("\"done\":true"))
+        .filter_map(|l| {
+            let v: Value = serde_json::from_str(&l[6..]).ok()?;
+            v["delta"].as_str().map(String::from)
+        })
+        .collect();
+    assert_eq!(texto_unido, "Hola streaming A4", "deltas en orden: {texto_unido:?}");
+    assert!(text.contains("\"persisted\":true"), "assistant persistido: {text}");
+
+    // la conversación quedó persistida: user + assistant
+    let (st, msgs) = req_json(app, "GET", &format!("/api/sessions/{sid}/messages"), None).await;
+    assert_eq!(st, StatusCode::OK);
+    let arr = msgs.as_array().unwrap();
+    assert_eq!(arr.len(), 2);
+    assert_eq!(arr[1]["content"], "Hola streaming A4");
+    assert_eq!(arr[1]["role"], "assistant");
+}

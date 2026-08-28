@@ -143,5 +143,7 @@
   "chat.memorySoon": "メモリレール — D段階で登場",
   "chat.providerNote": "BYOKプロバイダはA.3で接続",
   "view.canvas": "キャンバス",
-  "view.chat": "チャット"
+  "view.chat": "チャット",
+  "chat.help": "コマンド: /help。他のスラッシュはC段階で登場。",
+  "chat.slashLater": "{cmd}は後の段階で登場"
 }

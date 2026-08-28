@@ -143,5 +143,7 @@
   "chat.memorySoon": "记忆栏 — D 阶段推出",
   "chat.providerNote": "BYOK 提供商将在 A.3 接入",
   "view.canvas": "画布",
-  "view.chat": "聊天"
+  "view.chat": "聊天",
+  "chat.help": "命令：/help。更多斜杠命令将在 C 阶段推出。",
+  "chat.slashLater": "{cmd} 将在后续阶段推出"
 }

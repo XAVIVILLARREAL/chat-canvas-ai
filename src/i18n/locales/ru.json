@@ -143,5 +143,7 @@
   "chat.memorySoon": "Память — появится на этапе D",
   "chat.providerNote": "Провайдеры BYOK подключатся в A.3",
   "view.canvas": "Канвас",
-  "view.chat": "Чат"
+  "view.chat": "Чат",
+  "chat.help": "Команды: /help. Остальные слэши — с этапа C.",
+  "chat.slashLater": "{cmd} появится на более позднем этапе"
 }

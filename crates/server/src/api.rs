@@ -7,10 +7,11 @@
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
-    response::Json,
+    response::{IntoResponse, Json},
     routing::{get, post, put},
     Router,
 };
+use futures::StreamExt;
 use canvas_ai_core::{domain::*, providers, repo, vault};
 use providers::AgentProvider;
 use schemars::JsonSchema;
@@ -152,6 +153,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/sessions/:id", get(get_session).delete(delete_session))
         .route("/api/sessions/:id/messages", get(list_messages).post(create_message))
         .route("/api/sessions/:id/chat", post(chat_in_session))
+        .route("/api/sessions/:id/chat/stream", post(chat_in_session_stream))
         
         // Projects como SCOPE (A.0) + settings con scopes Global→Proyecto
         .route("/api/projects", get(list_projects).post(create_project))
@@ -629,25 +631,47 @@ pub struct ChatInSessionResponse {
     pub provider: String,
 }
 
-/// Resuelve el primer provider habilitado del proyecto (key desde el vault).
-async fn resolve_provider(
+/// Candidatos provider del proyecto (todos los habilitados, key desde el vault).
+/// El chat itera en orden: si uno está caído/muerto prueba el siguiente.
+async fn resolve_providers(
     state: &AppState,
-) -> Result<providers::OpenAICompatProvider, (StatusCode, String)> {
+) -> Result<Vec<providers::OpenAICompatProvider>, (StatusCode, String)> {
     let list = repo::provider_list_by_project(&state.db, &state.project_id)
         .await.map_err(|e| db_err(e))?;
-    let row = list
-        .iter()
-        .find(|p| p.enabled && p.key_ref.is_some())
-        .ok_or_else(|| (StatusCode::BAD_REQUEST, "sin provider BYOK configurado (créalo en /api/providers)".into()))?;
-    let key_ref = row.key_ref.clone().unwrap();
-    let api_key = vault::reveal_secret(&state.db, &key_ref, state.vault_ks.as_ref())
-        .await.map_err(vault_err)?;
-    let base_url = row
-        .base_url
-        .clone()
-        .or_else(|| providers::default_base_url(&row.provider_type).map(String::from))
-        .ok_or_else(|| (StatusCode::BAD_REQUEST, format!("provider '{}' sin base_url", row.provider_type)))?;
-    Ok(providers::OpenAICompatProvider::new(&row.name, &base_url, &api_key))
+    let mut out = Vec::new();
+    for row in list.iter().filter(|p| p.enabled && p.key_ref.is_some()) {
+        let key_ref = row.key_ref.clone().unwrap();
+        let api_key = match vault::reveal_secret(&state.db, &key_ref, state.vault_ks.as_ref()).await {
+            Ok(k) => k,
+            Err(e) => { error!("vault reveal falló para {}: {e}", row.name); continue; }
+        };
+        let base_url = row
+            .base_url
+            .clone()
+            .or_else(|| providers::default_base_url(&row.provider_type).map(String::from))
+            .ok_or_else(|| (StatusCode::BAD_REQUEST, format!("provider '{}' sin base_url", row.provider_type)))?;
+        out.push(providers::OpenAICompatProvider::new(&row.name, &base_url, &api_key));
+    }
+    if out.is_empty() {
+        return Err((StatusCode::BAD_REQUEST, "sin provider BYOK configurado (créalo en /api/providers)".into()));
+    }
+    Ok(out)
+}
+
+/// Llama al primer provider que responda (resiliencia ante providers caídos).
+async fn chat_via_any_provider(
+    state: &AppState,
+    completion_req: &providers::ChatCompletionRequest,
+) -> Result<(providers::ChatCompletionResponse, String), (StatusCode, String)> {
+    let candidates = resolve_providers(state).await?;
+    let mut last = (StatusCode::BAD_GATEWAY, "sin providers".to_string());
+    for p in &candidates {
+        match p.send_message(completion_req).await {
+            Ok(resp) => return Ok((resp, p.name().to_string())),
+            Err(e) => { error!("provider {} falló, probando siguiente: {e}", p.name()); last = (StatusCode::BAD_GATEWAY, e.to_string()); }
+        }
+    }
+    Err(last)
 }
 
 /// Chat en una sesión: persiste user → llama provider → persiste assistant.
@@ -660,7 +684,6 @@ async fn chat_in_session(
     if repo::session_get(&state.db, &id).await.map_err(|e| db_err(e))?.is_none() {
         return Err(not_found("Session"));
     }
-    let provider = resolve_provider(&state).await?;
     let model = req.model.clone().unwrap_or_else(|| "auto".to_string());
 
     // 1) user message persistida
@@ -682,10 +705,7 @@ async fn chat_in_session(
         temperature: None,
         stream: false,
     };
-    let resp = provider.send_message(&completion_req).await.map_err(|e| {
-        error!("provider error: {e}");
-        (StatusCode::BAD_GATEWAY, format!("provider: {e}"))
-    })?;
+    let (resp, provider_name) = chat_via_any_provider(&state, &completion_req).await?;
     let assistant_content = resp
         .choices
         .first()
@@ -698,7 +718,7 @@ async fn chat_in_session(
         .as_ref()
         .map(|u| (u.prompt_tokens, u.completion_tokens))
         .unwrap_or((0, 0));
-    let model_used = provider.name().to_string();
+    let model_used = provider_name;
     let assistant_msg = repo::message_create(
         &state.db, &Uuid::new_v4().to_string(), &id, "assistant", &assistant_content,
         Some(&model_used), Some(pt), Some(ct), None, &serde_json::json!({}),
@@ -706,6 +726,132 @@ async fn chat_in_session(
     repo::session_add_usage(&state.db, &id, pt + ct, 0.0).await.map_err(|e| db_err(e))?;
 
     Ok(Json(ChatInSessionResponse { user_message: user_msg, assistant_message: assistant_msg, provider: model_used }))
+}
+
+/// Streaming SSE del chat (A.4): persiste user → transmite chunks del provider →
+/// persiste assistant al terminar. Eventos SSE: `{"delta","done"}`; al final
+/// `{"done":true,"message_id","model","usage"}`. Errores: HTTP 502/404 antes del stream.
+async fn chat_in_session_stream(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Json(req): Json<ChatInSessionRequest>,
+) -> axum::response::Response {
+    use axum::response::sse::{Event, KeepAlive, Sse};
+
+    if repo::session_get(&state.db, &id)
+        .await
+        .map_err(|e| db_err(e))
+        .is_err()
+    {
+        return (StatusCode::NOT_FOUND, "Session not found").into_response();
+    }
+    let candidates = match resolve_providers(&state).await {
+        Ok(c) => c,
+        Err((st, msg)) => return (st, msg).into_response(),
+    };
+    let model = req.model.clone().unwrap_or_else(|| "auto".to_string());
+
+    // 1) persistir user message
+    let user_msg = match repo::message_create(
+        &state.db,
+        &Uuid::new_v4().to_string(),
+        &id,
+        "user",
+        &req.content,
+        None,
+        None,
+        None,
+        None,
+        &serde_json::json!({}),
+    )
+    .await
+    {
+        Ok(m) => m,
+        Err(e) => return db_err(e).into_response(),
+    };
+
+    // 2) historial → provider (streaming)
+    let history = match repo::message_list_by_session(&state.db, &id).await {
+        Ok(h) => h,
+        Err(e) => return db_err(e).into_response(),
+    };
+    let messages: Vec<providers::ChatMessage> = history
+        .iter()
+        .map(|m| providers::ChatMessage { role: m.role.clone(), content: m.content.clone() })
+        .collect();
+    let completion_req = providers::ChatCompletionRequest {
+        model,
+        messages,
+        max_tokens: None,
+        temperature: None,
+        stream: true,
+    };
+    let model_used = candidates.first().map(|p| p.name().to_string()).unwrap_or_default();
+
+    // probar candidatos en orden (providers caídos no bloquean el chat)
+    let mut stream_result: Result<Vec<providers::StreamChunk>, String> =
+        Err("sin providers".into());
+    for p in &candidates {
+        match p.send_message_stream(&completion_req).await {
+            Ok(chunks) => { stream_result = Ok(chunks); break; }
+            Err(e) => { error!("provider {} falló en stream: {e}", p.name()); stream_result = Err(e.to_string()); }
+        }
+    }
+    match stream_result {
+        Ok(chunks) => {
+            let full: String = chunks.iter().map(|c| c.delta.as_str()).collect();
+            let usage = chunks.iter().filter_map(|c| c.usage.as_ref()).next();
+            let (pt, ct) = usage.map(|u| (u.prompt_tokens, u.completion_tokens)).unwrap_or((0, 0));
+
+            // 3) persistir assistant al terminar el stream
+            let assistant = repo::message_create(
+                &state.db,
+                &Uuid::new_v4().to_string(),
+                &id,
+                "assistant",
+                &full,
+                Some(&model_used),
+                Some(pt),
+                Some(ct),
+                None,
+                &serde_json::json!({}),
+            )
+            .await;
+            let (assistant_id, persist_ok) = match assistant {
+                Ok(m) => (m.id, true),
+                Err(e) => {
+                    error!("fallo al persistir assistant: {e}");
+                    (String::new(), false)
+                }
+            };
+            repo::session_add_usage(&state.db, &id, pt + ct, 0.0).await.ok();
+
+            // 4) transmitir los chunks ya recolectados + meta final
+            let events = chunks.into_iter().map(move |c| {
+                Ok::<_, std::convert::Infallible>(Event::default().data(
+                    serde_json::json!({ "delta": c.delta, "done": c.done }).to_string(),
+                ))
+            });
+            let meta = Event::default().data(
+                serde_json::json!({
+                    "done": true,
+                    "message_id": assistant_id,
+                    "user_message_id": user_msg.id,
+                    "model": model_used,
+                    "persisted": persist_ok,
+                    "usage": { "prompt_tokens": pt, "completion_tokens": ct },
+                })
+                .to_string(),
+            );
+            let sse = futures::stream::iter(events)
+                .chain(futures::stream::iter(vec![Ok::<_, std::convert::Infallible>(meta)]));
+            Sse::new(sse).keep_alive(KeepAlive::default()).into_response()
+        }
+        Err(e) => {
+            error!("provider stream error: {e}");
+            (StatusCode::BAD_GATEWAY, format!("provider: {e}")).into_response()
+        }
+    }
 }
 
 // ============================================================================

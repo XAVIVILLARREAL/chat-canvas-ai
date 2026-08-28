@@ -7,7 +7,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Send, Brain } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { useChatUiStore } from '../stores/chat-ui-store';
-import { useSessions, useMessages, useSendMessage } from '../hooks/useSessions';
+import { useQueryClient } from '@tanstack/react-query';
+import { useSessions, useMessages, useSendMessage, sessionKeys } from '../hooks/useSessions';
+import { streamChat } from '../lib/chatApi';
 
 export function ChatPanel() {
   const { t } = useI18n();
@@ -16,22 +18,49 @@ export function ChatPanel() {
   const { data: messages = [] } = useMessages(activeSessionId);
   const send = useSendMessage(activeSessionId);
   const [draft, setDraft] = useState('');
+  const [streaming, setStreaming] = useState<string | null>(null); // texto en vivo
+  const [notice, setNotice] = useState<string | null>(null);       // notas /help etc.
+  const qc = useQueryClient();
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const active = sessions.find((s) => s.id === activeSessionId) ?? null;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages.length]);
+  }, [messages.length, streaming]);
 
   const handleSend = async () => {
     const content = draft.trim();
-    if (!content || !activeSessionId || send.isPending) return;
+    if (!content || !activeSessionId || send.isPending || streaming !== null) return;
     setDraft('');
-    try {
-      await send.mutateAsync(content);
-    } catch {
-      setDraft(content); // devolver el texto si el gateway falló (fail-open)
+
+    // slash commands — honestos: solo /help; los demás llegan en etapas C/A.5+
+    if (content.startsWith('/')) {
+      const cmd = content.split(' ')[0];
+      if (cmd === '/help') {
+        setNotice(t('chat.help'));
+      } else {
+        setNotice(t('chat.slashLater').replace('{cmd}', cmd));
+      }
+      return;
+    }
+
+    // streaming en vivo (A.4); si el gateway/provider falla → fallback local
+    setStreaming('');
+    const ok = await streamChat(activeSessionId, content, {
+      onDelta: (delta) => setStreaming((prev) => (prev ?? '') + delta),
+      onDone: () => {
+        setStreaming(null);
+        qc.invalidateQueries({ queryKey: sessionKeys.messages(activeSessionId) });
+      },
+    });
+    if (!ok) {
+      setStreaming(null);
+      try {
+        await send.mutateAsync(content);
+      } catch {
+        setDraft(content); // gateway caído: devolver el texto (fail-open)
+      }
     }
   };
 
@@ -64,9 +93,32 @@ export function ChatPanel() {
               }}
             >
               {m.content}
-              {m.model && <div style={{ fontSize: 11, opacity: 0.55, marginTop: 4 }}>{m.model}</div>}
+              {m.model && (
+                <div style={{ fontSize: 11, opacity: 0.55, marginTop: 4 }}>
+                  {m.model}
+                  {m.tokens_completion ? ` · ${m.tokens_completion} tok` : ''}
+                </div>
+              )}
             </div>
           ))}
+          {streaming !== null && (
+            <div
+              data-testid="chat-streaming"
+              style={{
+                alignSelf: 'flex-start', maxWidth: '75%', padding: '8px 12px',
+                borderRadius: 12, background: 'rgba(148,163,184,0.15)',
+                whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+              }}
+            >
+              {streaming}
+              <span className="chat-cursor">▍</span>
+            </div>
+          )}
+          {notice && (
+            <div data-testid="chat-notice" style={{ alignSelf: 'center', fontSize: 12, opacity: 0.7, background: 'rgba(148,163,184,0.1)', padding: '6px 10px', borderRadius: 8, whiteSpace: 'pre-wrap' }}>
+              {notice}
+            </div>
+          )}
           <div ref={bottomRef} />
         </div>
 
