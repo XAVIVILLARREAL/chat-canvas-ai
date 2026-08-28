@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { useI18n } from '../i18n';
 import './Modal.css';
 
 interface ModalContextType {
@@ -67,12 +68,13 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 interface ModalOverlayProps { id: string; content: ReactNode; size: ModalOptions['size']; closable: boolean; onClose: () => void; isTop: boolean; }
 
 const ModalOverlay: React.FC<ModalOverlayProps> = ({ id, content, size, closable, onClose, isTop }) => {
+  const { t } = useI18n();
   const handleBackdropClick = (e: React.MouseEvent) => { if (e.target === e.currentTarget && closable) onClose(); };
   const sizeClass = { sm: 'modal-sm', md: 'modal-md', lg: 'modal-lg', xl: 'modal-xl', full: 'modal-full' }[size || 'md'];
   return (
     <div className="modal-overlay" onClick={handleBackdropClick} style={{ zIndex: 900 + (isTop ? 10 : 0) }}>
       <div className={`modal-content ${sizeClass}`} role="dialog" aria-modal="true" aria-labelledby={`${id}-title`}>
-        {closable && <button className="modal-close" onClick={onClose} aria-label="Cerrar modal"><X width={20} height={20} /></button>}
+        {closable && <button className="modal-close" onClick={onClose} aria-label={t("modal.closeModal")}><X width={20} height={20} /></button>}
         <div className="modal-body">{content}</div>
       </div>
     </div>
@@ -102,9 +104,12 @@ export const Modal: React.FC<{ isOpen: boolean; onClose: () => void; title?: str
   return null;
 };
 
-export const ConfirmDialog: React.FC<{ isOpen: boolean; onClose: () => void; onConfirm: () => void; title: string; message: string; confirmText?: string; cancelText?: string; variant?: 'danger' | 'primary'; }> = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Confirmar', cancelText = 'Cancelar', variant = 'primary' }) => {
+export const ConfirmDialog: React.FC<{ isOpen: boolean; onClose: () => void; onConfirm: () => void; title: string; message: string; confirmText?: string; cancelText?: string; variant?: 'danger' | 'primary'; }> = ({ isOpen, onClose, onConfirm, title, message, confirmText, cancelText, variant = 'primary' }) => {
+  const { t } = useI18n();
   const { openModal, closeModal } = useModal();
   const modalIdRef = React.useRef<string | null>(null);
+  const resolvedConfirmText = confirmText ?? t("modal.confirm");
+  const resolvedCancelText = cancelText ?? t("modal.cancel");
   useEffect(() => {
     if (isOpen) {
       modalIdRef.current = openModal(
@@ -112,8 +117,8 @@ export const ConfirmDialog: React.FC<{ isOpen: boolean; onClose: () => void; onC
           <h2 id={`${modalIdRef.current}-title`} className="modal-title">{title}</h2>
           <p className="modal-message">{message}</p>
           <div className="modal-actions">
-            <button className="btn-secondary" onClick={onClose}>{cancelText}</button>
-            <button className={`btn-${variant}`} onClick={() => { onConfirm(); onClose(); }}>{confirmText}</button>
+            <button className="btn-secondary" onClick={onClose}>{resolvedCancelText}</button>
+            <button className={`btn-${variant}`} onClick={() => { onConfirm(); onClose(); }}>{resolvedConfirmText}</button>
           </div>
         </>,
         { size: 'sm', closable: true, onClose }
@@ -122,7 +127,7 @@ export const ConfirmDialog: React.FC<{ isOpen: boolean; onClose: () => void; onC
       closeModal(modalIdRef.current);
       modalIdRef.current = null;
     }
-  }, [isOpen, openModal, closeModal, title, message, confirmText, cancelText, variant, onConfirm, onClose]);
+  }, [isOpen, openModal, closeModal, title, message, resolvedConfirmText, resolvedCancelText, variant, onConfirm, onClose]);
   return null;
 };
 

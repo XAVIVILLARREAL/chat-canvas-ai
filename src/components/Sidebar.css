@@ -2,7 +2,7 @@
 
 .sidebar {
   background: var(--bg-elevated);
-  border-left: 1px solid var(--glass-border);
+  border-inline-start: 1px solid var(--glass-border);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -12,7 +12,7 @@
 
 .sidebar.collapsed {
   width: 0 !important;
-  border-left: none;
+  border-inline-start: none;
   padding: 0;
 }
 
@@ -89,7 +89,7 @@
 
 .sidebar-search Search {
   position: absolute;
-  left: var(--space-5);
+  inset-inline-start: var(--space-5);
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-tertiary);

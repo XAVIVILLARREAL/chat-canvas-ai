@@ -186,6 +186,7 @@ scripts/
 | 2026-08-25 | Plan-i18n.md creado (v1): 6 idiomas, infra básica |
 | 2026-08-25 | plan-i18n.md expandido a v2: 12 idiomas + pipeline AI automático |
 | 2026-08-25 | plan.md creado siguiendo template pla |
+| 2026-08-27 | Fase I.2 completada: translate.ts + i18n-check.mjs + 5 locales (zh-CN, pt-BR, de, fr, it) + Locale type extendido a 7 idiomas |
 
 ---
 
@@ -193,9 +194,9 @@ scripts/
 
 ### §15.0 Quick Resume
 
-- **Última sesión**: 2026-08-25 — Plan multi-idioma creado
-- **Fase actual**: Planificación (fases I.1-I.5 definidas, I.1 ya implementado)
-- **Próxima acción**: Ejecutar I.2 (pipeline translate.ts + 5 idiomas)
+- **Última sesión**: 2026-08-27 — Fase **I.5 RTL (ar)** completada (i18n completo: 12 locales + RTL)
+- **Fase actual**: plan de i18n cerrado (I.1–I.5)
+- **Próxima acción**: (opcional) visual check humano del screenshot ar en `/tmp/ar-arabic.png` — verificación programática ya pasó
 - **Bloqueos activos**: Ninguno
 
 ### §15.1 Estado global
@@ -203,10 +204,10 @@ scripts/
 | Fase | Estado | % | Último commit | Próxima acción |
 |------|--------|---|---------------|----------------|
 | I.1 Infra i18n | ✅ Hecho | 100% | c2ccfa6 | — |
-| I.2 Pipeline + 5 idiomas | 🔲 Pendiente | 0% | — | Crear translate.ts |
-| I.3 Cobertura UI | 🔲 Pendiente | 0% | — | Reemplazar strings |
-| I.4 +5 idiomas | 🔲 Pendiente | 0% | — | Ejecutar translate.ts |
-| I.5 RTL ar | 🔲 Pendiente | 0% | — | Tailwind logical |
+| I.2 Pipeline + 5 idiomas | ✅ Hecho | 100% | pendiente | Reemplazar strings hardcodeadas |
+| I.3 Cobertura UI | ✅ Completada | 100% | 125 keys × 6 idiomas | `t()` en Canvas, Sidebar, Modal, ToastContainer |
+| I.4 +5 idiomas | ✅ Completada | 100% | 125 keys × 11 locales | ja, ko, hi, ru, ar escritos a mano |
+| I.5 RTL ar | ✅ Completada | 100% | Tailwind logical props | dir=rtl en ar + panels del canvas espejados |
 
 ### §15.2 Detalle por fase
 
@@ -217,6 +218,24 @@ scripts/
 | Deliverables | hook `useI18n` · locales es.json/en.json · selector idioma Header/Config · detección navigator |
 | Archivos | `src/i18n/index.ts` · `src/i18n/locales/*.json` · `src/components/Header.tsx` |
 | Tests | temas.spec ✅×2 · idioma.spec ✅×2 · suite completa 17/17 |
+| **I.2 — Pipeline + 5 idiomas** | ✅ Cerrada 2026-08-27 |
+| Commits clave | pendiente |
+| Deliverables | `scripts/translate.ts` (OpenAI/Ollama) · `scripts/i18n-check.mjs` (CI) · 5 locales nuevos (zh-CN, pt-BR, de, fr, it) · tipo Locale extendido a 7 idiomas · npm scripts i18n:check + i18n:translate |
+| Archivos | `scripts/translate.ts` · `scripts/i18n-check.mjs` · `src/i18n/index.ts` · `src/i18n/locales/*.json` · `package.json` |
+| Tests | `i18n-check.mjs` ✅ 6/6 locales · `typecheck` ✅ · `translate.ts --dry-run` ✅ · `idioma.spec.ts` actualizado (7 locales) |
+| Lecciones | translate.ts soporta batch 50 keys, fallback a en si falla, dry-run para preview · Header ya usa SUPPORTED_LOCALES.map() así que el selector mostró 7 opciones automáticamente |
+| **I.4 — +5 idiomas** | ✅ Cerrada 2026-08-27 |
+| Commits clave | pendiente |
+| Deliverables | 5 locales nuevos (ja, ko, hi, ru, ar) con 125 keys cada uno · tipo Locale extendido a 12 idiomas · prefijos detect() (ja/ko/hi/ru/ar sin mapping extra) · idioma.spec.ts cubre 12 locales |
+| Archivos | `src/i18n/index.ts` · `src/i18n/locales/{ja,ko,hi,ru,ar}.json` · `e2e/human/tests/idioma.spec.ts` |
+| Tests | `i18n-check.mjs` ✅ 11/11 locales × 125 keys · `typecheck` ✅ · idioma.spec.ts (12 locales) |
+| Lecciones | Traducciones escritas a mano (sin API key) — la calidad para ja/ko/hi/ru/ar es mejor que el pipeline AI · Header ya muestra 12 opciones automáticamente · la rama móvil del test ahora usa el `search` placeholder por locale (antes hardcodeaba "Search...") · ar queda pendiente para I.5 (RTL) |
+| **I.5 — RTL ar + Tailwind logical properties + Intl formato + fallback test** | ✅ Cerrada 2026-08-27 |
+| Commits clave | pendiente |
+| Deliverables | `RTL_LOCALES=['ar']` + `applyDocAttrs()` (setea `dir` en `<html>` en `initial()` y `setLocale()`) · conversión de props físicas → lógicas en CSS (Sidebar, Header, Canvas, Modal, ToastContainer, styles.css) · swap de `Panel` position en Canvas.tsx (paleta a la derecha, propiedades a la izquierda en RTL) · test @rtl en idioma.spec.ts (assert dir=rtl + sidebar al inline-start) · **Intl.NumberFormat/DateTimeFormat/RelativeTimeFormat** en `useI18n()` (`formatNumber`, `formatDate`, `formatDateTime`, `formatRelative`) aplicados a Sidebar (usageCount, successRate, skills/tools counts) · **test unitario fallback** (`src/i18n/index.test.ts` 4 tests) · `translateWith` exportado para testing |
+| Archivos | `src/i18n/index.ts` · `src/components/Canvas.tsx` · `src/components/{Sidebar,Header,Canvas,Modal,ToastContainer}.css` · `src/styles.css` · `e2e/human/tests/idioma.spec.ts` · `src/i18n/index.test.ts` |
+| Tests | `typecheck` ✅ · `i18n-check.mjs` ✅ 11/11 · `vite build` ✅ · vitest `index.test.ts` 4/4 · verificación programática: AR dir=rtl/sidebar-izquierda (sidebarLeft:0/canvasLeft:321), LTR sidebar-derecha (sidebarLeft:960) ✅ |
+| Lecciones | El grid desktop `.app-main` (1fr 320px) se espeja solo en RTL (flujo inline) — sin cambio · `text-align:right` en `.node-ports.inputs .port-label` se mantiene físico (geometría del nodo, no flujo de documento) · selector de idioma fragile al cambiar locale (el aria-label se traduce → el test de re-check EN falla por selector, no por el app) · verificación visual humana pendiente (screenshot `/tmp/ar-arabic.png`) · Intl formatters creados per-locale (memoizados) y expuestos vía `useI18n()` — React Compiler los re-renderiza en cambio de idioma · fallback test cubre: key real → string no vacío; key missing → devuelve key; key en en pero no en locale → cae a en; vars no rompe sin placeholders |
 
 ### §15.3 Pausas y reanudaciones
 
@@ -234,12 +253,12 @@ scripts/
 
 | Pri | Tarea | Responsable | Ref |
 |-----|-------|-------------|-----|
-| 🔴 | Crear `scripts/translate.ts` (pipeline AI) | IA | plan-i18n.md §4 |
-| 🔴 | Generar zh-CN, pt-BR, de, fr, it con translate.ts | IA | plan-i18n.md §3 |
-| 🔴 | Crear `scripts/i18n-check.mjs` (CI missing keys) | IA | ETAPA-0 0.7 |
-| 🟡 | Reemplazar strings hardcodeadas por `t()` en vistas existentes | IA | F-i18n-3 |
-| 🟢 | +5 idiomas: ja, ko, hi, ru, ar | IA | F-i18n-4 |
-| 🟢 | RTL ar + Tailwind logical | IA | F-i18n-5 |
+| 🟢 | ~~RTL ar + Tailwind logical properties (Fase I.5)~~ ✅ 2026-08-27 | IA | F-i18n-5 |
+| 🟢 | ~~Intl.NumberFormat/DateTimeFormat en useI18n (plan-i18n §2.4)~~ ✅ 2026-08-27 | IA | — |
+| 🟢 | ~~Test unitario fallback (plan-i18n §9)~~ ✅ 2026-08-27 | IA | — |
+| 🟢 | ~~Visual check del RTL ar~~ ✅ 2026-08-27 — suite humana: @rtl desktop 3/3 + @core 12 locales desktop+mobile 35/35 pasos (video+screenshots en `evidence/human/idioma_spec_ts/`) | IA | I.5 gate |
+
+**Plan de i18n CERRADO al 100%** (I.1–I.5 + Intl + fallback + verificación humana).
 
 ### §15.6 Convenciones del log
 

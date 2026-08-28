@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { useCanvasStore } from '../stores/canvas-store';
+import { useI18n } from '../i18n';
 import './ToastContainer.css';
 
 export const ToastContainer: React.FC = () => {
   const { toasts, removeToast } = useCanvasStore();
+  const { t } = useI18n();
 
   useEffect(() => {
     toasts.forEach(toast => {
@@ -36,7 +38,7 @@ export const ToastContainer: React.FC = () => {
   };
 
   return (
-    <div className="toast-container" role="region" aria-label="Notifications">
+    <div className="toast-container" role="region" aria-label={t("toast.notifications")}>
       {toasts.map(toast => (
         <div
           key={toast.id}
@@ -53,7 +55,7 @@ export const ToastContainer: React.FC = () => {
           <button
             className="toast-close"
             onClick={() => removeToast(toast.id)}
-            aria-label="Cerrar notificación"
+            aria-label={t("toast.closeNotification")}
           >
             <X size={16} />
           </button>

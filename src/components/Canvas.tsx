@@ -30,6 +30,7 @@ import {
   AlignCenter, AlignHorizontalDistributeCenter,
   CheckCircle, Loader2,
 } from 'lucide-react';
+import { useI18n } from '../i18n';
 import { useCanvasStore } from '../stores/canvas-store';
 import { 
   NODE_TYPE_CONFIG, 
@@ -69,7 +70,7 @@ function canvasEdgeToRFEdge(canvasEdge: CanvasEdge): RFEdge {
   };
 }
 
-const CustomNode: React.FC<{ data: CanvasNodeData; selected?: boolean }> = ({ data, selected }) => {
+const CustomNodeInner: React.FC<{ data: CanvasNodeData; selected?: boolean; t: (key: string) => string }> = ({ data, selected, t }) => {
   const { canvasNode } = data;
   const config = NODE_TYPE_CONFIG[canvasNode.nodeType];
   const { removeNode, duplicateNode } = useCanvasStore.getState();
@@ -97,13 +98,13 @@ const CustomNode: React.FC<{ data: CanvasNodeData; selected?: boolean }> = ({ da
           </span>
         </div>
         <div className="node-actions">
-          <button className="node-action-btn" onClick={() => console.log('Test:', canvasNode.id)} title="Test">
+          <button className="node-action-btn" onClick={() => console.log('Test:', canvasNode.id)} title={t("canvas.test")}>
             <CheckCircle width={12} height={12} />
           </button>
-          <button className="node-action-btn" onClick={handleDuplicate} title="Duplicate">
+          <button className="node-action-btn" onClick={handleDuplicate} title={t("canvas.duplicate")}>
             <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
           </button>
-          <button className="node-action-btn danger" onClick={handleDelete} title="Delete">
+          <button className="node-action-btn danger" onClick={handleDelete} title={t("canvas.delete")}>
             <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
           </button>
         </div>
@@ -121,10 +122,10 @@ const CustomNode: React.FC<{ data: CanvasNodeData; selected?: boolean }> = ({ da
         </div>
         <div className="node-content">
           <div className="node-description">{canvasNode.metadata.description}</div>
-          {canvasNode.config.code && <div className="node-code-preview"><span className="code-label">Code:</span><pre>{canvasNode.config.code.slice(0, 100)}...</pre></div>}
-          {canvasNode.config.promptTemplate && <div className="node-prompt-preview"><span className="code-label">Prompt:</span><pre>{canvasNode.config.promptTemplate.slice(0, 100)}...</pre></div>}
-          {canvasNode.config.mcpServerId && <div className="node-mcp-info"><svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18.36 6.64A9 9 0 0 1 20.77 15"></path><path d="M6.16 6.16a9 9 0 0 0-4.5 16.5"></path><path d="M12 12h.01"></path></svg><span>MCP: {canvasNode.config.mcpToolName || canvasNode.config.mcpServerId}</span></div>}
-          {canvasNode.config.skillId && <div className="node-skill-info"><svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Skill: {canvasNode.config.skillId}</span></div>}
+          {canvasNode.config.code && <div className="node-code-preview"><span className="code-label">{t("canvas.codeLabel")}</span><pre>{canvasNode.config.code.slice(0, 100)}...</pre></div>}
+          {canvasNode.config.promptTemplate && <div className="node-prompt-preview"><span className="code-label">{t("canvas.promptLabel")}</span><pre>{canvasNode.config.promptTemplate.slice(0, 100)}...</pre></div>}
+          {canvasNode.config.mcpServerId && <div className="node-mcp-info"><svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18.36 6.64A9 9 0 0 1 20.77 15"></path><path d="M6.16 6.16a9 9 0 0 0-4.5 16.5"></path><path d="M12 12h.01"></path></svg><span>{t("canvas.mcpLabel")} {canvasNode.config.mcpToolName || canvasNode.config.mcpServerId}</span></div>}
+          {canvasNode.config.skillId && <div className="node-skill-info"><svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>{t("canvas.skillLabel")} {canvasNode.config.skillId}</span></div>}
         </div>
         <div className="node-ports outputs">
           {canvasNode.outputs.map((port) => (
@@ -140,6 +141,11 @@ const CustomNode: React.FC<{ data: CanvasNodeData; selected?: boolean }> = ({ da
       <div className="node-footer"><span className="node-id">{canvasNode.id.slice(0, 8)}</span></div>
     </div>
   );
+};
+
+const CustomNode: React.FC<{ data: CanvasNodeData; selected?: boolean }> = ({ data, selected }) => {
+  const { t } = useI18n();
+  return <CustomNodeInner data={data} selected={selected} t={t} />;
 };
 
 const CustomEdge: React.FC<{ data?: { edgeType?: string; condition?: string }; style?: React.CSSProperties }> = ({ data, style }) => {
@@ -185,6 +191,8 @@ export const Canvas: React.FC = () => {
     createNodeFromType,
     loading,
   } = useCanvasStore();
+  const { t, locale } = useI18n();
+  const isRtl = locale === 'ar';
 
   const [nodes, setNodes, onNodesChange] = useNodesState<RFNode>(currentCanvas?.nodes.map(canvasNodeToRFNode) || []);
   const [edges, setEdges, onEdgesChange] = useEdgesState<RFEdge>(currentCanvas?.edges.map(canvasEdgeToRFEdge) || []);
@@ -242,30 +250,30 @@ export const Canvas: React.FC = () => {
   const closeContextMenu = () => setContextMenu(null);
   const handleAddNodeFromMenu = (nodeType: NodeType) => { if (contextMenu && reactFlowInstance) { createNodeFromType(nodeType, reactFlowInstance.screenToFlowPosition({ x: contextMenu.x, y: contextMenu.y })); } closeContextMenu(); };
 
-  if (!currentCanvas) return <div className="canvas-loading">Loading canvas...</div>;
+  if (!currentCanvas) return <div className="canvas-loading">{t("canvas.loading")}</div>;
 
   return (
     <div className="canvas-container" onContextMenu={handleContextMenu}>
       <div className="canvas-toolbar">
         <div className="toolbar-group">
-          <button className="toolbar-btn" onClick={undo} disabled={!canUndo()} title="Undo (Ctrl+Z)"><Undo2 width={16} height={16} /></button>
-          <button className="toolbar-btn" onClick={redo} disabled={!canRedo()} title="Redo (Ctrl+Y)"><Redo2 width={16} height={16} /></button>
+          <button className="toolbar-btn" onClick={undo} disabled={!canUndo()} title={t("canvas.undo")}><Undo2 width={16} height={16} /></button>
+          <button className="toolbar-btn" onClick={redo} disabled={!canRedo()} title={t("canvas.redo")}><Redo2 width={16} height={16} /></button>
         </div>
         <div className="toolbar-divider" />
         <div className="toolbar-group">
-          <button className="toolbar-btn" onClick={() => reactFlowInstance?.setViewport({ x: 0, y: 0, zoom: 1 }, { duration: 300 })} title="Fit View (F)"><AlignCenter width={16} height={16} /></button>
-          <button className="toolbar-btn" onClick={() => reactFlowInstance?.setViewport({ x: 0, y: 0, zoom: reactFlowInstance.getZoom() }, { duration: 300 })} title="Center View"><AlignHorizontalDistributeCenter width={16} height={16} /></button>
+          <button className="toolbar-btn" onClick={() => reactFlowInstance?.setViewport({ x: 0, y: 0, zoom: 1 }, { duration: 300 })} title={t("canvas.fitView")}><AlignCenter width={16} height={16} /></button>
+          <button className="toolbar-btn" onClick={() => reactFlowInstance?.setViewport({ x: 0, y: 0, zoom: reactFlowInstance.getZoom() }, { duration: 300 })} title={t("canvas.centerView")}><AlignHorizontalDistributeCenter width={16} height={16} /></button>
         </div>
         <div className="toolbar-divider" />
         <div className="toolbar-group">
-          <button className="toolbar-btn" onClick={() => reactFlowInstance?.setViewport({ x: reactFlowInstance.getViewport().x, y: reactFlowInstance.getViewport().y, zoom: Math.min(3, reactFlowInstance.getZoom() + 0.1) })} title="Zoom In (+)"><ZoomIn width={16} height={16} /></button>
-          <button className="toolbar-btn" onClick={() => reactFlowInstance?.setViewport({ x: reactFlowInstance.getViewport().x, y: reactFlowInstance.getViewport().y, zoom: Math.max(0.1, reactFlowInstance.getZoom() - 0.1) })} title="Zoom Out (-)"><ZoomOut width={16} height={16} /></button>
-          <button className="toolbar-btn" onClick={() => reactFlowInstance?.setViewport({ x: reactFlowInstance.getViewport().x, y: reactFlowInstance.getViewport().y, zoom: 1 })} title="Reset Zoom (1)"><RotateCcw width={16} height={16} /></button>
+          <button className="toolbar-btn" onClick={() => reactFlowInstance?.setViewport({ x: reactFlowInstance.getViewport().x, y: reactFlowInstance.getViewport().y, zoom: Math.min(3, reactFlowInstance.getZoom() + 0.1) })} title={t("canvas.zoomIn")}><ZoomIn width={16} height={16} /></button>
+          <button className="toolbar-btn" onClick={() => reactFlowInstance?.setViewport({ x: reactFlowInstance.getViewport().x, y: reactFlowInstance.getViewport().y, zoom: Math.max(0.1, reactFlowInstance.getZoom() - 0.1) })} title={t("canvas.zoomOut")}><ZoomOut width={16} height={16} /></button>
+          <button className="toolbar-btn" onClick={() => reactFlowInstance?.setViewport({ x: reactFlowInstance.getViewport().x, y: reactFlowInstance.getViewport().y, zoom: 1 })} title={t("canvas.resetZoom")}><RotateCcw width={16} height={16} /></button>
         </div>
         <div className="toolbar-divider" />
         <div className="toolbar-group">
-          <label className="toolbar-toggle" title="Toggle Grid (G)"><input type="checkbox" checked={showGrid} onChange={(e) => setShowGrid(e.target.checked)} /><span>Grid</span></label>
-          <label className="toolbar-toggle" title="Snap to Grid"><input type="checkbox" checked={snapToGrid} onChange={(e) => setSnapToGrid(e.target.checked)} /><span>Snap</span></label>
+          <label className="toolbar-toggle" title={t("canvas.toggleGrid")}><input type="checkbox" checked={showGrid} onChange={(e) => setShowGrid(e.target.checked)} /><span>{t("canvas.grid")}</span></label>
+          <label className="toolbar-toggle" title={t("canvas.snapToGrid")}><input type="checkbox" checked={snapToGrid} onChange={(e) => setSnapToGrid(e.target.checked)} /><span>{t("canvas.snap")}</span></label>
         </div>
         <div className="toolbar-spacer" />
         <div className="toolbar-group"><span className="viewport-info">{Math.round(viewport.zoom * 100)}% • {Math.round(viewport.x)}, {Math.round(viewport.y)}</span></div>
@@ -292,9 +300,9 @@ export const Canvas: React.FC = () => {
         {miniMapOpen && <MiniMap nodeColor={miniMapNodeColor} maskColor="oklch(0.08 0.01 260 / 0.8)" />}
       </ReactFlow>
 
-      <Panel position={"left" as PanelPosition} className="node-palette-panel">
-        <div className="palette-header"><h3>Nodos</h3><button className="palette-close" onClick={() => useCanvasStore.getState().setSidebarTab('nodes')}><ChevronLeft width={16} height={16} /></button></div>
-        <div className="palette-search"><input type="text" placeholder="Buscar nodos..." /></div>
+      <Panel position={(isRtl ? "right" : "left") as PanelPosition} className="node-palette-panel">
+        <div className="palette-header"><h3>{t("canvas.nodes")}</h3><button className="palette-close" onClick={() => useCanvasStore.getState().setSidebarTab('nodes')}><ChevronLeft width={16} height={16} /></button></div>
+        <div className="palette-search"><input type="text" placeholder={t("canvas.searchNodes")} /></div>
         <div className="palette-categories">
           {['trigger', 'action', 'logic', 'data', 'ai', 'mcp', 'agent', 'human', 'output'].map(category => (
             <details key={category} className="palette-category" open>
@@ -312,24 +320,24 @@ export const Canvas: React.FC = () => {
         </div>
       </Panel>
 
-      <Panel position={"right" as PanelPosition} className="properties-panel" style={{ width: nodePanelOpen ? 360 : 0 }}>
+      <Panel position={(isRtl ? "left" : "right") as PanelPosition} className="properties-panel" style={{ width: nodePanelOpen ? 360 : 0 }}>
         {nodePanelOpen && nodePanelNodeId && <NodePropertiesPanel nodeId={nodePanelNodeId} onClose={() => useCanvasStore.getState().closeNodePanel()} />}
       </Panel>
 
       {contextMenu && (
         <div className="context-menu" style={{ left: contextMenu.x, top: contextMenu.y }} onClick={closeContextMenu}>
-          <div className="context-menu-section"><h4>Agregar Nodo</h4>{Object.entries(NODE_TYPE_CONFIG).map(([type, config]) => (<button key={type} className="context-menu-item" onClick={() => handleAddNodeFromMenu(type as NodeType)}><config.icon width={14} height={14} style={{ color: config.color }} />{config.label}</button>))}</div>
+          <div className="context-menu-section"><h4>{t("canvas.addNode")}</h4>{Object.entries(NODE_TYPE_CONFIG).map(([type, config]) => (<button key={type} className="context-menu-item" onClick={() => handleAddNodeFromMenu(type as NodeType)}><config.icon width={14} height={14} style={{ color: config.color }} />{config.label}</button>))}</div>
           <div className="context-menu-divider" />
-          <button className="context-menu-item" onClick={fitView}><AlignCenter width={14} height={14} /> Ajustar Vista</button>
-          <button className="context-menu-item" onClick={() => reactFlowInstance?.setViewport({ x: 0, y: 0, zoom: 1 }, { duration: 300 })}><AlignHorizontalDistributeCenter width={14} height={14} /> Centrar</button>
+          <button className="context-menu-item" onClick={fitView}><AlignCenter width={14} height={14} /> {t("canvas.fitViewMenu")}</button>
+          <button className="context-menu-item" onClick={() => reactFlowInstance?.setViewport({ x: 0, y: 0, zoom: 1 }, { duration: 300 })}><AlignHorizontalDistributeCenter width={14} height={14} /> {t("canvas.center")}</button>
         </div>
       )}
 
       <div className="canvas-status-bar">
-        <div className="status-item"><span>{nodes.length} nodos</span></div>
-        <div className="status-item"><span>{edges.length} conexiones</span></div>
-        <div className="status-item"><span>{selectedNodeIds.length} seleccionados</span></div>
-        {loading && <div className="status-item loading"><Loader2 width={14} height={14} className="spinning" /> Ejecutando...</div>}
+        <div className="status-item"><span>{nodes.length} {t("canvas.nodeCount")}</span></div>
+        <div className="status-item"><span>{edges.length} {t("canvas.edgeCount")}</span></div>
+        <div className="status-item"><span>{selectedNodeIds.length} {t("canvas.selectedCount")}</span></div>
+        {loading && <div className="status-item loading"><Loader2 width={14} height={14} className="spinning" /> {t("canvas.executing")}</div>}
       </div>
     </div>
   );
@@ -337,17 +345,18 @@ export const Canvas: React.FC = () => {
 
 const NodePropertiesPanel: React.FC<{ nodeId: string; onClose: () => void }> = ({ nodeId, onClose }) => {
   const { currentCanvas, updateNode, updateNodeConfig, closeNodePanel } = useCanvasStore();
+  const { t } = useI18n();
   const node = currentCanvas?.nodes.find(n => n.id === nodeId);
   if (!node) return null;
   const config = NODE_TYPE_CONFIG[node.nodeType];
   return (
     <div className="properties-panel-content">
       <div className="properties-header"><div className="node-type-badge" style={{ backgroundColor: `${config.color}20`, color: config.color }}><config.icon width={16} height={16} /> {config.label}</div><button className="close-btn" onClick={onClose}><X width={16} height={16} /></button></div>
-      <div className="properties-section"><h4>Configuración Básica</h4><div className="form-group"><label>Etiqueta</label><input value={node.metadata.label} onChange={(e) => updateNode(nodeId, { metadata: { ...node.metadata, label: e.target.value } })} /></div><div className="form-group"><label>Descripción</label><textarea value={node.metadata.description} onChange={(e) => updateNode(nodeId, { metadata: { ...node.metadata, description: e.target.value } })} rows={3} /></div><div className="form-group"><label>Color</label><input type="color" value={node.metadata.color} onChange={(e) => updateNode(nodeId, { metadata: { ...node.metadata, color: e.target.value } })} /></div></div>
-      <div className="properties-section"><h4>Configuración del Nodo</h4>{node.nodeType === 'code' && <div className="form-group"><label>Código (TypeScript)</label><textarea value={node.config.code || ''} onChange={(e) => updateNodeConfig(nodeId, { code: e.target.value })} rows={10} className="code-editor" spellCheck={false} /></div>}{node.nodeType === 'llmCall' && (<><div className="form-group"><label>Modelo</label><select value={node.config.model || 'gpt-4o'} onChange={(e) => updateNodeConfig(nodeId, { model: e.target.value })}><option value="gpt-4o">GPT-4o</option><option value="gpt-4o-mini">GPT-4o Mini</option><option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option><option value="gemini-1.5-pro">Gemini 1.5 Pro</option></select></div><div className="form-group"><label>Temperatura: {node.config.temperature || 0.7}</label><input type="range" min="0" max="2" step="0.1" value={node.config.temperature || 0.7} onChange={(e) => updateNodeConfig(nodeId, { temperature: parseFloat(e.target.value) })} /></div><div className="form-group"><label>Max Tokens</label><input type="number" value={node.config.maxTokens || 4096} onChange={(e) => updateNodeConfig(nodeId, { maxTokens: parseInt(e.target.value) })} /></div><div className="form-group"><label>Prompt Template</label><textarea value={node.config.promptTemplate || ''} onChange={(e) => updateNodeConfig(nodeId, { promptTemplate: e.target.value })} rows={8} className="code-editor" /></div></>)} {node.nodeType === 'mcpCall' && (<><div className="form-group"><label>MCP Server</label><input value={node.config.mcpServerId || ''} onChange={(e) => updateNodeConfig(nodeId, { mcpServerId: e.target.value })} placeholder="Seleccionar servidor MCP..." /></div><div className="form-group"><label>Herramienta</label><input value={node.config.mcpToolName || ''} onChange={(e) => updateNodeConfig(nodeId, { mcpToolName: e.target.value })} placeholder="Nombre de la herramienta" /></div></>)} {node.nodeType === 'skillInvoke' && <div className="form-group"><label>Skill ID</label><input value={node.config.skillId || ''} onChange={(e) => updateNodeConfig(nodeId, { skillId: e.target.value })} placeholder="ID de la skill" /></div>} {node.nodeType === 'conditional' && <div className="form-group"><label>Condición (expresión JS)</label><textarea value={node.config.condition || ''} onChange={(e) => updateNodeConfig(nodeId, { condition: e.target.value })} rows={3} className="code-editor" placeholder="return inputs.value > 10;" /></div>} {node.nodeType === 'loop' && (<><div className="form-group"><label>Tipo de Bucle</label><select value={node.config.loopConfig?.loopType || 'forEach'} onChange={(e) => updateNodeConfig(nodeId, { loopConfig: { ...node.config.loopConfig!, loopType: e.target.value as any } })}><option value="forEach">For Each</option><option value="while">While</option><option value="times">Times</option></select></div><div className="form-group"><label>Max Iteraciones</label><input type="number" value={node.config.loopConfig?.maxIterations || 100} onChange={(e) => updateNodeConfig(nodeId, { loopConfig: { ...node.config.loopConfig!, maxIterations: parseInt(e.target.value) } })} /></div></>)} {node.nodeType === 'trigger' && (<><div className="form-group"><label>Tipo de Trigger</label><select value={node.config.triggerConfig?.triggerType || 'manual'} onChange={(e) => updateNodeConfig(nodeId, { triggerConfig: { ...node.config.triggerConfig!, triggerType: e.target.value as any } })}><option value="manual">Manual</option><option value="cron">Cron</option><option value="webhook">Webhook</option><option value="event">Evento</option><option value="mcpNotification">Notificación MCP</option></select></div>{node.config.triggerConfig?.triggerType === 'cron' && <div className="form-group"><label>Expresión Cron</label><input value={node.config.triggerConfig?.cronExpression || ''} onChange={(e) => updateNodeConfig(nodeId, { triggerConfig: { ...node.config.triggerConfig!, cronExpression: e.target.value } })} placeholder="0 0 * * *" /></div>}</>)}</div>
-      <div className="properties-section"><h4>Puertos de Entrada</h4>{node.inputs.map(port => (<div key={port.id} className="port-config"><span className="port-name">{port.name}</span><span className="port-type">{port.dataType}</span>{port.required && <span className="required-badge">*</span>}</div>))}</div>
-      <div className="properties-section"><h4>Puertos de Salida</h4>{node.outputs.map(port => (<div key={port.id} className="port-config"><span className="port-name">{port.name}</span><span className="port-type">{port.dataType}</span></div>))}</div>
-      <div className="properties-actions"><button className="btn-secondary"><svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Probar Nodo</button><button className="btn-danger" onClick={() => { useCanvasStore.getState().removeNode(nodeId); closeNodePanel(); }}><svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg> Eliminar</button></div>
+      <div className="properties-section"><h4>{t("canvas.basicConfig")}</h4><div className="form-group"><label>{t("canvas.label")}</label><input value={node.metadata.label} onChange={(e) => updateNode(nodeId, { metadata: { ...node.metadata, label: e.target.value } })} /></div><div className="form-group"><label>{t("canvas.description")}</label><textarea value={node.metadata.description} onChange={(e) => updateNode(nodeId, { metadata: { ...node.metadata, description: e.target.value } })} rows={3} /></div><div className="form-group"><label>{t("canvas.color")}</label><input type="color" value={node.metadata.color} onChange={(e) => updateNode(nodeId, { metadata: { ...node.metadata, color: e.target.value } })} /></div></div>
+      <div className="properties-section"><h4>{t("canvas.nodeConfig")}</h4>{node.nodeType === 'code' && <div className="form-group"><label>{t("canvas.codeTypeScript")}</label><textarea value={node.config.code || ''} onChange={(e) => updateNodeConfig(nodeId, { code: e.target.value })} rows={10} className="code-editor" spellCheck={false} /></div>}{node.nodeType === 'llmCall' && (<><div className="form-group"><label>{t("canvas.model")}</label><select value={node.config.model || 'gpt-4o'} onChange={(e) => updateNodeConfig(nodeId, { model: e.target.value })}><option value="gpt-4o">GPT-4o</option><option value="gpt-4o-mini">GPT-4o Mini</option><option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option><option value="gemini-1.5-pro">Gemini 1.5 Pro</option></select></div><div className="form-group"><label>{t("canvas.temperature", { n: node.config.temperature || 0.7 })}</label><input type="range" min="0" max="2" step="0.1" value={node.config.temperature || 0.7} onChange={(e) => updateNodeConfig(nodeId, { temperature: parseFloat(e.target.value) })} /></div><div className="form-group"><label>{t("canvas.maxTokens")}</label><input type="number" value={node.config.maxTokens || 4096} onChange={(e) => updateNodeConfig(nodeId, { maxTokens: parseInt(e.target.value) })} /></div><div className="form-group"><label>{t("canvas.promptTemplate")}</label><textarea value={node.config.promptTemplate || ''} onChange={(e) => updateNodeConfig(nodeId, { promptTemplate: e.target.value })} rows={8} className="code-editor" /></div></>)} {node.nodeType === 'mcpCall' && (<><div className="form-group"><label>{t("canvas.mcpServer")}</label><input value={node.config.mcpServerId || ''} onChange={(e) => updateNodeConfig(nodeId, { mcpServerId: e.target.value })} placeholder={t("canvas.selectMcpServer")} /></div><div className="form-group"><label>{t("canvas.tool")}</label><input value={node.config.mcpToolName || ''} onChange={(e) => updateNodeConfig(nodeId, { mcpToolName: e.target.value })} placeholder={t("canvas.toolName")} /></div></>)} {node.nodeType === 'skillInvoke' && <div className="form-group"><label>{t("canvas.skillLabel")}</label><input value={node.config.skillId || ''} onChange={(e) => updateNodeConfig(nodeId, { skillId: e.target.value })} placeholder="ID" /></div>} {node.nodeType === 'conditional' && <div className="form-group"><label>{t("canvas.condition")}</label><textarea value={node.config.condition || ''} onChange={(e) => updateNodeConfig(nodeId, { condition: e.target.value })} rows={3} className="code-editor" placeholder="return inputs.value > 10;" /></div>} {node.nodeType === 'loop' && (<><div className="form-group"><label>{t("canvas.loopType")}</label><select value={node.config.loopConfig?.loopType || 'forEach'} onChange={(e) => updateNodeConfig(nodeId, { loopConfig: { ...node.config.loopConfig!, loopType: e.target.value as any } })}><option value="forEach">For Each</option><option value="while">While</option><option value="times">Times</option></select></div><div className="form-group"><label>{t("canvas.maxIterations")}</label><input type="number" value={node.config.loopConfig?.maxIterations || 100} onChange={(e) => updateNodeConfig(nodeId, { loopConfig: { ...node.config.loopConfig!, maxIterations: parseInt(e.target.value) } })} /></div></>)} {node.nodeType === 'trigger' && (<><div className="form-group"><label>{t("canvas.triggerType")}</label><select value={node.config.triggerConfig?.triggerType || 'manual'} onChange={(e) => updateNodeConfig(nodeId, { triggerConfig: { ...node.config.triggerConfig!, triggerType: e.target.value as any } })}><option value="manual">Manual</option><option value="cron">Cron</option><option value="webhook">Webhook</option><option value="event">{t("canvas.event")}</option><option value="mcpNotification">{t("canvas.mcpNotification")}</option></select></div>{node.config.triggerConfig?.triggerType === 'cron' && <div className="form-group"><label>{t("canvas.cronExpression")}</label><input value={node.config.triggerConfig?.cronExpression || ''} onChange={(e) => updateNodeConfig(nodeId, { triggerConfig: { ...node.config.triggerConfig!, cronExpression: e.target.value } })} placeholder="0 0 * * *" /></div>}</>)}</div>
+      <div className="properties-section"><h4>{t("canvas.inputPorts")}</h4>{node.inputs.map(port => (<div key={port.id} className="port-config"><span className="port-name">{port.name}</span><span className="port-type">{port.dataType}</span>{port.required && <span className="required-badge">*</span>}</div>))}</div>
+      <div className="properties-section"><h4>{t("canvas.outputPorts")}</h4>{node.outputs.map(port => (<div key={port.id} className="port-config"><span className="port-name">{port.name}</span><span className="port-type">{port.dataType}</span></div>))}</div>
+      <div className="properties-actions"><button className="btn-secondary"><svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> {t("canvas.testNode")}</button><button className="btn-danger" onClick={() => { useCanvasStore.getState().removeNode(nodeId); closeNodePanel(); }}><svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg> {t("sidebar.delete")}</button></div>
     </div>
   );
 };

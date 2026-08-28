@@ -3,7 +3,7 @@
 .toast-container {
   position: fixed;
   bottom: var(--space-6);
-  right: var(--space-6);
+  inset-inline-end: var(--space-6);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -19,7 +19,7 @@
   padding: var(--space-4) var(--space-5);
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-left-width: 4px;
+  border-inline-start-width: 4px;
   border-radius: var(--radius-lg);
   backdrop-filter: blur(20px) saturate(1.5);
   box-shadow: var(--shadow-xl);
@@ -33,6 +33,21 @@
   from {
     opacity: 0;
     transform: translateX(100%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+[dir="rtl"] .toast {
+  animation: toast-in-rtl var(--duration-slow) var(--ease-out-expo);
+}
+
+@keyframes toast-in-rtl {
+  from {
+    opacity: 0;
+    transform: translateX(-100%) scale(0.95);
   }
   to {
     opacity: 1;
@@ -83,7 +98,7 @@
 .toast-progress {
   position: absolute;
   bottom: 0;
-  left: 0;
+  inset-inline-start: 0;
   height: 3px;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   animation: toast-progress linear forwards;
@@ -103,6 +118,21 @@
   from {
     opacity: 0;
     transform: translateX(100%) scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1) translateY(0);
+  }
+}
+
+[dir="rtl"] .toast-container > *:not(:first-child) {
+  animation: toast-in-stacked-rtl var(--duration-slow) var(--ease-out-expo);
+}
+
+@keyframes toast-in-stacked-rtl {
+  from {
+    opacity: 0;
+    transform: translateX(-100%) scale(0.95) translateY(10px);
   }
   to {
     opacity: 1;

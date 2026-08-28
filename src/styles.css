@@ -1118,11 +1118,11 @@ button:not(:disabled):active { transform: scale(0.97); }
   .app-sidebar {
     position: fixed !important;
     top: 0;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
     width: min(86vw, 340px) !important;
     height: 100dvh;
-    z-index: 1200; /* drawer sobre todo; el toggle queda libre a la izquierda */
+    z-index: 1200; /* drawer sobre todo; el toggle queda libre al inicio */
     background: var(--bg-surface);
     box-shadow: var(--shadow-xl);
     transform: translateX(100%);
@@ -1130,6 +1130,13 @@ button:not(:disabled):active { transform: scale(0.97); }
   }
   .app-sidebar.open,
   .sidebar.open {
+    transform: translateX(0);
+  }
+  [dir="rtl"] .app-sidebar {
+    transform: translateX(-100%);
+  }
+  [dir="rtl"] .app-sidebar.open,
+  [dir="rtl"] .sidebar.open {
     transform: translateX(0);
   }
   .canvas-section {
@@ -1162,6 +1169,7 @@ button:not(:disabled):active { transform: scale(0.97); }
 .app-sidebar.closed { width: 0; }
 @media (max-width: 900px) {
   .app-sidebar.closed { transform: translateX(100%); width: min(86vw, 340px); }
+  [dir="rtl"] .app-sidebar.closed { transform: translateX(-100%); }
   /* Las tabs del sidebar envuelven dentro del drawer (no desbordan) */
   .app-sidebar .sidebar-tabs { flex-wrap: wrap; }
   .app-sidebar .sidebar-tab { flex: 1 1 40%; min-width: 0; justify-content: center; }
