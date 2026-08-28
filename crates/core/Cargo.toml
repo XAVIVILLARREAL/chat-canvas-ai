@@ -12,3 +12,8 @@ serde_json.workspace = true
 uuid.workspace = true
 thiserror.workspace = true
 schemars.workspace = true
+sqlx.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
+tempfile = "3"

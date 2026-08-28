@@ -5,3 +5,4 @@
 //! comparten el shell Tauri (local) y el binario servidor (nube).
 
 pub mod domain;
+pub mod repo;
