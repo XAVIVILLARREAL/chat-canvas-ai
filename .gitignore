@@ -47,3 +47,5 @@ test-results/
 # Tauri gen: se versiona el proyecto Android nativo (SDD-005);
 # solo se ignoran los esquemas autogenerados
 src-tauri/gen/schemas/
+canvas-ai.db*
+*.db
