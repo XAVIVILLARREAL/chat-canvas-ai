@@ -21,6 +21,9 @@ export interface MessageInfo {
   tokens_prompt?: number | null;
   tokens_completion?: number | null;
   created_at: number;
+  /** Ramas (A.9): grupo de variantes (ancla = id del original) y camino activo. */
+  variant_group?: string | null;
+  active?: number;
 }
 
 export interface ContextSource {
@@ -143,20 +146,35 @@ export interface ChatTurn {
   provider: string;
 }
 
+/**
+ * Resultado del chat con provider BYOK (A.1/A.9):
+ * - ok: user+assistant persistidos.
+ * - persisted: el gateway YA persistió el mensaje del usuario pero no hubo
+ *   respuesta (sin provider o provider caído) — NO re-persistir (duplicaría).
+ * - failed: nada se persistió (gateway caído, sesión inexistente).
+ */
+export type ChatFallback =
+  | { kind: 'ok'; turn: ChatTurn }
+  | { kind: 'persisted' }
+  | { kind: 'failed' };
+
 export const chatApi = {
-  /** Chat con provider BYOK (persiste user+assistant). `null` si no hay provider (400). */
-  chat: async (sessionId: string, content: string): Promise<ChatTurn | null> => {
+  /** Chat con provider BYOK. Sin provider → `persisted` (el mensaje del
+   *  usuario ya quedó guardado); gateway caído → `failed`. */
+  chat: async (sessionId: string, content: string): Promise<ChatFallback> => {
     try {
       const res = await fetch(`${API}/api/sessions/${sessionId}/chat`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ content }),
       });
-      if (res.status === 400) return null; // sin provider → fallback local
-      if (!res.ok) return null;
-      return (await res.json()) as ChatTurn;
+      if (res.ok) return { kind: 'ok', turn: (await res.json()) as ChatTurn };
+      // 400 (sin provider) y 5xx (provider caído): el handler persiste el
+      // mensaje del usuario ANTES de intentar el provider
+      if (res.status === 400 || res.status >= 500) return { kind: 'persisted' };
+      return { kind: 'failed' }; // 404 etc.
     } catch {
-      return null;
+      return { kind: 'failed' }; // red/gateway caído
     }
   },
   listSessions: () => apiFetch<SessionInfo[]>('/api/sessions'),
@@ -175,6 +193,15 @@ export const chatApi = {
       method: 'POST',
       body: JSON.stringify({ keep: keep ?? 4 }),
     }),
+  /** Edita un mensaje → crea variante hermana activa (A.9). */
+  editMessage: (id: string, content: string) =>
+    apiFetch<MessageInfo>(`/api/messages/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ content }),
+    }),
+  /** Activa una variante del grupo (flechas ‹/›) → devuelve el grupo completo. */
+  activateVariant: (id: string) =>
+    apiFetch<MessageInfo[]>(`/api/messages/${id}/activate`, { method: 'POST' }),
   /** Escribe el límite de contexto como override de proyecto (hereda si se borra). */
   setContextLimit: (projectId: string, limit: number) =>
     apiFetch<{ ok: boolean }>(`/api/settings/${projectId}`, {

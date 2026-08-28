@@ -157,6 +157,8 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/sessions/:id/context", get(session_context))
         .route("/api/sessions/:id/resume", get(session_resume))
         .route("/api/sessions/:id/compact", post(compact_session))
+        .route("/api/messages/:id", put(edit_message))
+        .route("/api/messages/:id/activate", post(activate_variant))
         
         // Projects como SCOPE (A.0) + settings con scopes Global→Proyecto
         .route("/api/projects", get(list_projects).post(create_project))
@@ -739,7 +741,7 @@ async fn session_context(
         .await
         .map_err(|e| db_err(e))?
         .ok_or_else(|| not_found("Session"))?;
-    let history = repo::message_list_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
+    let history = repo::message_list_active_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
     let msgs: Vec<context::ContextMessage> = history
         .iter()
         .map(|m| context::ContextMessage::new(&m.role, &m.content))
@@ -788,7 +790,7 @@ async fn chat_in_session(
     ).await.map_err(|e| db_err(e))?;
 
     // 2) historial → provider (con límite de contexto A.5: recorta lo viejo)
-    let history = repo::message_list_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
+    let history = repo::message_list_active_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
     let ctx_msgs: Vec<context::ContextMessage> = history
         .iter()
         .map(|m| context::ContextMessage::new(&m.role, &m.content))
@@ -886,7 +888,7 @@ async fn chat_in_session_stream(
     };
 
     // 2) historial → provider (streaming, con límite de contexto A.5)
-    let history = match repo::message_list_by_session(&state.db, &id).await {
+    let history = match repo::message_list_active_by_session(&state.db, &id).await {
         Ok(h) => h,
         Err(e) => return db_err(e).into_response(),
     };
@@ -1099,6 +1101,51 @@ async fn put_global_setting(
     Ok(Json(serde_json::json!({ "ok": true, "scope": "global", "key": req.key })))
 }
 
+// ─── Ramas visuales (A.9) — editar crea variantes, ‹/› navega ───────────────
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct EditMessageRequest {
+    pub content: String,
+}
+
+/// Editar un mensaje (A.9): NO lo muta — crea una variante hermana activa.
+/// Las variantes anteriores duermen pero se conservan (navegables con ‹/›).
+/// v1: solo mensajes del usuario (el prompt es lo que se reformula).
+async fn edit_message(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Json(req): Json<EditMessageRequest>,
+) -> ApiResult<repo::Message> {
+    let old = repo::message_get(&state.db, &id)
+        .await
+        .map_err(|e| db_err(e))?
+        .ok_or_else(|| not_found("Message"))?;
+    if old.role != "user" {
+        return Err((StatusCode::BAD_REQUEST, "solo los mensajes del usuario son editables (v1)".into()));
+    }
+    let content = req.content.trim();
+    if content.is_empty() {
+        return Err((StatusCode::BAD_REQUEST, "contenido vacío".into()));
+    }
+    let m = repo::message_edit(&state.db, &id, content).await.map_err(|e| db_err(e))?;
+    info!("mensaje {} editado → variante {} (grupo {})", id, m.id, m.variant_group.clone().unwrap_or_default());
+    Ok(Json(m))
+}
+
+/// Flechas ‹/› (A.9): activa una variante del grupo — ninguna se pierde.
+/// Devuelve el grupo completo (orden de creación) para pintar "n/total".
+async fn activate_variant(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> ApiResult<Vec<repo::Message>> {
+    if repo::message_get(&state.db, &id).await.map_err(|e| db_err(e))?.is_none() {
+        return Err(not_found("Message"));
+    }
+    Ok(Json(
+        repo::message_activate_variant(&state.db, &id).await.map_err(|e| db_err(e))?,
+    ))
+}
+
 // ─── Resume inteligente (A.8) — card de reanudación + /compact ──────────────
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
@@ -1124,7 +1171,7 @@ async fn session_resume(
         .await
         .map_err(|e| db_err(e))?
         .ok_or_else(|| not_found("Session"))?;
-    let history = repo::message_list_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
+    let history = repo::message_list_active_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
     let last_user = history.iter().rev().find(|m| m.role == "user").map(|m| m.content.clone());
     let last_assistant = history.iter().rev().find(|m| m.role == "assistant").map(|m| m.content.clone());
     let unanswered = history.last().map(|m| m.role == "user").unwrap_or(false);
@@ -1171,7 +1218,7 @@ async fn compact_session(
         .map_err(|e| db_err(e))?
         .ok_or_else(|| not_found("Session"))?;
     let keep = req.keep.unwrap_or(4).max(1);
-    let history = repo::message_list_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
+    let history = repo::message_list_active_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
     if history.len() <= keep {
         return Ok(Json(CompactResponse {
             compacted: false,
@@ -2535,6 +2582,8 @@ const OPS: &[Op] = &[
     Op { method: "get", path: "/api/encargos/{id}", summary: "Obtiene encargo con evidencia", tag: "encargos", request: None, response: Some("Encargo") },
     Op { method: "get", path: "/api/sessions/{id}/resume", summary: "Dónde se quedó la sesión (card de resume, A.8)", tag: "sessions", request: None, response: Some("SessionResumeResponse") },
     Op { method: "post", path: "/api/sessions/{id}/compact", summary: "Comprime el historial viejo en un resumen (A.8)", tag: "sessions", request: Some("CompactRequest"), response: Some("CompactResponse") },
+    Op { method: "put", path: "/api/messages/{id}", summary: "Edita mensaje → crea variante hermana activa (A.9)", tag: "messages", request: Some("EditMessageRequest"), response: Some("Message") },
+    Op { method: "post", path: "/api/messages/{id}/activate", summary: "Activa una variante del grupo (flechas ‹/›)", tag: "messages", request: None, response: Some("Message") },
 
     Op { method: "get", path: "/api/settings", summary: "Settings globales resueltas", tag: "settings", request: None, response: None },
     Op { method: "put", path: "/api/settings", summary: "Escribe setting GLOBAL", tag: "settings", request: Some("PutSettingRequest"), response: None },
@@ -2633,6 +2682,7 @@ pub fn build_openapi() -> serde_json::Value {
         ("SessionResumeResponse", schema_for!(SessionResumeResponse)),
         ("CompactResponse", schema_for!(CompactResponse)),
         ("CompactRequest", schema_for!(CompactRequest)),
+        ("EditMessageRequest", schema_for!(EditMessageRequest)),
         ("StreamEvent", schema_for!(repo::StreamEvent)),
         ("A2AAgentCard", schema_for!(A2AAgentCard)),
         ("A2ATask", schema_for!(A2ATask)),

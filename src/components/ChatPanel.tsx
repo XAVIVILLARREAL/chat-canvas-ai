@@ -1,21 +1,21 @@
 /**
- * Panel de Chat (A.1) — sesiones + mensajes + input + memory rail placeholder.
- * Sin proveedor aún (A.3): enviar persiste el mensaje del usuario; el hint
- * indica que los proveedores BYOK llegan después (sin datos inventados).
+ * Panel de Chat (A.1) — sesiones + mensajes + input + memory rail.
+ * A.9: editar un mensaje crea una rama (variante); flechas ‹/› navegan
+ * alternativas sin perder ninguna.
  */
-import { useEffect, useRef, useState } from 'react';
-import { Send, Brain } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Send, Brain, Pencil, ChevronLeft, ChevronRight, Check, X } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { useChatUiStore } from '../stores/chat-ui-store';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useSessions, useMessages, useSendMessage, sessionKeys,
+  useCompact, useEditMessage, useActivateVariant,
 } from '../hooks/useSessions';
-import { streamChat } from '../lib/chatApi';
+import { streamChat, type MessageInfo } from '../lib/chatApi';
 import { ContextMeter } from './ContextMeter';
 import { EncargosPanel } from './EncargosPanel';
 import { ResumeCard } from './ResumeCard';
-import { useCompact } from '../hooks/useSessions';
 
 export function ChatPanel() {
   const { t } = useI18n();
@@ -29,6 +29,20 @@ export function ChatPanel() {
   const qc = useQueryClient();
   const bottomRef = useRef<HTMLDivElement>(null);
   const compact = useCompact(activeSessionId);
+  const editMsg = useEditMessage(activeSessionId);
+  const activate = useActivateVariant(activeSessionId);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState('');
+
+  // camino activo + mapa de grupos de variantes (A.9)
+  const visible = useMemo(() => messages.filter((m) => m.active !== 0), [messages]);
+  const groups = useMemo(() => {
+    const g: Record<string, MessageInfo[]> = {};
+    for (const m of messages) {
+      if (m.variant_group) (g[m.variant_group] ??= []).push(m);
+    }
+    return g;
+  }, [messages]);
 
   const active = sessions.find((s) => s.id === activeSessionId) ?? null;
 
@@ -99,29 +113,118 @@ export function ChatPanel() {
               {t('chat.empty')}
             </p>
           )}
-          {messages.map((m) => (
-            <div
-              key={m.id}
-              data-testid={`msg-${m.role}`}
-              style={{
-                alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-                maxWidth: '75%',
-                padding: '8px 12px',
-                borderRadius: 12,
-                background: m.role === 'user' ? 'rgba(99,102,241,0.25)' : 'rgba(148,163,184,0.15)',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-              }}
-            >
-              {m.content}
-              {m.model && (
-                <div style={{ fontSize: 11, opacity: 0.55, marginTop: 4 }}>
-                  {m.model}
-                  {m.tokens_completion ? ` · ${m.tokens_completion} tok` : ''}
-                </div>
-              )}
-            </div>
-          ))}
+          {visible.map((m) => {
+            const group = m.variant_group ? groups[m.variant_group] ?? [] : [];
+            const branching = group.length > 1;
+            const vIdx = group.findIndex((v) => v.id === m.id);
+            const prev = branching && vIdx > 0 ? group[vIdx - 1] : null;
+            const next = branching && vIdx < group.length - 1 ? group[vIdx + 1] : null;
+            const isEditing = editingId === m.id;
+            return (
+              <div
+                key={m.id}
+                data-testid={`msg-${m.role}`}
+                style={{
+                  alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
+                  maxWidth: '75%',
+                  padding: '8px 12px',
+                  borderRadius: 12,
+                  background: m.role === 'user' ? 'rgba(99,102,241,0.25)' : 'rgba(148,163,184,0.15)',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {isEditing ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 220 }}>
+                    <textarea
+                      data-testid="msg-edit-input"
+                      value={editDraft}
+                      onChange={(e) => setEditDraft(e.target.value)}
+                      rows={3}
+                      autoFocus
+                      style={{
+                        fontSize: 'inherit', padding: 8, borderRadius: 8, resize: 'vertical',
+                        background: 'rgba(15,23,42,0.6)', color: 'inherit',
+                        border: '1px solid rgba(148,163,184,0.35)',
+                      }}
+                    />
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button
+                        className="btn-primary"
+                        data-testid="msg-edit-save"
+                        onClick={() =>
+                          editMsg.mutate(
+                            { id: m.id, content: editDraft },
+                            { onSuccess: () => setEditingId(null) },
+                          )
+                        }
+                        disabled={editMsg.isPending || !editDraft.trim()}
+                        style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, padding: '4px 8px', borderRadius: 8, cursor: 'pointer' }}
+                      >
+                        <Check width={12} height={12} /> {t('message.save')}
+                      </button>
+                      <button
+                        data-testid="msg-edit-cancel"
+                        onClick={() => setEditingId(null)}
+                        style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, padding: '4px 8px', borderRadius: 8, cursor: 'pointer', background: 'transparent', border: '1px solid rgba(148,163,184,0.3)', color: 'inherit' }}
+                      >
+                        <X width={12} height={12} /> {t('message.cancel')}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {m.content}
+                    {m.role === 'user' && (
+                      <button
+                        data-testid={`msg-edit-${m.id}`}
+                        onClick={() => { setEditingId(m.id); setEditDraft(m.content); }}
+                        aria-label={t('message.edit')}
+                        title={t('message.edit')}
+                        style={{ marginLeft: 6, background: 'transparent', border: 'none', cursor: 'pointer', color: 'inherit', opacity: 0.5, verticalAlign: 'middle', padding: 0 }}
+                      >
+                        <Pencil width={11} height={11} />
+                      </button>
+                    )}
+                    {m.model && (
+                      <div style={{ fontSize: 11, opacity: 0.55, marginTop: 4 }}>
+                        {m.model}
+                        {m.tokens_completion ? ` · ${m.tokens_completion} tok` : ''}
+                      </div>
+                    )}
+                    {branching && (
+                      <div
+                        data-testid={`msg-branch-${m.id}`}
+                        style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4, fontSize: 11, opacity: 0.75 }}
+                      >
+                        <button
+                          data-testid={`msg-prev-${m.id}`}
+                          onClick={() => prev && activate.mutate(prev.id)}
+                          disabled={!prev || activate.isPending}
+                          aria-label={t('message.prevVariant')}
+                          style={{ background: 'transparent', border: 'none', cursor: prev ? 'pointer' : 'default', color: 'inherit', padding: 0, opacity: prev ? 1 : 0.3 }}
+                        >
+                          <ChevronLeft width={13} height={13} />
+                        </button>
+                        <span data-testid={`msg-variant-pos-${m.id}`}>
+                          {vIdx + 1}/{group.length}
+                        </span>
+                        <button
+                          data-testid={`msg-next-${m.id}`}
+                          onClick={() => next && activate.mutate(next.id)}
+                          disabled={!next || activate.isPending}
+                          aria-label={t('message.nextVariant')}
+                          style={{ background: 'transparent', border: 'none', cursor: next ? 'pointer' : 'default', color: 'inherit', padding: 0, opacity: next ? 1 : 0.3 }}
+                        >
+                          <ChevronRight width={13} height={13} />
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
           {streaming !== null && (
             <div
               data-testid="chat-streaming"

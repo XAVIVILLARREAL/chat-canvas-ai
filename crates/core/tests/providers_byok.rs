@@ -103,60 +103,107 @@ async fn no_streaming_respuesta_completa() {
 
 #[tokio::test]
 async fn openrouter_free_real() {
-    let Ok(key) = std::env::var("OPENROUTER_API_KEY") else {
-        eprintln!("SKIP openrouter_free_real: OPENROUTER_API_KEY no definida");
-        return;
-    };
     if std::env::var("CANVAS_REAL_LLM").as_deref() != Ok("1") {
         eprintln!("SKIP openrouter_free_real: CANVAS_REAL_LLM != 1 (prueba real opt-in)");
         return;
     }
-    let provider = canvas_ai_core::providers::OpenAICompatProvider::new(
-        "openrouter-free",
-        "https://openrouter.ai/api/v1",
-        &key,
-    );
-    // fallback across free pool (los :free se rate-limitan upstream de forma
-    // transitoria — el router por modelo es el comportamiento real de dev)
-    let modelos: Vec<String> = vec![
-        std::env::var("CANVAS_TEST_MODEL").unwrap_or_default(),
-        "z-ai/glm-5.2:free".into(),
-        "liquid/lfm-2.5-2.6b:free".into(),
-        "poolside/laguna-xs-2.1:free".into(),
-    ]
-    .into_iter()
-    .filter(|m| !m.is_empty())
-    .collect();
 
-    let mut ultimo_error = String::new();
-    for model in &modelos {
-        let req = ChatCompletionRequest {
-            model: model.clone(),
-            messages: vec![ChatMessage {
-                role: "user".into(),
-                content: "Responde exactamente con la palabra: PING".into(),
-            }],
-            max_tokens: Some(20),
-            temperature: Some(0.0),
-            stream: false,
-        };
-        match provider.send_message(&req).await {
-            Ok(resp) => {
-                let content = resp.choices[0].message.content.clone().unwrap_or_default();
-                if content.trim().is_empty() {
-                    ultimo_error = format!("{model}: contenido vacío");
-                    continue;
+    // ── Primario: pool free de OpenRouter (los :free se rate-limitan upstream
+    // de forma transitoria — el router por modelo es el comportamiento real) ──
+    let or_key = std::env::var("OPENROUTER_API_KEY").unwrap_or_default();
+    if !or_key.is_empty() {
+        let key = or_key;
+        let provider = canvas_ai_core::providers::OpenAICompatProvider::new(
+            "openrouter-free",
+            "https://openrouter.ai/api/v1",
+            &key,
+        );
+        let modelos: Vec<String> = vec![
+            std::env::var("CANVAS_TEST_MODEL").unwrap_or_default(),
+            "z-ai/glm-5.2:free".into(),
+            "liquid/lfm-2.5-2.6b:free".into(),
+            "poolside/laguna-xs-2.1:free".into(),
+        ]
+        .into_iter()
+        .filter(|m| !m.is_empty())
+        .collect();
+
+        let mut ultimo_error = String::new();
+        for model in &modelos {
+            let req = ChatCompletionRequest {
+                model: model.clone(),
+                messages: vec![ChatMessage {
+                    role: "user".into(),
+                    content: "Responde exactamente con la palabra: PING".into(),
+                }],
+                max_tokens: Some(20),
+                temperature: Some(0.0),
+                stream: false,
+            };
+            match provider.send_message(&req).await {
+                Ok(resp) => {
+                    let content = resp.choices[0].message.content.clone().unwrap_or_default();
+                    if strip_think(&content).trim().is_empty() {
+                        ultimo_error = format!("{model}: contenido vacío");
+                        continue;
+                    }
+                    eprintln!("✅ LLM real respondió con {model}: {content}");
+                    return; // integración real verificada
                 }
-                eprintln!("LLM real respondió con {model}: {content}");
-                return; // ✅ integración real verificada
-            }
-            Err(e) => {
-                eprintln!("modelo {model} no disponible ahora: {e}");
-                ultimo_error = e.to_string();
+                Err(e) => {
+                    eprintln!("modelo {model} no disponible ahora: {e}");
+                    ultimo_error = e.to_string();
+                }
             }
         }
+        eprintln!("pool free agotado/rate-limited ({ultimo_error}) — probando fallback MiniMax…");
+    } else {
+        eprintln!("OPENROUTER_API_KEY no definida — probando fallback MiniMax…");
     }
-    eprintln!("SKIP openrouter_free_real: pool free agotado/rate-limited ({ultimo_error}) — reintenta luego");
+
+    // ── Fallback: MiniMax (sk-cp-… Coding Plan, endpoint OpenAI-compatible) ──
+    let mkey = std::env::var("MINIMAX_API_KEY").unwrap_or_default();
+    if mkey.is_empty() {
+        eprintln!("SKIP openrouter_free_real: ni OpenRouter ni MINIMAX_API_KEY definidas");
+        return;
+    }
+    let provider = canvas_ai_core::providers::OpenAICompatProvider::new(
+        "minimax",
+        &std::env::var("MINIMAX_BASE_URL").unwrap_or_else(|_| "https://api.minimax.io/v1".into()),
+        &mkey,
+    );
+    let model = std::env::var("MINIMAX_MODEL").unwrap_or_else(|_| "MiniMax-M2".into());
+    let req = ChatCompletionRequest {
+        model,
+        messages: vec![ChatMessage {
+            role: "user".into(),
+            content: "Responde exactamente con la palabra: PING".into(),
+        }],
+        // M2 razona inline (<think>…</think>) — presupuesto suficiente
+        max_tokens: Some(512),
+        temperature: Some(0.0),
+        stream: false,
+    };
+    match provider.send_message(&req).await {
+        Ok(resp) => {
+            let content = resp.choices[0].message.content.clone().unwrap_or_default();
+            let visible = strip_think(&content);
+            assert!(
+                visible.to_uppercase().contains("PING"),
+                "MiniMax no respondió PING: {content}"
+            );
+            eprintln!("✅ LLM real (fallback MiniMax) respondió: {visible}");
+        }
+        Err(e) => panic!("fallback MiniMax falló: {e}"),
+    }
+}
+
+/// Quita el bloque de razonamiento inline <think>…</think> (quirk de M2).
+fn strip_think(s: &str) -> String {
+    match (s.find("<think>"), s.find("</think>")) {
+        (Some(i), Some(j)) => format!("{}{}", &s[..i], &s[j + "</think>".len()..]),
+        _ => s.to_string(),
+    }
 }
 
 // trait object safety (registro universal)

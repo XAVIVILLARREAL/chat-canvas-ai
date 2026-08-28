@@ -104,6 +104,10 @@ pub struct Message {
     pub cache_hits: Option<i64>,
     pub metadata: String,
     pub created_at: i64,
+    /// Ramas (A.9): grupo de variantes hermanas (ancla = id del mensaje original).
+    pub variant_group: Option<String>,
+    /// 1 = en el camino activo; 0 = variante dormida (se navega con ‹/›).
+    pub active: i64,
 }
 
 #[derive(Debug, Clone, serde::Serialize, sqlx::FromRow)]
@@ -287,8 +291,66 @@ pub async fn message_retime(db: &Db, id: &str, created_at: i64) -> Result<(), sq
     Ok(())
 }
 
+/// Camino ACTIVO de la sesión (excluye variantes dormidas) — es lo que ve el
+/// chat y lo que viaja al provider como contexto.
+pub async fn message_list_active_by_session(db: &Db, session_id: &str) -> Result<Vec<Message>, sqlx::Error> {
+    sqlx::query_as("SELECT * FROM messages WHERE session_id = ?1 AND active = 1 ORDER BY created_at, rowid")
+        .bind(session_id)
+        .fetch_all(db)
+        .await
+}
+
+/// Edita un mensaje creando una VARIANTE hermana (A.9): el original y sus
+/// variantes comparten `variant_group` (ancla = id del original); la nueva
+/// queda activa y las demás duermen. Nada se pierde — se navega con ‹/›.
+pub async fn message_edit(db: &Db, id: &str, new_content: &str) -> Result<Message, sqlx::Error> {
+    let old = message_get(db, id).await?.ok_or_else(|| sqlx::Error::RowNotFound)?;
+    let group = old.variant_group.clone().unwrap_or_else(|| old.id.clone());
+    if old.variant_group.is_none() {
+        // el original se une a su propio grupo la primera vez que lo editan
+        sqlx::query("UPDATE messages SET variant_group = ?2 WHERE id = ?1")
+            .bind(&old.id).bind(&group)
+            .execute(db).await?;
+    }
+    let new_id = uuid::Uuid::new_v4().to_string();
+    sqlx::query(
+        "INSERT INTO messages (id, session_id, role, content, model, tokens_prompt, tokens_completion, cost_usd, cache_hits, metadata, created_at, variant_group, active)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, 1)",
+    )
+    .bind(&new_id).bind(&old.session_id).bind(&old.role).bind(new_content)
+    .bind(&old.model).bind(old.tokens_prompt).bind(old.tokens_completion)
+    .bind(old.cost_usd).bind(old.cache_hits).bind(&old.metadata)
+    .bind(old.created_at).bind(&group)
+    .execute(db).await?;
+    sqlx::query("UPDATE messages SET active = 0 WHERE variant_group = ?1 AND id != ?2")
+        .bind(&group).bind(&new_id)
+        .execute(db).await?;
+    Ok(message_get(db, &new_id).await?.expect("just inserted"))
+}
+
+/// Activa una variante del grupo (flechas ‹/›) — no borra ninguna.
+/// Devuelve el grupo completo en orden de creación.
+pub async fn message_activate_variant(db: &Db, id: &str) -> Result<Vec<Message>, sqlx::Error> {
+    let m = message_get(db, id).await?.ok_or_else(|| sqlx::Error::RowNotFound)?;
+    let group = m.variant_group.clone().unwrap_or_else(|| m.id.clone());
+    sqlx::query(
+        "UPDATE messages SET active = CASE WHEN id = ?2 THEN 1 ELSE 0 END WHERE variant_group = ?1",
+    )
+    .bind(&group).bind(id)
+    .execute(db).await?;
+    message_variants(db, &group).await
+}
+
+/// Variantes de un grupo (orden de creación).
+pub async fn message_variants(db: &Db, group: &str) -> Result<Vec<Message>, sqlx::Error> {
+    sqlx::query_as("SELECT * FROM messages WHERE variant_group = ?1 ORDER BY created_at, rowid")
+        .bind(group)
+        .fetch_all(db)
+        .await
+}
+
 pub async fn message_list_by_session(db: &Db, session_id: &str) -> Result<Vec<Message>, sqlx::Error> {
-    sqlx::query_as("SELECT * FROM messages WHERE session_id = ?1 ORDER BY created_at, id")
+    sqlx::query_as("SELECT * FROM messages WHERE session_id = ?1 ORDER BY created_at, rowid")
         .bind(session_id).fetch_all(db).await
 }
 

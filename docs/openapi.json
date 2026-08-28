@@ -2565,6 +2565,11 @@
         "definitions": {
           "Message": {
             "properties": {
+              "active": {
+                "description": "1 = en el camino activo; 0 = variante dormida (se navega con ‹/›).",
+                "format": "int64",
+                "type": "integer"
+              },
               "cache_hits": {
                 "format": "int64",
                 "type": [
@@ -2617,9 +2622,17 @@
                   "integer",
                   "null"
                 ]
+              },
+              "variant_group": {
+                "description": "Ramas (A.9): grupo de variantes hermanas (ancla = id del mensaje original).",
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
             "required": [
+              "active",
               "content",
               "created_at",
               "id",
@@ -2692,6 +2705,22 @@
           "used_skills"
         ],
         "title": "ChatResponse",
+        "type": "object"
+      },
+      "CompactRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "keep": {
+            "description": "Mensajes recientes a conservar (default 4, mínimo 1).",
+            "format": "uint",
+            "minimum": 0.0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "title": "CompactRequest",
         "type": "object"
       },
       "CompactResponse": {
@@ -2986,6 +3015,19 @@
           "name"
         ],
         "title": "CreateSkillRequest",
+        "type": "object"
+      },
+      "EditMessageRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "title": "EditMessageRequest",
         "type": "object"
       },
       "EffectiveSettingsResponse": {
@@ -3648,6 +3690,11 @@
       "Message": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "properties": {
+          "active": {
+            "description": "1 = en el camino activo; 0 = variante dormida (se navega con ‹/›).",
+            "format": "int64",
+            "type": "integer"
+          },
           "cache_hits": {
             "format": "int64",
             "type": [
@@ -3700,9 +3747,17 @@
               "integer",
               "null"
             ]
+          },
+          "variant_group": {
+            "description": "Ramas (A.9): grupo de variantes hermanas (ancla = id del mensaje original).",
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
+          "active",
           "content",
           "created_at",
           "id",
@@ -7454,6 +7509,68 @@
         "summary": "Tools del server",
         "tags": [
           "mcp"
+        ]
+      }
+    },
+    "/api/messages/{id}": {
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditMessageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Edita mensaje → crea variante hermana activa (A.9)",
+        "tags": [
+          "messages"
+        ]
+      }
+    },
+    "/api/messages/{id}/activate": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Activa una variante del grupo (flechas ‹/›)",
+        "tags": [
+          "messages"
         ]
       }
     },

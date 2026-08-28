@@ -142,9 +142,9 @@ async fn data_sobrevive_reinicio_del_server() {
     let db = repo::connect(&url).await.unwrap();
     assert_eq!(repo::project_list(&db).await.unwrap().len(), 1);
     assert_eq!(repo::message_list_by_session(&db, "s1").await.unwrap().len(), 1);
-    // migraciones NO se reaplican (idempotente): 0001+0002+0004+0005+0006
+    // migraciones NO se reaplican (idempotente): 0001+0002+0004+0005+0006+0007
     let versiones: Vec<(i64,)> = sqlx::query_as("SELECT version FROM _sqlx_migrations").fetch_all(&db).await.unwrap();
-    assert_eq!(versiones.len(), 5);
+    assert_eq!(versiones.len(), 6);
 }
 
 // ─── A.0 — Settings con scopes: override local NO muta global ───────────────

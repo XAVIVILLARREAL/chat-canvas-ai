@@ -59,6 +59,38 @@ export function useCompact(sessionId: string | null) {
   });
 }
 
+/** Edita un mensaje → variante hermana activa (A.9). Nada se pierde. */
+export function useEditMessage(sessionId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, content }: { id: string; content: string }) => {
+      const m = await chatApi.editMessage(id, content);
+      if (!m) throw new Error('edit falló');
+      return m;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: sessionKeys.messages(sessionId) });
+      qc.invalidateQueries({ queryKey: sessionKeys.context(sessionId) });
+    },
+  });
+}
+
+/** Flechas ‹/› (A.9): activa la variante elegida del grupo. */
+export function useActivateVariant(sessionId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const g = await chatApi.activateVariant(id);
+      if (!g) throw new Error('activate falló');
+      return g;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: sessionKeys.messages(sessionId) });
+      qc.invalidateQueries({ queryKey: sessionKeys.context(sessionId) });
+    },
+  });
+}
+
 /** Medidor de contexto de la sesión (A.5) — en vivo, refresco tras cada mensaje. */
 export function useContextInfo(sessionId: string | null) {
   return useQuery<ContextInfo | null>({
@@ -98,16 +130,17 @@ export function useSendMessage(sessionId: string | null) {
   return useMutation({
     mutationFn: async (content: string) => {
       if (!sessionId) throw new Error('sin sesión');
-      // A.3: si hay provider BYOK, /chat responde user+assistant reales;
-      // sin provider → 400 → fallback: persiste solo el mensaje del usuario.
-      const turn = await chatApi.chat(sessionId, content);
-      if (turn) return [turn.user_message, turn.assistant_message];
-      const m = await chatApi.sendMessage(sessionId, content);
-      if (!m) throw new Error('gateway');
-      return [m];
+      // A.3: /chat persiste user+assistant con provider BYOK. Sin provider o
+      // con provider caído, el handler YA persistió el mensaje del usuario
+      // ('persisted') — re-persistirlo duplicaría (bug raíz corregido en A.9).
+      const r = await chatApi.chat(sessionId, content);
+      if (r.kind === 'ok') return [r.turn.user_message, r.turn.assistant_message];
+      if (r.kind === 'persisted') return [];
+      throw new Error('gateway caído');
     },
-    onSuccess: (msgs: MessageInfo[]) => {
-      if (msgs[0]) qc.invalidateQueries({ queryKey: sessionKeys.messages(msgs[0].session_id) });
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: sessionKeys.messages(sessionId) });
+      qc.invalidateQueries({ queryKey: sessionKeys.context(sessionId) });
     },
   });
 }

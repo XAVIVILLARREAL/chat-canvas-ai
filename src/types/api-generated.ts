@@ -215,6 +215,7 @@ export type MemoryEntry = {
 };
 
 export type Message = {
+  active: number;
   cache_hits?: Record<string, unknown>;
   content: string;
   cost_usd?: Record<string, unknown>;
@@ -226,6 +227,7 @@ export type Message = {
   session_id: string;
   tokens_completion?: Record<string, unknown>;
   tokens_prompt?: Record<string, unknown>;
+  variant_group?: Record<string, unknown>;
 };
 
 export type NodeCategory = "trigger" | "action" | "logic" | "data" | "a_i" | "m_c_p" | "agent" | "human" | "output";
@@ -532,6 +534,10 @@ export type ChatResponse = {
   used_skills: string[];
 };
 
+export type CompactRequest = {
+  keep?: Record<string, unknown>;
+};
+
 export type CompactResponse = {
   compacted: boolean;
   reason?: Record<string, unknown>;
@@ -591,6 +597,10 @@ export type CreateSkillRequest = {
   created_by: string;
   description: string;
   name: string;
+};
+
+export type EditMessageRequest = {
+  content: string;
 };
 
 export type EffectiveSettingsResponse = {
