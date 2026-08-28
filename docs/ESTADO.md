@@ -18,9 +18,10 @@
 
 ## Próximo paso (Etapa 0 — ya concretada y con plan de implementación)
 
-- [ ] **Implementar la Etapa 0 por slices** ([ETAPA-0-IMPLEMENTACION](./ETAPA-0-IMPLEMENTACION.md)): ~~0.1 migraciones+repos SQLite~~ → 0.2 Postgres+RLS → 0.3 event_stream → 0.4 secretos BYOK → 0.5 sandbox → 0.6 OpenAPI → ~~0.7 i18n~~ → **M0 (Gate 0)**.
+- [ ] **Implementar la Etapa 0 por slices** ([ETAPA-0-IMPLEMENTACION](./ETAPA-0-IMPLEMENTACION.md)): ~~0.1 migraciones+repos SQLite~~ ✅ → 0.2 Postgres+RLS → 0.3 event_stream → 0.4 secretos BYOK → 0.5 sandbox → 0.6 OpenAPI → ~~0.7 i18n~~ ✅ → **M0 (Gate 0)**.
   - ✅ **Slice 0.7 (i18n) COMPLETADO 2026-08-27** — I.1-I.5 completos (12 locales + RTL árabe + Intl), suite humana verde. Commit `f87b26c`. Ver [plan.md](../plan.md).
-  - 🟡 **Slice 0.1 (SQLite) EN CURSO 2026-08-27** — migraciones 0001_init (11 tablas, up+down) + repos CRUD sqlx + tests 4/4 verde (`cargo test -p canvas-ai-core`). Commit `ad46ac8`. **Falta:** conectar el server axum a los repos (reemplazar los `HashMap` de `crates/server/src/main.rs:28-32` por `repo::Db`) — decisión de mapping pendiente: el modelo actual del server (Canvas/Agent/MCPServer) vs schema canónico (sessions/providers; agents viven en `session.agent_config`).
+  - ✅ **Slice 0.1 (SQLite) COMPLETADO 2026-08-27** — migraciones `0001_init` (11 tablas canónicas) + `0002_workspace` (canvas/agent/mcp con payload JSON, [ADR-007](./ADRs/ADR-007-mapping-dominio-sqlite.md)) + repos CRUD sqlx en `canvas-ai-core::repo` + **server rewired** (`HashMap`→SQLite, refactor lib+api) + proyecto default `local-default`. Tests 9/9: up/down/up idempotente · CRUD aislado por project_id + FK cascade · data sobrevive reinicio (nivel repo Y nivel HTTP con router real). `cargo test --workspace` verde. Commits `ad46ac8`, +wiring.
+- **SIGUIENTE EN ORDEN: slice 0.2** — Postgres + RLS fail-closed (mismas migraciones a Postgres, seed, 2 tenants aislados).
 - El server aún vive en `HashMap` en memoria; conectar sqlx/sqlite + Postgres ([SCHEMA-MAESTRO](./SCHEMA-MAESTRO.md)) ← **SIGUIENTE EN ORDEN (slice 0.1)**
 - Contrato `event_stream` (ledger append-only) + eventos de producto ([PRODUCT-METRICS](./PRODUCT-METRICS.md))
 - Módulo de secretos BYOK (keychain OS / cifrado por tenant) ([THREAT-MODEL](./THREAT-MODEL.md))

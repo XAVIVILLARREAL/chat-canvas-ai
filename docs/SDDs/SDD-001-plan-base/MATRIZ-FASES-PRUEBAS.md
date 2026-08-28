@@ -10,7 +10,7 @@
 ## Etapa 0 · Fundación (schema maestro + eventos + secretos) — `SCHEMA-MAESTRO.md` + `THREAT-MODEL.md`
 | Fase | Nombre | Pruebas |
 |---|---|---|
-| 0.1 | Schema maestro + migraciones | Cargo test repos en SQLite y Postgres; migración idempotente up/down/up; `project_id` en toda tabla ([SCHEMA-MAESTRO](../../SCHEMA-MAESTRO.md)) |
+| 0.1 | Schema maestro + migraciones ✅ SQLite 2026-08-27 | Cargo test repos en SQLite y Postgres; migración idempotente up/down/up; `project_id` en toda tabla ([SCHEMA-MAESTRO](../../SCHEMA-MAESTRO.md)) — **SQLite verde**: 0001_init (11 tablas canónicas) + 0002_workspace (canvas/agent/mcp payload JSON, [ADR-007](../../ADRs/ADR-007-mapping-dominio-sqlite.md)) + repos CRUD + server wired (`HashMap`→sqlx) · tests: up/down/up ✅ · CRUD aislado por project_id + FK cascade ✅ · data sobrevive reinicio (core + HTTP) ✅ · commits `ad46ac8`+ |
 | 0.2 | Contrato `event_stream` (ledger) | Trigger append-only rechaza UPDATE/DELETE; seed project→session→message→rung; taxonomía completa ([PRODUCT-METRICS](../../PRODUCT-METRICS.md)) |
 | 0.3 | Secretos BYOK + vault | Key cifrada/descifrable con la correcta; nunca en claro al webview ([THREAT-MODEL](../../THREAT-MODEL.md)) |
 | 0.4 | Frontera del sandbox Linux | Contrato de contenedor: límites CPU/RAM/disco/timeout, red off, mounts read-only ([THREAT-MODEL](../../THREAT-MODEL.md)) |

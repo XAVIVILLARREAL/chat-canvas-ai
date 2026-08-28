@@ -17,7 +17,9 @@
 2. **DoR**: contrato de pruebas definido (qué cargo/vitest/test humano exige) + fila en la MATRIZ.
 3. Implementar TDD (test que falla → código → verde).
 
-### 0.1 — Migraciones + repos SQLite (a)
+### 0.1 — Migraciones + repos SQLite (a) — ✅ COMPLETADO 2026-08-27
+> **Estado:** ✅ SQLite completo. Migraciones `0001_init` (11 tablas canónicas) + `0002_workspace` (canvas/agent/mcp payload JSON — [ADR-007](./ADRs/ADR-007-mapping-dominio-sqlite.md)) · repos CRUD en `canvas-ai-core::repo` · server rewired de `HashMap` a SQLite (refactor lib+api, `CANVAS_AI_DB` env) · tests 9/9 (up/down/up, CRUD aislado por project_id, FK cascade, persistencia tras reinicio a nivel repo y HTTP). La mitad Postgres de esta fila de la MATRIZ se cumple en el slice 0.2.
+
 - **Qué:** `crates/core/migrations/0001_*.sql` (sessions, messages, event_stream, skills, providers, settings, documents, executions) con up+down; `sqlx` connectado a SQLite; repos CRUD.
 - **Tests:** cargo test repos (CRUD por project_id) en SQLite + migración up/down/up idempotente.
 - **Mini-gate:** `cargo test -p canvas-ai-core` verde; la data sobrevive a reinicio del server.

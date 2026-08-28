@@ -25,3 +25,9 @@ tracing-subscriber.workspace = true
 anyhow.workspace = true
 schemars.workspace = true
 rmcp.workspace = true
+sqlx.workspace = true
+
+[dev-dependencies]
+http-body-util = "0.1"
+tempfile = "3"
+serde_json.workspace = true

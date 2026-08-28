@@ -268,6 +268,13 @@ pub async fn skill_get(db: &Db, id: &str) -> Result<Option<Skill>, sqlx::Error> 
         .bind(id).fetch_optional(db).await
 }
 
+pub async fn skill_soft_delete(db: &Db, id: &str) -> Result<u64, sqlx::Error> {
+    let r = sqlx::query("UPDATE skills SET deleted_at = ?2 WHERE id = ?1 AND deleted_at IS NULL")
+        .bind(id).bind(now_ms())
+        .execute(db).await?;
+    Ok(r.rows_affected())
+}
+
 pub async fn skill_list_by_project(db: &Db, project_id: &str) -> Result<Vec<Skill>, sqlx::Error> {
     sqlx::query_as("SELECT * FROM skills WHERE project_id = ?1 AND deleted_at IS NULL ORDER BY created_at")
         .bind(project_id).fetch_all(db).await
@@ -393,6 +400,235 @@ pub async fn event_append(
 pub async fn event_list_by_session(db: &Db, session_id: &str) -> Result<Vec<StreamEvent>, sqlx::Error> {
     sqlx::query_as("SELECT * FROM event_stream WHERE session_id = ?1 ORDER BY id")
         .bind(session_id).fetch_all(db).await
+}
+
+// ─── Workspace layer (ADR-007): dominio ↔ SQLite ────────────────────────────
+//
+// Objetos de workspace (Canvas/Agent/MCPServer) como payload JSON;
+// Skill sobre la tabla canónica (manifest); Execution sobre columnas tipadas.
+
+use crate::domain::{Agent, Canvas, ExecutionContext, MCPServer, Skill as DomainSkill};
+
+fn to_json<T: serde::Serialize>(v: &T) -> String {
+    serde_json::to_string(v).expect("dominio serializable")
+}
+
+fn from_json<T: for<'de> serde::Deserialize<'de>>(s: &str) -> T {
+    serde_json::from_str(s).expect("dominio deserializable (row corrupta)")
+}
+
+// ── Canvas ──────────────────────────────────────────────────────────────────
+
+pub async fn canvas_put(db: &Db, project_id: &str, canvas: &Canvas) -> Result<(), sqlx::Error> {
+    sqlx::query(
+        "INSERT INTO canvases (id, project_id, data, updated_at) VALUES (?1, ?2, ?3, ?4)
+         ON CONFLICT(id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at, deleted_at = NULL",
+    )
+    .bind(&canvas.id).bind(project_id).bind(to_json(canvas)).bind(now_ms())
+    .execute(db).await?;
+    Ok(())
+}
+
+pub async fn canvas_get(db: &Db, id: &str) -> Result<Option<Canvas>, sqlx::Error> {
+    let row: Option<(String,)> =
+        sqlx::query_as("SELECT data FROM canvases WHERE id = ?1 AND deleted_at IS NULL")
+            .bind(id).fetch_optional(db).await?;
+    Ok(row.map(|(d,)| from_json(&d)))
+}
+
+pub async fn canvas_list(db: &Db, project_id: &str) -> Result<Vec<Canvas>, sqlx::Error> {
+    let rows: Vec<(String,)> =
+        sqlx::query_as("SELECT data FROM canvases WHERE project_id = ?1 AND deleted_at IS NULL ORDER BY updated_at")
+            .bind(project_id).fetch_all(db).await?;
+    Ok(rows.into_iter().map(|(d,)| from_json(&d)).collect())
+}
+
+pub async fn canvas_delete(db: &Db, id: &str) -> Result<u64, sqlx::Error> {
+    let r = sqlx::query("UPDATE canvases SET deleted_at = ?2 WHERE id = ?1 AND deleted_at IS NULL")
+        .bind(id).bind(now_ms())
+        .execute(db).await?;
+    Ok(r.rows_affected())
+}
+
+// ── Agent ───────────────────────────────────────────────────────────────────
+
+pub async fn agent_put(db: &Db, project_id: &str, agent: &Agent) -> Result<(), sqlx::Error> {
+    sqlx::query(
+        "INSERT INTO agents (id, project_id, data, updated_at) VALUES (?1, ?2, ?3, ?4)
+         ON CONFLICT(id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at, deleted_at = NULL",
+    )
+    .bind(&agent.id).bind(project_id).bind(to_json(agent)).bind(now_ms())
+    .execute(db).await?;
+    Ok(())
+}
+
+pub async fn agent_get(db: &Db, id: &str) -> Result<Option<Agent>, sqlx::Error> {
+    let row: Option<(String,)> =
+        sqlx::query_as("SELECT data FROM agents WHERE id = ?1 AND deleted_at IS NULL")
+            .bind(id).fetch_optional(db).await?;
+    Ok(row.map(|(d,)| from_json(&d)))
+}
+
+pub async fn agent_list(db: &Db, project_id: &str) -> Result<Vec<Agent>, sqlx::Error> {
+    let rows: Vec<(String,)> =
+        sqlx::query_as("SELECT data FROM agents WHERE project_id = ?1 AND deleted_at IS NULL ORDER BY updated_at")
+            .bind(project_id).fetch_all(db).await?;
+    Ok(rows.into_iter().map(|(d,)| from_json(&d)).collect())
+}
+
+pub async fn agent_delete(db: &Db, id: &str) -> Result<u64, sqlx::Error> {
+    let r = sqlx::query("UPDATE agents SET deleted_at = ?2 WHERE id = ?1 AND deleted_at IS NULL")
+        .bind(id).bind(now_ms())
+        .execute(db).await?;
+    Ok(r.rows_affected())
+}
+
+// ── MCP server ──────────────────────────────────────────────────────────────
+
+pub async fn mcp_put(db: &Db, project_id: &str, server: &MCPServer) -> Result<(), sqlx::Error> {
+    sqlx::query(
+        "INSERT INTO mcp_servers (id, project_id, data, updated_at) VALUES (?1, ?2, ?3, ?4)
+         ON CONFLICT(id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at, deleted_at = NULL",
+    )
+    .bind(&server.id).bind(project_id).bind(to_json(server)).bind(now_ms())
+    .execute(db).await?;
+    Ok(())
+}
+
+pub async fn mcp_get(db: &Db, id: &str) -> Result<Option<MCPServer>, sqlx::Error> {
+    let row: Option<(String,)> =
+        sqlx::query_as("SELECT data FROM mcp_servers WHERE id = ?1 AND deleted_at IS NULL")
+            .bind(id).fetch_optional(db).await?;
+    Ok(row.map(|(d,)| from_json(&d)))
+}
+
+pub async fn mcp_list(db: &Db, project_id: &str) -> Result<Vec<MCPServer>, sqlx::Error> {
+    let rows: Vec<(String,)> =
+        sqlx::query_as("SELECT data FROM mcp_servers WHERE project_id = ?1 AND deleted_at IS NULL ORDER BY updated_at")
+            .bind(project_id).fetch_all(db).await?;
+    Ok(rows.into_iter().map(|(d,)| from_json(&d)).collect())
+}
+
+pub async fn mcp_delete(db: &Db, id: &str) -> Result<u64, sqlx::Error> {
+    let r = sqlx::query("UPDATE mcp_servers SET deleted_at = ?2 WHERE id = ?1 AND deleted_at IS NULL")
+        .bind(id).bind(now_ms())
+        .execute(db).await?;
+    Ok(r.rows_affected())
+}
+
+// ── Skill (dominio) sobre tabla canónica ────────────────────────────────────
+
+pub async fn skill_domain_create(db: &Db, project_id: &str, skill: &DomainSkill) -> Result<(), sqlx::Error> {
+    let manifest: serde_json::Value = serde_json::to_value(skill).expect("skill serializable");
+    skill_create(db, &skill.id, project_id, &skill.id, &manifest, "").await?;
+    Ok(())
+}
+
+/// Upsert de una nueva versión del skill (nuevo snapshot en skill_versions).
+pub async fn skill_domain_update(db: &Db, skill: &DomainSkill) -> Result<(), sqlx::Error> {
+    let manifest: serde_json::Value = serde_json::to_value(skill).expect("skill serializable");
+    skill_new_version(db, &skill.id, &manifest, "").await?;
+    Ok(())
+}
+
+pub async fn skill_domain_get(db: &Db, id: &str) -> Result<Option<DomainSkill>, sqlx::Error> {
+    let row: Option<(String,)> =
+        sqlx::query_as("SELECT manifest FROM skills WHERE id = ?1 AND deleted_at IS NULL")
+            .bind(id).fetch_optional(db).await?;
+    Ok(row.map(|(m,)| from_json(&m)))
+}
+
+pub async fn skill_domain_list(db: &Db, project_id: &str) -> Result<Vec<DomainSkill>, sqlx::Error> {
+    let rows: Vec<(String,)> =
+        sqlx::query_as("SELECT manifest FROM skills WHERE project_id = ?1 AND deleted_at IS NULL ORDER BY updated_at")
+            .bind(project_id).fetch_all(db).await?;
+    Ok(rows.into_iter().map(|(m,)| from_json(&m)).collect())
+}
+
+/// Historial de versiones como skills de dominio (desde los snapshots).
+pub async fn skill_domain_versions(db: &Db, skill_id: &str) -> Result<Vec<DomainSkill>, sqlx::Error> {
+    let rows: Vec<(String,)> =
+        sqlx::query_as("SELECT manifest FROM skill_versions WHERE skill_id = ?1 ORDER BY version")
+            .bind(skill_id).fetch_all(db).await?;
+    Ok(rows.into_iter().map(|(m,)| from_json(&m)).collect())
+}
+
+// ── Execution (dominio) sobre columnas tipadas ──────────────────────────────
+
+pub async fn execution_domain_create(db: &Db, ctx: &ExecutionContext) -> Result<(), sqlx::Error> {
+    let trigger = serde_json::to_value(&ctx.trigger).expect("trigger serializable");
+    let trigger = serde_json::to_string(&trigger).expect("trigger string");
+    sqlx::query(
+        "INSERT INTO executions (id, canvas_id, \"trigger\", status, node_states, variables, started_at, completed_at, result)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+    )
+    .bind(&ctx.execution_id).bind(&ctx.canvas_id).bind(trigger)
+    .bind(to_json(&ctx.status))
+    .bind(to_json(&ctx.node_states)).bind(to_json(&ctx.variables))
+    .bind(ctx.started_at).bind(ctx.completed_at)
+    .bind(ctx.result.as_ref().map(to_json))
+    .execute(db).await?;
+    Ok(())
+}
+
+pub async fn execution_domain_update(db: &Db, ctx: &ExecutionContext) -> Result<u64, sqlx::Error> {
+    let r = sqlx::query(
+        "UPDATE executions SET status = ?2, node_states = ?3, variables = ?4, completed_at = ?5, result = ?6 WHERE id = ?1",
+    )
+    .bind(&ctx.execution_id)
+    .bind(to_json(&ctx.status))
+    .bind(to_json(&ctx.node_states)).bind(to_json(&ctx.variables))
+    .bind(ctx.completed_at)
+    .bind(ctx.result.as_ref().map(to_json))
+    .execute(db).await?;
+    Ok(r.rows_affected())
+}
+
+pub async fn execution_domain_get(db: &Db, id: &str) -> Result<Option<ExecutionContext>, sqlx::Error> {
+    let row: Option<ExecRow> = sqlx::query_as(
+        "SELECT id, canvas_id, \"trigger\", status, node_states, variables, started_at, completed_at, result FROM executions WHERE id = ?1",
+    )
+    .bind(id)
+    .fetch_optional(db).await?;
+    Ok(row.map(ExecRow::into_domain))
+}
+
+pub async fn execution_domain_list(db: &Db) -> Result<Vec<ExecutionContext>, sqlx::Error> {
+    let rows: Vec<ExecRow> = sqlx::query_as(
+        "SELECT id, canvas_id, \"trigger\", status, node_states, variables, started_at, completed_at, result FROM executions ORDER BY started_at",
+    )
+    .fetch_all(db).await?;
+    Ok(rows.into_iter().map(ExecRow::into_domain).collect())
+}
+
+/// Fila de executions mapeada a ExecutionContext (los enums van como JSON serde).
+#[derive(sqlx::FromRow)]
+struct ExecRow {
+    id: String,
+    canvas_id: String,
+    trigger: String,
+    status: String,
+    node_states: String,
+    variables: String,
+    started_at: Option<i64>,
+    completed_at: Option<i64>,
+    result: Option<String>,
+}
+
+impl ExecRow {
+    fn into_domain(self) -> ExecutionContext {
+        ExecutionContext {
+            execution_id: self.id,
+            canvas_id: self.canvas_id,
+            trigger: from_json(&self.trigger),
+            variables: from_json(&self.variables),
+            node_states: from_json(&self.node_states),
+            started_at: self.started_at.unwrap_or(0),
+            completed_at: self.completed_at,
+            status: from_json(&self.status),
+            result: self.result.as_deref().map(from_json),
+        }
+    }
 }
 
 #[cfg(test)]

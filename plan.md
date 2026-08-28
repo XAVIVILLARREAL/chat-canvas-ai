@@ -194,9 +194,10 @@ scripts/
 
 ### §15.0 Quick Resume
 
-- **Última sesión**: 2026-08-27 — Fase **I.5 RTL (ar)** completada (i18n completo: 12 locales + RTL)
-- **Fase actual**: plan de i18n cerrado (I.1–I.5)
-- **Próxima acción**: (opcional) visual check humano del screenshot ar en `/tmp/ar-arabic.png` — verificación programática ya pasó
+- **Última sesión**: 2026-08-27 — i18n CERRADO (I.1–I.5) + **Etapa 0 slice 0.1 COMPLETO** (SQLite migraciones + repos + server wired)
+- **Fase actual**: Etapa 0 de [ETAPA-0-IMPLEMENTACION](docs/ETAPA-0-IMPLEMENTACION.md) — orden estricto 0.1→0.8
+- **Próxima acción**: **slice 0.2** — Postgres + RLS fail-closed (mismas migraciones a Postgres, seed, aislamiento 2 tenants)
+- **Progreso Etapa 0**: 0.1 ✅ · 0.7 ✅ · 0.2-0.6 pendientes · 0.8 (GATE 0) bloqueado
 - **Bloqueos activos**: Ninguno
 
 ### §15.1 Estado global

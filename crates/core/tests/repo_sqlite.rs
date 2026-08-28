@@ -7,6 +7,18 @@ use canvas_ai_core::repo;
 use serde_json::json;
 
 const DOWN_0001: &str = include_str!("../migrations/down/0001_init.sql");
+const DOWN_0002: &str = include_str!("../migrations/down/0002_workspace.sql");
+
+/// Ejecuta TODAS las reversas (0002 → 0001) y limpia el registro de sqlx.
+async fn run_all_down(db: &repo::Db) {
+    for stmt in DOWN_0002.split(';').map(str::trim).filter(|s| !s.is_empty()) {
+        sqlx::query(stmt).execute(db).await.unwrap();
+    }
+    for stmt in DOWN_0001.split(';').map(str::trim).filter(|s| !s.is_empty()) {
+        sqlx::query(stmt).execute(db).await.unwrap();
+    }
+    sqlx::query("DELETE FROM _sqlx_migrations").execute(db).await.unwrap();
+}
 
 #[tokio::test]
 async fn migracion_up_down_up_idempotente() {
@@ -18,12 +30,9 @@ async fn migracion_up_down_up_idempotente() {
     repo::project_create(&db, "p1", "proyecto").await.unwrap();
     db.close().await;
 
-    // down (reversa exacta sobre el mismo archivo + limpiar registro de sqlx)
+    // down (reversa exacta de TODAS las migraciones sobre el mismo archivo)
     let db = repo::open_raw(&url).await.unwrap();
-    for stmt in DOWN_0001.split(';').map(str::trim).filter(|s| !s.is_empty()) {
-        sqlx::query(stmt).execute(&db).await.unwrap();
-    }
-    sqlx::query("DELETE FROM _sqlx_migrations").execute(&db).await.unwrap();
+    run_all_down(&db).await;
     let tables: Vec<(String,)> = sqlx::query_as(
         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != '_sqlx_migrations'",
     )
@@ -118,7 +127,7 @@ async fn data_sobrevive_reinicio_del_server() {
     let db = repo::connect(&url).await.unwrap();
     assert_eq!(repo::project_list(&db).await.unwrap().len(), 1);
     assert_eq!(repo::message_list_by_session(&db, "s1").await.unwrap().len(), 1);
-    // migraciones NO se reaplican (idempotente por _sqlx_migrations)
+    // migraciones NO se reaplican (idempotente por _sqlx_migrations): 0001 + 0002
     let versiones: Vec<(i64,)> = sqlx::query_as("SELECT version FROM _sqlx_migrations").fetch_all(&db).await.unwrap();
-    assert_eq!(versiones.len(), 1);
+    assert_eq!(versiones.len(), 2);
 }
