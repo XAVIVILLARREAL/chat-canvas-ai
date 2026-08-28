@@ -209,6 +209,20 @@ export type MemoryEntry = {
   importance: number;
 };
 
+export type Message = {
+  cache_hits?: Record<string, unknown>;
+  content: string;
+  cost_usd?: Record<string, unknown>;
+  created_at: number;
+  id: string;
+  metadata: string;
+  model?: Record<string, unknown>;
+  role: string;
+  session_id: string;
+  tokens_completion?: Record<string, unknown>;
+  tokens_prompt?: Record<string, unknown>;
+};
+
 export type NodeCategory = "trigger" | "action" | "logic" | "data" | "a_i" | "m_c_p" | "agent" | "human" | "output";
 
 export type NodeConfig = {
@@ -485,6 +499,17 @@ export type Canvas = {
   viewport: Viewport;
 };
 
+export type ChatInSessionRequest = {
+  content: string;
+  model?: Record<string, unknown>;
+};
+
+export type ChatInSessionResponse = {
+  assistant_message: Message;
+  provider: string;
+  user_message: Message;
+};
+
 export type ChatRequest = {
   context?: Record<string, never>;
   message: string;
@@ -573,20 +598,6 @@ export type MCPServer = {
   updated_at: number;
 };
 
-export type Message = {
-  cache_hits?: Record<string, unknown>;
-  content: string;
-  cost_usd?: Record<string, unknown>;
-  created_at: number;
-  id: string;
-  metadata: string;
-  model?: Record<string, unknown>;
-  role: string;
-  session_id: string;
-  tokens_completion?: Record<string, unknown>;
-  tokens_prompt?: Record<string, unknown>;
-};
-
 export type Provider = {
   base_url?: Record<string, unknown>;
   created_at: number;
@@ -603,6 +614,11 @@ export type Provider = {
 export type ProviderTestResponse = {
   connected: boolean;
   error?: Record<string, unknown>;
+};
+
+export type SecretSettingRequest = {
+  key: string;
+  value: string;
 };
 
 export type Session = {

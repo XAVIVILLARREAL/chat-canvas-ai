@@ -286,3 +286,78 @@ async fn settings_cifradas_dump_sin_plaintext() {
         Some(json!({"key": KEY, "value": ""}))).await;
     assert_eq!(rev["value"], "otro-secreto-b");
 }
+
+// ─── A.3: chat con provider BYOK (mock) — user+assistant persistidos ────────
+
+async fn mock_chat_server(reply: &'static str) -> String {
+    let app = axum::Router::new().route(
+        "/v1/chat/completions",
+        axum::routing::post(move || async move {
+            axum::Json(json!({
+                "id": "chatcmpl-mock",
+                "choices": [{ "message": { "role": "assistant", "content": reply }, "finish_reason": "stop" }],
+                "usage": { "prompt_tokens": 4, "completion_tokens": 6 }
+            })
+        )
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+    format!("http://{addr}/v1")
+}
+
+#[tokio::test]
+async fn chat_con_provider_mock_persiste_conversacion() {
+    use base64::engine::general_purpose::STANDARD as B64;
+    use aes_gcm::aead::rand_core::RngCore;
+    let kek = {
+        let mut k = [0u8; 32];
+        aes_gcm::aead::OsRng.fill_bytes(&mut k);
+        B64.encode(k)
+    };
+    std::env::set_var("CANVAS_KEK", &kek);
+
+    let base = mock_chat_server("respuesta del provider mock").await;
+    let state = AppState::connect("sqlite::memory:").await.unwrap();
+    let app = create_router(state);
+
+    // provider BYOK (valida + cifra la key en el vault)
+    let (st, prov) = req_json(app.clone(), "POST", "/api/providers",
+        Some(json!({"provider_type": "generic", "name": "mock", "base_url": base, "api_key": "mock-key", "validate": false}))).await;
+    assert_eq!(st, StatusCode::OK, "{prov}");
+
+    // sesión + chat
+    let (_, ses) = req_json(app.clone(), "POST", "/api/sessions", Some(json!({"title": "chat A3"}))).await;
+    let sid = ses["id"].as_str().unwrap().to_string();
+
+    // sin provider configurado en OTRO proyecto → honesto 400
+    let (st, err) = req_json(app.clone(), "POST", "/api/sessions/nope/chat",
+        Some(json!({"content": "x"}))).await;
+    assert_eq!(st, StatusCode::NOT_FOUND);
+
+    let (st, chat) = req_json(app.clone(), "POST", &format!("/api/sessions/{sid}/chat"),
+        Some(json!({"content": "pregunta de prueba"}))).await;
+    assert_eq!(st, StatusCode::OK, "{chat}");
+    assert_eq!(chat["assistant_message"]["content"], "respuesta del provider mock");
+    assert_eq!(chat["user_message"]["content"], "pregunta de prueba");
+    assert_eq!(chat["provider"], "mock");
+
+    // conversación persistida: user + assistant (2 mensajes) + usage rollup
+    let (_, msgs) = req_json(app.clone(), "GET", &format!("/api/sessions/{sid}/messages"), None).await;
+    assert_eq!(msgs.as_array().unwrap().len(), 2);
+    assert_eq!(msgs[1]["model"], "mock");
+    // la key JAMÁS en ninguna respuesta
+    assert!(!chat.to_string().contains("mock-key"));
+}
+
+#[tokio::test]
+async fn chat_sin_provider_es_honesto_400() {
+    let state = AppState::connect("sqlite::memory:").await.unwrap();
+    let app = create_router(state);
+    let (_, ses) = req_json(app.clone(), "POST", "/api/sessions", Some(json!({"title": "sin provider"}))).await;
+    let sid = ses["id"].as_str().unwrap();
+    let (st, err) = req_json(app, "POST", &format!("/api/sessions/{sid}/chat"), Some(json!({"content": "x"}))).await;
+    assert_eq!(st, StatusCode::BAD_REQUEST, "sin provider debe ser 400 honesto");
+    let _ = err; // el body de error es texto plano ("sin provider…") — req_json lo trae Null
+}

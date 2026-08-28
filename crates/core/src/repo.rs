@@ -91,7 +91,7 @@ pub struct Session {
     pub deleted_at: Option<i64>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow, schemars::JsonSchema, specta::Type)]
+#[derive(Debug, Clone, serde::Serialize, sqlx::FromRow, schemars::JsonSchema, specta::Type, serde::Deserialize)]
 pub struct Message {
     pub id: String,
     pub session_id: String,

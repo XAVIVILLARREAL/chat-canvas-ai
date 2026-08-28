@@ -2541,6 +2541,114 @@
         "title": "CanvasNode",
         "type": "object"
       },
+      "ChatInSessionRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "title": "ChatInSessionRequest",
+        "type": "object"
+      },
+      "ChatInSessionResponse": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "Message": {
+            "properties": {
+              "cache_hits": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "content": {
+                "type": "string"
+              },
+              "cost_usd": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "id": {
+                "type": "string"
+              },
+              "metadata": {
+                "type": "string"
+              },
+              "model": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "role": {
+                "type": "string"
+              },
+              "session_id": {
+                "type": "string"
+              },
+              "tokens_completion": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "tokens_prompt": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "content",
+              "created_at",
+              "id",
+              "metadata",
+              "role",
+              "session_id"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "assistant_message": {
+            "$ref": "#/definitions/Message"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "user_message": {
+            "$ref": "#/definitions/Message"
+          }
+        },
+        "required": [
+          "assistant_message",
+          "provider",
+          "user_message"
+        ],
+        "title": "ChatInSessionResponse",
+        "type": "object"
+      },
       "ChatRequest": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "properties": {
@@ -3712,6 +3820,23 @@
           "connected"
         ],
         "title": "ProviderTestResponse",
+        "type": "object"
+      },
+      "SecretSettingRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ],
+        "title": "SecretSettingRequest",
         "type": "object"
       },
       "Session": {
@@ -7146,6 +7271,42 @@
         ]
       }
     },
+    "/api/sessions/{id}/chat": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatInSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatInSessionResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Chat con provider BYOK (persiste user+assistant)",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
     "/api/sessions/{id}/messages": {
       "get": {
         "responses": {
@@ -7203,6 +7364,64 @@
         "summary": "Agrega mensaje",
         "tags": [
           "sessions"
+        ]
+      }
+    },
+    "/api/settings/{project_id}/reveal": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretSettingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Descifra un setting (server-side)",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/{project_id}/secret": {
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretSettingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "summary": "Setting sensible CIFRADO (T.SEC)",
+        "tags": [
+          "settings"
         ]
       }
     },

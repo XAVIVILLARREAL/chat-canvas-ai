@@ -36,7 +36,28 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T | null> 
   }
 }
 
+export interface ChatTurn {
+  user_message: MessageInfo;
+  assistant_message: MessageInfo;
+  provider: string;
+}
+
 export const chatApi = {
+  /** Chat con provider BYOK (persiste user+assistant). `null` si no hay provider (400). */
+  chat: async (sessionId: string, content: string): Promise<ChatTurn | null> => {
+    try {
+      const res = await fetch(`${API}/api/sessions/${sessionId}/chat`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ content }),
+      });
+      if (res.status === 400) return null; // sin provider → fallback local
+      if (!res.ok) return null;
+      return (await res.json()) as ChatTurn;
+    } catch {
+      return null;
+    }
+  },
   listSessions: () => apiFetch<SessionInfo[]>('/api/sessions'),
   createSession: (title: string) =>
     apiFetch<SessionInfo>('/api/sessions', { method: 'POST', body: JSON.stringify({ title }) }),

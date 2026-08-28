@@ -44,10 +44,16 @@ export function useSendMessage(sessionId: string | null) {
   return useMutation({
     mutationFn: async (content: string) => {
       if (!sessionId) throw new Error('sin sesión');
+      // A.3: si hay provider BYOK, /chat responde user+assistant reales;
+      // sin provider → 400 → fallback: persiste solo el mensaje del usuario.
+      const turn = await chatApi.chat(sessionId, content);
+      if (turn) return [turn.user_message, turn.assistant_message];
       const m = await chatApi.sendMessage(sessionId, content);
       if (!m) throw new Error('gateway');
-      return m;
+      return [m];
     },
-    onSuccess: (m: MessageInfo) => qc.invalidateQueries({ queryKey: sessionKeys.messages(m.session_id) }),
+    onSuccess: (msgs: MessageInfo[]) => {
+      if (msgs[0]) qc.invalidateQueries({ queryKey: sessionKeys.messages(msgs[0].session_id) });
+    },
   });
 }

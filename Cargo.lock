@@ -595,9 +595,11 @@ name = "canvas-ai-core"
 version = "0.1.0"
 dependencies = [
  "aes-gcm",
+ "async-trait",
  "axum",
  "base64 0.22.1",
  "chrono",
+ "futures",
  "reqwest 0.12.28",
  "schemars 0.8.22",
  "serde",

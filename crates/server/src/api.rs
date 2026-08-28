@@ -11,7 +11,8 @@ use axum::{
     routing::{get, post, put},
     Router,
 };
-use canvas_ai_core::{domain::*, repo, vault};
+use canvas_ai_core::{domain::*, providers, repo, vault};
+use providers::AgentProvider;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -150,6 +151,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/sessions", get(list_sessions).post(create_session))
         .route("/api/sessions/:id", get(get_session).delete(delete_session))
         .route("/api/sessions/:id/messages", get(list_messages).post(create_message))
+        .route("/api/sessions/:id/chat", post(chat_in_session))
         
         // Projects como SCOPE (A.0) + settings con scopes Global→Proyecto
         .route("/api/projects", get(list_projects).post(create_project))
@@ -608,6 +610,102 @@ async fn reveal_setting(
         .await
         .map_err(vault_err)?;
     Ok(Json(serde_json::json!({ "key": req.key, "value": value })))
+}
+
+// ============================================================================
+// HANDLERS - CHAT con provider BYOK (A.3)
+// ============================================================================
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct ChatInSessionRequest {
+    pub content: String,
+    pub model: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, specta::Type)]
+pub struct ChatInSessionResponse {
+    pub user_message: repo::Message,
+    pub assistant_message: repo::Message,
+    pub provider: String,
+}
+
+/// Resuelve el primer provider habilitado del proyecto (key desde el vault).
+async fn resolve_provider(
+    state: &AppState,
+) -> Result<providers::OpenAICompatProvider, (StatusCode, String)> {
+    let list = repo::provider_list_by_project(&state.db, &state.project_id)
+        .await.map_err(|e| db_err(e))?;
+    let row = list
+        .iter()
+        .find(|p| p.enabled && p.key_ref.is_some())
+        .ok_or_else(|| (StatusCode::BAD_REQUEST, "sin provider BYOK configurado (créalo en /api/providers)".into()))?;
+    let key_ref = row.key_ref.clone().unwrap();
+    let api_key = vault::reveal_secret(&state.db, &key_ref, state.vault_ks.as_ref())
+        .await.map_err(vault_err)?;
+    let base_url = row
+        .base_url
+        .clone()
+        .or_else(|| providers::default_base_url(&row.provider_type).map(String::from))
+        .ok_or_else(|| (StatusCode::BAD_REQUEST, format!("provider '{}' sin base_url", row.provider_type)))?;
+    Ok(providers::OpenAICompatProvider::new(&row.name, &base_url, &api_key))
+}
+
+/// Chat en una sesión: persiste user → llama provider → persiste assistant.
+/// (Streaming UI llega en A.4; tool-calls → Reasonix en Etapa C.)
+async fn chat_in_session(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Json(req): Json<ChatInSessionRequest>,
+) -> ApiResult<ChatInSessionResponse> {
+    if repo::session_get(&state.db, &id).await.map_err(|e| db_err(e))?.is_none() {
+        return Err(not_found("Session"));
+    }
+    let provider = resolve_provider(&state).await?;
+    let model = req.model.clone().unwrap_or_else(|| "auto".to_string());
+
+    // 1) user message persistida
+    let user_msg = repo::message_create(
+        &state.db, &Uuid::new_v4().to_string(), &id, "user", &req.content,
+        None, None, None, None, &serde_json::json!({}),
+    ).await.map_err(|e| db_err(e))?;
+
+    // 2) historial → provider
+    let history = repo::message_list_by_session(&state.db, &id).await.map_err(|e| db_err(e))?;
+    let messages: Vec<providers::ChatMessage> = history
+        .iter()
+        .map(|m| providers::ChatMessage { role: m.role.clone(), content: m.content.clone() })
+        .collect();
+    let completion_req = providers::ChatCompletionRequest {
+        model,
+        messages,
+        max_tokens: None,
+        temperature: None,
+        stream: false,
+    };
+    let resp = provider.send_message(&completion_req).await.map_err(|e| {
+        error!("provider error: {e}");
+        (StatusCode::BAD_GATEWAY, format!("provider: {e}"))
+    })?;
+    let assistant_content = resp
+        .choices
+        .first()
+        .and_then(|c| c.message.content.clone())
+        .unwrap_or_default();
+
+    // 3) assistant message persistida + rollup de uso
+    let (pt, ct) = resp
+        .usage
+        .as_ref()
+        .map(|u| (u.prompt_tokens, u.completion_tokens))
+        .unwrap_or((0, 0));
+    let model_used = provider.name().to_string();
+    let assistant_msg = repo::message_create(
+        &state.db, &Uuid::new_v4().to_string(), &id, "assistant", &assistant_content,
+        Some(&model_used), Some(pt), Some(ct), None, &serde_json::json!({}),
+    ).await.map_err(|e| db_err(e))?;
+    repo::session_add_usage(&state.db, &id, pt + ct, 0.0).await.map_err(|e| db_err(e))?;
+
+    Ok(Json(ChatInSessionResponse { user_message: user_msg, assistant_message: assistant_msg, provider: model_used }))
 }
 
 // ============================================================================
@@ -1736,6 +1834,7 @@ const OPS: &[Op] = &[
     Op { method: "delete", path: "/api/sessions/{id}", summary: "Borra sesión (soft)", tag: "sessions", request: None, response: Some("Session") },
     Op { method: "get", path: "/api/sessions/{id}/messages", summary: "Mensajes de la sesión", tag: "sessions", request: None, response: Some("Message") },
     Op { method: "post", path: "/api/sessions/{id}/messages", summary: "Agrega mensaje", tag: "sessions", request: Some("CreateMessageRequest"), response: Some("Message") },
+    Op { method: "post", path: "/api/sessions/{id}/chat", summary: "Chat con provider BYOK (persiste user+assistant)", tag: "sessions", request: Some("ChatInSessionRequest"), response: Some("ChatInSessionResponse") },
 
     Op { method: "put", path: "/api/settings/{project_id}/secret", summary: "Setting sensible CIFRADO (T.SEC)", tag: "settings", request: Some("SecretSettingRequest"), response: None },
     Op { method: "post", path: "/api/settings/{project_id}/reveal", summary: "Descifra un setting (server-side)", tag: "settings", request: Some("SecretSettingRequest"), response: None },
@@ -1818,6 +1917,8 @@ pub fn build_openapi() -> serde_json::Value {
         ("CreateSessionRequest", schema_for!(CreateSessionRequest)),
         ("CreateMessageRequest", schema_for!(CreateMessageRequest)),
         ("SecretSettingRequest", schema_for!(SecretSettingRequest)),
+        ("ChatInSessionRequest", schema_for!(ChatInSessionRequest)),
+        ("ChatInSessionResponse", schema_for!(ChatInSessionResponse)),
         ("StreamEvent", schema_for!(repo::StreamEvent)),
         ("A2AAgentCard", schema_for!(A2AAgentCard)),
         ("A2ATask", schema_for!(A2ATask)),
